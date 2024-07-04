@@ -3,7 +3,7 @@ import MaxWidthWrapper from "./MaxWidthWrapper"
 import { Button, buttonVariants } from "./ui/button"
 import { ArrowRight } from "lucide-react"
 import { ModeToggle } from "./ModeToggle"
-
+import { signIn } from "next-auth/react"
 const Navbar = async () => {
   return (
     <nav className="fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background backdrop-blur-lg transition-all">
@@ -23,7 +23,7 @@ const Navbar = async () => {
               <ModeToggle />
             </div>
             <Button variant={"ghost"}>
-              <Link href="#">Login</Link>
+              <Link href="/signin">Login</Link>
             </Button>
             <Button
               variant={"default"}
