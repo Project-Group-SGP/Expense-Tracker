@@ -32,7 +32,7 @@ const Signin = () => {
   });
 
   function togglePasswordVisibility() {
-    setIsPasswordVisible((prevState: any) => !prevState);
+    setIsPasswordVisible((prevState: Boolean) => !prevState);
   }
   const router = useRouter();
   const email = useRef('');
@@ -40,12 +40,12 @@ const Signin = () => {
 
   const handleSubmitGoogle = async () =>{
     await signIn("google");
-    router.push('/');
+    // router.push('/');
   }
 
   const handleSubmitFacebook = async() =>{
     await signIn("facebook");
-    router.push('/');
+    //router.push('/');
   }
 
   const handleSubmit = async (e?: React.FormEvent<HTMLButtonElement>) => {
@@ -119,7 +119,7 @@ const Signin = () => {
                   name="password"
                   type={isPasswordVisible ? 'text' : 'password'}
                   id="password"
-                  placeholder="••••••••"
+                  placeholder="Enter you Password"
                   onChange={(e) => {
                     setRequiredError((prevState) => ({
                       ...prevState,
