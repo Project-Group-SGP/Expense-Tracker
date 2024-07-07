@@ -1,5 +1,4 @@
 "use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -67,12 +66,9 @@ export default function Signin(){
   };
 
    
-    // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
       setemailPassword(true);
       setCheckingPassword(true);
-      // Do something with the form values.
-      // ✅ This will be type-safe and validated.
       console.log(values);
     }
 
