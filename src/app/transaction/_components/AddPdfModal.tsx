@@ -6,32 +6,33 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
+  FormControl,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from "@/components/ui/button"
+import { TransactionPDF } from "../page"
 
 export default function AddPdfModal({
   isOpen,
   setIsOpen,
+  handleExtractTable,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  handleExtractTable: (values: TransactionPDF) => void
 }) {
   const formSchema = z.object({
     bank: z.string().min(1, "Please select a bank"),
-    file: z.any().refine((file) => file, "File is required"),
+    file: z.any().refine((file) => file instanceof File, "File is required"),
     password: z.string().min(1, "Password is required"),
   })
 
@@ -39,16 +40,19 @@ export default function AddPdfModal({
     resolver: zodResolver(formSchema),
     defaultValues: {
       bank: "",
-      file: "",
+      file: null,
       password: "",
     },
   })
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: {
+    bank: string
+    file: File | null
+    password: string
+  }): Promise<void> => {
     try {
-      console.log(data)
-      // Reset form or close modal after successful submission
       setIsOpen(false)
+      handleExtractTable(data as TransactionPDF)
     } catch (error) {
       console.error("Error submitting form:", error)
     }
@@ -86,92 +90,93 @@ export default function AddPdfModal({
             Import Transaction PDF
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className="py-2 text-base">
-          <Form {...formMethods}>
-            <form
-              onSubmit={formMethods.handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={formMethods.control}
-                name="bank"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormControl>
-                      <>
-                        <FormLabel>Select Bank</FormLabel>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex gap-3"
-                        >
-                          {bankOptions.map((option) => (
-                            <FormControl key={option.value}>
-                              <div className="flex items-center gap-1">
-                                <RadioGroupItem value={option.value} />
-                                <FormLabel>{option.label}</FormLabel>
-                              </div>
-                            </FormControl>
-                          ))}
-                        </RadioGroup>
-                        <FormMessage />
-                      </>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formMethods.control}
-                name="file"
-                render={({ field }) => (
-                  <div className="space-y-1">
+        <Form {...formMethods}>
+          <form
+            onSubmit={formMethods.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={formMethods.control}
+              name="bank"
+              render={({ field }) => (
+                <FormControl>
+                  <>
+                    <FormLabel>Select Bank</FormLabel>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex gap-3"
+                    >
+                      {bankOptions.map((option) => (
+                        <FormControl key={option.value}>
+                          <div className="flex items-center gap-1">
+                            <RadioGroupItem value={option.value} />
+                            <FormLabel>{option.label}</FormLabel>
+                          </div>
+                        </FormControl>
+                      ))}
+                    </RadioGroup>
+                    <FormMessage />
+                  </>
+                </FormControl>
+              )}
+            />
+            <FormField
+              control={formMethods.control}
+              name="file"
+              render={({ field }) => (
+                <FormControl>
+                  <>
                     <FormLabel>PDF file</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="application/pdf"
-                        {...field}
-                        className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                      />
-                    </FormControl>
+                    <Input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          field.onChange(file)
+                        }
+                      }}
+                      className="border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    />
                     <FormMessage />
-                  </div>
-                )}
-              />
-              <FormField
-                control={formMethods.control}
-                name="password"
-                render={({ field }) => (
-                  <div className="space-y-1">
+                  </>
+                </FormControl>
+              )}
+            />
+            <FormField
+              control={formMethods.control}
+              name="password"
+              render={({ field }) => (
+                <FormControl>
+                  <>
                     <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        {...field}
-                        className="border-gray-300 focus:border-green-500 focus:ring-green-500"
-                      />
-                    </FormControl>
+                    <Input
+                      type="password"
+                      {...field}
+                      className="border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    />
                     <FormMessage />
-                  </div>
-                )}
-              />
-              <div className="flex gap-3">
-                <Button
-                  type="submit"
-                  className="rounded-md bg-green-500 px-4 py-2 text-white"
-                >
-                  Submit
-                </Button>
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-md bg-gray-400 px-4 py-2 text-white"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogDescription>
+                  </>
+                </FormControl>
+              )}
+            />
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                className="rounded-md bg-green-500 px-4 py-2 text-white"
+              >
+                Submit
+              </Button>
+              <Button
+                onClick={() => setIsOpen(false)}
+                className="rounded-md bg-gray-400 px-4 py-2 text-white"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

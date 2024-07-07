@@ -1,12 +1,3 @@
-"use client"
-
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -15,102 +6,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Transaction } from "./page"
+import { cn } from "@/lib/utils"
+import CategoryDropdown from "./_components/CategoryDropDown"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data?: TData[]
-}
-
-function CategoryCell({
-  value,
-  onChange,
+export default function DataTable({
+  data,
+  changeCategory,
 }: {
-  value: string | null
-  onChange: (value: string) => void
+  data: Transaction[]
+  changeCategory: (id: number, category: string) => void
 }) {
-  const categories = [
-    "Select a Category",
-    "Groceries",
-    "Food",
-    "Entertainment",
-    "Other",
-  ]
   return (
-    <select
-      value={value || "Select a Category"}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {categories.map((category) => (
-        <option key={category} value={category}>
-          {category}
-        </option>
-      ))}
-    </select>
-  )
-}
-
-export function DataTable<TData, TValue>({
-  columns,
-  data = [],
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
-
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {cell.column.columnDef.header === "Category" ? (
-                      <CategoryCell
-                        value={cell.getValue() as string | null}
-                        //TODO: add setValue
-                        onChange={(newValue) => cell.setValue(newValue)}
-                      />
-                    ) : (
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
+    <>
+      {data.length > 0 ? (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
+              <TableHead>Date</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {data.map((transaction, index) => (
+              <TableRow key={index}>
+                <TableCell>{transaction.Date}</TableCell>
+                <TableCell>
+                  <CategoryDropdown
+                    id={index}
+                    changeCategory={changeCategory}
+                  />
+                </TableCell>
+                <TableCell
+                  className={cn("text-right", {
+                    "text-red-500": transaction.Amount < 0,
+                    "text-green-500": transaction.Amount > 0,
+                  })}
+                >
+                  {transaction.Amount > 0 && "+"}
+                  {transaction.Amount}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+        </Table>
+      )}
+    </>
   )
 }

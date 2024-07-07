@@ -1,46 +1,83 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { columns, Transaction } from "./columns"
-import { DataTable } from "./data-table"
 import React, { useState } from "react"
+import { Button } from "@/components/ui/button"
 import AddPdfModal from "./_components/AddPdfModal"
 import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
+import DataTable from "./data-table"
 
-type TransactionPDF = {
-  bank: String
+export type TransactionPDF = {
+  bank: string
   file: File
   password?: string
 }
+
+export type Transaction = {
+  Date: string
+  Category: string
+  Amount: number
+}
+
 export default function Page() {
   const [data, setData] = useState<Transaction[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
   const handleImportPDF = () => {
     setIsOpen(true)
   }
 
-  //   const handleExtractTable = (values: TransactionPDF) => {
-  //     const { data, mutate } = useMutation({
-  //       mutationKey: ["Extract-table"],
-  //       mutationFn: async () => {
-  //         const formdata = new FormData()
-  //         formdata.append("file", values.file, values.file.name)
-  //         formdata.append("bank", values.bank)
+  const { mutateAsync } = useMutation({
+    mutationKey: ["Extract-table"],
+    mutationFn: async (values: TransactionPDF) => {
+      try {
+        const formData = new FormData()
+        formData.append("file", values.file, values.file.name)
+        formData.append("bank", values.bank)
 
-  //         const requestOptions = {
-  //           method: "POST",
-  //           body: formdata,
-  //         }
-  //         const data = await fetch(
-  //           "http://localhost:5000/extract-tables",
-  //           requestOptions
-  //         )
-  //       },
-  //     })
-  //   }
+        const response = await axios.post(
+          "http://localhost:5000/extract-tables",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+
+        if (!response || !response.data) {
+          throw new Error(
+            `Failed to extract tables: ${response.status} ${response.statusText}`
+          )
+        }
+        console.log(response.data)
+        const dataWithCategory = response.data.table[0].map(
+          (transaction: Transaction) => ({
+            ...transaction,
+            Category: "Other",
+          })
+        )
+        setData(dataWithCategory)
+      } catch (error) {
+        console.error("Error extracting tables:", error)
+      }
+    },
+  })
+
+  const changeCategory = (index: number, newCategory: string) => {
+    setData((prevData) => {
+      const newData = [...prevData]
+      newData[index].Category = newCategory
+      return newData
+    })
+  }
 
   return (
     <>
-      <AddPdfModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AddPdfModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleExtractTable={mutateAsync}
+      />
       <div className="container mx-auto py-10">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Transactions</h1>
@@ -51,7 +88,7 @@ export default function Page() {
             Import Transaction PDF
           </Button>
         </div>
-        <DataTable columns={columns} data={data} />
+        <DataTable data={data} changeCategory={changeCategory} />
       </div>
     </>
   )
