@@ -161,16 +161,18 @@ export default function AddPdfModal({
                 </FormControl>
               )}
             />
-            <div className="flex gap-3">
+            <div className="flex w-full justify-between gap-4">
               <Button
                 type="submit"
-                className="rounded-md bg-green-500 px-4 py-2 text-white"
+                variant={"default"}
+                className="w-full rounded-md text-white"
               >
                 Submit
               </Button>
               <Button
                 onClick={() => setIsOpen(false)}
-                className="rounded-md bg-gray-400 px-4 py-2 text-white"
+                variant={"destructive"}
+                className="w-full rounded-md text-white"
               >
                 Cancel
               </Button>
