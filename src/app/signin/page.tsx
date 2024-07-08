@@ -1,9 +1,12 @@
 "use client"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { Passwordcmp } from "@/components/Passwordcmp"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -12,17 +15,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Mail } from "lucide-react"
-import { FaFacebook, FaGoogle } from "react-icons/fa"
-import { Passwordcmp } from "@/components/Passwordcmp"
 import { signIn } from "next-auth/react"
+import Link from "next/link"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { FaFacebook, FaGoogle } from "react-icons/fa"
+import { z } from "zod"
 
 
 const passwordValidation = new RegExp(
@@ -73,14 +74,14 @@ export default function Signin(){
     }
 
     return (
-      <section className=" flex h-screen items-center justify-center">
-      <Card className="mx-auto w-[70%] md:w-[70%] lg:w-[30%]">
+      <section className="flex h-screen items-center justify-center">
+      <Card className="mx-auto w-[70%]  md:w-[50%] lg:w-[30%]">
   <CardHeader>
-    <CardTitle className="text-xl">Signin to your Account</CardTitle>
+    <CardTitle className="text-xl">Sign in to your Account</CardTitle>
   </CardHeader>
   <CardContent className="pb-2">
   <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
           <FormField 
             control={form.control}
             name="email"
@@ -140,7 +141,12 @@ export default function Signin(){
               >
               {facebookPassword?<Loader2 className="mr-2 h-4 w-4 animate-spin" />:<FaFacebook className="mr-2 h-4 w-4" />}FaceBook
             </Button>
-          </div>
+    </div>
+    <div className='grid grid-cols-1 w-full justify-center' >
+            <Button variant={"link"}>
+               <Link href="/signup">Don't have Account?</Link>
+            </Button>
+            </div>  
   </CardContent>
 </Card>
    </section>   

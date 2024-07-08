@@ -18,18 +18,18 @@ const Navbar = async () => {
           </span>
         </Link>
         <div className="flex space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
-          <div className="flex gap-4">
-            <div className="hidden md:block lg:block">
+          <div className="flex">
+            <div className="hidden  md:block  lg:block">
               <ModeToggle />
             </div>
             <Button variant={"ghost"}>
-              <Link href="/signin">Login</Link>
+              {/* <Link href="/signin">Login</Link> */}
             </Button>
             <Button
               variant={"default"}
               className="flex h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-700"
             >
-              Signup
+              <Link href="/signin"> Get Started </Link> 
               <ArrowRight className="ml-1.5 h-5 w-5" />
             </Button>
           </div>
