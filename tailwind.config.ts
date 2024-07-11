@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { DEFAULT_CIPHERS } from "tls";
 
 const config = {
   darkMode: ["class"],
@@ -52,6 +53,12 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sarthak_d:{
+          DEFAULT:"#201c14"
+        },
+        sarthak_L:{
+          DEFAULT:"white"
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

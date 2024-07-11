@@ -12,3 +12,64 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum CategoryTypes {
+  Other
+  Bills
+  Food
+  Entertainment
+  Transportation
+  EMI 
+  Heathcare
+  Education
+  Investment
+  Shopping
+  Fuel
+  Groceries
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  budget        Decimal 
+  accounts      Account[]
+  categories    Category[]
+  expenses      Expense[]       
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  userId      String  
+  category    CategoryTypes
+  budget      Decimal
+  user        User     @relation(fields:[userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  category    CategoryTypes
+  amount      Decimal
+  user        User     @relation(fields:[userId], references: [id], onDelete: Cascade)
+}

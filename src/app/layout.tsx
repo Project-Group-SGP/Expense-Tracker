@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
-import { Providers, ThemeProvider } from "@/components/Providers"
+import { Providers } from "@/components/Providers/Providers"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -18,16 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <Providers>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
