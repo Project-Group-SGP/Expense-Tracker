@@ -5,6 +5,7 @@ import AddPdfModal from "./_components/AddPdfModal"
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
 import DataTable from "./data-table"
+import MaxWidthWrapper from "@/components/MaxWidthWrapper"
 
 export type TransactionPDF = {
   bank: string
@@ -78,18 +79,20 @@ export default function Page() {
         setIsOpen={setIsOpen}
         handleExtractTable={mutateAsync}
       />
-      <div className="container mx-auto py-10">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Transactions</h1>
-          <Button
-            onClick={handleImportPDF}
-            className="rounded-md bg-primary px-4 py-2 text-white"
-          >
-            Import Transaction PDF
-          </Button>
+      <MaxWidthWrapper>
+        <div className="container mx-auto py-10">
+          <div className="mb-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Transactions</h1>
+            <Button
+              onClick={handleImportPDF}
+              className="rounded-md bg-primary px-4 py-2 text-white"
+            >
+              Import Transaction PDF
+            </Button>
+          </div>
+          <DataTable data={data} changeCategory={changeCategory} />
         </div>
-        <DataTable data={data} changeCategory={changeCategory} />
-      </div>
+      </MaxWidthWrapper>
     </>
   )
 }
