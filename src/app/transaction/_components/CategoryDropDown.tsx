@@ -6,20 +6,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { CategoryTypes } from "@prisma/client"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
-const LABEL_MAP: Record<string, string> = {
+const LABEL_MAP: Record<string, keyof typeof CategoryTypes> = {
   Other: "Other",
-  Groceries: "Groceries",
-  Entertainment: "Entertainment",
+  Bills: "Bills",
   Food: "Food",
+  Entertainment: "Entertainment",
   Transportation: "Transportation",
+  EMI: "EMI",
   Healthcare: "Healthcare",
   Education: "Education",
+  Investment: "Investment",
   Shopping: "Shopping",
-  Personal: "Personal",
+  Fuel: "Fuel",
+  Groceries: "Groceries",
 }
 
 export default function CategoryDropdown({
@@ -33,18 +38,18 @@ export default function CategoryDropdown({
   const [selectedStatus, setSelectedStatus] = useState(initialStatus)
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex w-full items-center justify-between md:w-60"
-          >
-            {LABEL_MAP[selectedStatus]}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="p-0">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="flex w-full items-center justify-between md:w-60"
+        >
+          {LABEL_MAP[selectedStatus]}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="h-52 w-40 p-0 md:w-60">
+        <ScrollArea className="h-52">
           {Object.keys(LABEL_MAP).map((status) => (
             <DropdownMenuItem
               key={status}
@@ -68,8 +73,8 @@ export default function CategoryDropdown({
               {LABEL_MAP[status]}
             </DropdownMenuItem>
           ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+        </ScrollArea>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
