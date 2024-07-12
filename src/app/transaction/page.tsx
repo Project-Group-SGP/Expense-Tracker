@@ -36,6 +36,7 @@ export default function Page() {
         const formData = new FormData()
         formData.append("file", values.file, values.file.name)
         formData.append("bank", values.bank)
+        formData.append("password", values.password || "")
 
         const response = await axios.post(
           "http://localhost:5000/extract-tables",
@@ -52,12 +53,22 @@ export default function Page() {
             `Failed to extract tables: ${response.status} ${response.statusText}`
           )
         }
-        const dataWithCategory = response.data.table[0].map(
-          (transaction: Transaction) => ({
-            ...transaction,
-            Category: "Other",
-          })
-        )
+        let dataWithCategory = []
+        if (response.data.bank === "ICICI") {
+          dataWithCategory = response.data.table[0].map(
+            (transaction: Transaction) => ({
+              ...transaction,
+              Category: "Other",
+            })
+          )
+        } else {
+          dataWithCategory = response.data.table.map(
+            (transaction: Transaction) => ({
+              ...transaction,
+              Category: "Other",
+            })
+          )
+        }
         setData(dataWithCategory)
       } catch (error) {
         throw error
