@@ -98,6 +98,7 @@ export default function Page() {
       newData[index].Description = newDescription
       return newData
     })
+    toast.success("Transaction updated successfully")
   }
 
   const deleteTransaction = () => {
