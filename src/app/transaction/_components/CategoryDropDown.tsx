@@ -42,7 +42,7 @@ export default function CategoryDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex w-full items-center justify-between md:w-60"
+          className="flex items-center justify-between md:w-60"
         >
           {LABEL_MAP[selectedStatus]}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
