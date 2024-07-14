@@ -53,10 +53,9 @@ export default function Page() {
         )
 
         if (!response || !response.data) {
-          throw new Error(
-            `Failed to extract tables: ${response.status} ${response.statusText}`
-          )
+          throw new Error("Failed to extract transactions: No data received")
         }
+
         const dataWithCategory = response.data.table.map(
           (transaction: Transaction) => ({
             ...transaction,
@@ -64,17 +63,37 @@ export default function Page() {
             Description: "",
           })
         )
+        toast.success("Transactions extracted successfully")
         setData(dataWithCategory)
       } catch (error) {
         throw error
       }
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unknown error occurred."
-      toast.error(`There was an error extracting data: ${errorMessage}`)
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          if (error.response.status === 400) {
+            toast.error(`Bad Request: ${error.response.data.error}`)
+          } else if (error.response.status === 500) {
+            toast.error(`Server Error: ${error.response.data.error}`)
+          } else {
+            toast.error(`Error: ${error.response.data.error}`)
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          toast.error(
+            "No response received from server. Please ensure that the pdf and password are correct."
+          )
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          toast.error(`Error: ${error.message}`)
+        }
+      } else {
+        // Non-Axios error
+        toast.error(`An unexpected error occurred: ${error.message}`)
+      }
     },
   })
 
@@ -102,7 +121,7 @@ export default function Page() {
   }
 
   const deleteTransaction = () => {
-    if (!indexToBeDeleted) return
+    if (typeof indexToBeDeleted !== "number") return
 
     const index = indexToBeDeleted
     setData((prevData) => prevData.filter((_, i) => i !== index))
@@ -124,7 +143,7 @@ export default function Page() {
       />
       <MaxWidthWrapper>
         <div className="container mx-auto py-10">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="sticky top-0 z-10 mb-4 flex items-center justify-between bg-white py-4">
             <h1 className="text-2xl font-bold">Transactions</h1>
             <div>
               {data.length > 0 ? (

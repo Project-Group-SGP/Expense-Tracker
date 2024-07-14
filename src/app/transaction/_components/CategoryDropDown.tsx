@@ -42,13 +42,13 @@ export default function CategoryDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center justify-between md:w-60"
+          className="flex w-44 items-center justify-between"
         >
           {LABEL_MAP[selectedStatus]}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="h-52 w-40 p-0 md:w-60">
+      <DropdownMenuContent className="h-52 w-44 p-0">
         <ScrollArea className="h-52">
           {Object.keys(LABEL_MAP).map((status) => (
             <DropdownMenuItem
