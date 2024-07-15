@@ -32,7 +32,7 @@ const Navbar = () => {
 
           {/* navbar logo */}
           <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="/SpendWise-5.png" className="h-9" alt="SpendWise Logo" />
+            <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />
             <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
               spend<span className="text-primary">wise</span>
             </span>
@@ -101,7 +101,7 @@ const Navbar = () => {
 
             <Button
               variant={"default"}
-              className="flex h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-700"
+              className="flex h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 "
             >
               <Link href="/signin"> Get Started </Link>
               <ArrowRight className="ml-1.5 h-5 w-5" />

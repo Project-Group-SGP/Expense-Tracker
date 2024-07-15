@@ -1,21 +1,19 @@
-"use client"
-
-import Card from "../_components/Card"
-import { DatePickerWithRange } from "../_components/DatePickerWithRange"
-import Navbar from "../_components/Navbar"
+import Card from "./_components/Card"
+import { DatePickerWithRange } from "./_components/DatePickerWithRange"
+import Navbar from "./_components/Navbar"
 import * as React from "react"
-import PageTitle from "../_components/PageTitle"
+import PageTitle from "./_components/PageTitle"
 import { IndianRupee, MoveDownIcon, MoveDownRight, MoveUpIcon, PiggyBank, PiggyBankIcon } from "lucide-react"
-import { Cardcontent } from "../_components/Card"
+import { Cardcontent } from "./_components/Card"
 
-import ChartBar_1 from "../_components/ChartBar_1"
-import { ChartBar_2 } from "../_components/ChartBar_2"
-import { ChartBar_3 } from "../_components/ChartBar_3"
+import ChartBar_1 from "./_components/ChartBar_1"
+import { ChartBar_2 } from "./_components/ChartBar_2"
+import { ChartBar_3 } from "./_components/ChartBar_3"
 
-import ChartPie_1 from "../_components/ChartPie_1"
-import ChartPie_2 from "../_components/ChartPie_2"
-import ChartPie_3 from "../_components/ChartPie_3"
-import { ChartBar_4 } from "../_components/ChartBar_4"
+import ChartPie_1 from "./_components/ChartPie_1"
+import ChartPie_2 from "./_components/ChartPie_2"
+import ChartPie_3 from "./_components/ChartPie_3"
+import { ChartBar_4 } from "./_components/ChartBar_4"
 
 const Dashboard = () => {
   return (

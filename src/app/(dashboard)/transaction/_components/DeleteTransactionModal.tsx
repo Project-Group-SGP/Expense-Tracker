@@ -20,7 +20,7 @@ function DeleteTransactionModal({
   }
   return (
     <Dialog onOpenChange={closeModal} open={isOpen}>
-      <DialogContent className="w-80">
+      <DialogContent className="w-80 z-[6000]">
         <DialogHeader>
           <div className="relative flex w-full flex-col items-center justify-center p-4">
             <div>

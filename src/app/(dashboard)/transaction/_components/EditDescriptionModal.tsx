@@ -41,7 +41,7 @@ export function EditDescriptionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCloseModal}>
-      <DialogContent className="w-96">
+      <DialogContent className="w-96 z-[6000]">
         <DialogHeader>
           <DialogTitle>Edit Description</DialogTitle>
           <DialogDescription>

@@ -141,9 +141,9 @@ export default function Page() {
         handleCloseModal={setIsDeleteModalOpen}
         handleDeleteTransaction={deleteTransaction}
       />
-      <MaxWidthWrapper>
+      <MaxWidthWrapper className="mt-8">
         <div className="container mx-auto py-10">
-          <div className="sticky top-0 z-10 mb-4 flex items-center justify-between bg-white py-4">
+          <div className=" z-50 mb-4 flex items-center justify-between py-4 dark:bg-zinc-950 bg-white">
             <h1 className="text-2xl font-bold">Transactions</h1>
             <div>
               {data.length > 0 ? (
