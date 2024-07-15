@@ -52,7 +52,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function ChartBar_1() {
+export default function ChartPie_1() {
   return (<>
 
         <ChartContainer

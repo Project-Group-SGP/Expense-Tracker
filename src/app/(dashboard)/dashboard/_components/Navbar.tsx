@@ -51,11 +51,11 @@ const Navbar = () => {
                 className="mb-8 cursor-pointer text-3xl"
               />
               <div className="flex flex-col items-center justify-center gap-4">
-                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
-                  home
+                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/dashboard">
+                  dashboard
                 </Link>
-                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/spend">
-                  spend
+                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/transaction">
+                  transastion
                 </Link>
                 <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/about">
                   about
@@ -71,22 +71,22 @@ const Navbar = () => {
         {/* navbar menu */}
         <div className="hidden md:flex justify-center gap-11">
           <ul>
+            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/dashboard">
+              dashboard
+            </Link>
+          </ul>
+          <ul>
+            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/transaction">
+            transaction
+            </Link>
+          </ul>
+          <ul>
             <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
-              home
-            </Link>
-          </ul>
-          <ul>
-            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/spend">
-              spend
-            </Link>
-          </ul>
-          <ul>
-            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/about">
               about
             </Link>
           </ul>
           <ul>
-            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/contact">
+            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
               contact
             </Link>
           </ul>
@@ -103,7 +103,7 @@ const Navbar = () => {
               variant={"default"}
               className="flex h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary"
             >
-              <Link href="/signin"> Get Started </Link>
+              <Link href="/"> Logout </Link>
               <ArrowRight className="ml-1.5 h-5 w-5" />
             </Button>
           </div>

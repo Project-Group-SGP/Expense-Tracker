@@ -57,10 +57,10 @@ const Navbar = () => {
                 <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/spend">
                   spend
                 </Link>
-                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/about">
+                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
                   about
                 </Link>
-                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/contact">
+                <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
                   contact
                 </Link>
               </div>
@@ -81,12 +81,12 @@ const Navbar = () => {
             </Link>
           </ul>
           <ul>
-            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/about">
+            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
               about
             </Link>
           </ul>
           <ul>
-            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/contact">
+            <Link className="hover:text-primary hover:border-b-2 hover:border-green-600" href="/">
               contact
             </Link>
           </ul>

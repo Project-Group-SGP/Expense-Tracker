@@ -32,7 +32,7 @@ const chartData = [
   { month: "September", spend: 41004 }
 ];
 
-const ChartBar_1 = () => {
+export const ChartBar_1 = () => {
   return (
     <ChartContainer config={chartConfig} className="h-full w-full">
       <ResponsiveContainer width="100%" height={300}>
@@ -56,6 +56,5 @@ const ChartBar_1 = () => {
   );
 };
 
-export default ChartBar_1;
 
 

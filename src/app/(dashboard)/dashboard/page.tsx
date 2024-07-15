@@ -1,19 +1,19 @@
 import Card from "./_components/Card"
 import { DatePickerWithRange } from "./_components/DatePickerWithRange"
-import Navbar from "./_components/Navbar"
+
 import * as React from "react"
 import PageTitle from "./_components/PageTitle"
 import { IndianRupee, MoveDownIcon, MoveDownRight, MoveUpIcon, PiggyBank, PiggyBankIcon } from "lucide-react"
 import { Cardcontent } from "./_components/Card"
 
-import ChartBar_1 from "./_components/ChartBar_1"
-import { ChartBar_2 } from "./_components/ChartBar_2"
+
 import { ChartBar_3 } from "./_components/ChartBar_3"
 
-import ChartPie_1 from "./_components/ChartPie_1"
+
 import ChartPie_2 from "./_components/ChartPie_2"
-import ChartPie_3 from "./_components/ChartPie_3"
-import { ChartBar_4 } from "./_components/ChartBar_4"
+import { Dropdown_chart_1 } from "./_components/Dropdown_chart_1"
+import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
+
 
 const Dashboard = () => {
   return (
@@ -57,23 +57,16 @@ const Dashboard = () => {
         </section>
         {/* charts */}
         <section className="grid gap-4 w-full transition-all text-bl md:grid-cols-2 sm:grid-cols-1 lg:grid-cols-2">
+          {/* chart 1 */}
           <Cardcontent className="p-0">
-            <p className="p-4 font-semibold">Transactions</p>
-            <div className="p-4">
-              {/* <ChartBar_1 /> */}
-              <ChartBar_3 />
-              {/* <ChartBar_4 /> */}
-            </div>
+              <Dropdown_chart_1 />
           </Cardcontent>
-          <Cardcontent >
-            <p className="p-4 font-semibold">Expenses</p>
-            <div>
-              {/* <ChartPie_1/> */}
-              <ChartPie_2 />
-              {/* <ChartBar_2 /> */}
-              {/* <ChartPie_3/> */}
-            </div>
+
+            {/* chart 2 */}
+          <Cardcontent className="p-0">
+            <Dropdown_chart_2 />
           </Cardcontent>
+
         </section>
       </div>
     </>
