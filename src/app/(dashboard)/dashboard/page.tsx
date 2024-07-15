@@ -23,6 +23,10 @@ const Dashboard = () => {
         {/* Title */}
         <PageTitle title="Dashboard" />
 
+        <div>
+          Welcome Back , Ayush 👋
+        </div>
+
         {/* Date picker */}
         <div className="my-4">
           <DatePickerWithRange />
