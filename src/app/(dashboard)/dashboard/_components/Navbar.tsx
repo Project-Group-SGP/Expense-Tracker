@@ -1,45 +1,48 @@
-"use client";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { ModeToggle } from "@/components/ModeToggle";
-import { CiMenuFries } from "react-icons/ci";
-import { IoClose } from "react-icons/io5";
-import clsx from "clsx";
+"use client"
+import { ModeToggle } from "@/components/ModeToggle"
+import { Button } from "@/components/ui/button"
+import clsx from "clsx"
+import { ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { CiMenuFries } from "react-icons/ci"
+import { IoClose } from "react-icons/io5"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/transaction", label: "Transaction" },
   { href: "/", label: "About" },
   { href: "/", label: "Contact" },
-];
+]
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   if (!mounted) {
-    return null;
+    return null
   }
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => setIsOpen(!isOpen)
 
   return (
-    <nav className="fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background backdrop-blur-lg transition-all dark:bg-dark-background dark:border-dark-border">
+    <nav className="dark:bg-dark-background dark:border-dark-border fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background backdrop-blur-lg transition-all">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <CiMenuFries
-            className="text-2xl cursor-pointer md:hidden"
+            className="cursor-pointer text-2xl md:hidden"
             onClick={toggleMenu}
             aria-label="Toggle mobile menu"
           />
 
-          <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
             <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />
             <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
               spend<span className="text-primary">wise</span>
@@ -48,9 +51,13 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex justify-center gap-11">
+        <div className="hidden justify-center gap-11 md:flex">
           {navLinks.map(({ href, label }) => (
-            <Link key={href} className="hover:text-primary hover:border-b-2 hover:border-green-600" href={href}>
+            <Link
+              key={href}
+              className="hover:border-b-2 hover:border-green-600 hover:text-primary"
+              href={href}
+            >
               {label}
             </Link>
           ))}
@@ -73,7 +80,7 @@ const Navbar = () => {
               {navLinks.map(({ href, label }) => (
                 <Link
                   key={href}
-                  className="hover:text-primary hover:border-b-2 hover:border-green-600"
+                  className="hover:border-b-2 hover:border-green-600 hover:text-primary"
                   href={href}
                   onClick={toggleMenu}
                 >
@@ -101,7 +108,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

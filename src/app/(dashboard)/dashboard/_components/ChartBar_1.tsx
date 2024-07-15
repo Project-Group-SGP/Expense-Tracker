@@ -1,16 +1,14 @@
-import React from "react";
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig
+  ChartTooltipContent
 } from "@/components/ui/chart";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  XAxis,
-  ResponsiveContainer
+  ResponsiveContainer,
+  XAxis
 } from "recharts";
 
 const chartConfig = {

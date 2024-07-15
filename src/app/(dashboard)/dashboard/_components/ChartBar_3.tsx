@@ -1,13 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 import {
   ChartContainer,
-  ChartTooltipContent,
-  ChartConfig,
   ChartTooltip,
+  ChartTooltipContent
 } from "@/components/ui/chart";
 
 const chartData = [
