@@ -66,7 +66,13 @@ export default function Page() {
         toast.success("Transactions extracted successfully")
         setData(dataWithCategory)
       } catch (error) {
-        throw error
+        if (axios.isAxiosError(error) && !error.response) {
+          toast.error(
+            "Network error. Please check your connection and try again."
+          )
+        } else {
+          throw error // Re-throw the error so it's caught by the onError callback
+        }
       }
     },
     onError: (error: any) => {
@@ -143,7 +149,7 @@ export default function Page() {
       />
       <MaxWidthWrapper className="mt-8">
         <div className="container mx-auto py-10">
-          <div className=" z-50 mb-4 flex items-center justify-between py-4 dark:bg-zinc-950 bg-white">
+          <div className="z-50 mb-4 flex items-center justify-between bg-white py-4 dark:bg-zinc-950">
             <h1 className="text-2xl font-bold">Transactions</h1>
             <div>
               {data.length > 0 ? (
