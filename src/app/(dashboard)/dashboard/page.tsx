@@ -8,6 +8,11 @@ import PageTitle from "./_components/PageTitle"
 import { Dropdown_chart_1 } from "./_components/Dropdown_chart_1"
 import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 
+
+import { Button } from "@/components/ui/button"
+import { Newincome } from "./_components/Newincome"
+import { NewExpense } from "./_components/NewExpense"
+
 const Dashboard = () => {
   return (
     <>
@@ -15,7 +20,16 @@ const Dashboard = () => {
         {/* Title */}
         <PageTitle title="Dashboard" />
 
-        <div>Welcome Back , Ayush 👋</div>
+        <div className="flex w-full flex-wrap items-center justify-between gap-4">
+          <p className="mr-auto">Welcome Back, Ayush 👋</p>
+          <div className="ml-auto flex gap-2">
+           
+
+            <Newincome />
+
+            <NewExpense />
+          </div>
+        </div>
 
         {/* Date picker */}
         <div className="my-4">
@@ -27,7 +41,7 @@ const Dashboard = () => {
           <Card
             label="Remaining"
             icon={PiggyBankIcon}
-            amount="0"
+            amount="150000"
             description="Last month"
             iconclassName="text-blue-600"
             descriptionColor="text-blue-400"
@@ -35,7 +49,7 @@ const Dashboard = () => {
           <Card
             label="Income"
             icon={MoveUpIcon}
-            amount="0"
+            amount="295000"
             description="Last month"
             iconclassName="text-green-600"
             descriptionColor="text-green-400"
@@ -43,7 +57,7 @@ const Dashboard = () => {
           <Card
             label="Expenses"
             icon={MoveDownIcon}
-            amount="0"
+            amount="95000"
             description="Last month"
             iconclassName="text-red-600"
             descriptionColor="text-red-400"

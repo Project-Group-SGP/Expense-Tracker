@@ -52,7 +52,7 @@ const Navbar = () => {
               variant={"default"}
               className="flex h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary"
             >
-              <Link href="/">Logout</Link>
+              <Link href="/signup">Get Started</Link>
               <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
             </Button>
           </div>

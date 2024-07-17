@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { IndianRupee, LucideIcon } from "lucide-react"
 import React from "react"
+import AnimatedCounter from "./AnimatedCounter"
 
 type CardProps = {
   label: string
@@ -24,7 +25,7 @@ export default function Card(props: CardProps) {
         {/* amount */}
         <h2 className={cn("flex items-center gap-1 text-2xl font-semibold",props.iconclassName)}>
           <IndianRupee className="text-2xl" />
-          {props.amount}
+          <AnimatedCounter from={0} to={Number(props.amount)} />
         </h2>
         <p className={cn("text-xs text-gray-500",props.descriptionColor)}>{props.description}</p>
       </section>
