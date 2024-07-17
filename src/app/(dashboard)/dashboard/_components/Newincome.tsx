@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import * as z from "zod"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,15 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 import {
   Select,
@@ -39,6 +40,7 @@ import {
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import NewCategoryDialog from "./NewCategoryDialog"
 
 const defaultCategories = [
   "EMI",
@@ -81,6 +83,11 @@ export function Newincome() {
   const handleSubmit = (data: FormData) => {
     console.log(data)
   }
+
+  const [categories, setCategories] = useState(defaultCategories)
+  // const [newCategory, setNewCategory] = useState("")
+  // const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false)
+
 
   return (
     <Dialog>
@@ -150,25 +157,32 @@ export function Newincome() {
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-2">
                     <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent position="popper" side="top" align="start">
-                        {defaultCategories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex space-x-2">
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent
+                          position="popper"
+                          side="bottom"
+                          align="start"
+                        >
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                       <NewCategoryDialog />   
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -229,3 +243,4 @@ export function Newincome() {
     </Dialog>
   )
 }
+

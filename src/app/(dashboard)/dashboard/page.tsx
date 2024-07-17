@@ -49,7 +49,7 @@ const Dashboard = () => {
           <Card
             label="Income"
             icon={MoveUpIcon}
-            amount="295000"
+            amount="2000"
             description="Last month"
             iconclassName="text-green-600"
             descriptionColor="text-green-400"
