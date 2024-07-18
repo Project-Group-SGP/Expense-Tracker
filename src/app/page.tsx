@@ -70,21 +70,6 @@ export default async function Home() {
       <Navbar />
 
       <MaxWidthWrapper>
-<<<<<<< HEAD
-        <div className="m-8 flex flex-col-reverse items-center justify-center gap-8 md:flex-row md:gap-16">
-          <div className="mt-4 p-4 text-center md:text-left">
-            <p className="text-xl font-bold mb-5 md:text-2xl">
-              Track your spending, unleash your saving!
-              <br />
-              Transform expenses into financial freedom!
-            </p>
-            <Link
-              href="/auth/signup"
-              className="hover:bg-primary-dark  rounded-lg bg-primary px-6 py-2 text-white transition-colors"
-            >
-              Start Your Journey
-            </Link>
-=======
         <section className="px-3 pt-28 md:px-0 lg:px-0">
           <div className="flex flex-col-reverse items-center justify-between gap-12 pt-10 md:flex-row">
             <div className="max-w-xl">
@@ -117,7 +102,6 @@ export default async function Home() {
                 alt="Financial management illustration"
               />
             </div>
->>>>>>> b4b290c081d84ceb50ec115b0283765b7c9135e0
           </div>
         </section>
       </MaxWidthWrapper>
