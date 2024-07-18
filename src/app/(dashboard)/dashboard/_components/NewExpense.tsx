@@ -39,6 +39,8 @@ import {
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import { toast,Toaster } from "sonner"
+import { useState } from "react"
 
 const defaultCategories = [
   "EMI",
@@ -78,18 +80,30 @@ export function NewExpense() {
     },
   })
 
+  // handle submit
   const handleSubmit = (data: FormData) => {
     console.log(data)
+    setOpen(false)
+    // toast for success
+    toast.error("Expense added successfully", {
+      style: { background: 'red-500', color: 'white' },
+      closeButton: true,
+      icon: null,
+      duration: 3000,
+    })
   }
 
+  const [open, setOpen] = useState(false)
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <div>
         {/* New Income button */}
         <DialogTrigger asChild>
           <Button
             className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
             variant="outline"
+            onClick={() => setOpen(true)}
           >
             New Expense 😤
           </Button>
@@ -218,7 +232,8 @@ export function NewExpense() {
               />
 
               <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className="w-full sm:w-auto">
+                <Button type="submit" className=" w-full sm:w-auto"
+                 >
                   Add Expense
                 </Button>
               </DialogFooter>

@@ -98,6 +98,7 @@ export default function DataTable({
         }
         onSave={onSave}
       />
+      
       {data.length > 0 ? (
         <div className="relative overflow-x-auto">
           <Table className="min-w-96">

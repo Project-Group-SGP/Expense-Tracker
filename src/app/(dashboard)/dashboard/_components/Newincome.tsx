@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { toast } from "sonner" 
 import {
   Dialog,
   DialogContent,
@@ -80,9 +81,21 @@ export function Newincome() {
     },
   })
 
+  const [open, setOpen] = useState(false);
+  // handle submit
   const handleSubmit = (data: FormData) => {
-    console.log(data)
+    console.log("into handle submit");
+    
+    console.log( "New income data " + data);
+    setOpen(false);
+    // toast for success
+    toast.success("income added successfully", {
+      closeButton: true,
+      icon:'🤑',
+      duration: 3000,
+    })
   }
+
 
   const [categories, setCategories] = useState(defaultCategories)
   // const [newCategory, setNewCategory] = useState("")
@@ -90,7 +103,8 @@ export function Newincome() {
 
 
   return (
-    <Dialog>
+    // useing state to open dialog
+    <Dialog open={open} onOpenChange={setOpen}>
       <div>
         {/* New Income button */}
         <DialogTrigger asChild>

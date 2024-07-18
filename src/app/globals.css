@@ -72,7 +72,6 @@ html {
   background: transparent; /* Optional: just make scrollbar invisible */
 }
 
-
 /* charts */
 @layer base {
   :root {
