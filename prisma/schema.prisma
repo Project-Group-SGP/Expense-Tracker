@@ -14,10 +14,13 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  budget        Decimal
+  budget        Decimal?
   accounts      Account[]
   categories    Category[]
   expenses      Expense[]
+  isTwoFactorEnable Boolean @default(false)
+  twoFactorConfirmation TwoFactorConfirmation?
+  @@map("users")
 }
 
 model Account {
@@ -67,4 +70,27 @@ enum CategoryTypes {
   Shopping
   Fuel
   Groceries
+}
+
+enum TokenTypes {
+  EmailVerification
+  PasswordReset
+  TwoFactor
+}
+
+model Tokens {
+  id String @id @default(cuid())
+  email String
+  token String @unique
+  expires DateTime
+  type    TokenTypes
+  @@unique([email,token,type])
+}
+
+model TwoFactorConfirmation{
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
+  @@unique([userId])
 }

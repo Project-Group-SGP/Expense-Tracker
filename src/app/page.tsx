@@ -19,7 +19,7 @@ export default async function Home() {
               Transform expenses into financial freedom!
             </p>
             <Link
-              href="/signup"
+              href="/auth/signup"
               className="hover:bg-primary-dark  rounded-lg bg-primary px-6 py-2 text-white transition-colors"
             >
               Start Your Journey
