@@ -158,7 +158,7 @@ export default async function Home() {
       </MaxWidthWrapper>
 
       <MaxWidthWrapper className="mt-24">
-        <section className="py-16">
+        <section>
           <div className="text-center">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
               Ready to Take Control?
