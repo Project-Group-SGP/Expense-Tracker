@@ -4,17 +4,16 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import MobileNav from "./MobileNav"
 
-
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/spend", label: "Spend" },
   { href: "/", label: "About" },
   { href: "/", label: "Contact" },
-];
+]
 
 const Navbar = () => {
   return (
-    <nav className="dark:bg-dark-background dark:border-dark-border fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background backdrop-blur-lg transition-all">
+    <nav className="dark:bg-dark-background/70 dark:border-dark-border fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <MobileNav />
