@@ -8,14 +8,13 @@ import PageTitle from "./_components/PageTitle"
 import { Dropdown_chart_1 } from "./_components/Dropdown_chart_1"
 import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 
-
 import { Button } from "@/components/ui/button"
 import { Newincome } from "./_components/Newincome"
 import { NewExpense } from "./_components/NewExpense"
 
 const Dashboard = () => {
   return (
-    <>
+    <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
       <div className="mt-20 flex w-full flex-col gap-5 px-4">
         {/* Title */}
         <PageTitle title="Dashboard" />
@@ -23,8 +22,6 @@ const Dashboard = () => {
         <div className="flex w-full flex-wrap items-center justify-between gap-4">
           <p className="mr-auto">Welcome Back, Ayush 👋</p>
           <div className="ml-auto flex gap-2">
-           
-
             <Newincome />
 
             <NewExpense />
@@ -76,7 +73,7 @@ const Dashboard = () => {
           </Cardcontent>
         </section>
       </div>
-    </>
+    </div>
   )
 }
 
