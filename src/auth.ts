@@ -6,6 +6,8 @@ import { getUserById } from "./data/user";
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation";
  
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(db),
+  session: { strategy: "jwt" },
   events:{
     async linkAccount({user}){
       await db.user.update({
@@ -35,12 +37,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       console.log({Sessiontoken:token,session});
       // id of our user is in token.sub 
 
-      // if(token.sub && session.user) 
-      //   session.user.id = token.sub;
+      if(token.sub && session.user) 
+        session.user.id = token.sub;
       
 
-      // if(session.user)
-      //   session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;   
+      if(session.user)
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;   
     },
 
     // Action to tack when user signin/login
@@ -73,8 +75,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     }
   },
-  adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
 
   ...authConfig,
 

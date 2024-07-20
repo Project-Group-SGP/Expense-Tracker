@@ -10,7 +10,7 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation";
-
+import { AuthError } from "next-auth";
 
 
 export const Signin = async(values:z.infer<typeof SigninSchema>) => {
@@ -81,18 +81,18 @@ export const Signin = async(values:z.infer<typeof SigninSchema>) => {
     }
   }
 
-  return {success:"Successfully SignIN"};
-  // try{
-  //   await signIn("credentials",{
-  //     email,password,redirectTo:DEFAULT_LOGIN_REDIRECT})
-  // }catch(e:any){
-  //   if(e){
-  //     switch(e.type){
-  //       case "CredentialsSignin":
-  //         return {error:"Invalid credentials!"}
-  //       default:
-  //         return {error:"something went wrong!"}
-  //     }
-  //   }
-  // }
+  // return {success:"Successfully SignIN"};
+  try{
+    await signIn("credentials",{
+      email,password,redirectTo:DEFAULT_LOGIN_REDIRECT})
+  }catch(e) {
+    if(e instanceof AuthError){
+      switch(e.type){
+        case "CredentialsSignin":
+          return {error:"Invalid credentials!"}
+        default:
+          return {error:"something went wrong!"}
+      }
+    }
+  }
 }
