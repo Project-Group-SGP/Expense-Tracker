@@ -97,6 +97,7 @@ export default async function Home() {
             <div className="hidden w-full max-w-md md:block lg:block">
               <Image
                 src="/main_page.png"
+                priority={true}
                 width={900}
                 height={900}
                 alt="Financial management illustration"
@@ -111,14 +112,14 @@ export default async function Home() {
           <h2 className="text-center text-4xl font-extrabold text-gray-900 dark:text-white">
             Why Spendwise?
           </h2>
-          <div className="mt-7 grid grid-cols-1 gap-12 px-3 md:grid-cols-3 md:px-0 lg:px-0">
+          <div className="mt-7 grid min-w-[774px] grid-cols-1 gap-12 px-3 md:grid-cols-3 md:px-0 lg:px-0">
             {features.map((feature, index) => (
               <div
-                key={index}
+                key={"features" + index}
                 className="rounded-lg p-8 shadow-lg transition-transform hover:scale-105 dark:bg-gray-800"
               >
                 <div className="mb-4 flex items-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
+                  <div className="flex h-12 w-12 min-w-12 items-center justify-center rounded-full bg-primary text-white">
                     <feature.icon className="h-6 w-6" />
                   </div>
                   <h3 className="ml-4 text-2xl font-bold text-gray-900 dark:text-white">
@@ -142,7 +143,7 @@ export default async function Home() {
           <div className="mt-12 grid grid-cols-1 gap-8 px-3 md:grid-cols-2 md:px-0 lg:grid-cols-3 lg:px-0">
             {testimonials.map((testimonial, index) => (
               <div
-                key={index}
+                key={"testimonials" + index}
                 className="rounded-lg p-6 shadow-md dark:bg-gray-800"
               >
                 <p className="mb-4 italic text-gray-700 dark:text-gray-300">
@@ -191,7 +192,7 @@ export default async function Home() {
           <div className="mt-12 grid grid-cols-1 gap-8 pb-8 md:grid-cols-2">
             {faqs.map((faq, index) => (
               <div
-                key={index}
+                key={"faqs" + index}
                 className="rounded-lg border p-6 dark:border-gray-700"
               >
                 <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">

@@ -1,5 +1,5 @@
-import type { Config } from "tailwindcss";
-import { DEFAULT_CIPHERS } from "tls";
+import type { Config } from "tailwindcss"
+import { DEFAULT_CIPHERS } from "tls"
 
 const config = {
   darkMode: ["class"],
@@ -53,12 +53,22 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sarthak_d:{
-          DEFAULT:"#201c14"
+        sarthak_d: {
+          DEFAULT: "#201c14",
         },
-        sarthak_L:{
-          DEFAULT:"white"
-        }
+        sarthak_L: {
+          DEFAULT: "white",
+        },
+      },
+      screens: {
+        tablet: "640px",
+        // => @media (min-width: 640px) { ... }
+
+        laptop: "1024px",
+        // => @media (min-width: 1024px) { ... }
+
+        desktop: "1280px",
+        // => @media (min-width: 1280px) { ... }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -82,6 +92,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+} satisfies Config
 
-export default config;
+export default config

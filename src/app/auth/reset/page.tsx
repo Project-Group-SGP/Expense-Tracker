@@ -1,11 +1,12 @@
-import React from "react";
-import { ResetpasswordForm } from "../../../components/auth/reset-password-form";
+import React from "react"
+import { ResetpasswordForm } from "../../../components/auth/reset-password-form"
 
-const resetPasswordPage = () => {
-  return <>
-    <ResetpasswordForm />
-  </>
+const resetPasswordPage = async () => {
+  return (
+    <>
+      <ResetpasswordForm />
+    </>
+  )
 }
 
-
-export default resetPasswordPage;
+export default resetPasswordPage

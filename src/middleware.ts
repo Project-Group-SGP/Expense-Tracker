@@ -18,6 +18,15 @@ export default auth((req): any => {
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
+  const routeExists =
+    isApiAuthRoute ||
+    isPublicRoute ||
+    isAuthRoute ||
+    nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
+
+  if (!routeExists) {
+    return NextResponse.redirect(new URL("/404", nextUrl))
+  }
 
   if (isApiAuthRoute) {
     return null
