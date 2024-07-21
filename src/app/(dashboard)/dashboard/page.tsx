@@ -11,8 +11,11 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { Button } from "@/components/ui/button"
 import { Newincome } from "./_components/Newincome"
 import { NewExpense } from "./_components/NewExpense"
+import { currentUserServer } from "@/lib/auth"
 
-const Dashboard = () => {
+const Dashboard = async () => {
+  const user = await currentUserServer()
+  console.log("In Dashboard", user)
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
       <div className="mt-20 flex w-full flex-col gap-5 px-4">

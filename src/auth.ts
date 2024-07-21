@@ -48,8 +48,6 @@ export const {
     },
     // Modify the session / Action to take while generation of session
     async session({ token, session }) {
-      console.log({ Sessiontoken: token, session })
-
       if (token.sub && session.user) {
         session.user.id = token.sub
       }
@@ -63,7 +61,6 @@ export const {
     // Action to take when user sign in / login
     async signIn({ user, account }) {
       // Allow OAuth without email verification
-      console.log("signIn", user, account)
       if (account?.provider !== "credentials") return true
 
       try {

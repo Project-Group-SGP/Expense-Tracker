@@ -13,11 +13,20 @@ const { auth } = NextAuth(authConfig)
 export default auth((req): any => {
   const { nextUrl } = req
   const isLoggedIn = !!req.auth
-  console.log("Logged In", isLoggedIn)
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
+
+  const routeExists =
+    isApiAuthRoute ||
+    isPublicRoute ||
+    isAuthRoute ||
+    nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
+
+  if (!routeExists) {
+    return NextResponse.redirect(new URL("/404", nextUrl))
+  }
 
   if (isApiAuthRoute) {
     return null
@@ -39,5 +48,5 @@ export default auth((req): any => {
 
 // Optionally, don't invoke Middleware on some paths
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.*\\..*|_next|404).*)", "/", "/(api|trpc)(.*)"],
 }

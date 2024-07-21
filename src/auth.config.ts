@@ -1,10 +1,10 @@
-import { DefaultSession, NextAuthConfig } from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import { SigninSchema } from "./schemas"
-import { getUserByEmail } from "./data/user"
 import bcrypt from "bcryptjs"
-import Google from "next-auth/providers/google"
+import { NextAuthConfig } from "next-auth"
+import Credentials from "next-auth/providers/credentials"
 import Facebook from "next-auth/providers/facebook"
+import Google from "next-auth/providers/google"
+import { getUserByEmail } from "./data/user"
+import { SigninSchema } from "./schemas"
 
 // Notice this is only an object, not a full Auth.js instance
 const authOptions: NextAuthConfig = {
@@ -35,12 +35,12 @@ const authOptions: NextAuthConfig = {
       },
     }),
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
     Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID || "",
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
   ],
 } satisfies NextAuthConfig
