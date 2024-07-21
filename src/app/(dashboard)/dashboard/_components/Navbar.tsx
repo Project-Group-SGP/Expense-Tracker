@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
-import { signOut } from "@/auth"
+import { logout } from "@/actions/auth/logout"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -50,12 +50,7 @@ const Navbar = () => {
               <ModeToggle />
             </div>
             <form
-              action={async () => {
-                "use server"
-                await signOut({
-                  redirectTo: "/",
-                })
-              }}
+              action={logout}
             >
               <Button
                 variant="default"
