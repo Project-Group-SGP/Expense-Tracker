@@ -19,12 +19,14 @@ import { useState, useTransition } from "react";
 import { RegisterSchema } from "@/schemas";
 import { Register } from "@/actions/auth/signup";
 import { Loader2, Mail } from "lucide-react";
+import { Passwordcmp } from "../Passwordcmp";
 
 export const RegisterForm = () => {
 
   const [error,setError]=useState<string|undefined>("");
   const [success,setSuccess] = useState<string|undefined>("");
   const [isPending, startTransition] =useTransition();
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver:zodResolver(RegisterSchema),
@@ -108,11 +110,18 @@ export const RegisterForm = () => {
                     Password
                   </FormLabel>
                   <FormControl>
-                    <Input 
-                      {...field}
-                      placeholder="Enter your password"
-                      type="password"
-                    />
+                  <div className="relative">
+                        <Input
+                          placeholder="Enter you Password"
+                          {...field}
+                          disabled={isPending}
+                          type={isPasswordVisible ? "text" : "password"}
+                        />
+                        <Passwordcmp
+                          isPasswordVisible={isPasswordVisible}
+                          setisPasswordVisible={setIsPasswordVisible}
+                        />
+                      </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

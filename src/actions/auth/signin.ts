@@ -1,98 +1,100 @@
 "use server"
-import { SigninSchema } from "@/schemas";
+import { SigninSchema } from "@/schemas"
 import { signIn } from "@/auth"
-import * as z from 'zod';
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { getUserByEmail } from "@/data/user";
-import { generateTwoFactorToken, generateVerificationToken } from "@/lib/tokens";
-import { sendTwoFactorTokenEmail, sendVerificationEmail } from "@/lib/mail";
-import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
-import { db } from "@/lib/db";
-import bcrypt from "bcryptjs";
-import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation";
-import { AuthError } from "next-auth";
+import * as z from "zod"
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
+import { getUserByEmail } from "@/data/user"
+import { generateTwoFactorToken, generateVerificationToken } from "@/lib/tokens"
+import { sendTwoFactorTokenEmail, sendVerificationEmail } from "@/lib/mail"
+import { getTwoFactorTokenByEmail } from "@/data/two-factor-token"
+import { db } from "@/lib/db"
+import bcrypt from "bcryptjs"
+import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation"
+import { AuthError } from "next-auth"
 
-
-export const Signin = async(values:z.infer<typeof SigninSchema>) => {
-  
-  const validationeddFields = SigninSchema.safeParse(values);
+export const Signin = async (values: z.infer<typeof SigninSchema>) => {
+  const validationeddFields = SigninSchema.safeParse(values)
 
   if (validationeddFields.error)
-    return {error:"Invalid fields!",success:""};
+    return { error: "Invalid fields!", success: "" }
 
-  const {email , password, code} =validationeddFields.data;
+  const { email, password, code } = validationeddFields.data
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmail(email)
 
-  if(!existingUser || !existingUser.email || !existingUser.password)
-    return {error:"Email does not exist"};
+  if (!existingUser || !existingUser.email || !existingUser.password)
+    return { error: "Email does not exist" }
 
-  if(!existingUser.emailVerified){
-    const verificationToken = await generateVerificationToken(existingUser.email);
+  if (!existingUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(
+      existingUser.email
+    )
 
-    await sendVerificationEmail(verificationToken.email,verificationToken.token);
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    )
 
-    return {success:"Conformation emial sent!!"}
+    return { success: "Confirmation email sent!!" }
   }
 
+  const check = await bcrypt.compare(password, existingUser.password)
 
-  const check = await bcrypt.compare(password, existingUser.password);
+  if (!check) return { error: "Invalid Password" }
 
-  if(!check)
-    return {error:"Invalid Password"};
+  if (existingUser.isTwoFactorEnable && existingUser.email) {
+    if (code) {
+      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email)
 
-  if(existingUser.isTwoFactorEnable && existingUser.email){
+      if (!twoFactorToken) return { error: "Invalid code!" }
 
-    if(code){
-      const twoFactorToken= await getTwoFactorTokenByEmail(existingUser.email);
+      if (twoFactorToken.token !== code) return { error: "Invalid code!" }
 
-      if(!twoFactorToken)
-        return {error:"Invalid code!"};
+      const hasExpired = new Date(twoFactorToken.expires) < new Date()
 
-      if(twoFactorToken.token!==code)
-        return {error:"Invalid code!"};
-      
-
-      const hasExpired = new Date(twoFactorToken.expires) < new Date();
-
-      if(hasExpired)
-          return {error:"Token Has Expired!"};
+      if (hasExpired) return { error: "Token Has Expired!" }
 
       await db.tokens.delete({
-        where:{id:twoFactorToken.id,type:"TwoFactor"}
-      });
+        where: { id: twoFactorToken.id, type: "TwoFactor" },
+      })
 
-      const existingConformation = await getTwoFactorConformationByUserId(existingUser.id);
+      const existingConformation = await getTwoFactorConformationByUserId(
+        existingUser.id
+      )
 
-      if(existingConformation)
+      if (existingConformation)
         await db.twoFactorConfirmation.delete({
-          where:{id:existingConformation.id}
-        });
-
-        await db.twoFactorConfirmation.create({
-          data:{userId:existingUser.id}
+          where: { id: existingConformation.id },
         })
-    }else{
-      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
 
-      await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token);
+      await db.twoFactorConfirmation.create({
+        data: { userId: existingUser.id },
+      })
+    } else {
+      const twoFactorToken = await generateTwoFactorToken(existingUser.email)
 
-      return {twoFactor:true}
+      await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
+
+      return { twoFactor: true }
     }
   }
 
-  // return {success:"Successfully SignIN"};
-  try{
-    await signIn("credentials",{
-      email,password,redirectTo:DEFAULT_LOGIN_REDIRECT})
-  }catch(e) {
-    if(e instanceof AuthError){
-      switch(e.type){
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: DEFAULT_LOGIN_REDIRECT,
+    })
+  } catch (e: any) {
+    console.error("Error during signIn:", e)
+    if (e instanceof AuthError) {
+      switch (e.type) {
         case "CredentialsSignin":
-          return {error:"Invalid credentials!"}
+          return { error: "Invalid credentials!" }
         default:
-          return {error:"something went wrong!"}
+          return { error: "Something went wrong!" }
       }
     }
+    throw e
   }
 }
