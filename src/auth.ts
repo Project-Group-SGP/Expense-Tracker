@@ -60,35 +60,35 @@ export const {
     },
     // Action to take when user sign in / login
     async signIn({ user, account }) {
-      // Allow OAuth without email verification
-      if (account?.provider !== 'credentials' && !user.id) {
-        return true;
-      }
+      // // Allow OAuth without email verification
+      // if (account?.provider !== 'credentials' && !user.id) {
+      //   return true;
+      // }
 
-      // For OAuth sign-in with existing email
-      if (account?.provider !== 'credentials' && user.email) {
-        const existingUser = await db.user.findUnique({
-          where: { email: user.email },
-        });
+      // // For OAuth sign-in with existing email
+      // if (account?.provider !== 'credentials' && user.email) {
+      //   const existingUser = await db.user.findUnique({
+      //     where: { email: user.email },
+      //   });
 
-        // If user exists, link the new OAuth account
-        if (existingUser) {
-          await db.account.create({
-            data: {
-              userId: existingUser.id,
-              type: account?.type + "",
-              provider: account?.provider +"",
-              providerAccountId: account?.providerAccountId+"",
-              access_token: account?.access_token,
-              token_type: account?.token_type,
-              scope: account?.scope,
-            },
-          });
-          return true;
-        }
-      }
+      //   // If user exists, link the new OAuth account
+      //   if (existingUser) {
+      //     await db.account.create({
+      //       data: {
+      //         userId: existingUser.id,
+      //         type: account?.type + "",
+      //         provider: account?.provider +"",
+      //         providerAccountId: account?.providerAccountId+"",
+      //         access_token: account?.access_token,
+      //         token_type: account?.token_type,
+      //         scope: account?.scope,
+      //       },
+      //     });
+      //     return true;
+      //   }
+      // }
 
-      // if (account?.provider != "credentials") return true
+      if (account?.provider != "credentials") return true
 
       try {
         const existingUser = await getUserById(user.id || "")
