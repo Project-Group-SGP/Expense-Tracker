@@ -36,18 +36,16 @@ export default auth((req): any => {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
     }
-    return null;
+    return null
   }
 
   if (!isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/auth/signin", nextUrl))
   }
 
-  return null;
+  return null
 })
 
-// Optionally, don't invoke Middleware on some paths
 export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
-  // matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 }
