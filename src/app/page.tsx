@@ -95,9 +95,8 @@ export default async function Home() {
               </Link>
             </div>
             <div className="hidden w-full max-w-md md:block lg:block">
-              <Image
+              <img
                 src="/main_page.png"
-                priority={true}
                 width={900}
                 height={900}
                 alt="Financial management illustration"
@@ -112,14 +111,14 @@ export default async function Home() {
           <h2 className="text-center text-4xl font-extrabold text-gray-900 dark:text-white">
             Why Spendwise?
           </h2>
-          <div className="mt-7 grid min-w-[774px] grid-cols-1 gap-12 px-3 md:grid-cols-3 md:px-0 lg:px-0">
+          <div className="mt-7 grid grid-cols-1 gap-12 px-3 md:px-0 lg:grid-cols-3 lg:px-0">
             {features.map((feature, index) => (
               <div
                 key={"features" + index}
                 className="rounded-lg p-8 shadow-lg transition-transform hover:scale-105 dark:bg-gray-800"
               >
                 <div className="mb-4 flex items-center">
-                  <div className="flex h-12 w-12 min-w-12 items-center justify-center rounded-full bg-primary text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                     <feature.icon className="h-6 w-6" />
                   </div>
                   <h3 className="ml-4 text-2xl font-bold text-gray-900 dark:text-white">
