@@ -96,6 +96,7 @@ export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
         });
         onSuccessfulAdd(); // Call this to refresh the total income
         setOpen(false);
+        form.reset();
       } else {
         throw new Error("Income not added");
       }

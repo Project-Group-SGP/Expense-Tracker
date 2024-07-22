@@ -105,6 +105,7 @@ export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
     
         onSuccessfulAdd(); // Call this to refresh the total income
         setOpen(false);
+        form.reset();
       } else {
         throw new Error("Expense not added");
       }
