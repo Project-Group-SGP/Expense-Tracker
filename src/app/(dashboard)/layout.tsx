@@ -1,3 +1,4 @@
+import { FacebookRedirectCleaner } from "@/components/FacebookRedirectCleaner"
 import Navbar from "./dashboard/_components/Navbar"
 
 export default function RootLayout({
@@ -7,6 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <>
+      <FacebookRedirectCleaner />
       <Navbar />
       {children}
     </>

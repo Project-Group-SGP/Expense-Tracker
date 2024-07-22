@@ -48,15 +48,17 @@ const Navbar = () => {
             <div className="hidden md:block lg:block">
               <ModeToggle />
             </div>
-            <Button
-              variant="default"
-              className={cn(
-                "hidden h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary md:flex lg:flex"
-              )}
-            >
-              <Link href="/auth/signup">Get Started</Link>
-              <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
-            </Button>
+            <Link href="/auth/signup">
+              <Button
+                variant="default"
+                className={cn(
+                  "hidden h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary md:flex lg:flex"
+                )}
+              >
+                Get Started
+                <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
