@@ -87,7 +87,7 @@ export default async function Home() {
                 realistic budgets, and achieve your financial goals with ease.
               </div>
               <Link
-                href="/signup"
+                href="/auth/signup"
                 className="hover:bg-primary-dark mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-colors"
               >
                 Start Your Journey
@@ -169,7 +169,7 @@ export default async function Home() {
             </p>
             <div className="mt-8 flex justify-center">
               <Link
-                href="/signup"
+                href="/auth/signup"
                 className="hover:bg-primary-dark inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-lg font-medium text-white transition-colors"
               >
                 Get Started for Free
