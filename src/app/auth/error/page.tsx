@@ -3,8 +3,9 @@ import { ErrorCard } from "../../../components/auth/error-card";
 
 const AuthError = () => {
   return (
-    <ErrorCard
-     />
+    <div className="h-screen w-screen flex justify-center items-center content-center">
+      <ErrorCard/>
+    </div>
   );
 }
 

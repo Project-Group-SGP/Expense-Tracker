@@ -31,7 +31,7 @@ export function Dropdown_chart_1() {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 w-max-[400px]">
         <p className="font-semibold">Transactions</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

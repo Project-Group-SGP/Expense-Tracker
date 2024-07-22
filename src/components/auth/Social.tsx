@@ -1,25 +1,27 @@
 "use client";
 
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { Button } from "../ui/button";
 import { signIn } from "next-auth/react";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useTheme } from "next-themes";
 
-export const Social = () => {
+export const Social = ({disabled,setDisabled}:{disabled:boolean,setDisabled:any}) => {
   const [googlePassword, setgooglePassword] = useState<boolean>(false);
-  const [facebookPassword, setfacebookPassword] = useState<boolean>(false);
-  const onClick = (provider:"google"|"facebook") => {
-    if(provider==="google"){
-      setgooglePassword(true);
-    }else{
-      setfacebookPassword(true);
-    }
-    signIn(provider,{
+  const {theme} = useTheme();
+  const [Theme,setTheme] = useState<string>(theme as string);
+  console.log(theme=="dark"," theme:",theme);
+  const onClick = () => {
+    // setDisabled(true);
+    setgooglePassword(true);
+    signIn("google",{
       callbackUrl:DEFAULT_LOGIN_REDIRECT
     });
+
+    // setDisabled(false);
   }
   return <>
       <div className="relative mt-4 w-full">
@@ -32,22 +34,15 @@ export const Social = () => {
           </span>
         </div>
       </div>
-      <div className='grid grid-cols-2 w-full' >
+      <div className='grid grid-cols-1 w-full' >
         <Button
           className="my-3 w-full mb-2" 
-          onClick={()=>onClick("google")}
-          variant="ghost"
+          onClick={()=>onClick()}
+          variant={Theme=="dark" ?"ghost" :"outline"}
+          disabled={disabled}
           >
-          {googlePassword?<Loader2 className="mr-2 h-4 w-4 animate-spin" />:<FaGoogle className="mr-2 h-4 w-4" />}
+          {googlePassword?<Loader2 className="mr-2 h-4 w-4 animate-spin" />:<FcGoogle className="mr-2 h-4 w-4" />}
             Google
-        </Button>
-        <Button
-          className="my-3 w-full mb-2"
-          onClick={()=>onClick("facebook")}
-          variant="ghost"
-          >
-          {facebookPassword?<Loader2 className="mr-2 h-4 w-4 animate-spin" />:<FaFacebook className="mr-2 h-4 w-4" />}
-            FaceBook
         </Button>
       </div>
 </>

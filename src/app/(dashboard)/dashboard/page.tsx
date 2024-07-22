@@ -66,7 +66,7 @@ const Dashboard = async () => {
         {/* charts */}
         <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
           {/* chart 1 */}
-          <Cardcontent className="p-0">
+          <Cardcontent className="p-0 w-max-[400px] w-min-[300px]">
             <Dropdown_chart_1 />
           </Cardcontent>
 

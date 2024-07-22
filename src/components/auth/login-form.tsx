@@ -30,13 +30,13 @@ export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [isPending, startTransition] = useTransition()
-
+  const [isDisabled,setDisabled] = useState<boolean>(false);
   const searchparams = useSearchParams()
   const urlError =
     searchparams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use with diffrent provider!"
+      ? "Email already in use with different provider!"
       : ""
-  console.log(urlError)
+  console.log(urlError);
 
   const form = useForm<z.infer<typeof SigninSchema>>({
     resolver: zodResolver(SigninSchema),
@@ -50,6 +50,7 @@ export const LoginForm = () => {
     setError("")
     setSuccess("")
     startTransition(() => {
+      setDisabled(true);
       Signin(values)
         .then((data) => {
           if (data?.error) {
@@ -67,6 +68,7 @@ export const LoginForm = () => {
         .catch(() => {
           setError("Something went wrong")
         })
+        setDisabled(false);
     })
   }
   return (
@@ -74,6 +76,8 @@ export const LoginForm = () => {
       headerLabel="Sign in to your Account"
       backButtonLable="Don't have an account?"
       backButtonHref="/auth/signup"
+      disabled={isDisabled}
+      setDisabled={setDisabled} 
       showSocial
     >
       <Form {...form}>
@@ -82,7 +86,7 @@ export const LoginForm = () => {
             <FormField
               control={form.control}
               name="code"
-              disabled={isPending}
+              disabled={isDisabled}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Two Factor Code</FormLabel>
@@ -90,7 +94,7 @@ export const LoginForm = () => {
                     <Input
                       {...field}
                       placeholder="123456"
-                      disabled={isPending}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -103,7 +107,7 @@ export const LoginForm = () => {
               <FormField
                 control={form.control}
                 name="email"
-                disabled={isPending}
+                disabled={isDisabled}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
@@ -111,7 +115,7 @@ export const LoginForm = () => {
                       <Input
                         placeholder="xyz@gmail.com"
                         {...field}
-                        disabled={isPending}
+                        disabled={isDisabled}
                       />
                     </FormControl>
                     <FormMessage />
@@ -121,7 +125,7 @@ export const LoginForm = () => {
               <FormField
                 control={form.control}
                 name="password"
-                disabled={isPending}
+                disabled={isDisabled}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
@@ -130,7 +134,7 @@ export const LoginForm = () => {
                         <Input
                           placeholder="Enter you Password"
                           {...field}
-                          disabled={isPending}
+                          disabled={isDisabled}
                           type={isPasswordVisible ? "text" : "password"}
                         />
                         <Passwordcmp
@@ -141,13 +145,13 @@ export const LoginForm = () => {
                     </FormControl>
                     <FormMessage />
                     <Button
-                      disabled={isPending}
+                      disabled={isDisabled}
                       className="mt-[-10px] h-0 px-0 pt-2 font-normal"
                       variant={"link"}
                       size={"sm"}
                       asChild
                     >
-                      <Link href={isPending ? "#" : "/auth/reset"}>
+                      <Link href={isDisabled ? "#" : "/auth/reset"}>
                         Forget password?
                       </Link>
                     </Button>
@@ -159,7 +163,7 @@ export const LoginForm = () => {
           {!success && <FormError message={error} />}
           {!error && <FromSuccess message={success} />}
           <Button
-            disabled={isPending}
+            disabled={isDisabled}
             type="submit"
             className="w-full space-y-0 py-0"
           >

@@ -4,12 +4,14 @@ import { BackButton } from "./back-button"
 import { Header } from "./header"
 import { Social } from "./Social"
 
-interface CaardWrapperProps {
+interface CardWrapperProps {
   children: React.ReactNode
   headerLabel: string
   backButtonLable: string
   backButtonHref: string
   showSocial?: boolean
+  disabled?:boolean
+  setDisabled?:any
 }
 
 export const CardWrapper = ({
@@ -18,7 +20,9 @@ export const CardWrapper = ({
   backButtonLable,
   backButtonHref,
   showSocial,
-}: CaardWrapperProps) => {
+  disabled,
+  setDisabled
+}: CardWrapperProps) => {
   return (
     <section className="flex h-screen items-center justify-center">
       <Card className="w-[400px] shadow-md">
@@ -28,11 +32,11 @@ export const CardWrapper = ({
         <CardContent className="pb-0">{children}</CardContent>
         {showSocial && (
           <CardFooter className="flex-col pb-0">
-            <Social />
+            <Social disabled={disabled || false} setDisabled={setDisabled} />
           </CardFooter>
         )}
         <CardFooter className="pb-6">
-          <BackButton href={backButtonHref} lable={backButtonLable} />
+          <BackButton href={backButtonHref} lable={backButtonLable}  />
         </CardFooter>
       </Card>
     </section>
