@@ -42,6 +42,7 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import NewCategoryDialog from "./NewCategoryDialog"
+import { AddnewIncome } from "../actions"
 
 const defaultCategories = [
   "EMI",
@@ -64,15 +65,12 @@ const formSchema = z.object({
       message: "Amount must be a valid number greater than 0",
     }),
   transactionDate: z.date(),
-  category: z.string().refine((val) => val !== "", {
-    message: "Please select a category",
-  }),
 })
 
-type FormData = z.infer<typeof formSchema>
+export type IncomeFormData = z.infer<typeof formSchema>
 
 export function Newincome() {
-  const form = useForm<FormData>({
+  const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
@@ -83,17 +81,28 @@ export function Newincome() {
 
   const [open, setOpen] = useState(false);
   // handle submit
-  const handleSubmit = (data: FormData) => {
-    console.log("into handle submit");
+  const handleSubmit = async(data: IncomeFormData) => {
+    console.log("handleSubmit function called");
+  try {
+    console.log("Form data:", data);
+    const result = await AddnewIncome(data);
+    if(result==="error"){
+      throw new Error("Income not added");
+    }
+    console.log("New income data", result);
     
-    console.log( "New income data " + data);
-    setOpen(false);
-    // toast for success
-    toast.success("income added successfully", {
+    toast.success("Income added successfully", {
       closeButton: true,
-      icon:'🤑',
-      duration: 3000,
-    })
+      icon: '🤑',
+      duration: 4500,
+    });
+    
+    setOpen(false);
+  } catch (error) {
+    console.error("Error adding income:", error);
+    toast.error("Failed to add income");
+  }
+
   }
 
 
@@ -128,7 +137,9 @@ export function Newincome() {
           {/* Form */}
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleSubmit)}
+              onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+                console.log("Form validation errors:", errors);
+              })}
               className="mt-4 space-y-4"
             >
               {/* Description */}
@@ -166,7 +177,7 @@ export function Newincome() {
                 )}
               />
 
-              {/* Category */}
+              {/* Category
               <FormField
                 control={form.control}
                 name="category"
@@ -200,7 +211,7 @@ export function Newincome() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
               {/* Transaction Date */}
               <FormField

@@ -18,6 +18,7 @@ model User {
   isTwoFactorEnable     Boolean                @default(false)
   accounts              Account[]
   categories            Category[]
+  incomes               Income[]
   expenses              Expense[]
   twoFactorConfirmation TwoFactorConfirmation?
 
@@ -50,13 +51,25 @@ model Category {
   user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Expense {
-  id       String        @id @default(cuid())
-  userId   String
-  category CategoryTypes
-  amount   Decimal
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Income {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Decimal
+  date        DateTime
+  description String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Expense {
+  id          String        @id @default(cuid())
+  userId      String
+  category    CategoryTypes
+  amount      Decimal
+  date        DateTime
+  description String?
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 
 model Tokens {
   id      String     @id @default(cuid())

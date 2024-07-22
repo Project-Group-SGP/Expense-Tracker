@@ -14,8 +14,12 @@ import { NewExpense } from "./_components/NewExpense"
 import { currentUserServer } from "@/lib/auth"
 
 const Dashboard = async () => {
-  const user = await currentUserServer()
-  console.log("In Dashboard", user)
+  // const data = await fetch("/getData",{
+  //   method: "GET",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // })
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
       <div className="mt-20 flex w-full flex-col gap-5 px-4">
