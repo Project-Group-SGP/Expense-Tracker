@@ -8,7 +8,7 @@ import AnimatedCounter from "./AnimatedCounter"
 type CardProps = {
   label: string
   icon: LucideIcon
-  amount: string
+  amount: string | (() => Promise<string>);
   description: string
   iconclassName?: string
   descriptionColor?:string

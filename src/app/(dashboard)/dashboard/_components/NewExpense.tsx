@@ -41,18 +41,25 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { toast,Toaster } from "sonner"
 import { useState } from "react"
+import { CategoryTypes } from "@prisma/client"
+import { AddnewExpense } from "../actions"
 
 const defaultCategories = [
-  "EMI",
-  "Bills",
-  "Groceries",
-  "Shopping",
-  "Transportation",
-  "Entertainment",
-  "Health",
-  "Education",
   "Other",
+  "Bills",
+  "Food",
+  "Entertainment",
+  "Transportation",
+  "EMI",
+  "Healthcare",
+  "Education",
+  "Investment",
+  "Shopping",
+  "Fuel",
+  "Groceries"
 ]
+
+const CategoryTypesSchema = z.nativeEnum(CategoryTypes);
 
 // form validation schema
 const formSchema = z.object({
@@ -63,15 +70,18 @@ const formSchema = z.object({
       message: "Amount must be a valid number greater than 0",
     }),
   transactionDate: z.date(),
-  category: z.string().refine((val) => val !== "", {
-    message: "Please select a category",
-  }),
+  category: CategoryTypesSchema,
 })
 
-type FormData = z.infer<typeof formSchema>
+export type ExpenseFormData = z.infer<typeof formSchema>
 
-export function NewExpense() {
-  const form = useForm<FormData>({
+type NewExpenseProps = {
+  onSuccessfulAdd: () => void;
+};
+
+
+export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
+  const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
@@ -81,16 +91,27 @@ export function NewExpense() {
   })
 
   // handle submit
-  const handleSubmit = (data: FormData) => {
+   const handleSubmit = async (data: ExpenseFormData) => {
     console.log(data)
-    setOpen(false)
-    // toast for success
-    toast.error("Expense added successfully", {
-      style: { background: 'red-500', color: 'white' },
-      closeButton: true,
-      icon: null,
-      duration: 3000,
-    })
+   
+    try {
+      const result = await AddnewExpense(data);
+      if (result === "success") {
+        toast.success("Expense added successfully", {
+          closeButton: true,
+          icon: '😤',
+          duration: 4500,
+        });
+    
+        onSuccessfulAdd(); // Call this to refresh the total income
+        setOpen(false);
+      } else {
+        throw new Error("Expense not added");
+      }
+    } catch (error) {
+      console.error("Error adding Expense:", error);
+      toast.error("Failed to add Expense");
+    }
   }
 
   const [open, setOpen] = useState(false)

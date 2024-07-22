@@ -69,7 +69,11 @@ const formSchema = z.object({
 
 export type IncomeFormData = z.infer<typeof formSchema>
 
-export function Newincome() {
+type NewincomeProps = {
+  onSuccessfulAdd: () => void;
+};
+
+export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,29 +85,25 @@ export function Newincome() {
 
   const [open, setOpen] = useState(false);
   // handle submit
-  const handleSubmit = async(data: IncomeFormData) => {
-    console.log("handleSubmit function called");
-  try {
-    console.log("Form data:", data);
-    const result = await AddnewIncome(data);
-    if(result==="error"){
-      throw new Error("Income not added");
+  const handleSubmit = async (data: IncomeFormData) => {
+    try {
+      const result = await AddnewIncome(data);
+      if (result === "success") {
+        toast.success("Income added successfully", {
+          closeButton: true,
+          icon: '🤑',
+          duration: 4500,
+        });
+        onSuccessfulAdd(); // Call this to refresh the total income
+        setOpen(false);
+      } else {
+        throw new Error("Income not added");
+      }
+    } catch (error) {
+      console.error("Error adding income:", error);
+      toast.error("Failed to add income");
     }
-    console.log("New income data", result);
-    
-    toast.success("Income added successfully", {
-      closeButton: true,
-      icon: '🤑',
-      duration: 4500,
-    });
-    
-    setOpen(false);
-  } catch (error) {
-    console.error("Error adding income:", error);
-    toast.error("Failed to add income");
-  }
-
-  }
+  };
 
 
   const [categories, setCategories] = useState(defaultCategories)
