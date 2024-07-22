@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs"
 import { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import Facebook from "next-auth/providers/facebook"
 import Google from "next-auth/providers/google"
 import { getUserByEmail } from "./data/user"
 import { SigninSchema } from "./schemas"
@@ -37,10 +36,6 @@ const authOptions: NextAuthConfig = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
-    Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID as string,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     }),
   ],
 } satisfies NextAuthConfig
