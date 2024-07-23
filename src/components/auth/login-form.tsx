@@ -22,6 +22,12 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Passwordcmp } from "../Passwordcmp"
 import { Loader2, Mail } from "lucide-react"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import { Signin } from "@/actions/auth/signin"
 
 export const LoginForm = () => {
@@ -35,7 +41,8 @@ export const LoginForm = () => {
   const urlError =
     searchparams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with different provider!"
-      : ""
+      : "";
+  const callbackUrl = searchparams.get("callbackUrl")
   console.log(urlError);
 
   const form = useForm<z.infer<typeof SigninSchema>>({
@@ -51,7 +58,7 @@ export const LoginForm = () => {
     setSuccess("")
     startTransition(() => {
       setDisabled(true);
-      Signin(values)
+      Signin(values,callbackUrl)
         .then((data) => {
           if (data?.error) {
             form.reset()
@@ -86,16 +93,25 @@ export const LoginForm = () => {
             <FormField
               control={form.control}
               name="code"
-              disabled={isDisabled}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Two Factor Code</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="123456"
-                      disabled={isDisabled}
-                    />
+                    <div className="flex justify-center items-center text-center">
+                    <InputOTP maxLength={6} disabled={isDisabled} {...field }>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                      </InputOTPGroup>
+                      <InputOTPSeparator />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

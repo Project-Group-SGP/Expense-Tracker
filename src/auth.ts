@@ -4,7 +4,8 @@ import { db } from "./lib/db"
 import { getUserById } from "./data/user"
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation"
 import authOptions from "./auth.config"
-
+import { getAccountByUserId } from "./data/account";
+ 
 export const {
   handlers: { GET, POST },
   auth,
@@ -36,9 +37,17 @@ export const {
       try {
         const existingUser = await getUserById(token.sub)
 
-        if (existingUser) {
-          token.isTwoFactorEnable = existingUser.isTwoFactorEnable
-        }
+        if (!existingUser) return token;
+
+        
+      const existingAccount = await getAccountByUserId(existingUser.id);
+
+      token.isOAuth = !!existingAccount;
+
+      token.name = existingUser.name;
+      token.email = existingUser.email;
+      token.isTwoFactorEnable = existingUser.isTwoFactorEnable;
+
 
         return token
       } catch (error) {
@@ -53,7 +62,13 @@ export const {
       }
 
       if (session.user) {
-        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;
+
+        session.user.name = token.name as string;
+
+        session.user.email= token.email as string;
+        
+        session.user.isOAuth = token.isOAuth as boolean;
       }
 
       return session
@@ -66,7 +81,51 @@ export const {
       // }
       
       // // For OAuth sign-in with existing email
+      // For OAuth sign-in with existing email
+      // if (account?.provider !== 'credentials' && user.email) {
+      //   const existingUser = await db.user.findUnique({
+      //     where: { email: user.email },
+      //   });
 
+      //   // If user exists, link the new OAuth account
+      //   if (existingUser) {
+      //     await db.account.create({
+      //       data: {
+      //         userId: existingUser.id,
+      //         type: account.type,
+      //         provider: account.provider,
+      //         providerAccountId: account.providerAccountId,
+      //         access_token: account.access_token,
+      //         token_type: account.token_type,
+      //         scope: account.scope,
+      //       },
+      //     });
+      //     return true;
+      //   }
+      // }// For OAuth sign-in with existing email
+      // if (account?.provider !== 'credentials' && user.email) {
+      //   const existingUser = await db.user.findUnique({
+      //     where: { email: user.email },
+      //   });
+
+      //   // If user exists, link the new OAuth account
+      //   if (existingUser) {
+      //     await db.account.create({
+      //       data: {
+      //         userId: existingUser.id,
+      //         type: account?.type as string,
+      //         provider: account?.provider  as string,
+      //         providerAccountId: account?.providerAccountId  as string,
+      //         access_token: account?.access_token,
+      //         token_type: account?.token_type,
+      //         scope: account?.scope,
+      //       },
+      //     });
+      //     return true;
+      //   }
+      // }
+
+      // console.log("\n\nprovider :\n\n",account?.provider);
       if (account?.provider != "credentials") return true
 
       try {
@@ -80,7 +139,7 @@ export const {
           const twoFactorConfirmation = await getTwoFactorConformationByUserId(
             existingUser.id
           )
-
+          console.log("n\n\n\n TFA: ",twoFactorConfirmation);
           if (!twoFactorConfirmation) return false
 
           // Delete two factor confirmation for next sign in

@@ -19,6 +19,7 @@ model User {
   accounts              Account[]
   categories            Category[]
   expenses              Expense[]
+  Income                Income[]
   twoFactorConfirmation TwoFactorConfirmation?
 
   @@map("users")
@@ -51,11 +52,13 @@ model Category {
 }
 
 model Expense {
-  id       String        @id @default(cuid())
-  userId   String
-  category CategoryTypes
-  amount   Decimal
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String        @id @default(cuid())
+  userId      String
+  category    CategoryTypes
+  amount      Decimal
+  date        DateTime
+  description String?
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Tokens {
@@ -72,6 +75,15 @@ model TwoFactorConfirmation {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Income {
+  id          String   @id
+  userId      String
+  amount      Decimal
+  date        DateTime
+  description String?
+  users       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum CategoryTypes {
