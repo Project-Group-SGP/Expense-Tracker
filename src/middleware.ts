@@ -5,6 +5,7 @@ import {
   apiAuthPrefix,
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
+  privateRoutes,
   publicRoutes,
 } from "./routes"
 
@@ -17,6 +18,15 @@ export default auth((req): any => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
+  const isPrivateRoute = privateRoutes.includes(nextUrl.pathname)
+
+  const routeExists =
+    isApiAuthRoute || isPublicRoute || isAuthRoute || isPrivateRoute
+  nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
+
+  if (!routeExists) {
+    return NextResponse.redirect(new URL("/404", nextUrl))
+  }
 
   if (isApiAuthRoute) {
     return null
@@ -37,16 +47,6 @@ export default auth((req): any => {
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
     return Response.redirect(new URL("/auth/login?callbackUrl="+encodedCallbackUrl,nextUrl))
   }  
-
-  const routeExists =
-  isApiAuthRoute ||
-  isPublicRoute ||
-  isAuthRoute ||
-  nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
-
-if (!routeExists) {
-  return NextResponse.redirect(new URL("/404", nextUrl))
-}
 
 
   return null

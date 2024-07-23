@@ -4,13 +4,10 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
-import { logout } from "@/actions/auth/logout"
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/spend", label: "Spend" },
-  { href: "/", label: "About" },
-  { href: "/", label: "Contact" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/transaction", label: "Transactions" },
 ]
 
 const Navbar = () => {
@@ -49,20 +46,17 @@ const Navbar = () => {
             <div className="hidden md:block lg:block">
               <ModeToggle />
             </div>
-            <form
-              action={logout}
-            >
+            <Link href="/auth/signup">
               <Button
                 variant="default"
-                type="submit"
                 className={cn(
                   "hidden h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary md:flex lg:flex"
                 )}
               >
-                Logout
+                Get Started
                 <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
               </Button>
-            </form>
+            </Link>
           </div>
         </div>
       </div>
