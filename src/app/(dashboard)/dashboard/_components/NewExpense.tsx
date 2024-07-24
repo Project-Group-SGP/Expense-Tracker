@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import * as z from "zod"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,14 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 import {
   Select,
@@ -37,11 +37,11 @@ import {
 } from "@/components/ui/select"
 
 import { cn } from "@/lib/utils"
+import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { toast,Toaster } from "sonner"
 import { useState } from "react"
-import { CategoryTypes } from "@prisma/client"
+import { toast } from "sonner"
 import { AddnewExpense } from "../actions"
 
 const defaultCategories = [
@@ -80,7 +80,7 @@ type NewExpenseProps = {
 };
 
 
-export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
+export function NewExpense() {
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,8 +102,7 @@ export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
           icon: '😤',
           duration: 4500,
         });
-    
-        onSuccessfulAdd(); // Call this to refresh the total income
+  
         setOpen(false);
         form.reset();
       } else {

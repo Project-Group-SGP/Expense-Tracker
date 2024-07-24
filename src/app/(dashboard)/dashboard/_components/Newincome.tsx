@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { toast } from "sonner" 
 import {
   Dialog,
   DialogContent,
@@ -28,20 +27,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import * as z from "zod"
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import NewCategoryDialog from "./NewCategoryDialog"
 import { AddnewIncome } from "../actions"
 
 const defaultCategories = [
@@ -69,11 +61,9 @@ const formSchema = z.object({
 
 export type IncomeFormData = z.infer<typeof formSchema>
 
-type NewincomeProps = {
-  onSuccessfulAdd: () => void;
-};
 
-export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
+
+export function Newincome() {
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -94,7 +84,7 @@ export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
           icon: '🤑',
           duration: 4500,
         });
-        onSuccessfulAdd(); // Call this to refresh the total income
+     
         setOpen(false);
         form.reset();
       } else {
