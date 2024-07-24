@@ -61,11 +61,9 @@ const formSchema = z.object({
 
 export type IncomeFormData = z.infer<typeof formSchema>
 
-type NewincomeProps = {
-  onSuccessfulAdd: () => void;
-};
 
-export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
+
+export function Newincome() {
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -86,7 +84,7 @@ export function Newincome({ onSuccessfulAdd }: NewincomeProps) {
           icon: '🤑',
           duration: 4500,
         });
-        onSuccessfulAdd(); // Call this to refresh the total income
+     
         setOpen(false);
         form.reset();
       } else {

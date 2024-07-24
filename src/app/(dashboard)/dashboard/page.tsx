@@ -1,6 +1,3 @@
-// Dashboard.tsx
-"use client"
-
 import { MoveDownIcon, MoveUpIcon, PiggyBankIcon } from "lucide-react";
 import Card, { Cardcontent } from "./_components/Card";
 import { DatePickerWithRange } from "./_components/DatePickerWithRange";
@@ -9,10 +6,37 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2";
 import { NewExpense } from "./_components/NewExpense";
 import { Newincome } from "./_components/Newincome";
 import PageTitle from "./_components/PageTitle";
-import { useFinancialData } from './_hooks/useFinancialData';
 
-const Dashboard = () => {
-  const { totalIncome, totalExpense, refreshData } = useFinancialData();
+async function getTotalIncome() {
+  const res = await fetch("http://localhost:3000/api/totalIncome", {
+    method: 'GET',
+    next:{
+      tags:['totalIncome']
+    }
+  }
+  );
+  console.log(res)
+  if (!res.ok) {
+    throw new Error('Failed to fetch total income');
+  }
+  return res.json();
+}
+
+async function getTotalExpense() {
+  const res = await fetch("http://localhost:3000/api/totalExpense", {
+    next:{
+      tags:['totalExpense']
+    }
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch total expense');
+  }
+  return res.json();
+}
+
+export default async function Dashboard() {
+  const totalIncome: string = await getTotalIncome();
+  const totalExpense: string = await getTotalExpense();
 
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -22,12 +46,12 @@ const Dashboard = () => {
         <div className="flex w-full flex-wrap items-center justify-between gap-4">
           <p className="mr-auto">Welcome Back, Ayush 👋</p>
           <div className="ml-auto flex gap-2">
-            <Newincome onSuccessfulAdd={refreshData} />
-            <NewExpense onSuccessfulAdd={refreshData} />
+            <Newincome  />
+            <NewExpense  />
           </div>
         </div>
 
-        {/* Date Picker */}``
+        {/* Date Picker */}
         <DatePickerWithRange />
 
         {/* Cards */}
@@ -61,7 +85,6 @@ const Dashboard = () => {
         </section>
 
         <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-          
           {/* Charts */}
           <Cardcontent className="p-0 w-max-[400px] w-min-[300px]">
             <Dropdown_chart_1 />
@@ -71,11 +94,8 @@ const Dashboard = () => {
           <Cardcontent className="p-0">
             <Dropdown_chart_2 />
           </Cardcontent>
-          
         </section>
       </div>
     </div>
   )
 }
-
-export default Dashboard;

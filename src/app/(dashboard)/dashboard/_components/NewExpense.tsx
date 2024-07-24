@@ -80,7 +80,7 @@ type NewExpenseProps = {
 };
 
 
-export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
+export function NewExpense() {
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,8 +102,7 @@ export function NewExpense({ onSuccessfulAdd }: NewExpenseProps) {
           icon: '😤',
           duration: 4500,
         });
-    
-        onSuccessfulAdd(); // Call this to refresh the total income
+  
         setOpen(false);
         form.reset();
       } else {
