@@ -12,7 +12,7 @@ import bcrypt from "bcryptjs"
 import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation"
 import { AuthError } from "next-auth"
 
-export const Signin = async (values: z.infer<typeof SigninSchema>) => {
+export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:string|null) => {
   const validationeddFields = SigninSchema.safeParse(values)
 
   if (validationeddFields.error)
@@ -83,7 +83,7 @@ export const Signin = async (values: z.infer<typeof SigninSchema>) => {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: DEFAULT_LOGIN_REDIRECT,
+      redirectTo:callbackUrl || DEFAULT_LOGIN_REDIRECT,
     })
   } catch (e: any) {
     console.error("Error during signIn:", e)

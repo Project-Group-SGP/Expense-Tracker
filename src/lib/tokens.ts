@@ -10,15 +10,15 @@ export const generateTwoFactorToken = async(email:string) => {
   // 100000 and 100_000 same thing this is a little trick to read numbers better
   const token = crypto.randomInt(100_000,1_000_000) + "";
 
-
   //TODO:: Later change to 15 min token expires
   const expires = new Date(new Date().getTime() + 3600*1000);
 
   const existingToken = await getTwoFactorTokenByEmail(email);
 
+  console.log(existingToken);
+  
   if(existingToken)
-    await db.twoFactorConfirmation.delete({
-      where:{id:existingToken.id}});
+    await db.tokens.delete({where:{id:existingToken.id}});
 
   const twoFactorToken = await db.tokens.create({
     data:{

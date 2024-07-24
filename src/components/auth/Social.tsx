@@ -8,18 +8,24 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSearchParams } from "next/navigation";
 
 export const Social = ({disabled,setDisabled}:{disabled:boolean,setDisabled:any}) => {
   const [googlePassword, setgooglePassword] = useState<boolean>(false);
   const {theme} = useTheme();
   const [Theme,setTheme] = useState<string>(theme as string);
-  console.log(theme=="dark"," theme:",theme);
+  const searchparams = useSearchParams();
+  const callbackUrl = searchparams.get("callbackUrl")
   const onClick = () => {
     // setDisabled(true);
     setgooglePassword(true);
+    try{
     signIn("google",{
-      callbackUrl:DEFAULT_LOGIN_REDIRECT
+      callbackUrl:callbackUrl||DEFAULT_LOGIN_REDIRECT
     });
+  }catch(e){
+    console.error("Error: ",e);
+  }
 
     // setDisabled(false);
   }
