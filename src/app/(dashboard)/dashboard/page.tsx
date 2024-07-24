@@ -6,45 +6,48 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2";
 import { NewExpense } from "./_components/NewExpense";
 import { Newincome } from "./_components/Newincome";
 import PageTitle from "./_components/PageTitle";
+import { currentUserServer } from "@/lib/auth";
 
-async function getTotalIncome() {
-  const res = await fetch("http://localhost:3000/api/totalIncome", {
-    method: 'GET',
-    next:{
-      tags:['totalIncome']
-    }
-  }
-  );
-  console.log(res)
-  if (!res.ok) {
-    throw new Error('Failed to fetch total income');
-  }
-  return res.json();
-}
+// async function getTotalIncome() {
+//   const res = await fetch("http://localhost:3000/api/totalIncome", {
+//     method: 'GET',
+//     next:{
+//       tags:['totalIncome']
+//     }
+//   }
+//   );
+//   console.log(res)
+//   if (!res.ok) {
+//     throw new Error('Failed to fetch total income');
+//   }
+//   return res.json();
+// }
 
-async function getTotalExpense() {
-  const res = await fetch("http://localhost:3000/api/totalExpense", {
-    next:{
-      tags:['totalExpense']
-    }
-  });
-  if (!res.ok) {
-    throw new Error('Failed to fetch total expense');
-  }
-  return res.json();
-}
+// async function getTotalExpense() {
+//   const res = await fetch("http://localhost:3000/api/totalExpense", {
+//     next:{
+//       tags:['totalExpense']
+//     }
+//   });
+//   if (!res.ok) {
+//     throw new Error('Failed to fetch total expense');
+//   }
+//   return res.json();
+// }
 
 export default async function Dashboard() {
-  const totalIncome: string = await getTotalIncome();
-  const totalExpense: string = await getTotalExpense();
-
+  // const totalIncome: string = await getTotalIncome();
+  // const totalExpense: string = await getTotalExpense();
+  const totalIncome: string = 10000+"";
+  const totalExpense: string = 2000+"";
+  const user = await currentUserServer();
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
       <div className="mt-20 flex w-full flex-col gap-5 px-4">
         <PageTitle title="Dashboard" />
         
         <div className="flex w-full flex-wrap items-center justify-between gap-4">
-          <p className="mr-auto">Welcome Back, Ayush 👋</p>
+          <p className="mr-auto">Welcome Back,<span className="font-semibold text  text-orange-500 dark:text-sky-500"> {user?.name.split(" ")[0]} </span>👋</p>
           <div className="ml-auto flex gap-2">
             <Newincome  />
             <NewExpense  />
