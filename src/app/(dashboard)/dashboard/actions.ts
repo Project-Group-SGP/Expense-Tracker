@@ -1,9 +1,9 @@
 "use server"
 
-import { db } from "@/lib/db"
 import { currentUserServer } from "@/lib/auth"
-import { IncomeFormData } from "./_components/Newincome"
+import { db } from "@/lib/db"
 import { ExpenseFormData } from "./_components/NewExpense"
+import { IncomeFormData } from "./_components/Newincome"
 
 // get current user
 async function getCurrentUser() {
@@ -65,37 +65,82 @@ export async function getTotalExpense() {
 }
 
 // get monthly spend
-// export async function getMonthlySpendData() {
-//   const user = await currentUserServer()
-//   if (!user) {
-//     throw new Error("User not found")
-//   }
+const getMonthName = (monthNumber: number): string => {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  return monthNames[monthNumber - 1];
+};
 
-//   const currentYear = new Date().getFullYear()
 
-//   const monthlyData = await db.expense.groupBy({
-//     by: ["month"],
-//     _sum: {
-//       amount: true,
-//     },
-//     where: {
-//       userId: user.id,
-//       date: {
-//         gte: new Date(currentYear, 0, 1),
-//         lt: new Date(currentYear + 1, 0, 1),
-//       },
-//     },
-//     orderBy: {
-//       month: "asc",
-//     },
-//   })
 
-//   const formattedData = monthlyData.map((item) => ({
-//     month: new Date(currentYear, item.month - 1, 1).toLocaleString("default", {
-//       month: "long",
-//     }),
-//     spend: item._sum.amount?.toNumber() ?? 0,
-//   }))
+interface MonthlySummary {
+  [key: string]: number;
+}
 
-//   return formattedData
-// }
+interface AggregationResult {
+  date: Date;
+  _sum: {
+    amount: number | null;
+  };
+}
+
+const getMonthlyIncomeAndExpenses = async (): Promise<{ incomeByMonth: MonthlySummary, expenseByMonth: MonthlySummary }> => {
+  const user = await currentUserServer();
+
+  const incomeAggregation: AggregationResult[] = await db.income.groupBy({
+    by: ['date'],
+    where: {
+      userId: user?.id,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  const expenseAggregation: AggregationResult[] = await db.expense.groupBy({
+    by: ['date'],
+    where: {
+      userId: userId,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  const incomeByMonth: MonthlySummary = {};
+  const expenseByMonth: MonthlySummary = {};
+
+  incomeAggregation.forEach(income => {
+    const month = new Date(income.date).getMonth() + 1;
+    const monthName = getMonthName(month);
+    if (!incomeByMonth[monthName]) {
+      incomeByMonth[monthName] = 0;
+    }
+    incomeByMonth[monthName] += income._sum.amount || 0;
+  });
+
+  expenseAggregation.forEach(expense => {
+    const month = new Date(expense.date).getMonth() + 1;
+    const monthName = getMonthName(month);
+    if (!expenseByMonth[monthName]) {
+      expenseByMonth[monthName] = 0;
+    }
+    expenseByMonth[monthName] += expense._sum.amount || 0;
+  });
+
+  return { incomeByMonth, expenseByMonth };
+};
+
+getMonthlyIncomeAndExpenses()
+  .then(data => {
+    console.log('Monthly Income:', data.incomeByMonth);
+    console.log('Monthly Expenses:', data.expenseByMonth);
+  })
+  .catch(error => {
+    console.error(error);
+  })
+  .finally(async () => {
+    await db.$disconnect();
+  });

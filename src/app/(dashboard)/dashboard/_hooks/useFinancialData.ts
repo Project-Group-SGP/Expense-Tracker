@@ -1,7 +1,9 @@
-// hooks/useFinancialData.ts
-import { useState, useEffect, useCallback } from 'react';
-import { getTotalIncome, getTotalExpense } from '../actions';
+//when we update something in the database we need to refresh the data 
 
+import { useCallback, useEffect, useState } from 'react';
+import { getTotalExpense, getTotalIncome } from '../actions';
+
+// it give me new total income and expense
 export function useFinancialData() {
   const [totalIncome, setTotalIncome] = useState('Loading...');
   const [totalExpense, setTotalExpense] = useState('Loading...');
