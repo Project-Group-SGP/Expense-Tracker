@@ -18,7 +18,6 @@ model User {
   isTwoFactorEnable     Boolean                @default(false)
   accounts              Account[]
   categories            Category[]
-  incomes               Income[]
   expenses              Expense[]
   Income                Income[]
   twoFactorConfirmation TwoFactorConfirmation?
@@ -86,15 +85,6 @@ model TwoFactorConfirmation {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Income {
-  id          String   @id
-  userId      String
-  amount      Decimal
-  date        DateTime
-  description String?
-  users       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum CategoryTypes {
