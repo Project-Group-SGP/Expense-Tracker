@@ -20,7 +20,6 @@ model User {
   categories            Category[]
   incomes               Income[]
   expenses              Expense[]
-  Income                Income[]
   twoFactorConfirmation TwoFactorConfirmation?
 
   @@map("users")
@@ -88,14 +87,6 @@ model TwoFactorConfirmation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Income {
-  id          String   @id
-  userId      String
-  amount      Decimal
-  date        DateTime
-  description String?
-  users       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
 enum CategoryTypes {
   Other

@@ -4,8 +4,8 @@ import { db } from "./lib/db"
 import { getUserById } from "./data/user"
 import { getTwoFactorConformationByUserId } from "./data/two-factor-conformation"
 import authOptions from "./auth.config"
-import { getAccountByUserId } from "./data/account";
- 
+import { getAccountByUserId } from "./data/account"
+
 export const {
   handlers: { GET, POST },
   auth,
@@ -37,17 +37,15 @@ export const {
       try {
         const existingUser = await getUserById(token.sub)
 
-        if (!existingUser) return token;
+        if (!existingUser) return token
 
-        
-      const existingAccount = await getAccountByUserId(existingUser.id);
+        const existingAccount = await getAccountByUserId(existingUser.id)
 
-      token.isOAuth = !!existingAccount;
+        token.isOAuth = !!existingAccount
 
-      token.name = existingUser.name;
-      token.email = existingUser.email;
-      token.isTwoFactorEnable = existingUser.isTwoFactorEnable;
-
+        token.name = existingUser.name
+        token.email = existingUser.email
+        token.isTwoFactorEnable = existingUser.isTwoFactorEnable
 
         return token
       } catch (error) {
@@ -62,13 +60,13 @@ export const {
       }
 
       if (session.user) {
-        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean
 
-        session.user.name = token.name as string;
+        session.user.name = token.name as string
 
-        session.user.email= token.email as string;
-        
-        session.user.isOAuth = token.isOAuth as boolean;
+        session.user.email = token.email as string
+
+        session.user.isOAuth = token.isOAuth as boolean
       }
 
       return session
@@ -79,7 +77,7 @@ export const {
       // if (account?.provider !== 'credentials' && !user.id) {
       //   return true;
       // }
-      
+
       // // For OAuth sign-in with existing email
       // For OAuth sign-in with existing email
       // if (account?.provider !== 'credentials' && user.email) {
@@ -139,7 +137,7 @@ export const {
           const twoFactorConfirmation = await getTwoFactorConformationByUserId(
             existingUser.id
           )
-          console.log("n\n\n\n TFA: ",twoFactorConfirmation);
+          console.log("n\n\n\n TFA: ", twoFactorConfirmation)
           if (!twoFactorConfirmation) return false
 
           // Delete two factor confirmation for next sign in

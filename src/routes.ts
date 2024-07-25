@@ -25,7 +25,7 @@ export const authRoutes = [
 /**
  *  The prefix for Api authentication routes
  * Routes that start with this
- * @type{string}
+ * @type{string[]}
  *
  */
 
@@ -38,5 +38,7 @@ export const apiAuthPrefix = "/api/auth"
  */
 
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
+
+export const apiRoutes = ["/api/totalExpense", "/api/totalIncome"]
 
 export const privateRoutes = ["/dashboard", "/transaction", "/settings"]
