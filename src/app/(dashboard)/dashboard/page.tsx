@@ -74,7 +74,14 @@ export default async function Dashboard() {
         <PageTitle title="Dashboard" />
 
         <div className="flex w-full flex-wrap items-center justify-between gap-4">
-          <p className="mr-auto">Welcome Back, {user.name || "User"} 👋</p>
+          <p className="mr-auto">
+            Welcome Back,
+            <span className="text font-semibold text-orange-500 dark:text-sky-500">
+              {" "}
+              {user?.name.split(" ")[0]}{" "}
+            </span>
+            👋
+          </p>
           <div className="ml-auto flex gap-2">
             <Newincome />
             <NewExpense />
