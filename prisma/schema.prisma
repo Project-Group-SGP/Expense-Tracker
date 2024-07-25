@@ -19,6 +19,7 @@ model User {
   accounts              Account[]
   categories            Category[]
   expenses              Expense[]
+  incomes               Income[]
   twoFactorConfirmation TwoFactorConfirmation?
 
   @@map("users")
