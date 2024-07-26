@@ -18,8 +18,8 @@ model User {
   isTwoFactorEnable     Boolean                @default(false)
   accounts              Account[]
   categories            Category[]
-  expenses              Expense[]
   incomes               Income[]
+  expenses              Expense[]
   twoFactorConfirmation TwoFactorConfirmation?
 
   @@map("users")

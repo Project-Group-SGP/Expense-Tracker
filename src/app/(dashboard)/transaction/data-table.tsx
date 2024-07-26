@@ -98,11 +98,11 @@ export default function DataTable({
         }
         onSave={onSave}
       />
-      
+
       {data.length > 0 ? (
         <div className="relative overflow-x-auto">
           <Table className="min-w-96">
-            <TableHeader className="sticky top-0 z-10 ">
+            <TableHeader className="sticky top-0 z-10">
               <TableRow>
                 <TableHead className="min-w-28">
                   <Button variant="ghost" onClick={() => toggleSort("Date")}>

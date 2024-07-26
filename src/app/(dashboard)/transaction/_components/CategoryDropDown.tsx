@@ -48,7 +48,7 @@ export default function CategoryDropdown({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="h-52 w-44 p-0 ">
+      <DropdownMenuContent className="h-52 w-44 p-0">
         <ScrollArea className="h-52">
           {Object.keys(LABEL_MAP).map((status) => (
             <DropdownMenuItem
