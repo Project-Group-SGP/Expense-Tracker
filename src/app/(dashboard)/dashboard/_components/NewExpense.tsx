@@ -39,10 +39,17 @@ import {
 import { cn } from "@/lib/utils"
 import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Check, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { AddnewExpense } from "../actions"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 const defaultCategories = [
   "Other",
@@ -56,10 +63,10 @@ const defaultCategories = [
   "Investment",
   "Shopping",
   "Fuel",
-  "Groceries"
+  "Groceries",
 ]
 
-const CategoryTypesSchema = z.nativeEnum(CategoryTypes);
+const CategoryTypesSchema = z.nativeEnum(CategoryTypes)
 
 // form validation schema
 const formSchema = z.object({
@@ -76,9 +83,8 @@ const formSchema = z.object({
 export type ExpenseFormData = z.infer<typeof formSchema>
 
 type NewExpenseProps = {
-  onSuccessfulAdd: () => void;
-};
-
+  onSuccessfulAdd: () => void
+}
 
 export function NewExpense() {
   const form = useForm<ExpenseFormData>({
@@ -91,26 +97,26 @@ export function NewExpense() {
   })
 
   // handle submit
-   const handleSubmit = async (data: ExpenseFormData) => {
+  const handleSubmit = async (data: ExpenseFormData) => {
     console.log(data)
-   
+
     try {
-      const result = await AddnewExpense(data);
+      const result = await AddnewExpense(data)
       if (result === "success") {
         toast.success("Expense added successfully", {
           closeButton: true,
-          icon: '😤',
+          icon: "😤",
           duration: 4500,
-        });
-  
-        setOpen(false);
-        form.reset();
+        })
+
+        setOpen(false)
+        form.reset()
       } else {
-        throw new Error("Expense not added");
+        throw new Error("Expense not added")
       }
     } catch (error) {
-      console.error("Error adding Expense:", error);
-      toast.error("Failed to add Expense");
+      console.error("Error adding Expense:", error)
+      toast.error("Failed to add Expense")
     }
   }
 
@@ -180,30 +186,44 @@ export function NewExpense() {
                 )}
               />
 
-              {/* Category */}
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent position="popper" side="top" align="start">
-                        {defaultCategories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between"
+                          >
+                            {field.value || "Select a category"}
+                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-full">
+                          <ScrollArea className="h-52 w-full">
+                            {defaultCategories.map((category) => (
+                              <DropdownMenuItem
+                                key={category}
+                                onSelect={() => field.onChange(category)}
+                              >
+                                <Check
+                                  className={`mr-2 h-4 w-4 ${
+                                    category === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  }`}
+                                />
+                                {category}
+                              </DropdownMenuItem>
+                            ))}
+                          </ScrollArea>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -253,8 +273,7 @@ export function NewExpense() {
               />
 
               <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className=" w-full sm:w-auto"
-                 >
+                <Button type="submit" className="w-full sm:w-auto">
                   Add Expense
                 </Button>
               </DialogFooter>
