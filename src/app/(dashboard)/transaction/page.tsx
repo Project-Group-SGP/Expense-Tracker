@@ -9,6 +9,7 @@ import MaxWidthWrapper from "@/components/MaxWidthWrapper"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import DeleteTransactionModal from "./_components/DeleteTransactionModal"
+import { SaveTransactions } from "./actions"
 
 export type TransactionPDF = {
   bank: string
@@ -28,6 +29,7 @@ export default function Page() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false)
   const [indexToBeDeleted, setIndexToBeDeleted] = useState<number | null>()
+  const [isSaving, setIsSaving] = useState<boolean>(false)
 
   const handleImportPDF = () => {
     setIsOpen(true)
@@ -59,7 +61,7 @@ export default function Page() {
         const dataWithCategory = response.data.table.map(
           (transaction: Transaction) => ({
             ...transaction,
-            Category: "Other",
+            Category: transaction.Amount > 0 ? "Income" : "Other",
             Description: "",
           })
         )
@@ -135,6 +137,29 @@ export default function Page() {
     toast.success("Transaction deleted successfully")
   }
 
+  const handleSaveTransactions = async () => {
+    setIsSaving(true)
+    const loadingToast = toast.loading("Saving transactions...")
+
+    try {
+      const response = await SaveTransactions(data)
+      if (response.success) {
+        setData([])
+        toast.success("Transactions saved successfully", {
+          id: loadingToast,
+        })
+        setIsSaving(false)
+      } else {
+        throw new Error("Failed to save transactions")
+      }
+    } catch (error) {
+      toast.error("Failed to save transactions", {
+        id: loadingToast,
+      })
+      setIsSaving(false)
+    }
+  }
+
   return (
     <>
       <AddPdfModal
@@ -150,10 +175,14 @@ export default function Page() {
       <MaxWidthWrapper className="mt-8">
         <div className="container mx-auto py-10">
           <div className="z-50 mb-4 flex items-center justify-between bg-white py-4 dark:bg-zinc-950">
-            <h1 className="text-2xl font-bold">Transactions</h1>
+            <h1 className="text-3xl font-bold">Transactions</h1>
             <div>
               {data.length > 0 ? (
-                <Button className="w-38 rounded-md bg-primary px-4 py-2 text-white">
+                <Button
+                  className="w-38 rounded-md bg-primary px-4 py-2 text-white"
+                  onClick={handleSaveTransactions}
+                  disabled={isSaving}
+                >
                   Save Transactions
                 </Button>
               ) : (

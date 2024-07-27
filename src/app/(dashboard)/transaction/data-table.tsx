@@ -137,6 +137,8 @@ export default function DataTable({
                   <TableCell>{transaction.Date}</TableCell>
                   <TableCell>
                     <CategoryDropdown
+                      initialCategory={transaction.Category}
+                      amount={transaction.Amount}
                       id={index}
                       changeCategory={changeCategory}
                     />
