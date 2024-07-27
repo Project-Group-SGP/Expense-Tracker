@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   XAxis
 } from "recharts";
+import { chartDataBar1 } from "./ChartBar_3";
 
 const chartConfig = {
   spend: {
@@ -18,19 +19,10 @@ const chartConfig = {
   }
 }; // satisfies ChartConfig
 
-const chartData = [
-  { month: "January", spend: 14806 },
-  { month: "February", spend: 17805 },
-  { month: "March", spend: 22307 },
-  { month: "April", spend: 7003 },
-  { month: "May", spend: 21009 },
-  { month: "June", spend: 11104 },
-  { month: "July", spend: 21004 },
-  { month: "August", spend: 31004 },
-  { month: "September", spend: 41004 }
-];
 
-export const ChartBar_1 = () => {
+export const ChartBar_1 = ({chartData}:chartDataBar1) => {
+  
+
   return (
     <ChartContainer config={chartConfig} className="h-full">
       <ResponsiveContainer width="100%" height={300}>

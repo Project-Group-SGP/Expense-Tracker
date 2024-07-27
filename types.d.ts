@@ -6,7 +6,7 @@ declare module "next-auth" {
   interface User {}
   /**
    * The shape of the account object returned in the OAuth providers' `account` callback,
-   * Usually contains information about the provider being used, like OAuth tokens (`access_token`, etc).
+   * Usually contains information about the provider being used, (like OAuth tokens `access_token`, etc).
    */
   interface Account {}
  

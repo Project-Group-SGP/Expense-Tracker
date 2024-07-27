@@ -7,30 +7,30 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from "@/components/ui/chart";
-
-const chartData = [
-  { month: "January", spend: 14806 },
-  { month: "February", spend: 17805 },
-  { month: "March", spend: 22307 },
-  { month: "April", spend: 7003 },
-  { month: "May", spend: 21009 },
-  { month: "June", spend: 11104 },
-  { month: "July", spend: 21004 },
-  { month: "August", spend: 31004 },
-  { month: "September", spend: 41004 },
-];
+import { ChartData1 } from "./Dropdown_chart_1";
 
 const chartConfig = {
   spend: {
-    label: "Spend",
+    label: "spend",
     color: "#2563eb",
   },
 }; // satisfies ChartConfig
 
-export function ChartBar_3() {
+export type chartDataBar1 = {
+    chartData : ChartData1[];
+}
+
+export function ChartBar_3({chartData}:chartDataBar1) {
+  
+  console.log("inside ChartBar_3");
+  
+  console.log(chartData);
+  
+
   return (
     <ChartContainer config={chartConfig}>
       <ResponsiveContainer width="100%" height={300}>
+      
         <BarChart
           data={chartData}
           layout="vertical"

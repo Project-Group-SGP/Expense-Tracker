@@ -1,48 +1,70 @@
 "use client"
 
 import { LabelList, RadialBar, RadialBarChart } from "recharts"
-
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { category: "Bills", spend: 20705, fill: "#0088FE" },
-  { category: "EMI", spend: 10000, fill: "#00C49F" },
-  { category: "Entertainment", spend: 9087, fill: "#FFBB28" },
-  { category: "Foods", spend: 11173, fill: "#FF8042" },
-  { category: "Others", spend: 12190, fill: "#00C49F" },
-]
+import { ChartData2 } from "./Dropdown_chart_2";
+import { chartPieProps } from "./ChartPie_1";
 
 const chartConfig = {
   spend: {
-    label: "spend",
+    label: "Spend",
+  },
+  Other: {
+    label: "Other",
+    color: "#888888",
   },
   Bills: {
     label: "Bills",
     color: "#0088FE",
   },
-  EMI: {
-    label: "EMI",
-    color: "#00C49F",
+  Food: {
+    label: "Food",
+    color: "#FF8042",
   },
   Entertainment: {
     label: "Entertainment",
     color: "#FFBB28",
   },
-  Foods: {
-    label: "Foods",
-    color: "#FF8042",
-  },
-  Others: {
-    label: "Others",
+  Transportation: {
+    label: "Transportation",
     color: "#00C49F",
   },
-} satisfies ChartConfig
+  EMI: {
+    label: "EMI",
+    color: "#FF0000",
+  },
+  Healthcare: {
+    label: "Healthcare",
+    color: "#800080",
+  },
+  Education: {
+    label: "Education",
+    color: "#00FFFF",
+  },
+  Investment: {
+    label: "Investment",
+    color: "#008000",
+  },
+  Shopping: {
+    label: "Shopping",
+    color: "#FFD700",
+  },
+  Fuel: {
+    label: "Fuel",
+    color: "#FF6347",
+  },
+  Groceries: {
+    label: "Groceries",
+    color: "#ADFF2F",
+  },
+} satisfies ChartConfig;
 
-export default function ChartPie_3() {
+export default function ChartPie_3({chartData}: chartPieProps) {
   return (
     <>
       <ChartContainer
@@ -58,7 +80,7 @@ export default function ChartPie_3() {
         >
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent hideLabel nameKey="spend" />}
+            content={<ChartTooltipContent nameKey="category" valueKey="spend" />}
           />
           <RadialBar dataKey="spend" background>
             <LabelList

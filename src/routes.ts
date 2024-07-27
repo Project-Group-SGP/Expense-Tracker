@@ -39,6 +39,6 @@ export const apiAuthPrefix = "/api/auth"
 
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
 
-export const apiRoutes = ["/api/totalExpense", "/api/totalIncome"]
+export const apiRoutes = ["/api/totalExpense", "/api/totalIncome", "/api/allData"]
 
 export const privateRoutes = ["/dashboard", "/transaction", "/settings"]
