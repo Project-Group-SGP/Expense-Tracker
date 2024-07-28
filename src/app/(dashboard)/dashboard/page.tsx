@@ -55,18 +55,18 @@ const getTotalExpense = cache(
 
 // Define the type for your API response
 type Expense = {
-  id: string;
-  userId: string;
-  category: string;
-  amount: string;
-  date: string;
-  description: string;
-};
+  id: string
+  userId: string
+  category: string
+  amount: string
+  date: string
+  description: string
+}
 
 export type FinancialData_ = {
-  expense: Expense[];
+  expense: Expense[]
   // Add other properties if needed based on your API response
-};
+}
 
 const getAllData = cache(
   async (id: string, cookie: string): Promise<FinancialData_> => {
@@ -75,24 +75,23 @@ const getAllData = cache(
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["getAllData"] },
-      });
+      })
 
-      if (!res.ok) throw new Error("Failed to fetch All expenses");
+      if (!res.ok) throw new Error("Failed to fetch All expenses")
 
-      const data: FinancialData_ = await res.json();
+      const data: FinancialData_ = await res.json()
 
-      // Log the entire data object
-      console.log("All data from getAllData:", JSON.stringify(data, null, 2));
+      // // Log the entire data object
+      // console.log("All data from getAllData:", JSON.stringify(data, null, 2));
 
       // Return the raw data
-      return data;
+      return data
     } catch (error) {
-      console.error("Error fetching data:", error);
-      return { expense: [] }; // Return an empty array or adjust based on your data structure
+      console.error("Error fetching data:", error)
+      return { expense: [] } // Return an empty array or adjust based on your data structure
     }
   }
-);
-
+)
 
 export default async function Dashboard() {
   const headersList = headers()
@@ -106,7 +105,6 @@ export default async function Dashboard() {
   const totalIncome = await getTotalIncome(user.id, cookie)
   const totalExpense = await getTotalExpense(user.id, cookie)
   const Data = await getAllData(user.id, cookie)
-  
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
@@ -163,11 +161,11 @@ export default async function Dashboard() {
         <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
           <Cardcontent className="w-max-[400px] w-min-[300px] p-0">
             {/* get all data and pass it */}
-            <Dropdown_chart_1  data={Data}/>
+            <Dropdown_chart_1 data={Data} />
           </Cardcontent>
 
           <Cardcontent className="p-0">
-            <Dropdown_chart_2 data={Data}/>
+            <Dropdown_chart_2 data={Data} />
           </Cardcontent>
         </section>
       </div>

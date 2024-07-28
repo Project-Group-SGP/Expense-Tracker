@@ -172,9 +172,9 @@ export default function Page() {
         handleCloseModal={setIsDeleteModalOpen}
         handleDeleteTransaction={deleteTransaction}
       />
-      <MaxWidthWrapper className="mt-8">
-        <div className="container mx-auto py-10">
-          <div className="z-50 mb-4 flex items-center justify-between bg-white py-4 dark:bg-zinc-950">
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="mt-20 flex w-full flex-col gap-5 px-4">
+          <div className="z-10 mb-4 flex items-center justify-between bg-white py-4 dark:bg-zinc-950">
             <h1 className="text-3xl font-bold">Transactions</h1>
             <div>
               {data.length > 0 ? (
@@ -226,7 +226,7 @@ export default function Page() {
             </div>
           )}
         </div>
-      </MaxWidthWrapper>
+      </div>
     </>
   )
 }

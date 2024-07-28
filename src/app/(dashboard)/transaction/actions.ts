@@ -49,6 +49,7 @@ export async function SaveTransactions(data: Transaction[]) {
     ])
     revalidateTag("totalIncome")
     revalidateTag("totalExpense")
+    revalidateTag("getAllData")
 
     return { success: true, message: "Transactions saved successfully" }
   } catch (error) {

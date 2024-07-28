@@ -30,7 +30,6 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -61,8 +60,6 @@ const formSchema = z.object({
 
 export type IncomeFormData = z.infer<typeof formSchema>
 
-
-
 export function Newincome() {
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -73,34 +70,33 @@ export function Newincome() {
     },
   })
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   // handle submit
   const handleSubmit = async (data: IncomeFormData) => {
     try {
-      const result = await AddnewIncome(data);
+      const result = await AddnewIncome(data)
+
       if (result === "success") {
         toast.success("Income added successfully", {
           closeButton: true,
-          icon: '🤑',
+          icon: "🤑",
           duration: 4500,
-        });
-     
-        setOpen(false);
-        form.reset();
+        })
+
+        setOpen(false)
+        form.reset()
       } else {
-        throw new Error("Income not added");
+        throw new Error("Income not added")
       }
     } catch (error) {
-      console.error("Error adding income:", error);
-      toast.error("Failed to add income");
+      console.error("Error adding income:", error)
+      toast.error("Failed to add income")
     }
-  };
-
+  }
 
   const [categories, setCategories] = useState(defaultCategories)
   // const [newCategory, setNewCategory] = useState("")
   // const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false)
-
 
   return (
     // useing state to open dialog
@@ -129,7 +125,7 @@ export function Newincome() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-                console.log("Form validation errors:", errors);
+                console.log("Form validation errors:", errors)
               })}
               className="mt-4 space-y-4"
             >
@@ -259,4 +255,3 @@ export function Newincome() {
     </Dialog>
   )
 }
-
