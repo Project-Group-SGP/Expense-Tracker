@@ -14,6 +14,6 @@ type User = {
  * @return {User | undefined} The user object if available, otherwise undefined.
  */
 export const currentUserServer = async (): Promise<User | undefined> => {
-  const session = await auth()
-  return session?.user
+  const session = await auth();
+  return session?.user;
 }

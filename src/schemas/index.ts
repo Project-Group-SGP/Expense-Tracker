@@ -13,12 +13,14 @@ export const SigninSchema = z.object({
 })
 
 export const RegisterSchema = z.object({
-  email:z.string().email({message:"Email is Required"}),
-  password:z.string().min(6,{message:"Password is min 6 length"}).regex(passwordValidation, {
-    message: 'Password should include digits(0-9),special symbols(@,#,&...),Uppercase (A-Z),lowercase(a-z) letters',
-  }),
+  email:z.string().email({message:"Email field is empty!"}),
+  password:z.string(),
+  // .min(6,{message:"Password is min 6 length"})
+  // .regex(passwordValidation, {
+  //   message: 'Password should include digits(0-9),special symbols(@,#,&...),Uppercase (A-Z),lowercase(a-z) letters',
+  // }),
   name:z.string().min(1,{
-    message:"Name is required",
+    message:"Name field is empty!",
   })
 });
 
@@ -35,3 +37,21 @@ export const NewPasswordSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
+
+
+export const SettingsSchema = z.object({
+  name:z.optional(z.string()),
+  isTwoFactorEnabled:z.optional(z.boolean()),
+  email : z.optional(z.string().email()),
+  password:z.optional(z.string().min(6,{message:"password shold be of min 6 characters"})),
+  newPassword:z.optional(z.string().min(6))
+}) .refine((data)=>{
+  if(data.password && !data.newPassword)      return false;
+
+  return true;
+},{message:"New password is required!",path:["newPassword"]})
+.refine((data)=>{
+  if(!data.password && data.newPassword)      return false;
+  
+  return true;
+},{message:"password is required!",path:["password"]})
