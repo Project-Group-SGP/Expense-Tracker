@@ -36,10 +36,10 @@ export type ChartData3 = {
 }
 
 export type DropdownChartProps = {
-  data : FinancialData_;
+  data: FinancialData_
 }
 
-export function Dropdown_chart_1({data}: DropdownChartProps) {
+export function Dropdown_chart_1({ data }: DropdownChartProps) {
   const [selectedChart, setSelectedChart] = React.useState("Bar chart_1")
 
   // 1. monthwise data
@@ -72,10 +72,8 @@ export function Dropdown_chart_1({data}: DropdownChartProps) {
     })
   }
 
-  console.log("month wise data");
-  console.log(chartData1)
-
-  
+  // console.log("month wise data");
+  // console.log(chartData1)
 
   // 3 Date wise
   const chartData3: ChartData3[] = []
@@ -96,19 +94,19 @@ export function Dropdown_chart_1({data}: DropdownChartProps) {
     })
   }
 
-  console.log("Date wise data");
+  console.log("Date wise data")
   console.log(chartData3)
 
   const renderChart = () => {
     switch (selectedChart) {
       case "Bar chart_1":
-        return <ChartBar_1 chartData={chartData1}/>
+        return <ChartBar_1 chartData={chartData1} />
       case "Bar chart_2":
-        return <ChartBar_3  chartData={chartData1}/>
+        return <ChartBar_3 chartData={chartData1} />
       case "Bar chart_3":
-        return <ChartBar_4 chartData= {chartData3}/>
+        return <ChartBar_4 chartData={chartData3} />
       default:
-        return <ChartBar_3 chartData={chartData1}/>
+        return <ChartBar_3 chartData={chartData1} />
     }
   }
 
