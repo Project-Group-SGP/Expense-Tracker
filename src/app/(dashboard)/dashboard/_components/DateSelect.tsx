@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import { useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { useState } from 'react';
 import { subMonths } from 'date-fns';
 import { DatePickerWithRange } from './DatePickerWithRange';
 
-const MyComponent = () => {
+const DateSelect = () => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subMonths(new Date(), 1),
@@ -35,4 +35,4 @@ const MyComponent = () => {
   );
 };
 
-export default MyComponent;
+export default DateSelect;
