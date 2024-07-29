@@ -9,12 +9,13 @@ import PageTitle from "./_components/PageTitle"
 import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
 import { cache } from "react"
+import DateSelect from "./_components/DateSelect"
 
 type FinancialData = {
   amount: number
 }
 
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
 
 const getTotalIncome = cache(
@@ -68,10 +69,11 @@ export type FinancialData_ = {
   // Add other properties if needed based on your API response
 }
 
+// get all Data
 const getAllData = cache(
-  async (id: string, cookie: string): Promise<FinancialData_> => {
+  async (id: string, cookie: string, startDate: string, endDate: string): Promise<FinancialData_> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/allData?userId=${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`, {
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["getAllData"] },
@@ -93,7 +95,13 @@ const getAllData = cache(
   }
 )
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string };
+}) {
+  console.log(searchParams)
+
   const headersList = headers()
   const cookie = headersList.get("cookie") || ""
   const user = await currentUserServer()
@@ -104,7 +112,7 @@ export default async function Dashboard() {
 
   const totalIncome = await getTotalIncome(user.id, cookie)
   const totalExpense = await getTotalExpense(user.id, cookie)
-  const Data = await getAllData(user.id, cookie)
+  const Data = await getAllData(user.id, cookie,searchParams?.startDate,searchParams?.endDate)
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
@@ -129,7 +137,7 @@ export default async function Dashboard() {
           </div>
         </div>
 
-        <DatePickerWithRange />
+        <DateSelect />
 
         <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card
