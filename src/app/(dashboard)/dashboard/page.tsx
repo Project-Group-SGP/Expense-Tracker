@@ -8,8 +8,7 @@ import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
 import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
-import { cache } from "react"
-import DateSelect from "./_components/DateSelect"
+import { cache, Suspense } from "react"
 
 type FinancialData = {
   amount: number
@@ -95,13 +94,7 @@ const getAllData = cache(
   }
 )
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string };
-}) {
-  console.log(searchParams)
-
+export default async function Dashboard() {
   const headersList = headers()
   const cookie = headersList.get("cookie") || ""
   const user = await currentUserServer()
@@ -118,65 +111,67 @@ export default async function Dashboard({
   const expenseAmount = totalExpense?.amount ?? 0
 
   return (
-    <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
-      <div className="mt-20 flex w-full flex-col gap-5 px-4">
-        <PageTitle title="Dashboard" />
+    <Suspense>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="mt-20 flex w-full flex-col gap-5 px-4">
+          <PageTitle title="Dashboard" />
 
-        <div className="flex w-full flex-wrap items-center justify-between gap-4">
-          <p className="mr-auto">
-            Welcome Back,
-            <span className="text font-semibold text-orange-500 dark:text-sky-500">
-              {" "}
-              {user?.name.split(" ")[0]}{" "}
-            </span>
-            👋
-          </p>
-          <div className="ml-auto flex gap-2">
-            <Newincome />
-            <NewExpense />
+          <div className="flex w-full flex-wrap items-center justify-between gap-4">
+            <p className="mr-auto">
+              Welcome Back,
+              <span className="text font-semibold text-orange-500 dark:text-sky-500">
+                {" "}
+                {user?.name.split(" ")[0]}{" "}
+              </span>
+              👋
+            </p>
+            <div className="ml-auto flex gap-2">
+              <Newincome />
+              <NewExpense />
+            </div>
           </div>
+
+        <DatePickerWithRange />
+
+          <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Card
+              label="Remaining"
+              icon={PiggyBankIcon}
+              amount={(incomeAmount - expenseAmount).toFixed(2)}
+              description="All time"
+              iconclassName="text-blue-600"
+              descriptionColor="text-blue-400"
+            />
+            <Card
+              label="Income"
+              icon={MoveUpIcon}
+              amount={incomeAmount.toFixed(2)}
+              description="All time"
+              iconclassName="text-green-600"
+              descriptionColor="text-green-400"
+            />
+            <Card
+              label="Expenses"
+              icon={MoveDownIcon}
+              amount={expenseAmount.toFixed(2)}
+              description="All time"
+              iconclassName="text-red-600"
+              descriptionColor="text-red-400"
+            />
+          </section>
+
+          <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+            <Cardcontent className="w-max-[400px] w-min-[300px] p-0">
+              {/* get all data and pass it */}
+              <Dropdown_chart_1 data={Data} />
+            </Cardcontent>
+
+            <Cardcontent className="p-0">
+              <Dropdown_chart_2 data={Data} />
+            </Cardcontent>
+          </section>
         </div>
-
-        <DateSelect />
-
-        <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card
-            label="Remaining"
-            icon={PiggyBankIcon}
-            amount={(incomeAmount - expenseAmount).toFixed(2)}
-            description="All time"
-            iconclassName="text-blue-600"
-            descriptionColor="text-blue-400"
-          />
-          <Card
-            label="Income"
-            icon={MoveUpIcon}
-            amount={incomeAmount.toFixed(2)}
-            description="All time"
-            iconclassName="text-green-600"
-            descriptionColor="text-green-400"
-          />
-          <Card
-            label="Expenses"
-            icon={MoveDownIcon}
-            amount={expenseAmount.toFixed(2)}
-            description="All time"
-            iconclassName="text-red-600"
-            descriptionColor="text-red-400"
-          />
-        </section>
-
-        <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-          <Cardcontent className="w-max-[400px] w-min-[300px] p-0">
-            {/* get all data and pass it */}
-            <Dropdown_chart_1 data={Data} />
-          </Cardcontent>
-
-          <Cardcontent className="p-0">
-            <Dropdown_chart_2 data={Data} />
-          </Cardcontent>
-        </section>
       </div>
-    </div>
+    </Suspense>
   )
 }

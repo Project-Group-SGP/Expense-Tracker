@@ -52,7 +52,7 @@ const categoryColors: { [key: string]: string } = {
 export function Dropdown_chart_2({ data }: DropdownChartProps) {
   const [selectedChart, setSelectedChart] = React.useState("pie chart_2")
 
-  console.log(data)
+  // console.log(data)
 
   // Check if `data` and `data.expense` are valid
   if (!data || !Array.isArray(data.expense)) {
@@ -111,7 +111,7 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 w-max-[400px]">
+      <div className="w-max-[400px] flex items-center justify-between p-4">
         <p className="font-semibold">Expenses</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

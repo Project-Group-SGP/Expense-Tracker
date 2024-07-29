@@ -5,7 +5,11 @@
  *
  */
 
-export const publicRoutes = ["/", "/auth/new-verification"]
+export const publicRoutes = [
+  "/",
+  "/auth/new-verification",
+  "/api/sendMonthlyMail",
+]
 
 /**
  *  An Array of routes that are used for authentication
@@ -39,6 +43,10 @@ export const apiAuthPrefix = "/api/auth"
 
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
 
-export const apiRoutes = ["/api/totalExpense", "/api/totalIncome", "/api/allData"]
+export const apiRoutes = [
+  "/api/totalExpense",
+  "/api/totalIncome",
+  "/api/allData",
+]
 
 export const privateRoutes = ["/dashboard", "/transaction", "/settings"]
