@@ -11,7 +11,7 @@ const font = Poppins({
 export const Header = ({lable}:{lable:string}) => (
   <div className="w-full flex flex-col gap-y-2 items-center justify-center">
     <h1 className={cn("text-3xl font-semibold", font.className)}>
-     Spend Wise
+     spend<span className="text-green-500">wise</span>
     </h1>
     <p className="text-muted-foreground text-sm">
       {lable}
