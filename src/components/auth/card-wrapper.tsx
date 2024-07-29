@@ -24,7 +24,7 @@ export const CardWrapper = ({
   setDisabled
 }: CardWrapperProps) => {
   return (
-    <section className="flex h-screen items-center justify-center">
+    <section className="flex h-screen items-center justify-center my-12">
       <Card className="w-[400px] shadow-md">
         <CardHeader>
           <Header lable={headerLabel} />

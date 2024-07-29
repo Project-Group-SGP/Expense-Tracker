@@ -28,11 +28,12 @@ export const RegisterForm = () => {
   const [success,setSuccess] = useState<string|undefined>("");
   const [isPending, startTransition] =useTransition();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [password,setPassword] = useState<string|undefined>("");
+  const [password,setPassword] = useState<string>("");
   const [errorpassword,setErrorpassword] = useState<string|undefined>("");
-  const Password_testResult =zxcvbn(password);
+
+  const Password_testResult =useMemo(()=>zxcvbn(password),[password]);
   console.log(Password_testResult);
-  const password_score = (Password_testResult.score * 100)/4;
+  const password_score = useMemo(()=>(Password_testResult.score * 100)/4,[Password_testResult.score]);
   console.log(password_score);  
 
     const PassProgressColor = useCallback(() => {
@@ -50,7 +51,7 @@ export const RegisterForm = () => {
         default:
           return 'none';
       }
-    },[password]);
+    },[Password_testResult.score]);
   
     const createPassLable = useCallback(() => {
       switch(Password_testResult.score){
@@ -67,7 +68,7 @@ export const RegisterForm = () => {
         default:
           return 'none';
       }
-    },[password]);
+    },[Password_testResult.score]);
 
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -83,7 +84,7 @@ export const RegisterForm = () => {
     setError("");
     setSuccess("");
     if(password === ""){ setErrorpassword("Password field is empty!"); return;}
-    if(password_score <= 75){ setErrorpassword("Set an Strong password Password"); return;}
+    if(password_score < 70){ setErrorpassword("Set an Strong password Password"); return;}
     startTransition(()=>{
       Register(values)
         .then((data:{success?:string,error?:string})=>{
