@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^0.0.30",
     "@auth/prisma-adapter": "^2.4.1",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
@@ -29,6 +30,7 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@tanstack/react-query": "^5.50.1",
     "@tanstack/react-table": "^8.19.2",
+    "ai": "^3.2.37",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
