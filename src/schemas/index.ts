@@ -44,7 +44,8 @@ export const SettingsSchema = z.object({
   isTwoFactorEnable:z.optional(z.boolean()),
   email : z.optional(z.string().email()),
   password:z.optional(z.string()),
-  newPassword:z.optional(z.string())
+  newPassword:z.optional(z.string()),
+  theme : z.optional(z.string()),
 })
 //  .refine((data)=>{
 //   if(data.password && !data.newPassword)      return false;

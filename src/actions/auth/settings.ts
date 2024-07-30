@@ -12,7 +12,7 @@ import bcrypt from "bcryptjs";
 export const settings = async (
   values:z.infer<typeof SettingsSchema>
 )=>{
-  console.log("values: ",values);
+  // console.log("values: ",values);
   if(!values.email && !values.isTwoFactorEnable && !values.name && !values.newPassword && !values.password) 
     return {error:"No Changes are made"};
   if(!values.password && values.newPassword)
@@ -26,6 +26,9 @@ export const settings = async (
   const user = await currentUserServer();
   
   if(!user) return {error:"unauthorized"};
+
+  // if(user.email==values.email && user.name==values.name && user.isTwoFactorEnable==values.isTwoFactorEnable && !values.password && !values.newPassword)
+  //   return {error:"No Changes are made"};
 
   const dbuser = await getUserById(user?.id as string);
 

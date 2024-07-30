@@ -18,6 +18,8 @@ import { FromSuccess }from "@/components/auth/form-success";
 import { Switch } from "@/components/ui/switch";
 import zxcvbn from "zxcvbn";
 import { Passwordcmp } from "@/components/Passwordcmp";
+import { ModeToggle } from "@/components/ModeToggle";
+import { useTheme } from "next-themes";
 
 
 const SettingsPage = () => {
@@ -32,7 +34,6 @@ const SettingsPage = () => {
   const [password,setPassword] = useState<string>("");
   const [errorpassword,setErrorpassword] = useState<string|undefined>("");
   const [errorpassword1,setErrorpassword1] = useState<string|undefined>("");
-
 
   const Password_testResult =useMemo(()=>zxcvbn(password),[password]);
   console.log(Password_testResult);
@@ -81,6 +82,7 @@ const SettingsPage = () => {
       password:undefined,
       newPassword:undefined,
       isTwoFactorEnable:user?.isTwoFactorEnable||undefined,
+      theme:undefined,
     }
   });
   const onSubmit = (values:z.infer<typeof SettingsSchema>)=>{
@@ -93,6 +95,12 @@ const SettingsPage = () => {
     if(password!==""){
       if(oldpassword===""){setErrorpassword1("Password field is empty!"); return;}
     }
+    // console.log(values);
+    // if(password == "" && oldpassword =="" && !values.email && !values.isTwoFactorEnable && !values.name){
+    //   setSuccess("Theme successfully saved");
+    //   return;
+    // }
+    values.theme = undefined;
     const newvalues = {...values,password:oldpassword,newPassword:password}
     console.log("values:",newvalues);
     startTransition(()=>{
@@ -239,7 +247,7 @@ const SettingsPage = () => {
               :<></>
               }
             {user?.isOAuth===false &&
-              <FormField 
+            <FormField 
                 disabled={isPending}
                 control={form.control}
                 name="isTwoFactorEnable"
@@ -264,6 +272,24 @@ const SettingsPage = () => {
                 )}
               />
             }
+            <FormField 
+                disabled={isPending}
+                control={form.control}
+                name="theme"
+                render = {({field})=>(
+                  <FormItem className="flex justify-between rounded-lg items-center border p-3 shadow-sm py-0 pb-1">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-left block ml-2 text-center pt-1">Theme</FormLabel>
+                    </div>
+                    <FormControl>
+                      <div className="hidden md:block lg:block text-center flex justify-center items-center">
+                        <ModeToggle/>
+                      </div>
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
             </div>
             {error && <FormError message={error} key={error}/>}
             {success && <FromSuccess message={success} key={success}/>}
