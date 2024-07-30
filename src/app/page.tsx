@@ -2,6 +2,7 @@ import MaxWidthWrapper from "@/components/MaxWidthWrapper"
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
 import { ArrowRight, BarChart2, Check, Coins } from "lucide-react"
+import Image from "next/image"
 const features = [
   {
     icon: Check,
@@ -104,7 +105,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="hidden w-full max-w-md lg:block">
-              <img
+              <Image
                 src="/main_page.png"
                 width={900}
                 height={900}

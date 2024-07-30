@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/transaction", label: "Transaction" },
   { href: "/", label: "About" },
   { href: "/", label: "Contact" },
+  { href: "/settings", label: "Settings" }
 ]
 
 const MobileNav = () => {
@@ -28,7 +29,7 @@ const MobileNav = () => {
       <div
         className={clsx(
           "fixed left-0 top-0 z-50 h-full w-screen backdrop-blur-sm transition-all lg:hidden",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <section className="absolute left-0 top-0 h-screen w-56 flex-col gap-8 bg-white p-8 shadow-lg dark:bg-black">
