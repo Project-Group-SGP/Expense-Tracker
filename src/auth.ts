@@ -60,13 +60,13 @@ export const {
       }
 
       if (session.user) {
-        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;
 
-        session.user.name = token.name as string
+        session.user.name = token.name as string;
 
-        session.user.email = token.email as string
+        session.user.email = token.email as string;
 
-        session.user.isOAuth = token.isOAuth as boolean
+        session.user.isOAuth = token.isOAuth as boolean;
       }
 
       return session

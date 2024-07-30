@@ -10,6 +10,7 @@ import { Form } from "@/components/ui/form"
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/transaction", label: "Transactions" },
+  { href: "/settings", label: "Settings" },
 ]
 
 const Navbar = () => {

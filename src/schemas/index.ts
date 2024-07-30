@@ -41,17 +41,18 @@ export const NewPasswordSchema = z.object({
 
 export const SettingsSchema = z.object({
   name:z.optional(z.string()),
-  isTwoFactorEnabled:z.optional(z.boolean()),
+  isTwoFactorEnable:z.optional(z.boolean()),
   email : z.optional(z.string().email()),
-  password:z.optional(z.string().min(6,{message:"password shold be of min 6 characters"})),
-  newPassword:z.optional(z.string().min(6))
-}) .refine((data)=>{
-  if(data.password && !data.newPassword)      return false;
+  password:z.optional(z.string()),
+  newPassword:z.optional(z.string())
+})
+//  .refine((data)=>{
+//   if(data.password && !data.newPassword)      return false;
 
-  return true;
-},{message:"New password is required!",path:["newPassword"]})
-.refine((data)=>{
-  if(!data.password && data.newPassword)      return false;
+//   return true;
+// },{message:"New password is required!",path:["newPassword"]})
+// .refine((data)=>{
+//   if(!data.password && data.newPassword)      return false;
   
-  return true;
-},{message:"password is required!",path:["password"]})
+//   return true;
+// },{message:"password is required!",path:["password"]})
