@@ -9,7 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { chartPieProps } from "./ChartPie_1";
+import { chartPieProps } from "./ChartPie_1"
 
 const chartConfig = {
   spend: {
@@ -63,9 +63,9 @@ const chartConfig = {
     label: "Groceries",
     color: "hsl(84, 100%, 59%)", // #ADFF2F
   },
-} satisfies ChartConfig;
+} satisfies ChartConfig
 
-export default function ChartPie_2({chartData}:chartPieProps) {
+export default function ChartPie_2({ chartData }: chartPieProps) {
   const totalSpend = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.spend, 0)
   }, [chartData])
@@ -78,6 +78,7 @@ export default function ChartPie_2({chartData}:chartPieProps) {
       <PieChart>
         <ChartTooltip
           cursor={false}
+          // @ts-ignore
           content={<ChartTooltipContent nameKey="category" valueKey="spend" />}
         />
         <Pie

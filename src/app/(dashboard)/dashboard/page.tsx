@@ -1,6 +1,9 @@
+import { currentUserServer } from "@/lib/auth"
 import { MoveDownIcon, MoveUpIcon, PiggyBankIcon } from "lucide-react"
+import { headers } from "next/headers"
+import { cache, Suspense } from "react"
 import Card, { Cardcontent } from "./_components/Card"
-import { DatePickerWithRange } from "./_components/DatePickerWithRange"
+import DateSelect from "./_components/DateSelect"
 import { Dropdown_chart_1 } from "./_components/Dropdown_chart_1"
 import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
@@ -82,6 +85,7 @@ const getAllData = cache(
       // // newEndDate.setDate(newEndDate.getDate() + 1);
 
       const res = await fetch(
+        `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",

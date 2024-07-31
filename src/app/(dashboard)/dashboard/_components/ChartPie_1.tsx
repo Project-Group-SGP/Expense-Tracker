@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Pie, PieChart } from "recharts"
@@ -9,8 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartData3 } from "./Dropdown_chart_1";
-import { ChartData2 } from "./Dropdown_chart_2";
+import { ChartData2 } from "./Dropdown_chart_2"
 // const chartData = [
 //   { category: "Bills", spend: 20705, fill: "#0088FE" },
 //   { category: "EMI", spend: 10000, fill: "#00C49F" },
@@ -71,26 +69,27 @@ const chartConfig = {
     label: "Groceries",
     color: "#ADFF2F",
   },
-} satisfies ChartConfig;
+} satisfies ChartConfig
 
-export type chartPieProps= {
-  chartData : ChartData2[]
+export type chartPieProps = {
+  chartData: ChartData2[]
 }
 
-export default function ChartPie_1({chartData}:chartPieProps) {
-  return (<>
-
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie data={chartData} dataKey="spend" nameKey="category" />
-          </PieChart>
-        </ChartContainer>
-        </>)
+export default function ChartPie_1({ chartData }: chartPieProps) {
+  return (
+    <>
+      <ChartContainer
+        config={chartConfig}
+        className="mx-auto aspect-square max-h-[250px]"
+      >
+        <PieChart>
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent hideLabel />}
+          />
+          <Pie data={chartData} dataKey="spend" nameKey="category" />
+        </PieChart>
+      </ChartContainer>
+    </>
+  )
 }

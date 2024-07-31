@@ -7,8 +7,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartData2 } from "./Dropdown_chart_2";
-import { chartPieProps } from "./ChartPie_1";
+import { ChartData2 } from "./Dropdown_chart_2"
+import { chartPieProps } from "./ChartPie_1"
 
 const chartConfig = {
   spend: {
@@ -62,9 +62,9 @@ const chartConfig = {
     label: "Groceries",
     color: "#ADFF2F",
   },
-} satisfies ChartConfig;
+} satisfies ChartConfig
 
-export default function ChartPie_3({chartData}: chartPieProps) {
+export default function ChartPie_3({ chartData }: chartPieProps) {
   return (
     <>
       <ChartContainer
@@ -80,7 +80,10 @@ export default function ChartPie_3({chartData}: chartPieProps) {
         >
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent nameKey="category" valueKey="spend" />}
+            content={
+              // @ts-ignore
+              <ChartTooltipContent nameKey="category" valueKey="spend" />
+            }
           />
           <RadialBar dataKey="spend" background>
             <LabelList
