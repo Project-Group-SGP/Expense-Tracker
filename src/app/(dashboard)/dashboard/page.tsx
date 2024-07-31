@@ -1,31 +1,30 @@
+import { currentUserServer } from "@/lib/auth"
 import { MoveDownIcon, MoveUpIcon, PiggyBankIcon } from "lucide-react"
+import { headers } from "next/headers"
+import { cache, Suspense } from "react"
 import Card, { Cardcontent } from "./_components/Card"
-import { DatePickerWithRange } from "./_components/DatePickerWithRange"
+import DateSelect from "./_components/DateSelect"
 import { Dropdown_chart_1 } from "./_components/Dropdown_chart_1"
 import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
-import { headers } from "next/headers"
-import { currentUserServer } from "@/lib/auth"
-import { cache, Suspense } from "react"
-import DateSelect from "./_components/DateSelect"
 
 type FinancialData = {
   amount: number
 }
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
-
 const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/totalIncome?userId=${id}`, {
-        method: "GET",
-        headers: { Cookie: cookie },
-        next: { tags: ["totalIncome"] },
-      })
+      const res = await fetch(
+        `${process.env.BASE_URL}/api/totalIncome?userId=${id}`,
+        {
+          method: "GET",
+          headers: { Cookie: cookie },
+          next: { tags: ["totalIncome"] },
+        }
+      )
       if (!res.ok) throw new Error("Failed to fetch total income")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -39,11 +38,14 @@ const getTotalIncome = cache(
 const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/totalExpense?userId=${id}`, {
-        method: "GET",
-        headers: { Cookie: cookie },
-        next: { tags: ["totalExpense"] },
-      })
+      const res = await fetch(
+        `${process.env.BASE_URL}/api/totalExpense?userId=${id}`,
+        {
+          method: "GET",
+          headers: { Cookie: cookie },
+          next: { tags: ["totalExpense"] },
+        }
+      )
       if (!res.ok) throw new Error("Failed to fetch total expense")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -76,7 +78,7 @@ const getAllData = cache(
   ): Promise<FinancialData_> => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
+        `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",
           headers: { Cookie: cookie },
