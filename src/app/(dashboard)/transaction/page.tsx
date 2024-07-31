@@ -1,15 +1,14 @@
 "use client"
-import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import AddPdfModal from "./_components/AddPdfModal"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
-import DataTable from "./data-table"
-import MaxWidthWrapper from "@/components/MaxWidthWrapper"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react"
 import { toast } from "sonner"
+import AddPdfModal from "./_components/AddPdfModal"
 import DeleteTransactionModal from "./_components/DeleteTransactionModal"
 import { SaveTransactions } from "./actions"
+import DataTable from "./data-table"
 
 export type TransactionPDF = {
   bank: string
@@ -73,7 +72,7 @@ export default function Page() {
             "Network error. Please check your connection and try again."
           )
         } else {
-          throw error // Re-throw the error so it's caught by the onError callback
+          throw error
         }
       }
     },

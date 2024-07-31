@@ -1,14 +1,13 @@
-import { db } from "@/lib/db"
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { generateText } from "ai"
-import { NextResponse } from "next/server"
-// import { sendMail } from "./your-email-service" // You'll need to implement this
+// import { db } from "@/lib/db"
+// import { createGoogleGenerativeAI } from "@ai-sdk/google"
+// import { generateText } from "ai"
+// import { NextResponse } from "next/server"
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_MAIL_API_KEY,
-})
+// const google = createGoogleGenerativeAI({
+//   apiKey: process.env.GEMINI_MAIL_API_KEY,
+// })
 
-const model = google("models/gemini-1.5-flash-latest")
+// const model = google("models/gemini-1.5-flash-latest")
 
 // async function generateSuggestion(userData) {
 //   const prompt = `
@@ -38,23 +37,14 @@ const model = google("models/gemini-1.5-flash-latest")
 //   return text
 // }
 
-async function fetchVerifiedUsers() {
-  return await db.user.findMany({
-    where: {
-      emailVerified: {
-        not: null,
-      },
-      email: {
-        not: null,
-      },
-    },
-    include: {
-      categories: true,
-      incomes: true,
-      expenses: true,
-    },
-  })
-}
+// async function fetchUserDataFromQueue(batchSize: number) {
+//   const pipeline = redis.pipeline()
+//   for (let i = 0; i < batchSize; i++) {
+//     pipeline.lpop("userQueue")
+//   }
+//   const results = await pipeline.exec()
+//   return results.map((result) => JSON.parse(result[1]))
+// }
 
 // async function processUserData(user) {
 //   const currentDate = new Date()
@@ -96,29 +86,49 @@ async function fetchVerifiedUsers() {
 //   }
 // }
 
-export async function GET() {
-  const users = await fetchVerifiedUsers()
-  const suggestions = []
-  let callCount = 0
+// export async function GET() {
+//   const batchSize = 15
+//   const startTime = Date.now()
+//   const timeLimit = 59000 // 59 seconds, leaving 1 second for final processing
 
-  for (const user of users) {
-    if (callCount >= 15) {
-      // Wait for a minute before continuing
-      await new Promise((resolve) => setTimeout(resolve, 70000))
-      callCount = 0
-    }
+//   try {
+//     let totalProcessed = 0
+//     let callCount = 0
 
-    // const processedUserData = await processUserData(user)
-    // const suggestion = await generateSuggestion(processedUserData)
-    // suggestions.push({ userId: user.id, suggestion })
-    callCount++
+//     while (Date.now() - startTime < timeLimit) {
+//       const users = await fetchUserDataFromQueue(batchSize)
+//       if (users.length === 0) break
 
-    // Send email
-    // await sendMail({
-    //   to: user.email,
-    //   subject: "Your Spendwise Financial Insights",
-    //   body: suggestion,
-    // })
-  }
-  return NextResponse.json({ success: true, count: suggestions.length })
-}
+//       for (const user of users) {
+//         if (callCount >= 15) {
+//           // Wait for a minute before continuing
+//           await new Promise((resolve) => setTimeout(resolve, 60000))
+//           callCount = 0
+//         }
+
+//         const processedUserData = await processUserData(user)
+//         const suggestion = await generateSuggestion(processedUserData)
+
+//         // Send email
+//         // await sendMail({
+//         //   to: user.email,
+//         //   subject: "Your Spendwise Financial Insights",
+//         //   body: suggestion,
+//         // })
+
+//         callCount++
+//         totalProcessed++
+//       }
+
+//       if (users.length < batchSize) break
+//     }
+
+//     return NextResponse.json({ success: true, processedUsers: totalProcessed })
+//   } catch (error) {
+//     console.error("Error processing users:", error)
+//     return NextResponse.json(
+//       { error: "Internal server error" },
+//       { status: 500 }
+//     )
+//   }
+// }
