@@ -6,7 +6,7 @@ type User = {
   image: string | null
   id: string
   isTwoFactorEnable: boolean
-  isOAuth:boolean
+  isOAuth: boolean
 }
 
 /**
@@ -15,12 +15,7 @@ type User = {
  * @return {User | undefined} The user object if available, otherwise undefined.
  */
 export const currentUserServer = async (): Promise<User | undefined> => {
-<<<<<<< HEAD
   const session = await auth()
+  //@ts-ignore
   return session?.user
-=======
-  const session = await auth();
-   //@ts-ignore
-  return session?.user;
->>>>>>> 76d1c281e1844fbdcad32beb58e06bc5579f038e
 }
