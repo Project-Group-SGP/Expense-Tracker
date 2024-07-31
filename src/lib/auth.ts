@@ -16,5 +16,6 @@ type User = {
  */
 export const currentUserServer = async (): Promise<User | undefined> => {
   const session = await auth();
+   //@ts-ignore
   return session?.user;
 }
