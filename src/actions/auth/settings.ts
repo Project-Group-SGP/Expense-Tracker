@@ -1,5 +1,4 @@
 "use server";
-
 import { getUserByEmail, getUserById } from "@/data/user";
 import { currentUserServer } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -24,8 +23,10 @@ export const settings = async (
     values.newPassword = undefined;
   }
   const user = await currentUserServer();
+  console.log("User:" ,user);
   
-  if(!user) return {error:"unauthorized"};
+  if(!user)
+     return {error:"unauthorized"};
 
   // if(user.email==values.email && user.name==values.name && user.isTwoFactorEnable==values.isTwoFactorEnable && !values.password && !values.newPassword)
   //   return {error:"No Changes are made"};

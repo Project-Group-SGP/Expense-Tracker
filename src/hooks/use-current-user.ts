@@ -6,6 +6,7 @@ type User = {
   image: string | null
   id: string
   isTwoFactorEnable: boolean
+  isOAuth : boolean
 }
 
 /**
