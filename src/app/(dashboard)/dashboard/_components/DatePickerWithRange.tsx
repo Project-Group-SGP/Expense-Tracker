@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { format, subMonths } from "date-fns";
+import { format, subMonths, isBefore, startOfTomorrow } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -15,13 +15,17 @@ import {
 export function DatePickerWithRange({
   className,
   onDateRangeChange,
+  defaultDateRange,
 }: React.HTMLAttributes<HTMLDivElement> & {
-  onDateRangeChange?: (dateRange: DateRange | undefined) => void
+  onDateRangeChange?: (dateRange: DateRange | undefined) => void;
+  defaultDateRange?: DateRange;
 }) {
-  const [date, setDate] = React.useState<DateRange>({
-    from: subMonths(new Date(), 1),
-    to: new Date(),
-  });
+  const [date, setDate] = React.useState<DateRange>(
+    defaultDateRange || {
+      from: subMonths(new Date(), 1),
+      to: new Date(),
+    }
+  );
 
   const handleSelect = (range: DateRange | undefined) => {
     if (range) {
@@ -39,6 +43,10 @@ export function DatePickerWithRange({
       onDateRangeChange(date);
     }
   }, [date, onDateRangeChange]);
+
+  const disabledDays = {
+    after: new Date(),
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -75,6 +83,7 @@ export function DatePickerWithRange({
             selected={date}
             onSelect={handleSelect}
             numberOfMonths={2}
+            disabled={disabledDays}
           />
         </PopoverContent>
       </Popover>

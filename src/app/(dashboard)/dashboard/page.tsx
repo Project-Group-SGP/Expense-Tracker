@@ -10,18 +10,18 @@ import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
 import { cache, Suspense } from "react"
 import DateSelect from "./_components/DateSelect"
+import { format, subMonths } from "date-fns"
 
 type FinancialData = {
   amount: number
 }
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000"
 
+ 
 const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/totalIncome?userId=${id}`, {
+      const res = await fetch(`${process.env.BASE_URL}/api/totalIncome?userId=${id}`, {
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["totalIncome"] },
@@ -39,7 +39,7 @@ const getTotalIncome = cache(
 const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/totalExpense?userId=${id}`, {
+      const res = await fetch(`${process.env.BASE_URL}/api/totalExpense?userId=${id}`, {
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["totalExpense"] },
@@ -75,25 +75,31 @@ const getAllData = cache(
     endDate: string
   ): Promise<FinancialData_> => {
     try {
+      // // Increase startDate and endDate by 1 day
+      // const newStartDate = new Date(startDate);
+      // // newStartDate.setDate(newStartDate.getDate() + 1);
+      // const newEndDate = new Date(endDate);
+      // // newEndDate.setDate(newEndDate.getDate() + 1);
+
       const res = await fetch(
-        `${API_BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
+        `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",
           headers: { Cookie: cookie },
           next: { tags: ["getAllData"] },
         }
-      )
+      );
 
-      if (!res.ok) throw new Error("Failed to fetch all expenses")
+      if (!res.ok) throw new Error("Failed to fetch all expenses");
 
-      const data: FinancialData_ = await res.json()
-      return data
+      const data: FinancialData_ = await res.json();
+      return data;
     } catch (error) {
-      console.error("Error fetching data:", error)
-      return { expense: [] }
+      console.error("Error fetching data:", error);
+      return { expense: [] };
     }
   }
-)
+);
 
 export default async function Dashboard({
   searchParams,
@@ -108,8 +114,8 @@ export default async function Dashboard({
     return <div>Please log in to view your dashboard.</div>
   }
 
-  const startDate = searchParams?.startDate || ""
-  const endDate = searchParams?.endDate || ""
+  const startDate = searchParams?.startDate || format(subMonths(new Date(), 1), 'yyyy-MM-dd') || ""
+  const endDate = searchParams?.endDate || format(new Date(), 'yyyy-MM-dd') || ""
 
   const totalIncome = await getTotalIncome(user.id, cookie)
   const totalExpense = await getTotalExpense(user.id, cookie)
