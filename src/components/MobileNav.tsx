@@ -4,12 +4,15 @@ import Link from "next/link"
 import clsx from "clsx"
 import { IoClose } from "react-icons/io5"
 import { CiMenuFries } from "react-icons/ci"
+import { Button } from "./ui/button"
+import { logout } from "@/actions/auth/logout"
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/spend", label: "Spend" },
   { href: "/", label: "About" },
   { href: "/", label: "Contact" },
+  { href: "/settings", label: "Settings" },
 ]
 
 const MobileNav = () => {
@@ -46,6 +49,15 @@ const MobileNav = () => {
                 {label}
               </Link>
             ))}
+            <form action={logout}>
+              <Button
+                variant="link"
+                className="text-black dark:text-white hover:text-primary text-base mt-[-10px]"
+                size={"lg"}
+              >
+                Logout
+              </Button>
+              </form>
           </div>
         </section>
       </div>

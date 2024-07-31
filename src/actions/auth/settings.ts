@@ -12,9 +12,23 @@ import bcrypt from "bcryptjs";
 export const settings = async (
   values:z.infer<typeof SettingsSchema>
 )=>{
+  // console.log("values: ",values);
+  if(!values.email && !values.isTwoFactorEnable && !values.name && !values.newPassword && !values.password) 
+    return {error:"No Changes are made"};
+  if(!values.password && values.newPassword)
+    return {error:"New Password is required"};
+  if(values.password && !values.newPassword)
+    return {error:"Old Password is required"};
+  if(values.password==""){
+    values.password = undefined;
+    values.newPassword = undefined;
+  }
   const user = await currentUserServer();
-
+  
   if(!user) return {error:"unauthorized"};
+
+  // if(user.email==values.email && user.name==values.name && user.isTwoFactorEnable==values.isTwoFactorEnable && !values.password && !values.newPassword)
+  //   return {error:"No Changes are made"};
 
   const dbuser = await getUserById(user?.id as string);
 
@@ -24,8 +38,9 @@ export const settings = async (
     values.email = undefined;
     values.password=undefined;
     values.newPassword=undefined;
-    values.isTwoFactorEnabled=undefined;
+    values.isTwoFactorEnable=undefined;
   }
+  console.log(values);
 
   if(values.email && values.email!==user.email){
     const existingUser = await getUserByEmail(values.email);
@@ -44,19 +59,15 @@ export const settings = async (
   }
 
   if(values.password && values.newPassword && dbuser.password){
-    if(values.password !== values.newPassword)
-      return {error:"Password Doesn't Match"}
-
     const passwordsMatch = await bcrypt.compare(values.password,dbuser.password);
 
     if(!passwordsMatch)
-      return {error:"Incorrect passwords"}
+      return {error:"Incorrect Oldpassword"}
 
     const hashedPassword = await bcrypt.hash(values.newPassword,10);
     values.password = hashedPassword;
     values.newPassword = undefined;
   }
-
 
   await db.user.update({
     where:{id:dbuser?.id},
