@@ -9,10 +9,6 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
-import { headers } from "next/headers"
-import { currentUserServer } from "@/lib/auth"
-import { cache, Suspense } from "react"
-import DateSelect from "./_components/DateSelect"
 import { format, subMonths } from "date-fns"
 
 type FinancialData = {
@@ -85,7 +81,6 @@ const getAllData = cache(
       // // newEndDate.setDate(newEndDate.getDate() + 1);
 
       const res = await fetch(
-        `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",
