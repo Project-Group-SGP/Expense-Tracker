@@ -6,6 +6,7 @@ type User = {
   image: string | null
   id: string
   isTwoFactorEnable: boolean
+  isOAuth : boolean
 }
 
 /**
@@ -15,5 +16,6 @@ type User = {
  */
 export function useCurrentUserClient(): User | undefined {
   const session = useSession()
-  return session.data?.user
+  //@ts-ignore
+  return session.data?.user;
 }
