@@ -6,43 +6,41 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
+  ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartData3 } from "./Dropdown_chart_1";
-
+import { ChartData3 } from "./Dropdown_chart_1"
 
 const chartConfig = {
-    spend: {
-      label: "spend",
-      color: "#2563eb"
-    }
-}; //satisfies ChartConfig
+  spend: {
+    label: "spend",
+    color: "#2563eb",
+  },
+} //satisfies ChartConfig
 
 type chartDataProps = {
-  chartData : ChartData3[];
+  chartData: ChartData3[]
 }
 
-export function ChartBar_4({chartData}:chartDataProps) {
+export function ChartBar_4({ chartData }: chartDataProps) {
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("spend")
 
   const total = React.useMemo(
     () => ({
       desktop: chartData.reduce((acc, curr) => acc + curr.spend, 0),
-      
     }),
     []
   )
 
   const handleChartChange = (chart: keyof typeof chartConfig) => {
-    setActiveChart(chart);
-  };
+    setActiveChart(chart)
+  }
 
   return (
     <>
       <div className="flex">
         {Object.keys(chartConfig).map((key) => {
-          const chart = key as keyof typeof chartConfig;
+          const chart = key as keyof typeof chartConfig
           return (
             <button
               key={chart}
@@ -57,7 +55,7 @@ export function ChartBar_4({chartData}:chartDataProps) {
                 {total.desktop.toLocaleString()}
               </span>
             </button>
-          );
+          )
         })}
       </div>
 
@@ -80,11 +78,11 @@ export function ChartBar_4({chartData}:chartDataProps) {
             tickMargin={8}
             minTickGap={32}
             tickFormatter={(value) => {
-              const date = new Date(value);
+              const date = new Date(value)
               return date.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
-              });
+              })
             }}
           />
           <ChartTooltip
@@ -97,7 +95,7 @@ export function ChartBar_4({chartData}:chartDataProps) {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
-                  });
+                  })
                 }}
               />
             }
@@ -106,5 +104,5 @@ export function ChartBar_4({chartData}:chartDataProps) {
         </BarChart>
       </ChartContainer>
     </>
-  );
+  )
 }

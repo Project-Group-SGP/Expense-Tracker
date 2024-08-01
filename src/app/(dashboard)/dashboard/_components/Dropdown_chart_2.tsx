@@ -90,8 +90,8 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
     })
   )
 
-  console.log("category wise data")
-  console.log(chartData2)
+  // console.log("category wise data")
+  // console.log(chartData2)
 
   // Render selected chart
   const renderChart = () => {

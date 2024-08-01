@@ -94,8 +94,8 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
     })
   }
 
-  console.log("Date wise data")
-  console.log(chartData3)
+  // console.log("Date wise data")
+  // console.log(chartData3)
 
   const renderChart = () => {
     switch (selectedChart) {

@@ -8,7 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { chartPieProps } from "./ChartPie_1";
+import { chartPieProps } from "./ChartPie_1"
 
 const chartConfig = {
   spend: {
@@ -62,9 +62,9 @@ const chartConfig = {
     label: "Groceries",
     color: "#ADFF2F",
   },
-} satisfies ChartConfig;
+} satisfies ChartConfig
 
-export function ChartBar_2({chartData}:chartPieProps) {
+export function ChartBar_2({ chartData }: chartPieProps) {
   return (
     <ChartContainer config={chartConfig}>
       <BarChart
@@ -91,13 +91,19 @@ export function ChartBar_2({chartData}:chartPieProps) {
         />
         <XAxis dataKey="spend" type="number" />
         <ChartTooltip
-          cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+          cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
+          //@ts-ignore
           content={<ChartTooltipContent nameKey="category" valueKey="spend" />}
         />
-        <Bar 
-          dataKey="spend" 
-          fill={(entry) => chartConfig[entry.category as keyof typeof chartConfig]?.color || "#000000"}
-          radius={[0, 5, 5, 0]} 
+        <Bar
+          dataKey="spend"
+          //@ts-ignore
+          fill={(entry) =>
+            //@ts-ignore
+            chartConfig[entry.category as keyof typeof chartConfig]?.color ||
+            "#000000"
+          }
+          radius={[0, 5, 5, 0]}
         />
       </BarChart>
     </ChartContainer>

@@ -17,34 +17,26 @@ export async function GET(req: NextRequest) {
     }
 
     let whereClause: any = { userId: userId };
-    
+
     if (startDate && endDate) {
       const start = new Date(startDate);
-      start.setDate(start.getDate() - 1);
-      
+      start.setHours(0, 0, 0, 0);
       const end = new Date(endDate);
-      end.setDate(end.getDate() + 1);
+      end.setHours(23, 59, 59, 999);
 
-      if (startDate === endDate) {
-        whereClause.date = {
-          equals: new Date(start),
-        };
-      } else {
-        whereClause.date = {
-          gte: start,
-          lte: end,
-        };
-      }
+      whereClause.date = {
+        gte: start,
+        lte: end,
+      };
     }
 
     const expense = await db.expense.findMany({
       where: whereClause,
     });
 
-    console.log("Expense:", expense);
+    console.log(whereClause);
 
     return NextResponse.json({ expense });
-    
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json(
