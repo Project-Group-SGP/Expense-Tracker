@@ -18,8 +18,11 @@ import zxcvbn from "zxcvbn";
 import { Passwordcmp } from "@/components/Passwordcmp";
 import { ModeToggle } from "@/components/ModeToggle";
 import { toast } from "sonner";
+import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import { IconUser, IconMail, IconLock, IconShieldLock, IconPalette } from "@tabler/icons-react";
 
 const SettingsPage = () => {
+  // ... (keep the existing state and hooks)
   const user = useCurrentUserClient();
   const {update} = useSession();
   const [isPending,startTransition]=useTransition();
@@ -110,7 +113,7 @@ const SettingsPage = () => {
             )
           }else if (data.success){
             update();
-            toast.success("Updates are saved successfully",{
+            toast.success(data.success,{
               id:toastid
             })
           }
@@ -124,183 +127,226 @@ const SettingsPage = () => {
         });
     })
   }
-  console.log("is oauth:",user);
   return (
-      <Card className="w-[400px] text-left"> 
-        <CardHeader>
-          <p className="text-2xl font-semibold text-center">
-            Settings
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              className="space-y-6"
-              onSubmit={form.handleSubmit(onSubmit)}
+    <MaxWidthWrapper>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="mt-20 flex w-full flex-col gap-5 px-4">
+          <div className="z-10 mb-4 flex items-center justify-between bg-white py-4 dark:bg-zinc-950">
+            <h1 className="text-3xl font-bold">Settings</h1>
+            <Button 
+              onClick={form.handleSubmit(onSubmit)} 
+              disabled={isPending}
+              className="w-32"
             >
-              <div className="space-y-4">
-                <FormField 
-                  disabled={isPending}
-                  control={form.control}
-                  name="name"
-                  render = {({field})=>(
-                    <FormItem>
-                      <FormLabel className="text-left block ml-2">Name</FormLabel>
-                      <FormControl>
-                        <Input
-                        disabled={isPending}
-                        {...field}
-                        placeholder="jhon deo"
-                        defaultValue={user?.name}
-                        />
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
-                {user?.isOAuth === false &&
-                <>
-                  <FormField 
+              Save Changes
+            </Button>
+          </div>
+
+          <Form {...form}>
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl font-semibold">Personal Information</h2>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
                     disabled={isPending}
                     control={form.control}
-                    name="email"
-                    render = {({field})=>(
+                    name="name"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-left block ml-2">Email</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <IconUser size={18} />
+                          Name
+                        </FormLabel>
                         <FormControl>
                           <Input
-                          disabled={isPending}
-                          placeholder="xyz@gmail.com"
-                          defaultValue={user?.email}
-                          {...field}
+                            {...field}
+                            placeholder="John Doe"
+                            defaultValue={user?.name}
                           />
                         </FormControl>
-                        <FormMessage/>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
-                <FormField
-                control={form.control}
-                name="password"
-                disabled={isPending}
-                render={({field})=>(
-                  <FormItem>
-                    <FormLabel className={`${errorpassword1!=="" && " text-red-600"}`}>
-                    Old Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                          <Input
-                            placeholder="Enter you Password"
-                            {...field}
-                            disabled={isPending}
-                            type={isPasswordVisible1 ? "text" : "password"}
-                            onChange={(e)=>{setoldPassword(e.target.value);setErrorpassword1("");}}
-                            value={oldpassword}
-                            className="pr-10"
-                          />
-                          <Passwordcmp
-                            isPasswordVisible={isPasswordVisible1}
-                            setisPasswordVisible={setIsPasswordVisible1}
-                          />
-                      </div>
-                    </FormControl>
-                    {errorpassword1!=="" && <div className="text-[0.8rem] font-medium text-destructive">{errorpassword1}</div>}
-                  </FormItem>
-    )}
-              />
-                  <FormField 
+
+                  {user?.isOAuth === false && (
+                    <FormField
+                      disabled={isPending}
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <IconMail size={18} />
+                            Email
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="john@example.com"
+                              defaultValue={user?.email}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+
+              {user?.isOAuth === false && (
+                <Card>
+                  <CardHeader>
+                    <h2 className="text-xl font-semibold">Security</h2>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      disabled={isPending}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <IconLock size={18} />
+                            Old Password
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                {...field}
+                                type={isPasswordVisible1 ? "text" : "password"}
+                                onChange={(e) => { setoldPassword(e.target.value); setErrorpassword1(""); }}
+                                value={oldpassword}
+                                className="pr-10"
+                              />
+                              <Passwordcmp
+                                isPasswordVisible={isPasswordVisible1}
+                                setisPasswordVisible={setIsPasswordVisible1}
+                              />
+                            </div>
+                          </FormControl>
+                          {errorpassword1 !== "" && <FormMessage>{errorpassword1}</FormMessage>}
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      disabled={isPending}
+                      control={form.control}
+                      name="newPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <IconLock size={18} />
+                            New Password
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                {...field}
+                                type={isPasswordVisible2 ? "text" : "password"}
+                                onChange={(e) => { setPassword(e.target.value); setErrorpassword(""); }}
+                                value={password}
+                                className="pr-10"
+                              />
+                              <Passwordcmp
+                                isPasswordVisible={isPasswordVisible2}
+                                setisPasswordVisible={setIsPasswordVisible2}
+                              />
+                            </div>
+                          </FormControl>
+                          {errorpassword === "" && password !== "" && !isPending && (
+                            <div className="mt-2">
+                              <div className="h-2 w-full bg-gray-200 rounded-full">
+                                <div
+                                  className="h-full rounded-full transition-all duration-300"
+                                  style={{
+                                    width: `${password_score}%`,
+                                    backgroundColor: PassProgressColor(),
+                                  }}
+                                ></div>
+                              </div>
+                              <p className="text-sm mt-1" style={{ color: PassProgressColor() }}>
+                                {createPassLable()}
+                              </p>
+                            </div>
+                          )}
+                          {errorpassword !== "" && <FormMessage>{errorpassword}</FormMessage>}
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      disabled={isPending}
+                      control={form.control}
+                      name="isTwoFactorEnable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                              <div className="flex items-center gap-2">
+                                <IconShieldLock size={18} />
+                                Two Factor Authentication
+                              </div>
+                            </FormLabel>
+                            <FormDescription>
+                              Enable two factor authentication for your account
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                setonoff(checked);
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl font-semibold">Preferences</h2>
+                </CardHeader>
+                <CardContent>
+                  <FormField
                     disabled={isPending}
                     control={form.control}
-                    name="newPassword"
-                    render = {({field})=>(
-                      <FormItem>
-                    <FormLabel className={`${errorpassword!=="" && " text-red-600"}`}>
-                      New Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                          <Input
-                            placeholder="Enter you Password"
-                            {...field}
-                            disabled={isPending}
-                            type={isPasswordVisible2 ? "text" : "password"}
-                            onChange={(e)=>{setPassword(e.target.value); setErrorpassword("");}}
-                            value={password}
-                            className="pr-10"
-                          />
-                          <Passwordcmp
-                            isPasswordVisible={isPasswordVisible2}
-                            setisPasswordVisible={setIsPasswordVisible2}
-                          />
-                      </div>
-                    </FormControl>
-                    {errorpassword==="" && password!=="" && isPending===false &&<div className="text-right">
-                      <div className="w-full h-2 bg-slate-500 rounded-sm shadow-none">
-                        <div className={`h-2 rounded-sm `} style={{background:PassProgressColor(),
-                          width:password_score+"%",
-                        }}>
+                    name="theme"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">
+                            <div className="flex items-center gap-2">
+                              <IconPalette size={18} />
+                              Theme
+                            </div>
+                          </FormLabel>
+                          <FormDescription>
+                            Choose between light and dark mode
+                          </FormDescription>
                         </div>
-                      </div>
-                        <p style={{color:PassProgressColor()}} className="text-sm">{createPassLable()}</p>
-                    </div>}
-                  {errorpassword!=="" && <div className="text-[0.8rem] font-medium text-destructive">{errorpassword}</div>}
-                  </FormItem>
+                        <FormControl>
+                          <ModeToggle />
+                        </FormControl>
+                      </FormItem>
                     )}
                   />
-              <FormField 
-                  disabled={isPending}
-                  control={form.control}
-                  name="isTwoFactorEnable"
-                  render = {({field})=>(
-                    <FormItem className="flex justify-between rounded-lg items-center border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                      <FormLabel className="text-left block ml-2">Two Factor Authentication</FormLabel>
-                      <FormDescription>
-                        Enable two factor authentication for your account
-                      </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          disabled={isPending}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          defaultChecked={user?.isTwoFactorEnable}
-                          onClick={()=>{setonoff(!onoff);}}
-                        />
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
-              </>
-              }
-              <FormField 
-                  disabled={isPending}
-                  control={form.control}
-                  name="theme"
-                  render = {({field})=>(
-                    <FormItem className="flex justify-between rounded-lg items-center border p-3 shadow-sm py-0 pb-1">
-                      <div className="space-y-0.5">
-                        <FormLabel className=" block ml-2 pt-1">Theme</FormLabel>
-                      </div>
-                      <FormControl>
-                        <div className="hidden md:block lg:block">
-                          <ModeToggle/>
-                        </div>
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button disabled={isPending} type="submit" className="text-lg text-center px-14">
-                Save
-              </Button>
+                </CardContent>
+              </Card>
             </form>
           </Form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+    </MaxWidthWrapper>
   )
 }
 

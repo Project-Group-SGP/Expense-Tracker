@@ -22,6 +22,10 @@ export const settings = async (
     values.password = undefined;
     values.newPassword = undefined;
   }
+  if(values.email && values.password){
+    return {error:"Change one section at a time!!"};
+  }
+
   const user = await currentUserServer();
   console.log("User:" ,user);
   

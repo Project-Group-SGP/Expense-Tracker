@@ -12,7 +12,8 @@ const navLinks = [
   { href: "/transaction", label: "Transaction" },
   { href: "/", label: "About" },
   { href: "/", label: "Contact" },
-  { href: "/settings", label: "Settings" }
+  { href: "/settings", label: "Settings" },
+  { href: "/history", label: "History" },
 ]
 
 const MobileNav = () => {

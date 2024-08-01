@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/transaction", label: "Transactions" },
   { href: "/settings", label: "Settings" },
+  { href: "/history", label: "History" },
 ]
 
 const Navbar = () => {
