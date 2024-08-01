@@ -57,3 +57,10 @@ export const SettingsSchema = z.object({
   
 //   return true;
 // },{message:"password is required!",path:["password"]})
+
+export const bulkdeleteProps = z.object({
+  props: z.array(z.object({
+    ids:z.string(),
+    category:z.enum(["Income", "Expense"]),
+  })),
+})
