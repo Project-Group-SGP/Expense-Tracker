@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartDataIncomeExpense } from "./Dropdown_chart_1"
+import { ChartDataIncomeExpense } from "../Dropdown_chart_1"
 
 
 const chartConfig = {
@@ -30,11 +30,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-type ChartBar5Props = {
+export type Chart_income_expense_Props = {
   chartData: ChartDataIncomeExpense[]
 }
 
-export function ChartBar_5({ chartData }: ChartBar5Props) {
+export function Chart_income_expense_1({ chartData }: Chart_income_expense_Props) {
   return (
     <Card>
       <CardHeader>

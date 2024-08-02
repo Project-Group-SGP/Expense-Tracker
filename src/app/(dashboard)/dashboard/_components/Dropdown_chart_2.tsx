@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-import { ChartBar_2 } from "./ChartBar_2"
-import ChartPie_1 from "./ChartPie_1"
-import ChartPie_2 from "./ChartPie_2"
-import ChartPie_3 from "./ChartPie_3"
+import { ChartBar_2 } from "./charts/ChartBar_2"
+import ChartPie_1 from "./charts/ChartPie_1"
+import ChartPie_2 from "./charts/ChartPie_2"
+import ChartPie_3 from "./charts/ChartPie_3"
 import { DropdownChartProps } from "./Dropdown_chart_1"
 
 // Define data types

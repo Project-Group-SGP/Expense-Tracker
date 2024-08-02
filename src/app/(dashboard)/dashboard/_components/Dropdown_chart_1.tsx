@@ -9,11 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-import { ChartBar_1 } from "./ChartBar_1"
-import { ChartBar_3 } from "./ChartBar_3"
-import { ChartBar_4 } from "./ChartBar_4"
+import { ChartBar_1 } from "./charts/ChartBar_1"
+import { ChartBar_3 } from "./charts/ChartBar_3"
+import { ChartBar_4 } from "./charts/ChartBar_4"
 import { FinancialData_ } from "../page"
-import { ChartBar_5 } from "./ChartBar_5"
+
+import { Chart_income_expense_2 } from "./charts/Chart_income_expense_2"
+import { Chart_income_expense_1 } from "./charts/Chart_income_expense_1"
 
 export type Expense = {
   id: string
@@ -166,8 +168,11 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
         return <ChartBar_3 chartData={expenseData} />
       case "Bar chart_3":
         return <ChartBar_4 chartData={chartData3} />
-      case "income-expense":
-        return <ChartBar_5 chartData={incomeExpenseData} />
+      case "income-expense 1":
+        return <Chart_income_expense_1 chartData={incomeExpenseData} />
+      case "income-expense 2":
+        return <Chart_income_expense_2  chartData={incomeExpenseData}/>
+
       default:
         return <ChartBar_3 chartData={expenseData} />
     }
@@ -198,9 +203,13 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
               <DropdownMenuRadioItem value="Bar chart_3">
                 Bar chart_3
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="income-expense">
-                  income-expense
+              <DropdownMenuRadioItem value="income-expense 1">
+                  income-expense 1
               </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="income-expense 2">
+                  income-expense 2
+              </DropdownMenuRadioItem>
+
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>

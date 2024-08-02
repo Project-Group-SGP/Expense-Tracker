@@ -8,7 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartData3 } from "./Dropdown_chart_1"
+import { ChartData3 } from "../Dropdown_chart_1"
 
 const chartConfig = {
   spend: {
