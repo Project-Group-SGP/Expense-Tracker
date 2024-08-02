@@ -37,6 +37,10 @@ export async function AddnewExpense(data: ExpenseFormData) {
       category,
     },
   })
+
+  console.log("newExpense", newExpense);
+  
+
   revalidateTag("totalExpense")
   revalidateTag("getAllData")
   return newExpense ? "success" : "error"

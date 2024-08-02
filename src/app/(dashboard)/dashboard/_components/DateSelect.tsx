@@ -8,7 +8,7 @@ import { DatePickerWithRange } from './DatePickerWithRange';
 const DateSelect = () => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subMonths(new Date(), 1),
+    from: subMonths(new Date(), 6),
     to: new Date(),
   });
 
