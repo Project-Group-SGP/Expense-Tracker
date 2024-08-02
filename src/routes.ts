@@ -49,4 +49,10 @@ export const apiRoutes = [
   "/api/allData",
 ]
 
-export const privateRoutes = ["/dashboard", "/transaction", "/settings" ,"/history"]
+export const privateRoutes = [
+  "/dashboard",
+  "/transaction",
+  "/settings",
+  "/history",
+  "/report",
+]
