@@ -6,6 +6,88 @@ import { currentUserServer } from "@/lib/auth"
 import jsPDF from "jspdf"
 import "jspdf-autotable"
 import autoTable from "jspdf-autotable"
+import { createCanvas } from "canvas"
+import { Chart, registerables } from "chart.js"
+
+Chart.register(...registerables)
+
+interface ChartData {
+  labels: string[]
+  values: number[]
+}
+
+async function generatePieChart(data: ChartData): Promise<string> {
+  const width = 800 // Width of the chart
+  const height = 400 // Height of the chart
+
+  const canvas = createCanvas(width, height)
+  const ctx = canvas.getContext("2d")
+
+  if (!ctx) {
+    throw new Error("Failed to get 2D context from canvas")
+  }
+
+  const configuration = {
+    type: "pie",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          data: data.values,
+          backgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#FF9F40",
+            "#A3E6B3",
+            "#FFC3A0",
+            "#A5A8A5",
+            "#9F99C4",
+            "#8C9C8C",
+            "#D6E1E0",
+            "#B8C9A7",
+            "#C7A7A1",
+          ],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem) => {
+              return `${tooltipItem.label}: ${tooltipItem.raw}`
+            },
+          },
+        },
+      },
+    },
+  }
+
+  //@ts-ignore
+  const chart = new Chart(ctx, configuration)
+  const imageBuffer = canvas.toBuffer("image/png")
+  return imageBuffer.toString("base64")
+}
+
+enum CategoryTypes {
+  Other = "Other",
+  Bills = "Bills",
+  Food = "Food",
+  Entertainment = "Entertainment",
+  Transportation = "Transportation",
+  EMI = "EMI",
+  Healthcare = "Healthcare",
+  Education = "Education",
+  Investment = "Investment",
+  Shopping = "Shopping",
+  Fuel = "Fuel",
+  Groceries = "Groceries",
+}
 
 function addHeader(
   doc: jsPDF,
@@ -14,26 +96,23 @@ function addHeader(
   start?: Date,
   end?: Date
 ) {
-  const headerHeight = 35 // Increase the header height
-  const backgroundColor = "#008000" // Lighter green background color
-  const textColor = "#ffffff" // White text color
+  const headerHeight = 35
+  const backgroundColor = "#008000"
+  const textColor = "#ffffff"
 
-  // Draw the background rectangle
   doc.setFillColor(backgroundColor)
   doc.rect(0, 0, doc.internal.pageSize.width, headerHeight, "F")
 
-  // Add a thin line below the header
   doc.setDrawColor(0)
   doc.setLineWidth(0.5)
   doc.line(0, headerHeight, doc.internal.pageSize.width, headerHeight)
 
-  // Add header text
   doc.setFontSize(18)
   doc.setTextColor(textColor)
-  doc.text("SpendWise", 14, headerHeight / 2) // Company name on the left
+  doc.text("SpendWise", 14, headerHeight / 2)
   doc.text(title, doc.internal.pageSize.width / 2, headerHeight / 2, {
     align: "center",
-  }) // Title centered
+  })
 
   if (name && start && end) {
     doc.setFontSize(12)
@@ -57,7 +136,6 @@ function addHeader(
 function addFooter(doc: jsPDF, pageNumber: number, totalPages: number) {
   const footerHeight = 30
 
-  // Add a thin line above the footer
   doc.setDrawColor(0)
   doc.setLineWidth(0.5)
   doc.line(
@@ -68,7 +146,7 @@ function addFooter(doc: jsPDF, pageNumber: number, totalPages: number) {
   )
 
   doc.setFontSize(10)
-  doc.setTextColor("#008000") // Lighter green color for footer
+  doc.setTextColor("#008000")
   doc.text(`Page ${pageNumber} of ${totalPages}`, 105, 297 - footerHeight / 2, {
     align: "center",
   })
@@ -78,14 +156,14 @@ export async function generateReport(
   reportType: string,
   startDate?: Date,
   endDate?: Date
-) {
+): Promise<string> {
   const user = await currentUserServer()
   if (!user) {
     throw new Error("Login Please")
   }
   const { name, id } = user
   let start: Date, end: Date
-  const headerHeight = 50 // Define headerHeight here
+  const headerHeight = 50
 
   switch (reportType) {
     case "last_month":
@@ -101,8 +179,9 @@ export async function generateReport(
       end = endOfMonth(new Date())
       break
     case "custom":
-      if (!startDate || !endDate)
+      if (!startDate || !endDate) {
         throw new Error("Custom date range requires start and end dates")
+      }
       start = startDate
       end = endDate
       break
@@ -110,7 +189,6 @@ export async function generateReport(
       throw new Error("Invalid report type")
   }
 
-  // Fetch expenses grouped by category
   const expensesByCategory = await db.expense.groupBy({
     by: ["category"],
     _sum: {
@@ -125,7 +203,6 @@ export async function generateReport(
     },
   })
 
-  // Fetch all expenses
   const expenses = await db.expense.findMany({
     where: {
       userId: id,
@@ -139,7 +216,6 @@ export async function generateReport(
     },
   })
 
-  // Fetch all incomes
   const incomes = await db.income.findMany({
     where: {
       userId: id,
@@ -153,17 +229,33 @@ export async function generateReport(
     },
   })
 
-  // Generate PDF
+  const pieChartData: ChartData = {
+    labels: Object.values(CategoryTypes),
+    //@ts-ignore
+    values: Object.values(CategoryTypes).map(
+      (cat) =>
+        expensesByCategory.find((exp) => exp.category === cat)?._sum.amount || 0
+    ),
+  }
+
+  const pieChartBase64 = await generatePieChart(pieChartData)
+
   const doc = new jsPDF()
 
-  // Add header to the first page
   addHeader(doc, "Expense Report", name, start, end)
+  doc.addImage(
+    `data:image/png;base64,${pieChartBase64}`,
+    "PNG",
+    14,
+    60,
+    180,
+    100
+  )
 
-  // Add expense distribution
   doc.setFontSize(14)
-  doc.setTextColor("#004d00") // Green color for text
-  doc.text("Expense Distribution", 14, 60)
-  let yPos = 70
+  doc.setTextColor("#004d00")
+  doc.text("Expense Distribution", 14, 180)
+  let yPos = 190
   expensesByCategory.forEach((category) => {
     doc.setFontSize(10)
     doc.text(
@@ -174,66 +266,63 @@ export async function generateReport(
     yPos += 7
   })
 
-  // Add page and header for expenses table
   doc.addPage()
   addHeader(doc, "Expense Report")
   doc.setFontSize(14)
-  doc.setTextColor("#004d00") // Green color for text
-  doc.text("Expenses", 14, headerHeight + 10) // Start the text below the header
+  doc.setTextColor("#004d00")
+  doc.text("Expenses", 14, headerHeight + 10)
   autoTable(doc, {
     head: [["Date", "Category", "Amount", "Description"]],
     body: expenses.map((e) => [
-      format(e.date, "dd-MM-yyyy"), // Use the "dd-MM-yyyy" date format
+      format(e.date, "dd-MM-yyyy"),
       e.category,
       e.amount.toFixed(2),
       e.description || "",
     ]),
-    startY: headerHeight + 20, // Start the table below the header
-    margin: { top: 50 }, // Add more top margin
+    startY: headerHeight + 20,
+    margin: { top: 50 },
     styles: {
-      fillColor: [220, 255, 220], // Light green background color for header row
-      textColor: 0, // Black text color
-      lineColor: 0, // Black border color
-      lineWidth: 0.1, // Thin border
+      fillColor: [220, 255, 220],
+      textColor: 0,
+      lineColor: 0,
+      lineWidth: 0.1,
     },
     headStyles: {
-      fillColor: [200, 255, 200], // Lighter green background color for header row
-      textColor: 0, // Black text color
-      lineColor: 0, // Black border color
-      lineWidth: 0.1, // Thin border
+      fillColor: [200, 255, 200],
+      textColor: 0,
+      lineColor: 0,
+      lineWidth: 0.1,
     },
   })
 
-  // Add page and header for income table
   doc.addPage()
   addHeader(doc, "Expense Report")
   doc.setFontSize(14)
-  doc.setTextColor("#004d00") // Green color for text
-  doc.text("Income", 14, headerHeight + 10) // Start the text below the header
+  doc.setTextColor("#004d00")
+  doc.text("Income", 14, headerHeight + 10)
   autoTable(doc, {
     head: [["Date", "Amount", "Description"]],
     body: incomes.map((i) => [
-      format(i.date, "dd-MM-yyyy"), // Use the "dd-MM-yyyy" date format
+      format(i.date, "dd-MM-yyyy"),
       i.amount.toFixed(2),
       i.description || "",
     ]),
-    startY: headerHeight + 20, // Start the table below the header
-    margin: { top: 50 }, // Add more top margin
+    startY: headerHeight + 20,
+    margin: { top: 50 },
     styles: {
-      fillColor: [220, 255, 220], // Light green background color for header row
-      textColor: 0, // Black text color
-      lineColor: 0, // Black border color
-      lineWidth: 0.1, // Thin border
+      fillColor: [220, 255, 220],
+      textColor: 0,
+      lineColor: 0,
+      lineWidth: 0.1,
     },
     headStyles: {
-      fillColor: [200, 255, 200], // Lighter green background color for header row
-      textColor: 0, // Black text color
-      lineColor: 0, // Black border color
-      lineWidth: 0.1, // Thin border
+      fillColor: [200, 255, 200],
+      textColor: 0,
+      lineColor: 0,
+      lineWidth: 0.1,
     },
   })
 
-  // Add footer
   //@ts-ignore
   const totalPages = doc.internal.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
@@ -241,9 +330,6 @@ export async function generateReport(
     addFooter(doc, i, totalPages)
   }
 
-  // Generate PDF buffer
   const pdfBuffer = doc.output("arraybuffer")
-
-  // Return the PDF as a base64 encoded string
   return Buffer.from(pdfBuffer).toString("base64")
 }
