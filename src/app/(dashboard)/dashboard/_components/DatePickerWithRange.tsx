@@ -22,7 +22,7 @@ export function DatePickerWithRange({
 }) {
   const [date, setDate] = React.useState<DateRange>(
     defaultDateRange || {
-      from: subMonths(new Date(), 1),
+      from: subMonths(new Date(), 6),
       to: new Date(),
     }
   );

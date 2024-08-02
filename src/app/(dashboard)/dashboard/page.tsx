@@ -15,8 +15,6 @@ type FinancialData = {
   amount: number
 }
 
-
- 
 const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
@@ -62,8 +60,18 @@ type Expense = {
   description: string
 }
 
+type Income = {
+  id: string
+  userId: string
+  category: string
+  amount: string
+  date: string
+  description: string
+}
+
 export type FinancialData_ = {
   expense: Expense[]
+  income: Income[]
 }
 
 const getAllData = cache(
@@ -74,12 +82,6 @@ const getAllData = cache(
     endDate: string
   ): Promise<FinancialData_> => {
     try {
-      // // Increase startDate and endDate by 1 day
-      // const newStartDate = new Date(startDate);
-      // // newStartDate.setDate(newStartDate.getDate() + 1);
-      // const newEndDate = new Date(endDate);
-      // // newEndDate.setDate(newEndDate.getDate() + 1);
-
       const res = await fetch(
         `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         {
@@ -89,13 +91,17 @@ const getAllData = cache(
         }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch all expenses");
+      if (!res.ok) throw new Error("Failed to fetch all financial data");
 
       const data: FinancialData_ = await res.json();
+      console.log("Income Expanse Data");
+      console.log(data);
+      
+      
       return data;
     } catch (error) {
       console.error("Error fetching data:", error);
-      return { expense: [] };
+      return { expense: [], income: [] };
     }
   }
 );

@@ -7,7 +7,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { ChartData2 } from "./Dropdown_chart_2"
+import { ChartData2 } from "../Dropdown_chart_2"
 import { chartPieProps } from "./ChartPie_1"
 
 const chartConfig = {
