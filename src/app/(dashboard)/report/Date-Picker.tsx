@@ -17,6 +17,9 @@ interface DatePickerProps {
   date: Date | undefined
   setDate: (date: Date | undefined) => void
 }
+const disabledDays = {
+  after: new Date(),
+}
 
 export function DatePicker({ date, setDate }: DatePickerProps) {
   return (
@@ -38,6 +41,7 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
           mode="single"
           selected={date}
           onSelect={setDate}
+          disabled={disabledDays}
           initialFocus
         />
       </PopoverContent>

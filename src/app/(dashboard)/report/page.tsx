@@ -39,6 +39,14 @@ export default function Report() {
 
   const today = startOfDay(new Date())
 
+  const handleReportTypeChange = (value: string) => {
+    setReportType(value)
+    if (value !== "custom") {
+      setStartDate(undefined)
+      setEndDate(undefined)
+    }
+  }
+
   const handleStartDateChange = (date: Date | undefined) => {
     if (date && isAfter(date, today)) {
       toast.error("Start date cannot be in the future")
@@ -145,7 +153,7 @@ export default function Report() {
                 <Label className="text-base">Report Type</Label>
                 <RadioGroup
                   value={reportType}
-                  onValueChange={(value) => setReportType(value)}
+                  onValueChange={handleReportTypeChange}
                   className="mt-2 space-y-2"
                 >
                   <div className="flex items-center space-x-2">
