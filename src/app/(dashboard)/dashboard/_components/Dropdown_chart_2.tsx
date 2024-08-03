@@ -13,6 +13,7 @@ import { ChartBar_2 } from "./charts/ChartBar_2"
 import ChartPie_1 from "./charts/ChartPie_1"
 import ChartPie_2 from "./charts/ChartPie_2"
 import ChartPie_3 from "./charts/ChartPie_3"
+import { ChartPie_4 } from "./charts/ChartPie_4"
 import { DropdownChartProps } from "./Dropdown_chart_1"
 
 // Define data types
@@ -103,7 +104,7 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
       case "pie chart_3":
         return <ChartPie_3 chartData={chartData2} />
       case "chart_4":
-        return <ChartBar_2 chartData={chartData2} />
+        return <ChartPie_4 chartData={chartData2} />
       default:
         return <ChartPie_1 chartData={chartData2} />
     }

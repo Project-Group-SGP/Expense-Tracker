@@ -18,20 +18,6 @@ import {
 } from "@/components/ui/chart"
 import { Chart_income_expense_Props } from "./Chart_income_expense_1"
 
-const chartData = [
-  { month: "January", income: 186, expense: 80 },
-  { month: "February", income: 305, expense: 200 },
-  { month: "March", income: 237, expense: 120 },
-  { month: "April", income: 273, expense: 190 },
-  { month: "May", income: 209, expense: 130 },
-  { month: "June", income: 214, expense: 140 },
-  { month: "July", income: 220, expense: 150 },
-  { month: "August", income: 230, expense: 160 },
-  { month: "September", income: 240, expense: 170 },
-  { month: "October", income: 250, expense: 180 },
-  { month: "November", income: 260, expense: 190 },
-  { month: "December", income: 270, expense: 200 },
-]
 
 const chartConfig = {
   income: {
@@ -46,7 +32,7 @@ const chartConfig = {
 
 export function Chart_income_expense_2 ({ chartData }: Chart_income_expense_Props) {
   return (
-    <Card>
+   
       <CardContent>
         <ChartContainer
           config={chartConfig}
@@ -84,6 +70,6 @@ export function Chart_income_expense_2 ({ chartData }: Chart_income_expense_Prop
           </RadarChart>
         </ChartContainer>
       </CardContent>
-    </Card>
+    
   )
 }
