@@ -8,8 +8,12 @@ import "jspdf-autotable"
 import autoTable from "jspdf-autotable"
 import { createCanvas } from "canvas"
 import { Chart, registerables } from "chart.js"
+import ChartDataLabels from "chartjs-plugin-datalabels"
+import nodemailer from "nodemailer"
+import { CategoryTypes, Prisma } from "@prisma/client"
+import * as XLSX from "xlsx"
 
-Chart.register(...registerables)
+Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
   labels: string[]
@@ -17,8 +21,8 @@ interface ChartData {
 }
 
 async function generatePieChart(data: ChartData): Promise<string> {
-  const width = 800 // Width of the chart
-  const height = 400 // Height of the chart
+  const width = 400
+  const height = 300
 
   const canvas = createCanvas(width, height)
   const ctx = canvas.getContext("2d")
@@ -55,13 +59,40 @@ async function generatePieChart(data: ChartData): Promise<string> {
       responsive: true,
       plugins: {
         legend: {
-          position: "top",
+          position: "right",
+          labels: {
+            boxWidth: 12,
+            padding: 10,
+          },
         },
         tooltip: {
           callbacks: {
             label: (tooltipItem) => {
-              return `${tooltipItem.label}: ${tooltipItem.raw}`
+              const dataset = tooltipItem.dataset
+              const total = dataset.data.reduce(
+                (acc, data) => acc + Number(data),
+                0
+              )
+              const value = Number(dataset.data[tooltipItem.dataIndex])
+              const percentage = ((value / total) * 100).toFixed(1)
+              return `${tooltipItem.label}: ${value.toFixed(2)} (${percentage}%)`
             },
+          },
+        },
+        datalabels: {
+          formatter: (value, ctx) => {
+            const dataset = ctx.chart.data.datasets[0]
+            const total = dataset.data.reduce(
+              (acc, data) => acc + Number(data),
+              0
+            )
+            const percentage = ((Number(value) / total) * 100).toFixed(1)
+            return percentage + "%"
+          },
+          color: "#fff",
+          font: {
+            weight: "bold",
+            size: 10,
           },
         },
       },
@@ -74,20 +105,20 @@ async function generatePieChart(data: ChartData): Promise<string> {
   return imageBuffer.toString("base64")
 }
 
-enum CategoryTypes {
-  Other = "Other",
-  Bills = "Bills",
-  Food = "Food",
-  Entertainment = "Entertainment",
-  Transportation = "Transportation",
-  EMI = "EMI",
-  Healthcare = "Healthcare",
-  Education = "Education",
-  Investment = "Investment",
-  Shopping = "Shopping",
-  Fuel = "Fuel",
-  Groceries = "Groceries",
-}
+// enum CategoryTypes {
+//   Other = "Other",
+//   Bills = "Bills",
+//   Food = "Food",
+//   Entertainment = "Entertainment",
+//   Transportation = "Transportation",
+//   EMI = "EMI",
+//   Healthcare = "Healthcare",
+//   Education = "Education",
+//   Investment = "Investment",
+//   Shopping = "Shopping",
+//   Fuel = "Fuel",
+//   Groceries = "Groceries",
+// }
 
 function addHeader(
   doc: jsPDF,
@@ -96,48 +127,49 @@ function addHeader(
   start?: Date,
   end?: Date
 ) {
-  const headerHeight = 35
-  const backgroundColor = "#008000"
+  const headerHeight = 40
+  const backgroundColor = "#4CAF50"
   const textColor = "#ffffff"
 
   doc.setFillColor(backgroundColor)
   doc.rect(0, 0, doc.internal.pageSize.width, headerHeight, "F")
 
-  doc.setDrawColor(0)
-  doc.setLineWidth(0.5)
+  doc.setDrawColor(backgroundColor)
+  doc.setLineWidth(2)
   doc.line(0, headerHeight, doc.internal.pageSize.width, headerHeight)
 
-  doc.setFontSize(18)
+  doc.setFontSize(22)
   doc.setTextColor(textColor)
-  doc.text("SpendWise", 14, headerHeight / 2)
-  doc.text(title, doc.internal.pageSize.width / 2, headerHeight / 2, {
+  doc.setFont("helvetica", "bold")
+  doc.text("SpendWise", 14, headerHeight / 2 - 5)
+  doc.setFontSize(18)
+  doc.setFont("helvetica", "normal")
+  doc.text(title, doc.internal.pageSize.width / 2, headerHeight / 2 + 5, {
     align: "center",
   })
 
   if (name && start && end) {
-    doc.setFontSize(12)
+    doc.setFontSize(10)
     doc.text(
       `Name: ${name}`,
       doc.internal.pageSize.width - 14,
-      headerHeight / 2,
-      {
-        align: "right",
-      }
+      headerHeight / 2 - 5,
+      { align: "right" }
     )
     doc.text(
-      `Period: ${format(start, "dd-MM-yyyy")} - ${format(end, "dd-MM-yyyy")}`,
+      `Period: ${format(start, "dd MMM yyyy")} - ${format(end, "dd MMM yyyy")}`,
       doc.internal.pageSize.width - 14,
-      headerHeight / 2 + 7,
+      headerHeight / 2 + 5,
       { align: "right" }
     )
   }
 }
 
 function addFooter(doc: jsPDF, pageNumber: number, totalPages: number) {
-  const footerHeight = 30
+  const footerHeight = 25
 
-  doc.setDrawColor(0)
-  doc.setLineWidth(0.5)
+  doc.setDrawColor("#4CAF50")
+  doc.setLineWidth(1)
   doc.line(
     0,
     297 - footerHeight,
@@ -146,24 +178,63 @@ function addFooter(doc: jsPDF, pageNumber: number, totalPages: number) {
   )
 
   doc.setFontSize(10)
-  doc.setTextColor("#008000")
+  doc.setTextColor("#4CAF50")
   doc.text(`Page ${pageNumber} of ${totalPages}`, 105, 297 - footerHeight / 2, {
     align: "center",
   })
 }
 
+async function sendReportEmail(
+  email: string,
+  reportBuffer: Buffer,
+  reportFormat: string,
+  name: string
+) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  })
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Your SpendWise Expense Report",
+    html: `
+      <h1>Your SpendWise Expense Report</h1>
+      <p>Please find your requested expense report attached.</p>
+    `,
+    attachments: [
+      {
+        filename: `${name}_report.${reportFormat}`,
+        content: reportBuffer,
+      },
+    ],
+  }
+
+  await transporter.sendMail(mailOptions)
+}
+
 export async function generateReport(
   reportType: string,
   startDate?: Date,
-  endDate?: Date
-): Promise<string> {
+  endDate?: Date,
+  reportFormat: string = "pdf",
+  includeCharts: boolean = true,
+  isDetailed: boolean = false,
+  selectedCategories: CategoryTypes[] = [],
+  includeIncome: boolean = false,
+  emailReport: boolean = false,
+  emailAddress?: string
+): Promise<{ buffer: string; mimeType: string; fileExtension: string }> {
   const user = await currentUserServer()
   if (!user) {
     throw new Error("Login Please")
   }
   const { name, id } = user
   let start: Date, end: Date
-  const headerHeight = 50
 
   switch (reportType) {
     case "last_month":
@@ -189,147 +260,262 @@ export async function generateReport(
       throw new Error("Invalid report type")
   }
 
+  const expenseQuery: Prisma.ExpenseFindManyArgs = {
+    where: {
+      userId: id,
+      date: {
+        gte: start,
+        lte: end,
+      },
+      ...(selectedCategories.length > 0 && {
+        category: { in: selectedCategories as CategoryTypes[] },
+      }),
+    },
+    orderBy: {
+      date: "asc",
+    },
+  }
+
   const expensesByCategory = await db.expense.groupBy({
     by: ["category"],
+    where: {
+      userId: id,
+      date: {
+        gte: start,
+        lte: end,
+      },
+      ...(selectedCategories.length > 0 && {
+        category: { in: selectedCategories as CategoryTypes[] },
+      }),
+    },
     _sum: {
       amount: true,
     },
-    where: {
-      userId: id,
-      date: {
-        gte: start,
-        lte: end,
-      },
-    },
   })
 
-  const expenses = await db.expense.findMany({
-    where: {
-      userId: id,
-      date: {
-        gte: start,
-        lte: end,
-      },
-    },
-    orderBy: {
-      date: "asc",
-    },
-  })
+  const expenses = await db.expense.findMany(expenseQuery)
 
-  const incomes = await db.income.findMany({
-    where: {
-      userId: id,
-      date: {
-        gte: start,
-        lte: end,
-      },
-    },
-    orderBy: {
-      date: "asc",
-    },
-  })
+  const incomes = includeIncome
+    ? await db.income.findMany({
+        where: {
+          userId: id,
+          date: {
+            gte: start,
+            lte: end,
+          },
+        },
+        orderBy: {
+          date: "asc",
+        },
+      })
+    : []
 
   const pieChartData: ChartData = {
-    labels: Object.values(CategoryTypes),
-    //@ts-ignore
-    values: Object.values(CategoryTypes).map(
+    labels: Object.values(CategoryTypes).filter(
       (cat) =>
-        expensesByCategory.find((exp) => exp.category === cat)?._sum.amount || 0
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(cat as CategoryTypes)
     ),
+    values: Object.values(CategoryTypes)
+      .filter(
+        (cat) =>
+          selectedCategories.length === 0 ||
+          selectedCategories.includes(cat as CategoryTypes)
+      )
+      .map((cat) =>
+        Number(
+          expensesByCategory.find((exp) => exp.category === cat)?._sum
+            ?.amount || 0
+        )
+      ),
   }
 
-  const pieChartBase64 = await generatePieChart(pieChartData)
+  let reportBuffer: Buffer
+  let mimeType: string
+  let fileExtension: string
 
-  const doc = new jsPDF()
+  if (reportFormat === "pdf") {
+    const doc = new jsPDF()
 
-  addHeader(doc, "Expense Report", name, start, end)
-  doc.addImage(
-    `data:image/png;base64,${pieChartBase64}`,
-    "PNG",
-    14,
-    60,
-    180,
-    100
-  )
+    addHeader(doc, "Expense Report", name, start, end)
 
-  doc.setFontSize(14)
-  doc.setTextColor("#004d00")
-  doc.text("Expense Distribution", 14, 180)
-  let yPos = 190
-  expensesByCategory.forEach((category) => {
-    doc.setFontSize(10)
-    doc.text(
-      `${category.category}: ${category._sum.amount?.toFixed(2) || "0.00"}`,
-      14,
-      yPos
-    )
-    yPos += 7
-  })
+    if (includeCharts) {
+      const pieChartBase64 = await generatePieChart(pieChartData)
+      doc.addImage(
+        `data:image/png;base64,${pieChartBase64}`,
+        "PNG",
+        14,
+        70,
+        90,
+        70
+      )
 
-  doc.addPage()
-  addHeader(doc, "Expense Report")
-  doc.setFontSize(14)
-  doc.setTextColor("#004d00")
-  doc.text("Expenses", 14, headerHeight + 10)
-  autoTable(doc, {
-    head: [["Date", "Category", "Amount", "Description"]],
-    body: expenses.map((e) => [
-      format(e.date, "dd-MM-yyyy"),
-      e.category,
-      e.amount.toFixed(2),
-      e.description || "",
-    ]),
-    startY: headerHeight + 20,
-    margin: { top: 50 },
-    styles: {
-      fillColor: [220, 255, 220],
-      textColor: 0,
-      lineColor: 0,
-      lineWidth: 0.1,
-    },
-    headStyles: {
-      fillColor: [200, 255, 200],
-      textColor: 0,
-      lineColor: 0,
-      lineWidth: 0.1,
-    },
-  })
+      doc.setFontSize(16)
+      doc.setTextColor("#4CAF50")
+      doc.setFont("helvetica", "bold")
+      doc.text("Expense Distribution", 14, 65)
 
-  doc.addPage()
-  addHeader(doc, "Expense Report")
-  doc.setFontSize(14)
-  doc.setTextColor("#004d00")
-  doc.text("Income", 14, headerHeight + 10)
-  autoTable(doc, {
-    head: [["Date", "Amount", "Description"]],
-    body: incomes.map((i) => [
-      format(i.date, "dd-MM-yyyy"),
-      i.amount.toFixed(2),
-      i.description || "",
-    ]),
-    startY: headerHeight + 20,
-    margin: { top: 50 },
-    styles: {
-      fillColor: [220, 255, 220],
-      textColor: 0,
-      lineColor: 0,
-      lineWidth: 0.1,
-    },
-    headStyles: {
-      fillColor: [200, 255, 200],
-      textColor: 0,
-      lineColor: 0,
-      lineWidth: 0.1,
-    },
-  })
+      let yPos = 70
+      expensesByCategory.forEach((category) => {
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        doc.text(
+          `${category.category}: -${Number(category._sum.amount || 0).toFixed(2)}`,
+          110,
+          yPos
+        )
+        yPos += 7
+      })
+    }
 
-  //@ts-ignore
-  const totalPages = doc.internal.getNumberOfPages()
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i)
-    addFooter(doc, i, totalPages)
+    const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0)
+    const totalIncome = incomes.reduce((sum, i) => sum + Number(i.amount), 0)
+
+    doc.setFontSize(12)
+    doc.setFont("helvetica", "bold")
+    doc.text(`Total Expenses: -${totalExpenses.toFixed(2)}`, 14, 160)
+    if (includeIncome) {
+      doc.text(`Total Income: +${totalIncome.toFixed(2)}`, 14, 170)
+      doc.text(`Net: ${(totalIncome - totalExpenses).toFixed(2)}`, 14, 180)
+    }
+
+    if (isDetailed) {
+      doc.addPage()
+      addHeader(doc, "Expense Report")
+      doc.setFontSize(14)
+      doc.setTextColor("#4CAF50")
+      doc.text("Expenses", 14, 50)
+      autoTable(doc, {
+        head: [["Date", "Category", "Amount", "Description"]],
+        body: expenses.map((e) => [
+          format(e.date, "dd-MM-yyyy"),
+          e.category,
+          `-${Number(e.amount).toFixed(2)}`,
+          e.description || "",
+        ]),
+        startY: 60,
+        margin: { top: 50 },
+        styles: {
+          fillColor: [240, 248, 240],
+          textColor: 20,
+          lineColor: [0, 100, 0],
+          lineWidth: 0.1,
+        },
+        headStyles: {
+          fillColor: [76, 175, 80],
+          textColor: 255,
+          lineColor: [0, 100, 0],
+          lineWidth: 0.1,
+          fontStyle: "bold",
+        },
+        alternateRowStyles: {
+          fillColor: [248, 255, 248],
+        },
+      })
+
+      if (includeIncome) {
+        doc.addPage()
+        addHeader(doc, "Expense Report")
+        doc.setFontSize(14)
+        doc.setTextColor("#4CAF50")
+        doc.text("Income", 14, 50)
+        autoTable(doc, {
+          head: [["Date", "Amount", "Description"]],
+          body: incomes.map((i) => [
+            format(i.date, "dd-MM-yyyy"),
+            `+${Number(i.amount).toFixed(2)}`,
+            i.description || "",
+          ]),
+          startY: 60,
+          margin: { top: 50 },
+          styles: {
+            fillColor: [240, 248, 240],
+            textColor: 20,
+            lineColor: [0, 100, 0],
+            lineWidth: 0.1,
+          },
+          headStyles: {
+            fillColor: [76, 175, 80],
+            textColor: 255,
+            lineColor: [0, 100, 0],
+            lineWidth: 0.1,
+            fontStyle: "bold",
+          },
+          alternateRowStyles: {
+            fillColor: [248, 255, 248],
+          },
+        })
+      }
+    }
+
+    //@ts-ignore
+    const totalPages = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      addFooter(doc, i, totalPages)
+    }
+
+    reportBuffer = Buffer.from(doc.output("arraybuffer"))
+    mimeType = "application/pdf"
+    fileExtension = "pdf"
+  } else if (reportFormat === "csv" || reportFormat === "excel") {
+    const worksheetData = [
+      ["Date", "Category", "Amount", "Description"],
+      ...expenses.map((e) => [
+        format(e.date, "dd-MM-yyyy"),
+        e.category,
+        -Number(e.amount),
+        e.description || "",
+      ]),
+    ]
+
+    if (includeIncome) {
+      worksheetData.push(
+        [],
+        ["Income"],
+        ["Date", "Amount", "Description"],
+        ...incomes.map((i) => [
+          format(i.date, "dd-MM-yyyy"),
+          Number(i.amount),
+          i.description || "",
+        ])
+      )
+    }
+
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Expense Report")
+
+    if (reportFormat === "csv") {
+      reportBuffer = Buffer.from(
+        XLSX.write(workbook, { type: "buffer", bookType: "csv" })
+      )
+      mimeType = "text/csv"
+      fileExtension = "csv"
+    } else {
+      reportBuffer = Buffer.from(
+        XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })
+      )
+      mimeType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      fileExtension = "xlsx"
+    }
+  } else {
+    throw new Error("Invalid report format")
   }
 
-  const pdfBuffer = doc.output("arraybuffer")
-  return Buffer.from(pdfBuffer).toString("base64")
+  if (emailReport && emailAddress) {
+    await sendReportEmail(emailAddress, reportBuffer, reportFormat, name)
+    return {
+      buffer: "Report sent to your email successfully!",
+      mimeType: "",
+      fileExtension: "",
+    }
+  } else {
+    return {
+      buffer: reportBuffer.toString("base64"),
+      mimeType,
+      fileExtension,
+    }
+  }
 }

@@ -37,6 +37,7 @@
     "bcryptjs": "^2.4.3",
     "canvas": "^2.11.2",
     "chart.js": "^4.4.3",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
@@ -63,6 +64,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zxcvbn": "^4.4.2"
   },
