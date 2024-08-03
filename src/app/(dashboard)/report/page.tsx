@@ -21,7 +21,6 @@ import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { CategoryTypes } from "@prisma/client"
-import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 export default function Report() {
   const [reportType, setReportType] = useState<string>("last_month")
@@ -34,12 +33,7 @@ export default function Report() {
   const [selectedCategories, setSelectedCategories] = useState<CategoryTypes[]>(
     []
   )
-  const user = useCurrentUserClient()
-
-  if (!user) {
-    Response.redirect("/")
-  }
-  const [includeIncome, setIncludeIncome] = useState<boolean>(false)
+  const [includeIncome, setIncludeIncome] = useState<boolean>(true)
   const [emailReport, setEmailReport] = useState<boolean>(false)
   const [emailAddress, setEmailAddress] = useState<string>("")
 
@@ -78,7 +72,7 @@ export default function Report() {
     const loading = toast.loading("Generating report...")
     setIsGenerating(true)
     try {
-      const { buffer, mimeType, fileExtension } = await generateReport(
+      const { buffer, mimeType, fileExtension, name } = await generateReport(
         reportType,
         startDate,
         endDate,
@@ -90,7 +84,6 @@ export default function Report() {
         emailReport,
         emailAddress
       )
-
       if (emailReport) {
         toast.success("Report sent to your email successfully!", {
           id: loading,
@@ -113,7 +106,7 @@ export default function Report() {
         const endDateStr = endDate ? format(endDate, "ddMMyyyy") : ""
         const dateRange =
           startDateStr && endDateStr ? `_${startDateStr}_${endDateStr}` : ""
-        link.download = `${user?.name.replace(/\s+/g, "_")}_expense_report${dateRange}.${fileExtension}`
+        link.download = `${name?.replace(/\s+/g, "_")}_expense_report${dateRange}.${fileExtension}`
 
         // Trigger the download
         document.body.appendChild(link)
@@ -131,10 +124,8 @@ export default function Report() {
       toast.error("Failed to generate report", {
         id: loading,
       })
-    } finally {
-      setIsGenerating(false)
-      toast.dismiss(loading)
     }
+    setIsGenerating(false)
   }
 
   return (

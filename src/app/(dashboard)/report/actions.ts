@@ -190,6 +190,14 @@ async function sendReportEmail(
   reportFormat: string,
   name: string
 ) {
+  const fileExtensionMap: { [key: string]: string } = {
+    pdf: "pdf",
+    csv: "csv",
+    excel: "xlsx",
+  }
+
+  const fileExtension = fileExtensionMap[reportFormat] || reportFormat
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -208,7 +216,7 @@ async function sendReportEmail(
     `,
     attachments: [
       {
-        filename: `${name}_report.${reportFormat}`,
+        filename: `${name}_report.${fileExtension}`,
         content: reportBuffer,
       },
     ],
@@ -228,7 +236,12 @@ export async function generateReport(
   includeIncome: boolean = false,
   emailReport: boolean = false,
   emailAddress?: string
-): Promise<{ buffer: string; mimeType: string; fileExtension: string }> {
+): Promise<{
+  buffer: string
+  mimeType: string
+  fileExtension: string
+  name?: string
+}> {
   const user = await currentUserServer()
   if (!user) {
     throw new Error("Login Please")
@@ -516,6 +529,7 @@ export async function generateReport(
       buffer: reportBuffer.toString("base64"),
       mimeType,
       fileExtension,
+      name,
     }
   }
 }
