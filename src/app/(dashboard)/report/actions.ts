@@ -297,11 +297,11 @@ export async function generateReport(
         .setDrawColor(76, 175, 80)
         .setLineWidth(1)
         .rect(0, 0, pageWidth, headerHeight, "FD")
-      // Add a thin border at the bottom of the header
-      doc
-        .setDrawColor(76, 175, 80)
-        .setLineWidth(0.5)
-        .line(0, headerHeight, pageWidth, headerHeight)
+      // // Add a thin border at the bottom of the header
+      // doc
+      //   .setDrawColor(76, 175, 80)
+      //   .setLineWidth(0.5)
+      //   .line(0, headerHeight, pageWidth, headerHeight)
 
       // Add logo
       const logoWidth = 20
