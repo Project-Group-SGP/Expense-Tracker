@@ -12,6 +12,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels"
 import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
+import { logo } from "@/lib/logo"
 
 Chart.register(...registerables, ChartDataLabels)
 
@@ -39,18 +40,16 @@ async function generatePieChart(data: ChartData): Promise<string> {
         {
           data: data.values,
           backgroundColor: [
-            "#FF6384",
-            "#36A2EB",
-            "#FFCE56",
-            "#FF9F40",
-            "#A3E6B3",
-            "#FFC3A0",
-            "#A5A8A5",
-            "#9F99C4",
-            "#8C9C8C",
-            "#D6E1E0",
-            "#B8C9A7",
-            "#C7A7A1",
+            "#4CAF50",
+            "#2196F3",
+            "#FFC107",
+            "#F44336",
+            "#9C27B0",
+            "#00BCD4",
+            "#FF9800",
+            "#795548",
+            "#607D8B",
+            "#E91E63",
           ],
         },
       ],
@@ -64,6 +63,21 @@ async function generatePieChart(data: ChartData): Promise<string> {
             boxWidth: 12,
             padding: 10,
           },
+        },
+        title: {
+          display: true,
+          text: "Expense Distribution",
+          font: {
+            size: 16,
+            weight: "bold",
+          },
+        },
+        shadow: {
+          enabled: true,
+          color: "rgba(0, 0, 0, 0.1)",
+          blur: 10,
+          offsetX: 5,
+          offsetY: 5,
         },
         tooltip: {
           callbacks: {
@@ -283,14 +297,35 @@ export async function generateReport(
         .setDrawColor(76, 175, 80)
         .setLineWidth(1)
         .rect(0, 0, pageWidth, headerHeight, "FD")
+      // Add a thin border at the bottom of the header
+      doc
+        .setDrawColor(76, 175, 80)
+        .setLineWidth(0.5)
+        .line(0, headerHeight, pageWidth, headerHeight)
+
+      // Add logo
+      const logoWidth = 20
+      const logoHeight = 20
+      doc.addImage(
+        logo,
+        "PNG",
+        margin,
+        (headerHeight - logoHeight) / 2,
+        logoWidth,
+        logoHeight
+      )
 
       // Add "spendwise" text
       doc.setFontSize(24)
-      doc.setTextColor(76, 175, 80)
+      doc.setTextColor(46, 125, 50)
       doc.setFont("helvetica", "bold")
-      doc.text("spend", margin, headerHeight / 2 + 2)
-      doc.setTextColor(50, 120, 50)
-      doc.text("wise", margin + doc.getTextWidth("spend"), headerHeight / 2 + 2)
+      doc.text("spend", margin + 23, headerHeight / 2 + 2)
+      doc.setTextColor(76, 175, 80)
+      doc.text(
+        "wise",
+        margin + doc.getTextWidth("spend") + 23,
+        headerHeight / 2 + 2
+      )
 
       if (name && start && end) {
         doc.setFontSize(10)
