@@ -353,7 +353,7 @@ export async function generateReport(
     doc.setFontSize(20)
     doc.setTextColor("#2E7D32")
     doc.setFont("helvetica", "bold")
-    doc.text("Expense Report", 14, 60)
+    doc.text("Expense Report", 14, 55)
 
     if (expenses.length === 0) {
       if (includeIncome && incomes.length > 0) {
@@ -437,7 +437,7 @@ export async function generateReport(
         doc.setFontSize(16)
         doc.setTextColor("#2E7D32")
         doc.setFont("helvetica", "bold")
-        doc.text("Expense Distribution", 14, 180)
+        doc.text("Expense Distribution", 14, 175)
 
         // Improve layout of category totals
         let leftCol = 20
@@ -464,24 +464,24 @@ export async function generateReport(
       doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
       doc.setTextColor("#F44336")
-      doc.text(`Total Expense:`, 14, yPos)
-      doc.text(`-${totalExpenses.toFixed(2)}`, pageWidth - 14, yPos, {
+      doc.text(`Total Expense:`, 14, yPos - 5)
+      doc.text(`-${totalExpenses.toFixed(2)}`, pageWidth - 14, yPos - 5, {
         align: "right",
       })
       yPos += 15
       if (includeIncome) {
         doc.setTextColor("#2E7D32")
-        doc.text(`Total Income:`, 14, yPos)
-        doc.text(`+${totalIncome.toFixed(2)}`, pageWidth - 14, yPos, {
+        doc.text(`Total Income:`, 14, yPos - 5)
+        doc.text(`+${totalIncome.toFixed(2)}`, pageWidth - 14, yPos - 5, {
           align: "right",
         })
         yPos += 15
         doc.setTextColor("#1976D2")
-        doc.text(`Net:`, 14, yPos)
+        doc.text(`Net:`, 14, yPos - 5)
         doc.text(
           `${(totalIncome - totalExpenses).toFixed(2)}`,
           pageWidth - 14,
-          yPos,
+          yPos - 5,
           { align: "right" }
         )
       }
@@ -568,13 +568,34 @@ export async function generateReport(
     // Update page numbers
     //@ts-ignore
     const totalPages = doc.internal.getNumberOfPages()
+    // Inside the loop that updates page numbers
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i)
+
+      // Set font for footer text
       doc.setFontSize(8)
       doc.setTextColor(100, 100, 100)
+
+      // Add page numbers
       doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, {
         align: "center",
       })
+
+      // Add generated date on the left
+      doc.text(
+        `Generated on: ${new Date().toLocaleDateString()}`,
+        20,
+        pageHeight - 10
+      )
+
+      doc.text(
+        (process.env.BASE_URL as string).split("//")[1],
+        pageWidth - 20,
+        pageHeight - 10,
+        {
+          align: "right",
+        }
+      )
     }
 
     reportBuffer = Buffer.from(doc.output("arraybuffer"))
