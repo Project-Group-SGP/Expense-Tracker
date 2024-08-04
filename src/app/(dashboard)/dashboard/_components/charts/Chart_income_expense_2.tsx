@@ -18,21 +18,24 @@ import {
 } from "@/components/ui/chart"
 import { Chart_income_expense_Props } from "./Chart_income_expense_1"
 
-
 const chartConfig = {
   income: {
     label: "Income",
-    color: "hsl(120, 100%, 30%)",  // Bright green color
+    color: "hsl(143, 85%, 60%)",  // Brighter, more vibrant green
   },
   expense: {
     label: "Expense",
-    color: "hsl(0, 100%, 50%)",  // Bright red color
+    color: "hsl(354, 85%, 60%)",  // Brighter, more vibrant red
   },
 } satisfies ChartConfig
 
-export function Chart_income_expense_2 ({ chartData }: Chart_income_expense_Props) {
+export function Chart_income_expense_2({ chartData }: Chart_income_expense_Props) {
   return (
-   
+    <Card className="w-full max-w-3xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center">Income vs. Expense Radar</CardTitle>
+        <CardDescription className="text-center text-gray-500">Monthly comparison of income and expenses</CardDescription>
+      </CardHeader>
       <CardContent>
         <ChartContainer
           config={chartConfig}
@@ -50,26 +53,28 @@ export function Chart_income_expense_2 ({ chartData }: Chart_income_expense_Prop
             <ChartTooltip
               content={<ChartTooltipContent />}
             />
-            <PolarGrid stroke="#555" />
-            <PolarAngleAxis dataKey="month" tick={{ fill: "#999" }} />
+            <PolarGrid stroke="#777" strokeDasharray="3 3" />
+            <PolarAngleAxis dataKey="month" tick={{ fill: "#bbb", fontSize: 12 }} />
             <Radar
               name="Income"
               dataKey="income"
               stroke={chartConfig.income.color}
               fill={chartConfig.income.color}
-              fillOpacity={0.6}
+              fillOpacity={0.4}
+              strokeWidth={2}
             />
             <Radar
               name="Expense"
               dataKey="expense"
               stroke={chartConfig.expense.color}
               fill={chartConfig.expense.color}
-              fillOpacity={0.6}
+              fillOpacity={0.4}
+              strokeWidth={2}
             />
-            <ChartLegend />
+            <ChartLegend verticalAlign="bottom" align="center" />
           </RadarChart>
         </ChartContainer>
       </CardContent>
-    
+    </Card>
   )
 }
