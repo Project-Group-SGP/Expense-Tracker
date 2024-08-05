@@ -150,7 +150,7 @@ export default async function Dashboard({
             </div>
           </div>
 
-          <DateSelect />
+       
 
           <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card
@@ -178,6 +178,8 @@ export default async function Dashboard({
               descriptionColor="text-red-400"
             />
           </section>
+
+          <DateSelect />
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
             <Cardcontent className="w-max-[400px] w-min-[300px] p-0">

@@ -73,8 +73,30 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+// Catagory label
+const Catagory_label = ({ data }) => (
+  <div className="flex flex-wrap justify-center gap-2 mb-4 ">
+    {data.map((item, index) => (
+      <div key={index} className="flex items-center">
+        <div
+          className="w-3 h-3 mr-1  rounded-full"
+          style={{ backgroundColor: chartConfig[item.category]?.color }}
+        ></div>
+        <span className="text-sm">{item.category}</span>
+      </div>
+    ))}
+  </div>
+)
+
+
 export function ChartPie_4({ chartData }: chartPieProps) {
   return (
+    <Card className="mx-auto w-full max-w-3xl dark:bg-black shadow-none border-none">
+    <CardHeader>
+      <CardTitle className="text-center">Expense Distribution</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Catagory_label data={chartData} />
       <CardContent className="pb-0">
         <ChartContainer
           config={chartConfig}
@@ -92,5 +114,7 @@ export function ChartPie_4({ chartData }: chartPieProps) {
           </RadarChart>
         </ChartContainer>
       </CardContent>
+    </CardContent>
+    </Card>
   )
 }

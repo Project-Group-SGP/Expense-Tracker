@@ -49,8 +49,7 @@ export type DropdownChartProps = {
 }
 
 export function Dropdown_chart_1({ data }: DropdownChartProps) {
-  
-  const [selectedChart, setSelectedChart] = React.useState("Bar chart_1")
+  const [selectedChart, setSelectedChart] = React.useState("Monthly Money Meters")
 
   // 1. monthwise data
   const monthNames: string[] = [
@@ -73,20 +72,19 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
     spend: 0,
   }))
 
-  const incomeData: ChartData1[] = monthNames.map((month)=>({
+  const incomeData: ChartData1[] = monthNames.map((month) => ({
     month,
     spend: 0,
   }))
 
-
-
   // Income-Expense data
-const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
-  month,
-  income: 0,
-  expense: 0,
-}))
-
+  const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map(
+    (month) => ({
+      month,
+      income: 0,
+      expense: 0,
+    })
+  )
 
   // expense data
   if (data.expense && Array.isArray(data.expense)) {
@@ -98,11 +96,10 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
     })
   }
 
-  console.log("expense Data" , expenseData);
-  
+  console.log("expense Data", expenseData)
 
   // income data
-  if(data.income && Array.isArray(data.income)) {
+  if (data.income && Array.isArray(data.income)) {
     data.income.forEach((income: Expense) => {
       const date = new Date(income.date)
       const monthIndex = date.getUTCMonth() // Get month index (0 for January, 1 for February, etc.)
@@ -111,7 +108,7 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
     })
   }
 
-  console.log("income Data" , incomeData);
+  console.log("income Data", incomeData)
 
   // income - expanse data
   if (data.expense && Array.isArray(data.expense)) {
@@ -122,7 +119,7 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
       incomeExpenseData[monthIndex].expense += amount
     })
   }
-  
+
   if (data.income && Array.isArray(data.income)) {
     data.income.forEach((income: Expense) => {
       const date = new Date(income.date)
@@ -131,9 +128,8 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
       incomeExpenseData[monthIndex].income += amount
     })
   }
-  
-  console.log("Income-expense Data" , incomeExpenseData);
-  
+
+  console.log("Income-expense Data", incomeExpenseData)
 
   // console.log("month wise data");
   // console.log(chartData1)
@@ -162,16 +158,16 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
 
   const renderChart = () => {
     switch (selectedChart) {
-      case "Bar chart_1":
+      case "Monthly Money Meters":
         return <ChartBar_1 chartData={expenseData} />
-      case "Bar chart_2":
-        return <ChartBar_3 chartData={expenseData} />
-      case "Bar chart_3":
+      // case "Bar chart_2":
+      //   return <ChartBar_3 chartData={expenseData} />
+      case "Daily Money Meters":
         return <ChartBar_4 chartData={chartData3} />
-      case "income-expense 1":
+      case "Financial Flow":
         return <Chart_income_expense_1 chartData={incomeExpenseData} />
-      case "income-expense 2":
-        return <Chart_income_expense_2  chartData={incomeExpenseData}/>
+      case "Financial Footprint":
+        return <Chart_income_expense_2 chartData={incomeExpenseData} />
 
       default:
         return <ChartBar_3 chartData={expenseData} />
@@ -193,23 +189,22 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
               value={selectedChart}
               onValueChange={setSelectedChart}
             >
-              <DropdownMenuRadioItem value="Bar chart_1">
-                Bar chart_1
+              <DropdownMenuRadioItem value="Monthly Money Meters">
+                Monthly Money Meters
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="Bar chart_2">
+              {/* <DropdownMenuRadioItem value="Bar chart_2">
                 Bar chart_2
-              </DropdownMenuRadioItem>
-              
-              <DropdownMenuRadioItem value="Bar chart_3">
-                Bar chart_3
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="income-expense 1">
-                  income-expense 1
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="income-expense 2">
-                  income-expense 2
-              </DropdownMenuRadioItem>
+              </DropdownMenuRadioItem> */}
 
+              <DropdownMenuRadioItem value="Daily Money Meters">
+                Daily Money Meters
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Financial Flow">
+                Financial Flow
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Financial Footprint">
+                Financial Footprint
+              </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -218,4 +213,3 @@ const incomeExpenseData: ChartDataIncomeExpense[] = monthNames.map((month) => ({
     </>
   )
 }
-
