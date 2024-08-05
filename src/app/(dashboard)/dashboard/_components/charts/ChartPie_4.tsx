@@ -1,4 +1,3 @@
-// month wise category wise
 "use client"
 
 import { TrendingUp } from "lucide-react"
@@ -15,76 +14,83 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+import { chartPieProps } from "./ChartPie_1"
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  spend: {
+    label: "Spend",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
+  Other: {
+    label: "Other",
+    color: "#888888",
+  },
+  Bills: {
+    label: "Bills",
+    color: "#0088FE",
+  },
+  Food: {
+    label: "Food",
+    color: "#FF8042",
+  },
+  Entertainment: {
+    label: "Entertainment",
+    color: "#FFBB28",
+  },
+  Transportation: {
+    label: "Transportation",
+    color: "#00C49F",
+  },
+  EMI: {
+    label: "EMI",
+    color: "#FF0000",
+  },
+  Healthcare: {
+    label: "Healthcare",
+    color: "#800080",
+  },
+  Education: {
+    label: "Education",
+    color: "#00FFFF",
+  },
+  Investment: {
+    label: "Investment",
+    color: "#008000",
+  },
+  Shopping: {
+    label: "Shopping",
+    color: "#FFD700",
+  },
+  Fuel: {
+    label: "Fuel",
+    color: "#FF6347",
+  },
+  Groceries: {
+    label: "Groceries",
+    color: "#ADFF2F",
   },
 } satisfies ChartConfig
 
-export function Component() {
+export function ChartPie_4({ chartData }: chartPieProps) {
   return (
-    <Card>
-      <CardHeader className="items-center pb-4">
-        <CardTitle>Radar Chart - Legend</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[350px]"
         >
-          <RadarChart
-            data={chartData}
-            margin={{
-              top: -40,
-              bottom: -10,
-            }}
-          >
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <PolarAngleAxis dataKey="month" />
+          <RadarChart data={chartData}>
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <PolarAngleAxis dataKey="category" />
             <PolarGrid />
             <Radar
-              dataKey="desktop"
-              fill="var(--color-desktop)"
+              dataKey="spend"
+              fill="#EE4B2B"
               fillOpacity={0.6}
             />
-            <Radar dataKey="mobile" fill="var(--color-mobile)" />
-            <ChartLegend className="mt-8" content={<ChartLegendContent />} />
           </RadarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 pt-4 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="flex items-center gap-2 leading-none text-muted-foreground">
-          January - June 2024
-        </div>
-      </CardFooter>
-    </Card>
   )
 }
