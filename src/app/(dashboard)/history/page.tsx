@@ -1,4 +1,4 @@
-
+"use client"
 import { Payment, columns } from "./columns"
 import { DataTable } from "./data-table"
 
@@ -22,6 +22,18 @@ const data :Payment[] =[
     status: "pending",
     email: "m@example.com",
   },
+  {
+    id: "728ed52f",
+    amount: 500,
+    status: "pending",
+    email: "124wfsdm@example.com",
+  },
+  {
+    id: "728ed52f",
+    amount: 200,
+    status: "pending",
+    email: "m12312@example.com",
+  },
 ]
 
 
@@ -31,7 +43,9 @@ const HistoryPage =  () => {
     <>
     <div className="text-red-500 text-2xl text-center font-semibold mt-20"> History </div>
     <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} filterKey="email" onDelete={()=>{
+          return;
+        }}/>
     </div>
     </>
   )
