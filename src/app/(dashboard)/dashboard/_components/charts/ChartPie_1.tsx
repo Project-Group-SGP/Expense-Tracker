@@ -1,7 +1,7 @@
 "use client"
 
+import React from "react"
 import { Pie, PieChart } from "recharts"
-
 import {
   ChartConfig,
   ChartContainer,
@@ -9,13 +9,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { ChartData2 } from "../Dropdown_chart_2"
-// const chartData = [
-//   { category: "Bills", spend: 20705, fill: "#0088FE" },
-//   { category: "EMI", spend: 10000, fill: "#00C49F" },
-//   { category: "Entertainment", spend: 9087, fill: "#FFBB28" },
-//   { category: "Foods", spend: 11173, fill: "#FF8042" },
-//   { category: "Others", spend: 12190, fill: "#00C49F" },
-// ];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const chartConfig = {
   spend: {
@@ -75,21 +69,42 @@ export type chartPieProps = {
   chartData: ChartData2[]
 }
 
+// Catagory label
+const Catagory_label = ({ data }) => (
+  <div className="flex flex-wrap justify-center gap-2 mb-4">
+    {data.map((item, index) => (
+      <div key={index} className="flex items-center">
+        <div
+          className="w-3 h-3 mr-1 rounded-full"
+          style={{ backgroundColor: chartConfig[item.category]?.color }}
+        ></div>
+        <span className="text-sm">{item.category}</span>
+      </div>
+    ))}
+  </div>
+)
+
 export default function ChartPie_1({ chartData }: chartPieProps) {
   return (
-    <>
-      <ChartContainer
-        config={chartConfig}
-        className="mx-auto aspect-square max-h-[250px]"
-      >
-        <PieChart>
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent hideLabel />}
-          />
-          <Pie data={chartData} dataKey="spend" nameKey="category" />
-        </PieChart>
-      </ChartContainer>
-    </>
+    <Card className="w-full max-w-3xl mx-auto dark:bg-black shadow-none border-none">
+      <CardHeader>
+        <CardTitle className="text-center">Expense Distribution</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Catagory_label data={chartData} />
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <PieChart>
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Pie data={chartData} dataKey="spend" nameKey="category" />
+          </PieChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   )
 }

@@ -51,7 +51,7 @@ const categoryColors: { [key: string]: string } = {
 // Define DropdownChartProps
 
 export function Dropdown_chart_2({ data }: DropdownChartProps) {
-  const [selectedChart, setSelectedChart] = React.useState("pie chart_2")
+  const [selectedChart, setSelectedChart] = React.useState("Category Crustview")
 
   // console.log(data)
 
@@ -97,13 +97,13 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
   // Render selected chart
   const renderChart = () => {
     switch (selectedChart) {
-      case "pie chart_1":
+      case "Category Crustview":
         return <ChartPie_1 chartData={chartData2} />
-      case "pie chart_2":
-        return <ChartPie_2 chartData={chartData2} />
-      case "pie chart_3":
+      // case "pie chart_2":
+      //   return <ChartPie_2 chartData={chartData2} />
+      case "Spending Circle":
         return <ChartPie_3 chartData={chartData2} />
-      case "chart_4":
+      case "Spend Spectrum":
         return <ChartPie_4 chartData={chartData2} />
       default:
         return <ChartPie_1 chartData={chartData2} />
@@ -125,17 +125,17 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
               value={selectedChart}
               onValueChange={setSelectedChart}
             >
-              <DropdownMenuRadioItem value="pie chart_1">
-                pie chart_1
+              <DropdownMenuRadioItem value="Category Crustview">
+              Category Crustview
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="pie chart_2">
+              {/* <DropdownMenuRadioItem value="pie chart_2">
                 pie chart_2
+              </DropdownMenuRadioItem> */}
+              <DropdownMenuRadioItem value="Spending Circle">
+              Spending Circle
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="pie chart_3">
-                pie chart_3
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="chart_4">
-                chart_4
+              <DropdownMenuRadioItem value="Spend Spectrum">
+                Spend Spectrum
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>

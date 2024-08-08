@@ -18,11 +18,14 @@ type FinancialData = {
 const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${process.env.BASE_URL}/api/totalIncome?userId=${id}`, {
-        method: "GET",
-        headers: { Cookie: cookie },
-        next: { tags: ["totalIncome"] },
-      })
+      const res = await fetch(
+        `${process.env.BASE_URL}/api/totalIncome?userId=${id}`,
+        {
+          method: "GET",
+          headers: { Cookie: cookie },
+          next: { tags: ["totalIncome"] },
+        }
+      )
       if (!res.ok) throw new Error("Failed to fetch total income")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -36,11 +39,14 @@ const getTotalIncome = cache(
 const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${process.env.BASE_URL}/api/totalExpense?userId=${id}`, {
-        method: "GET",
-        headers: { Cookie: cookie },
-        next: { tags: ["totalExpense"] },
-      })
+      const res = await fetch(
+        `${process.env.BASE_URL}/api/totalExpense?userId=${id}`,
+        {
+          method: "GET",
+          headers: { Cookie: cookie },
+          next: { tags: ["totalExpense"] },
+        }
+      )
       if (!res.ok) throw new Error("Failed to fetch total expense")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -89,22 +95,18 @@ const getAllData = cache(
           headers: { Cookie: cookie },
           next: { tags: ["getAllData"] },
         }
-      );
+      )
 
-      if (!res.ok) throw new Error("Failed to fetch all financial data");
+      if (!res.ok) throw new Error("Failed to fetch all financial data")
 
-      const data: FinancialData_ = await res.json();
-      console.log("Income Expanse Data");
-      console.log(data);
-      
-      
-      return data;
+      const data: FinancialData_ = await res.json()
+      return data
     } catch (error) {
-      console.error("Error fetching data:", error);
-      return { expense: [], income: [] };
+      console.error("Error fetching data:", error)
+      return { expense: [], income: [] }
     }
   }
-);
+)
 
 export default async function Dashboard({
   searchParams,
@@ -119,12 +121,18 @@ export default async function Dashboard({
     return <div>Please log in to view your dashboard.</div>
   }
 
-  const startDate = searchParams?.startDate || format(subMonths(new Date(), 1), 'yyyy-MM-dd') || ""
-  const endDate = searchParams?.endDate || format(new Date(), 'yyyy-MM-dd') || ""
+  const startDate =
+    searchParams?.startDate ||
+    format(subMonths(new Date(), 1), "yyyy-MM-dd") ||
+    ""
+  const endDate =
+    searchParams?.endDate || format(new Date(), "yyyy-MM-dd") || ""
 
-  const totalIncome = await getTotalIncome(user.id, cookie)
-  const totalExpense = await getTotalExpense(user.id, cookie)
-  const Data = await getAllData(user.id, cookie, startDate, endDate)
+  const [totalIncome, totalExpense, Data] = await Promise.all([
+    getTotalIncome(user.id, cookie),
+    getTotalExpense(user.id, cookie),
+    getAllData(user.id, cookie, startDate, endDate),
+  ])
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
@@ -150,7 +158,7 @@ export default async function Dashboard({
             </div>
           </div>
 
-          <DateSelect />
+       
 
           <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card
@@ -178,6 +186,8 @@ export default async function Dashboard({
               descriptionColor="text-red-400"
             />
           </section>
+
+          <DateSelect />
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
             <Cardcontent className="w-max-[400px] w-min-[300px] p-0">

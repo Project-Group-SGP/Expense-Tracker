@@ -10,6 +10,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { chartPieProps } from "./ChartPie_1"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const chartConfig = {
   spend: {
@@ -65,12 +66,35 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+// Catagory label
+const Catagory_label = ({ data }) => (
+  <div className="flex flex-wrap justify-center gap-2 mb-4">
+    {data.map((item, index) => (
+      <div key={index} className="flex items-center">
+        <div
+          className="w-3 h-3 mr-1  rounded-full"
+          style={{ backgroundColor: chartConfig[item.category]?.color }}
+        ></div>
+        <span className="text-sm">{item.category}</span>
+      </div>
+    ))}
+  </div>
+)
+
+
 export default function ChartPie_2({ chartData }: chartPieProps) {
   const totalSpend = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.spend, 0)
   }, [chartData])
 
   return (
+    <Card className="w-full max-w-3xl mx-auto dark:bg-black shadow-none border-none">
+      <CardHeader>
+        <CardTitle className="text-center">Expense Distribution</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Catagory_label data={chartData} />
+      
     <ChartContainer
       config={chartConfig}
       className="mx-auto aspect-square max-h-[250px]"
@@ -120,5 +144,7 @@ export default function ChartPie_2({ chartData }: chartPieProps) {
         </Pie>
       </PieChart>
     </ChartContainer>
+    </CardContent>
+    </Card>
   )
 }
