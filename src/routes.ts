@@ -47,6 +47,7 @@ export const apiRoutes = [
   "/api/totalExpense",
   "/api/totalIncome",
   "/api/allData",
+  "/api/joinin-date"
 ]
 
 export const privateRoutes = [
@@ -55,4 +56,5 @@ export const privateRoutes = [
   "/settings",
   "/history",
   "/report",
+  "/budget"
 ]

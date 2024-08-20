@@ -1,23 +1,38 @@
 "use client";
+
 import { useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { useState, useEffect } from 'react';
-import { subMonths, format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { DatePickerWithRange } from './DatePickerWithRange';
 
 const DateSelect = () => {
   const router = useRouter();
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subMonths(new Date(), 6),
-    to: new Date(),
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
-    // Set initial date range on component mount
-    const initialStartDate = format(subMonths(new Date(), 1), 'yyyy-MM-dd');
-    const initialEndDate = format(new Date(), 'yyyy-MM-dd');
-    router.push(`?startDate=${initialStartDate}&endDate=${initialEndDate}`, { scroll: false });
-  }, []);
+    // Fetch the joinin date from the server
+    const fetchJoininDate = async () => {
+      try {
+        const response = await fetch('/api/joinin-date');
+        const data = await response.json();
+
+        if (data.joininDate) {
+          const joininDate = parseISO(data.joininDate);
+          setDateRange({ from: joininDate, to: new Date() });
+
+          const formattedStartDate = format(joininDate, 'yyyy-MM-dd');
+          const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
+
+          router.push(`?startDate=${formattedStartDate}&endDate=${formattedEndDate}`, { scroll: false });
+        }
+      } catch (error) {
+        console.error('Error fetching joinin date:', error);
+      }
+    };
+
+    fetchJoininDate();
+  }, [router]);
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
     if (newDateRange) {
