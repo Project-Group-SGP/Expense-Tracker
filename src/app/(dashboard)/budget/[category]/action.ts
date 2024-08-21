@@ -4,7 +4,7 @@ import { CategoryTypes } from '@prisma/client';
 import { headers } from 'next/headers';
 
 
-export async function fetchBudgetData() {
+export async function GetExpensesData() {
   const headersList = headers();
   const cookie = headersList.get('cookie') || '';
   try{
@@ -22,14 +22,11 @@ export async function fetchBudgetData() {
       // console.log(data.expenses);
       // console.log(data);
       
-      return data;
+
+      return data.expenses;
   }catch(error){
-    console.error('Error fetching budget data:', error);
+    console.error('Error fetching expenses data:', error);
     return {
-      totalIncome: 0,
-      budget: { budget: 0 },
-      perDayBudget: 0,
-      category: {},
       expense:[],
     };
   }

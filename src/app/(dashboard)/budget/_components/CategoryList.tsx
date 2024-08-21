@@ -16,9 +16,16 @@ import {
   ShoppingCart,
   UtensilsCrossed,
 } from "lucide-react";
+import { CategoryTypes } from "@prisma/client";
 
-const CategoryList = ({ categories }) => {
+type CategoryListType = {
+  categories: {
+    [key: string]: number;};
+}
+
+const CategoryList = (props: CategoryListType) => {
   const router = useRouter();
+
 
   const categoryItems = [
     { title: "Food", color: "text-food", icon: UtensilsCrossed, path: "/budget/food" },
@@ -48,7 +55,7 @@ const CategoryList = ({ categories }) => {
         >
           <Card_Category
             title={category.title}
-            amount={categories[category.title] || 0}
+            amount={props.categories[category.title] || 0}
             color={category.color}
             icon={category.icon}
           />

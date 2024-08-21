@@ -9,6 +9,7 @@ type CateroyCardType = {
   amount: number;
   color: string;
   icon: LucideIcon;
+  
 };
 
 const Card_Category = (prop: CateroyCardType) => {

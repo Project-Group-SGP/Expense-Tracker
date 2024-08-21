@@ -1,14 +1,12 @@
-import React from 'react'
+"use client"
+import React from "react"
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-
-
 import {
   Table,
   TableBody,
@@ -19,91 +17,96 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Cardcontent } from '@/app/(dashboard)/dashboard/_components/Card'
+import { IndianRupee } from "lucide-react"
+import { usePathname } from "next/navigation"
 
+type Expense = {
+  id: string
+  userId: string
+  category: string
+  amount: string
+  date: string
+  description: string
+}
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-]
+export type Expenses = Expense[]
 
+const Transaction = ({ data }: { data: Expenses }) => {
+  const pathname = usePathname()
+  const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || ""
 
-const Transaction = () => {
+  const categoryTransaction: {
+    id: string
+    category: string
+    date: string
+    description: string | null
+    amount: string
+  }[] = []
+
+  // Filter data  category wise
+  const filteredData = data.filter(
+    (transaction) =>
+      transaction.category.toUpperCase() === lastRouteName
+  )
+
+  filteredData.forEach((transaction) => {
+    categoryTransaction.push({
+      id: transaction.id,
+      category: transaction.category,
+      date: transaction.date,
+      description: transaction.description || null,
+      amount: transaction.amount
+    })
+  })
+
+  //total amount
+  const totalAmount = categoryTransaction.reduce((total, transaction) => {
+    return total + parseFloat(transaction.amount)
+  }, 0)
+
+  let i = 1;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Transation</CardTitle>
-        <CardDescription>All Food  Transation</CardDescription>
-        <Cardcontent>
-        <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.invoice}>
-            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-            <TableCell>{invoice.paymentStatus}</TableCell>
-            <TableCell>{invoice.paymentMethod}</TableCell>
-            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
-        </Cardcontent>
+        <CardTitle>{lastRouteName}</CardTitle>
+        <CardDescription>
+          All {lastRouteName} Transactions
+        </CardDescription>
       </CardHeader>
+      <CardContent>
+        <Table>
+          <TableCaption>A list of your {lastRouteName} transactions.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">No.</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {categoryTransaction.map((transaction) => (
+              <TableRow key={transaction.id}>
+                <TableCell className="font-medium">{i++}</TableCell>
+                <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                <TableCell>{transaction.description || '-'}</TableCell>
+                <TableCell className="text-right">
+                  {transaction.amount}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell className="text-right">
+                {`₹${totalAmount.toFixed(2)}`}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </CardContent>
     </Card>
   )
 }
