@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/transaction", label: "Transactions" },
   { href: "/settings", label: "Settings" },
   { href: "/history", label: "History" },
+  { href: "/budget", label: "Budget" },
 ]
 
 const Navbar = () => {
@@ -60,7 +61,7 @@ const Navbar = () => {
                 Logout
                 <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
               </Button>
-              </form>
+            </form>
           </div>
         </div>
       </div>

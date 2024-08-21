@@ -47,7 +47,8 @@ export const apiRoutes = [
   "/api/totalExpense",
   "/api/totalIncome",
   "/api/allData",
-  "/api/joinin-date"
+  "/api/joinin-date",
+  "/api/budget-category"
 ]
 
 export const privateRoutes = [
@@ -56,5 +57,17 @@ export const privateRoutes = [
   "/settings",
   "/history",
   "/report",
-  "/budget"
+  "/budget",
+  "/budget/food",
+  "/budget/entertainment",
+  "/budget/transportation",
+  "/budget/healthcare",
+  "/budget/education",
+  "/budget/investment",
+  "/budget/shopping",
+  "/budget/groceries",
+  "/budget/other",
+  "/budget/bills",
+  "/budget/fuel",
+  "/budget/emi",
 ]

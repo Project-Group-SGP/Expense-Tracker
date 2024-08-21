@@ -1,6 +1,5 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import {
   Label,
   PolarGrid,
@@ -18,6 +17,10 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+import CateroyCard from "./Card_Category"
+import { HandCoins, CircleGauge, Wallet } from 'lucide-react'
+import Card_click from "./Card_click"
+
 const chartData = [
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
 ]
@@ -32,11 +35,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function OverallGraph() {
+type OverallGraphProps = {
+    totalIncome: number,
+    budget: number,
+    perDayBudget: number,
+}
+
+export function OverallGraph(props:OverallGraphProps) {
   return (
-    <Card className="flex flex-col ">
-      <CardHeader className="items-center pb-0">
-        <CardDescription>January - June 2024</CardDescription>
+    <Card className="flex flex-col ml-6 w-full mr-6 border-none shadow-lg rounded-lg">
+      <CardHeader className="items-center pb-2">
+        <CardTitle className="text-lg font-semibold text-gray-800">Overall Summary</CardTitle>
+        {/* give options for selecting month and year */}
+        <CardDescription className="text-sm text-gray-500">January 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -79,9 +90,9 @@ export function OverallGraph() {
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
+                          className="fill-muted-foreground text-sm"
                         >
-                          Visitors
+                          Spend
                         </tspan>
                       </text>
                     )
@@ -92,6 +103,29 @@ export function OverallGraph() {
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter>
+  <div className="flex justify-around gap-2 w-full">
+    <CateroyCard
+      title="Income"
+      amount={Number(props.totalIncome)}
+      color="text-green-600"
+      icon={HandCoins}
+    />
+    <CateroyCard
+      title="Set Budget"
+      amount={Number(props.budget)}
+      color="text-blue-700"
+      icon={CircleGauge}
+    />
+    <CateroyCard
+      title="Safe to spend per day"
+      amount={Number(props.perDayBudget)}
+      color="text-sky-400"
+      icon={Wallet}
+    />
+  </div>
+</CardFooter>
+
     </Card>
   )
 }
