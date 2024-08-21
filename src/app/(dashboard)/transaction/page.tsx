@@ -57,7 +57,7 @@ export default function Page() {
           throw new Error("Failed to extract transactions: No data received")
         }
 
-        const dataWithCategory = response.data.table.map(
+        const dataWithCategory = response.data.transactions.map(
           (transaction: Transaction) => ({
             ...transaction,
             Category: transaction.Amount > 0 ? "Income" : "Other",
@@ -67,20 +67,28 @@ export default function Page() {
         toast.success("Transactions extracted successfully")
         setData(dataWithCategory)
       } catch (error) {
-        if (axios.isAxiosError(error) && !error.response) {
-          toast.error(
-            "Network error. Please check your connection and try again."
-          )
+        if (axios.isAxiosError(error)) {
+          if (!error.response) {
+            toast.error(
+              "Network error. Please check your connection and try again."
+            )
+          } else if (error.response.status === 400) {
+            toast.error(
+              `Bad Request: ${error.response.data.error.split(":")[1]}`
+            )
+          } else if (error.response.status === 500) {
+            toast.error(`Server Error: ${error.response.data.error}`)
+          } else {
+            toast.error(`Error: ${error.response.data.error}`)
+          }
         } else {
-          throw error
+          toast.error(`An unexpected error occurred, please try again.`)
         }
       }
     },
     onError: (error: any) => {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           if (error.response.status === 400) {
             toast.error(`Bad Request: ${error.response.data.error}`)
           } else if (error.response.status === 500) {
@@ -89,16 +97,13 @@ export default function Page() {
             toast.error(`Error: ${error.response.data.error}`)
           }
         } else if (error.request) {
-          // The request was made but no response was received
           toast.error(
-            "No response received from server. Please ensure that the pdf and password are correct."
+            "No response received from server. Please ensure that the PDF and password are correct."
           )
         } else {
-          // Something happened in setting up the request that triggered an Error
           toast.error(`Error: ${error.message}`)
         }
       } else {
-        // Non-Axios error
         toast.error(`An unexpected error occurred: ${error.message}`)
       }
     },
@@ -118,7 +123,6 @@ export default function Page() {
   }
 
   const changeDescription = (index: number, newDescription: string) => {
-    console.log(newDescription, index)
     setData((prevData) => {
       const newData = [...prevData]
       newData[index].Description = newDescription

@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { format, subMonths, isBefore, startOfTomorrow } from "date-fns";
+import { format, subMonths, isBefore, startOfTomorrow, parseISO } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -20,12 +20,33 @@ export function DatePickerWithRange({
   onDateRangeChange?: (dateRange: DateRange | undefined) => void;
   defaultDateRange?: DateRange;
 }) {
-  const [date, setDate] = React.useState<DateRange>(
-    defaultDateRange || {
-      from: subMonths(new Date(), 6),
-      to: new Date(),
-    }
-  );
+  const [date, setDate] = React.useState<DateRange>({
+    from: undefined,
+    to: new Date(),
+  });
+  
+  // ṣet start date to joing Date
+  React.useEffect(() => {
+    // Fetch the join date from the server
+    const fetchJoinDate = async () => {
+      try {
+        const response = await fetch('/api/joinin-date');
+        const data = await response.json();
+  
+        if (data.joininDate) {
+          const joinDate = parseISO(data.joininDate);
+          setDate({
+            from: joinDate,
+            to: new Date(),
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching join date:', error);
+      }
+    };
+  
+    fetchJoinDate();
+  }, []);
 
   const handleSelect = (range: DateRange | undefined) => {
     if (range) {

@@ -38,10 +38,10 @@ export async function AddnewExpense(data: ExpenseFormData) {
     },
   })
 
-  console.log("newExpense", newExpense);
+  // console.log("newExpense", newExpense);
   
-
   revalidateTag("totalExpense")
   revalidateTag("getAllData")
   return newExpense ? "success" : "error"
 }
+

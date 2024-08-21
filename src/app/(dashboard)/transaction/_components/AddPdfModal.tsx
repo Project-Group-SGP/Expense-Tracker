@@ -91,11 +91,11 @@ export default function AddPdfModal({
 
   return (
     <Dialog onOpenChange={handleCloseModal} open={isOpen}>
-      <DialogContent className="w-96 z-[6000]">
+      <DialogContent className="z-[6000] w-96">
         <DialogHeader>
           <div className="mb-4 flex items-center justify-center">
             <Image
-              src="/SpendWise-5.png"
+              src="/SpendWIse-5.png"
               alt="Logo"
               width={120}
               height={120}
