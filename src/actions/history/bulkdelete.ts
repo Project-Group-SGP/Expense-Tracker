@@ -1,6 +1,6 @@
 import * as  z from "zod";
 import { db } from "@/lib/db";
-import { bulkdeleteProps } from "@/schemas";
+import { bulkdeleteProps } from "@/index";
 import { currentUserServer } from "@/lib/auth";
 
 export const bulkdelete = async(values:z.infer<typeof  bulkdeleteProps>)=>{

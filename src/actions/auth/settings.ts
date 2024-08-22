@@ -4,7 +4,7 @@ import { currentUserServer } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/mail";
 import { generateVerificationToken } from "@/lib/tokens";
-import { SettingsSchema } from "@/schemas";
+import { SettingsSchema } from "@/index";
 import * as z from "zod";
 import bcrypt from "bcryptjs";
 

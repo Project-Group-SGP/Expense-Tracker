@@ -7,6 +7,7 @@ export const useGetTransactions = () => {
   const to = params.get("to") || "";
 
   const query = useQuery({
+    //Todo check i params are needed in key
     queryKey:["transactions",{from,to}],
     queryFn: async () => {  
       const responce = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`,{
@@ -17,7 +18,7 @@ export const useGetTransactions = () => {
       if(!responce.ok){
         throw new Error("Failed to fetch transactions"); 
       }
-
+      
       const { data } = await responce.json();
 
       return data;

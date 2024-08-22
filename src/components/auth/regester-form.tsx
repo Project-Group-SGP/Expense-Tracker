@@ -16,7 +16,7 @@ import { CardWrapper } from "./card-wrapper";
 import { FormError } from "./form-error";
 import { FromSuccess } from "./form-success";
 import { useCallback, useMemo, useRef, useState, useTransition } from "react";
-import { RegisterSchema } from "@/schemas";
+import { RegisterSchema } from "@/index";
 import { Register } from "@/actions/auth/signup";
 import { Loader2, Mail } from "lucide-react";
 import { Passwordcmp } from "../Passwordcmp";

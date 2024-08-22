@@ -19,7 +19,7 @@ import {
 import { Input } from "../ui/input"
 
 import { newPassword } from "@/actions/auth/new-password"
-import { NewPasswordSchema } from "@/schemas"
+import { NewPasswordSchema } from "@/index"
 import { useState, useTransition } from "react"
 export const NewResetPasswordForm = () => {
   const [Error ,setError] = useState<string|undefined>("");

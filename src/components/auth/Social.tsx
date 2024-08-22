@@ -1,7 +1,6 @@
 "use client";
 
 import { FcGoogle } from "react-icons/fc";
-import { FaGoogle } from "react-icons/fa";
 import { Button } from "../ui/button";
 import { signIn } from "next-auth/react";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";

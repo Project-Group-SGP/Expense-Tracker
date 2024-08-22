@@ -58,7 +58,22 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    return NextResponse.json({ expense,income });
+    const updatedIncome = income.map(item => ({
+      ...item,
+      category: 'I  ncome',
+    }));
+
+    const updatedexpance = expense.map(item => ({
+      ...item,
+      amount:-item.amount,
+    }));
+
+    const transactions = { ...updatedexpance,...updatedIncome }.sort((a, b) => {
+      if (a.date < b.date) return -1;
+      return 0;
+   });
+
+    return NextResponse.json({transactions});
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json(

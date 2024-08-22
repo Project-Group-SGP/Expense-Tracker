@@ -17,7 +17,7 @@ import { FormError } from "./form-error";
 import { FromSuccess } from "./form-success";
 import { Resetpass } from "@/actions/auth/reset";
 import { useState, useTransition } from "react";
-import { ResetSchema } from "@/schemas";
+import { ResetSchema } from "@/index";
 
 export const ResetpasswordForm = () => {
   const [error,setError]=useState<string|undefined>("");

@@ -64,3 +64,16 @@ export const bulkdeleteProps = z.object({
     category:z.enum(["Income", "Expense"]),
   })),
 })
+
+export const singledeleteProps = z.object({
+    id:z.string(),
+    category:z.enum(["Income", "Expense"]),
+})
+
+export const editTransactionProps = z.object({
+  id:z.string(),
+  category:z.enum(["Income", "Expense"]),
+  props:z.object({
+    amount: z.optional(z.number()), date: z.optional(z.date()), description:z.optional(z.string()),
+  })
+})

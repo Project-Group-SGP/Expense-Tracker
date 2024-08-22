@@ -5,12 +5,12 @@ import Link from "next/link"
 import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
 import { logout } from "@/actions/auth/logout"
-import { Form } from "@/components/ui/form"
+import { UserButton } from "@/components/user-button"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/transaction", label: "Transactions" },
-  { href: "/settings", label: "Settings" },
+  // { href: "/settings", label: "Settings" },
   { href: "/history", label: "History" },
 ]
 
@@ -50,7 +50,7 @@ const Navbar = () => {
             <div className="hidden md:block lg:block">
               <ModeToggle />
             </div>
-            <form action={logout}>
+            {/* <form action={logout}>
               <Button
                 variant="default"
                 className={cn(
@@ -60,7 +60,8 @@ const Navbar = () => {
                 Logout
                 <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
               </Button>
-              </form>
+              </form> */}
+              <UserButton />
           </div>
         </div>
       </div>
