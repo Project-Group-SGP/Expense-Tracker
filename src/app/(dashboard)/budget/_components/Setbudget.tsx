@@ -25,6 +25,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 import CategoryCard from "./Card_Category"
 import { CircleGauge } from "lucide-react"
+import { SetBudgetDb } from "../actions"
 
 // form validation schema
 const formSchema = z.object({
@@ -47,16 +48,28 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
     },
   })
 
+  // form handler
   const handleSubmit = async (data: BudgetFormData) => {
     try {
+      
       // For now, we'll just simulate a successful update
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulating API call
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulating API call
 
-      toast.success("Budget updated successfully", {
-        closeButton: true,
-        icon: "💰",
-        duration: 4500,
-      })
+      const budget = Number(data.amount);
+
+      const result = await SetBudgetDb(budget);
+
+      if(result == "success"){
+        toast.success("Budget updated successfully", {
+          closeButton: true,
+          icon: "💰",
+          duration: 4500,
+        })
+        form.reset();
+      }else{
+        toast.error("Budget not set");
+      }
+     
 
       setOpen(false)
       form.reset({ amount: data.amount })

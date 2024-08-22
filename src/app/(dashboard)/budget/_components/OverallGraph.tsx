@@ -23,10 +23,6 @@ import Card_click from "./Card_unclick"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
 
-const chartData = [
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-]
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -41,6 +37,7 @@ type OverallGraphProps = {
   totalIncome: number
   budget: number
   perDayBudget: number
+  totalExpense: number
 }
 
 export function OverallGraph(props: OverallGraphProps) {
@@ -60,13 +57,23 @@ export function OverallGraph(props: OverallGraphProps) {
   ]
 
   const currentMonth = new Date().getMonth()
-  console.log(currentMonth)
+
+  const remainingBudget = props.budget - props.totalExpense
+  const isOverBudget = remainingBudget < 0;
+  const budgetColor = isOverBudget ? "text-emi" : "text-blue-700"
+
+  const chartData = [
+    {
+      browser: "safari",
+      visitors: props.totalExpense,
+      fill: isOverBudget ? "var(--color-emi)" : "var(--color-safari)",
+    },
+  ]
 
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-lg font-semibold">Overall Summary</CardTitle>
-        {/* give options for selecting month and year */}
         <CardDescription className="text-sm text-gray-500">
           {month[currentMonth]}
         </CardDescription>
@@ -144,7 +151,7 @@ export function OverallGraph(props: OverallGraphProps) {
             <Card_unclick
               title="Safe to spend per day"
               amount={Number(props.perDayBudget)}
-              color="text-sky-400"
+              color={budgetColor}
               icon={Wallet}
             />
           </div>

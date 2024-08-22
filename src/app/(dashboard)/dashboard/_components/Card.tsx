@@ -21,7 +21,7 @@ export default function Card(props: CardProps) {
         {/* lable */}
         <p className="text-sm font-semibold">{props.label}</p>
         {/* icon */}
-        <props.icon className={cn("h-4 text-3xl w-4 text-gray-900 ",props.iconclassName)} />
+        <props.icon className={cn("h-5 text-3xl w-5 text-gray-900 ",props.iconclassName)} />
       </section>
       <section className="flex flex-col gap-1">
         {/* amount */}

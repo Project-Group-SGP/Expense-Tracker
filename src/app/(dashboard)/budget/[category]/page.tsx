@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { cache } from 'react'
 import { Cardcontent } from '../../dashboard/_components/Card'
 import  {Category_Graph, Expenses}  from './_components/Category_Graph'
 import Transaction from './_components/Transaction'
 import { useRouter } from 'next/router'
-import { GetExpensesData } from './action'
+// import { GetExpensesData } from './action'
 import { usePathname } from 'next/navigation'
+import { headers } from 'next/headers'
+
+export const GetExpensesData = cache(async () => {
+  const headersList = headers();
+  const cookie = headersList.get('cookie') || '';
+  
+  try {
+    const response = await fetch(
+      `${process.env.BASE_URL}/api/budget-category`,
+      {
+        method: 'GET',
+        headers: { Cookie: cookie },
+        // Including cache-related options in the request
+        next: { tags: ['budget-data'] },
+      }
+    );
+
+    const data = await response.json();
+    return data.expenses;
+  } catch (error) {
+    console.error('Error fetching expenses data:', error);
+    return {
+      expense: [],
+    };
+  }
+});
 
 const page = async () => {
 
