@@ -1,6 +1,5 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import {
   Label,
   PolarGrid,
@@ -18,6 +17,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+
+import { HandCoins, CircleGauge, Wallet } from "lucide-react"
+import Card_click from "./Card_unclick"
+import Card_unclick from "./Card_unclick"
+import { SetBudget } from "./Setbudget"
+
 const chartData = [
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
 ]
@@ -32,11 +37,39 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function OverallGraph() {
+type OverallGraphProps = {
+  totalIncome: number
+  budget: number
+  perDayBudget: number
+}
+
+export function OverallGraph(props: OverallGraphProps) {
+  const month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ]
+
+  const currentMonth = new Date().getMonth()
+  console.log(currentMonth)
+
   return (
-    <Card className="flex flex-col ">
-      <CardHeader className="items-center pb-0">
-        <CardDescription>January - June 2024</CardDescription>
+    <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
+      <CardHeader className="items-center pb-2">
+        <CardTitle className="text-lg font-semibold">Overall Summary</CardTitle>
+        {/* give options for selecting month and year */}
+        <CardDescription className="text-sm text-gray-500">
+          {month[currentMonth]}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -79,9 +112,9 @@ export function OverallGraph() {
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
+                          className="fill-muted-foreground text-sm"
                         >
-                          Visitors
+                          Spend
                         </tspan>
                       </text>
                     )
@@ -92,6 +125,31 @@ export function OverallGraph() {
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter>
+        <div className="flex w-full justify-around gap-2">
+          <div className=" max-w-[300px] flex-1 ">
+            <Card_unclick
+              title="Income"
+              amount={Number(props.totalIncome)}
+              color="text-green-600"
+              icon={HandCoins}
+            />
+          </div>
+
+          <div className="max-w-[300px] flex-1">
+            <SetBudget currentBudget={Number(props.budget)} />
+          </div>
+
+          <div className="max-w-[300px] flex-1">
+            <Card_unclick
+              title="Safe to spend per day"
+              amount={Number(props.perDayBudget)}
+              color="text-sky-400"
+              icon={Wallet}
+            />
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   )
 }

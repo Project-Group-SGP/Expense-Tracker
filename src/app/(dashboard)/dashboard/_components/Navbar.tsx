@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/transaction", label: "Transactions" },
   // { href: "/settings", label: "Settings" },
   { href: "/history", label: "History" },
+  { href: "/budget", label: "Budget" },
 ]
 
 const Navbar = () => {

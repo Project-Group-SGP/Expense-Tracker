@@ -20,6 +20,19 @@ const config = {
     },
     extend: {
       colors: {
+        // category color 
+        other: "#888888",
+        bills: "#0088FE",
+        food: "#FF8042",
+        entertainment: "#FFBB28",
+        transportation: "#00C49F",
+        emi: "#FF0000",
+        healthcare: "#800080",
+        education: "#00FFFF",
+        investment: "#008000",
+        shopping: "#FFD700",
+        fuel: "#FF6347",
+        groceries: "#ADFF2F",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
