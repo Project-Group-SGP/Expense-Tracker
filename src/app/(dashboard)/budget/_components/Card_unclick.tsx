@@ -14,9 +14,9 @@ type CateroyCardType = {
   icon: LucideIcon;
 };
 
-const Card_click = (prop: CateroyCardType) => {
+const Card_unclick = (prop: CateroyCardType) => {
   return (<>
-        <CardContent className="flex w-full flex-col gap-3 cursor-pointer  rounded-xl border p-5 shadow dark:bg-black">
+        <CardContent className="flex w-full flex-col gap-3 rounded-xl  border p-5 shadow dark:bg-black">
         <section className="flex justify-between gap-2">
             {/* Label */}
             <p className={cn('text-sm font-semibold', prop.color)}>{prop.title}</p>
@@ -36,4 +36,4 @@ const Card_click = (prop: CateroyCardType) => {
     </>);
 };
 
-export default Card_click;
+export default Card_unclick;

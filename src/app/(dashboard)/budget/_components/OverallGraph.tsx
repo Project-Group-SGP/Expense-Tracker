@@ -17,9 +17,11 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-import CateroyCard from "./Card_Category"
-import { HandCoins, CircleGauge, Wallet } from 'lucide-react'
-import Card_click from "./Card_click"
+
+import { HandCoins, CircleGauge, Wallet } from "lucide-react"
+import Card_click from "./Card_unclick"
+import Card_unclick from "./Card_unclick"
+import { SetBudget } from "./Setbudget"
 
 const chartData = [
   { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
@@ -36,18 +38,38 @@ const chartConfig = {
 } satisfies ChartConfig
 
 type OverallGraphProps = {
-    totalIncome: number,
-    budget: number,
-    perDayBudget: number,
+  totalIncome: number
+  budget: number
+  perDayBudget: number
 }
 
-export function OverallGraph(props:OverallGraphProps) {
+export function OverallGraph(props: OverallGraphProps) {
+  const month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ]
+
+  const currentMonth = new Date().getMonth()
+  console.log(currentMonth)
+
   return (
-    <Card className="flex flex-col ml-6 w-full mr-6 border-none shadow-lg rounded-lg">
+    <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
-        <CardTitle className="text-lg font-semibold text-gray-800">Overall Summary</CardTitle>
+        <CardTitle className="text-lg font-semibold">Overall Summary</CardTitle>
         {/* give options for selecting month and year */}
-        <CardDescription className="text-sm text-gray-500">January 2024</CardDescription>
+        <CardDescription className="text-sm text-gray-500">
+          {month[currentMonth]}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -104,28 +126,30 @@ export function OverallGraph(props:OverallGraphProps) {
         </ChartContainer>
       </CardContent>
       <CardFooter>
-  <div className="flex justify-around gap-2 w-full">
-    <CateroyCard
-      title="Income"
-      amount={Number(props.totalIncome)}
-      color="text-green-600"
-      icon={HandCoins}
-    />
-    <CateroyCard
-      title="Set Budget"
-      amount={Number(props.budget)}
-      color="text-blue-700"
-      icon={CircleGauge}
-    />
-    <CateroyCard
-      title="Safe to spend per day"
-      amount={Number(props.perDayBudget)}
-      color="text-sky-400"
-      icon={Wallet}
-    />
-  </div>
-</CardFooter>
+        <div className="flex w-full justify-around gap-2">
+          <div className=" max-w-[300px] flex-1 ">
+            <Card_unclick
+              title="Income"
+              amount={Number(props.totalIncome)}
+              color="text-green-600"
+              icon={HandCoins}
+            />
+          </div>
 
+          <div className="max-w-[300px] flex-1">
+            <SetBudget currentBudget={Number(props.budget)} />
+          </div>
+
+          <div className="max-w-[300px] flex-1">
+            <Card_unclick
+              title="Safe to spend per day"
+              amount={Number(props.perDayBudget)}
+              color="text-sky-400"
+              icon={Wallet}
+            />
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   )
 }

@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { IndianRupee } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 type Expense = {

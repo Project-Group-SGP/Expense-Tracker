@@ -17,7 +17,7 @@ const Card_Category = (prop: CateroyCardType) => {
     <CardContent className="flex w-full flex-col gap-3 rounded-xl cursor-pointer border p-5 shadow dark:bg-black">
       <section className="flex justify-between gap-2">
         <p className={cn("text-sm font-semibold", prop.color)}>{prop.title}</p>
-        <prop.icon className={cn("h-6 w-6 text-gray-900", prop.color)} />
+        <prop.icon className={cn("h-4 w-4 text-gray-900", prop.color)} />
       </section>
       <section className="flex flex-col gap-1">
         <h2 className={cn("flex items-center gap-1 text-2xl font-semibold", prop.color)}>

@@ -84,6 +84,7 @@ export function Category_Graph({ data }: { data: Expenses }) {
   const chartData = Object.entries(categoryWiseData).map(([month, spend]) => ({ month, spend }));
 
   // console.log(chartData);
+
  
   return (
     <Card>
