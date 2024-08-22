@@ -25,8 +25,7 @@ export const UserButton = () => {
       <DropdownMenuTrigger className='border-0'>
         <Avatar className={`w-10 h-10 ${theme === 'dark' ? 'bg-black' : 'bg-white' }`}>
           <AvatarImage 
-            // src={user?.image || ""} 
-            src=""
+            src={user?.image || ""} 
             className="object-cover"
           />
           <AvatarFallback 
