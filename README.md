@@ -17,6 +17,8 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - [Development](#development)
 - [Deployment](#deployment)
 - [Contributors](#contributors)
+- [License](#license)
+- [Contact](#contact)
 
 ### Features
 
@@ -93,6 +95,10 @@ OR
 - [Ayush Kalathiya](https://github.com/Ayushkalathiya)
 - [Sarthak Mayani](https://github.com/MACOOF)
 
-## Contact
+### License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+### Contact
 
 For any questions or support, please contact etracker690@gmail.com or open an issue on the GitHub repository.
