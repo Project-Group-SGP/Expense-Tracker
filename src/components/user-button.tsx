@@ -22,11 +22,10 @@ export const UserButton = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className='border-0'>
-        <Avatar className={`w-10 h-10 ${theme === 'dark' ? 'bg-black' : 'bg-white' }`}>
+      <DropdownMenuTrigger className='border-none focus:outline-none'>
+        <Avatar className={`w-10 h-10 border-none  focus:outline-none ${theme === 'dark' ? 'bg-black' : 'bg-white' }`}>
           <AvatarImage 
-            // src={user?.image || ""} 
-            src=""
+            src={user?.image || ""} 
             className="object-cover"
           />
           <AvatarFallback 
@@ -36,7 +35,7 @@ export const UserButton = () => {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40" align="end">
+      <DropdownMenuContent className="w-40 border-none  focus:outline-none" align="end">
         <DropdownMenuItem 
           onClick={handleSettingsClick} 
           className={`flex items-center ${theme === 'dark' ? 'hover:bg-gray-700 text-white' : 'bg-white text-gray-900' } cursor-pointer`}

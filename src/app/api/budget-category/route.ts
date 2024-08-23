@@ -44,6 +44,22 @@ export async function GET(req: NextRequest) {
       },
     })
 
+    // total expense
+    const totalEx = await db.expense.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        userId: userId,
+        date: {
+          gt: startDate,
+          lte: endDate,
+        },
+      },
+    })
+
+    const totalExpense = totalEx._sum.amount || 0;
+
     // get all expense data
     const expenses = await db.expense.findMany({
       where: {
@@ -98,7 +114,7 @@ export async function GET(req: NextRequest) {
     // console.log("expenses:", expenses)
     // console.log("category:", category)
 
-    return NextResponse.json({ totalIncome, budget, expenses, perDayBudget  ,category })
+    return NextResponse.json({ totalIncome, budget, expenses, perDayBudget ,totalExpense ,category })
   } catch (error) {
     console.error("Error in GET function:", error)
     return NextResponse.json(

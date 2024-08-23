@@ -1,9 +1,40 @@
 'use server';
 
+import { currentUserServer } from '@/lib/auth';
+import { db } from '@/lib/db';
 import { CategoryTypes } from '@prisma/client';
+import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 
+//Set Budget
+export async function SetBudgetDb(budget:number){
+  const headersList = headers();
+  const cookie = headersList.get('cookie') || '';
+  // check login or not
+  const user = await currentUserServer();
+  if (!user) {
+    throw new Error("Login Please")
+  }
+  try{
+      const result = await db.user.update({
+        where: {
+          id: user.id
+        },
+        data:{
+          budget: budget
+        }
+      })
+      revalidateTag("budget-data");
+      return result ? "success" : "error";
+  }catch(error){
+    console.log("Error in SetBudget" + error);
+    
+  }
+}
 
+
+
+//fetch All Data
 export async function fetchBudgetData() {
   const headersList = headers();
   const cookie = headersList.get('cookie') || '';

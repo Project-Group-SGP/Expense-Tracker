@@ -17,7 +17,7 @@ const Page = async () => {
         totalIncome={data.totalIncome}
         budget={data.budget.budget}
         perDayBudget={data.perDayBudget}
-        
+        totalExpense = {data.totalExpense}
       />
       <CategoryList 
         categories={data.category}

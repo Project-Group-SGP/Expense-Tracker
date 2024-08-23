@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { usePathname } from "next/navigation";
 import { CategoryTypes } from "@prisma/client";
-import { GetExpensesData } from "../action";
+
 
 const chartConfig = {
   desktop: {
@@ -52,7 +52,7 @@ export function Category_Graph({ data }: { data: Expenses }) {
   const lastRouteName = pathname?.split("/").pop();
   console.log("Last Route Name:", lastRouteName);
 
-  // console.log("Data:", data);
+  console.log("Data:", data);
 
   const categoryWiseData: { [key: string]: number } = {
     January: 0,
