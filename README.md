@@ -1,8 +1,9 @@
 <p align="center">
   <img src="https://i.imgur.com/HQABOAl.jpg" width="200" height="200" />
-    <span style="display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; color: white;    background-color: #343A40; padding: 0.5rem 1rem; border-radius: 0.5rem;">
-        spend<span style="color: #34C759;">wise</span>
-    </span>
+</p>
+
+<p align="center" style="font-size: 2rem; font-weight: 600; color: white; background-color: #343A40; padding: 0.5rem 1rem; border-radius: 0.5rem; display: inline-block;">
+    spend<span style="color: #34C759;">wise</span>
 </p>
 
 ## Spendwise - Expense Tracker
