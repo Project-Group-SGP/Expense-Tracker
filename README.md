@@ -1,6 +1,7 @@
 <p align="center">
-  <img src="https://i.imgur.com/HQABOAl.jpg" width="600" />
+  <img src="https://i.imgur.com/HQABOAl.jpg" width="600" height="300" />
 </p>
+
 ## Spendwise - Expense Tracker
 
 Spendwise is an expense tracking website that allows you to easily log and categorize your expenses, set budgets, and track your spending habits. The website is built with Next.js, a popular React-based framework for server-rendered and statically generated websites and applications.
