@@ -10,6 +10,14 @@ The website features a clean and intuitive interface, making it easy to use and 
 
 The website is designed to be fast, secure, and scalable, making it a great choice for anyone looking for an expense tracking solution.
 
+### Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Contributors](#contributors)
+
 ### Features
 
 - User authentication and authorization
@@ -23,17 +31,18 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 
 ### Tech Stack
 
-- Next.js (React-based framework)
-- Tailwind CSS (CSS framework)
-- TypeScript (programming language)
-- PostgreSQL (database)
-- NextAuth (authentication and authorization)
-- ShadCN UI (UI library)
-- Prisma (ORM)
-- Recharts (Data Visualization)
-- jspdf (Report Generation)
-- Nodemailer (Emails)
-- tanstack/react-query (React Query)
+- Next.js (React-based framework): Provides server-side rendering and static site generation capabilities for optimal performance and SEO.
+- Tailwind CSS (CSS framework): Enables utility-first CSS styling, allowing for rapid and flexible UI design.
+- TypeScript (programming language): Adds static type checking to JavaScript, improving code quality and developer experience.
+- PostgreSQL (database): A powerful, open-source relational database system known for its reliability and feature-rich capabilities.
+- NextAuth (authentication and authorization): Simplifies authentication and authorization, supporting multiple providers including Google login.
+- ShadCN UI (UI library): Provides pre-built, customizable UI components to accelerate development.
+- Prisma (ORM): Facilitates database access with an intuitive, type-safe API.
+- Recharts (Data Visualization): Used for creating dynamic and interactive charts and graphs for visualizing data.
+- jspdf (Report Generation): Allows for the creation and export of PDF reports with embedded charts and tables.
+- Nodemailer (Emails): Enables sending emails from the application, useful for notifications and reports.
+- tanstack/react-query (React Query): Manages server-state and caching, improving data fetching and synchronization.
+- next-themes (Theme management): Provides support for dark mode and theme switching, enhancing the user experience.
 
 ### Development
 
@@ -83,3 +92,7 @@ OR
 - [Dhruv Kotadiya](https://github.com/DhruvK007)
 - [Ayush Kalathiya](https://github.com/Ayushkalathiya)
 - [Sarthak Mayani](https://github.com/MACOOF)
+
+## Contact
+
+For any questions or support, please contact etracker690@gmail.com or open an issue on the GitHub repository.
