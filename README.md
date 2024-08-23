@@ -38,9 +38,36 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 ### Development
 
 - Clone the repository
+
+```bash
+  git clone "https://github.com/Project-Group-SGP/Expense-Tracker"
+```
+
 - Run `npm install` or `yarn install` to install dependencies
+
+```bash
+  npm install
+```
+
+OR
+
+```bash
+  yarn install
+```
+
 - Add Credentials and other secret keys in .env file
 - Run `npm run dev` or `yarn dev` to start the development server
+
+```bash
+  npm run dev
+```
+
+OR
+
+```bash
+  yarn dev
+```
+
 - Open [http://localhost:3000](http://localhost:3000) in your browser to see the result
 
 ### Deployment
