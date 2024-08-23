@@ -91,9 +91,9 @@ OR
 
 ### Contributors
 
-- [Dhruv Kotadiya](https://github.com/DhruvK007)
-- [Ayush Kalathiya](https://github.com/Ayushkalathiya)
-- [Sarthak Mayani](https://github.com/MACOOF)
+<a href="https://github.com/Project-Group-SGP/Expense-Tracker/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Project-Group-SGP/Expense-Tracker" />
+</a>
 
 ### License
 
