@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Spendwise - Expense Tracker
 
-## Getting Started
+Spendwise is an expense tracking website that allows you to easily log and categorize your expenses, set budgets, and track your spending habits. The website is built with Next.js, a popular React-based framework for server-rendered and statically generated websites and applications.
 
-First, run the development server:
+The website features a clean and intuitive interface, making it easy to use and navigate. You can create accounts, log in, and start tracking your expenses right away. The website also features a budgeting system, which allows you to set budgets for different categories of expenses and track your spending against those budgets. You can also import your online transactions by uploading your bank statement pdfs and also generate detailed reports and export it as csv or pdf.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The website is designed to be fast, secure, and scalable, making it a great choice for anyone looking for an expense tracking solution.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- User authentication and authorization
+- Expense tracking and categorization
+- Import Transactions with PDF
+- Detailed Report Generation
+- Budgeting system
+- Fast, secure, and scalable
+- Clean and intuitive interface
+- Dark Mode support
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Tech Stack
 
-## Learn More
+- Next.js (React-based framework)
+- Tailwind CSS (CSS framework)
+- TypeScript (programming language)
+- PostgreSQL (database)
+- NextAuth (authentication and authorization)
+- ShadCN UI (UI library)
+- Prsima (ORM)
+- Recharts (Data Visualization)
+- jspdf (Report Generation)
+- Nodemailer (Emails)
+- tanstack/react-query (React Query)
 
-To learn more about Next.js, take a look at the following resources:
+### Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Clone the repository
+- Run `npm install` or `yarn install` to install dependencies
+- Run `npm run dev` or `yarn dev` to start the development server
+- Open [http://localhost:3000](http://localhost:3000) in your browser to see the result
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Deployment
 
-## Deploy on Vercel
+- Deploy to Vercel (recommended)
+- Deploy to Netlify
+- Deploy to AWS
+- Deploy to Google Cloud
+- Deploy to Microsoft Azure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Contributors
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [Dhruv Kotadiya](https://github.com/DhruvK007)
+- [Ayush Kalathiya](https://github.com/Ayushkalathiya)
+- [Sarthak Mayani](https://github.com/MACOOF)
