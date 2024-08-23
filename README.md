@@ -1,23 +1,14 @@
 <p align="center">
   <img src="https://i.imgur.com/HQABOAl.jpg" width="200" height="200" />
 </p>
-<p align="center">
-  <a href="https://github.com/Project-Group-SGP/Expense-Tracker/stargazers">
-    <img src="https://img.shields.io/github/stars/Project-Group-SGP/Expense-Tracker" alt="Stars" />
-  </a>
-  <a href="https://github.com/Project-Group-SGP/Expense-Tracker/forks">
-    <img src="https://img.shields.io/github/forks/Project-Group-SGP/Expense-Tracker" alt="Forks" />
-  </a>
-  <a href="https://github.com/Project-Group-SGP/Expense-Tracker/issues">
-    <img src="https://img.shields.io/github/issues/Project-Group-SGP/Expense-Tracker" alt="Issues" />
-  </a>
-  <a href="https://github.com/Project-Group-SGP/Expense-Tracker">
-    <img src="https://img.shields.io/github/license/Project-Group-SGP/Expense-Tracker" alt="License" />
-  </a>
-  <a href="https://github.com/Project-Group-SGP/Expense-Tracker/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/Project-Group-SGP/Expense-Tracker" alt="Contributors" />
-  </a>
-</p>
+
+<div align="center">
+  ![Contributors](https://img.shields.io/github/contributors/Project-Group-SGP/Expense-Tracker?color=dark-green) 
+  ![Forks](https://img.shields.io/github/forks/Project-Group-SGP/Expense-Tracker?style=social) 
+  ![Stargazers](https://img.shields.io/github/stars/Project-Group-SGP/Expense-Tracker?style=social) 
+  ![Issues](https://img.shields.io/github/issues/Project-Group-SGP/Expense-Tracker) 
+  ![License](https://img.shields.io/github/license/Project-Group-SGP/Expense-Tracker)
+</div>
 
 ## Spendwise - Expense Tracker
 
