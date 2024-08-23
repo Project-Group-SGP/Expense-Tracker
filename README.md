@@ -3,11 +3,13 @@
 </p>
 
 <div align="center">
-  ![Contributors](https://img.shields.io/github/contributors/Project-Group-SGP/Expense-Tracker?color=dark-green) 
-  ![Forks](https://img.shields.io/github/forks/Project-Group-SGP/Expense-Tracker?style=social) 
-  ![Stargazers](https://img.shields.io/github/stars/Project-Group-SGP/Expense-Tracker?style=social) 
-  ![Issues](https://img.shields.io/github/issues/Project-Group-SGP/Expense-Tracker) 
-  ![License](https://img.shields.io/github/license/Project-Group-SGP/Expense-Tracker)
+
+![Contributors](https://img.shields.io/github/contributors/Project-Group-SGP/Expense-Tracker?color=dark-green)
+![Forks](https://img.shields.io/github/forks/Project-Group-SGP/Expense-Tracker?style=social)
+![Stargazers](https://img.shields.io/github/stars/Project-Group-SGP/Expense-Tracker?style=social)
+![Issues](https://img.shields.io/github/issues/Project-Group-SGP/Expense-Tracker)
+![License](https://img.shields.io/github/license/Project-Group-SGP/Expense-Tracker)
+
 </div>
 
 ## Spendwise - Expense Tracker
