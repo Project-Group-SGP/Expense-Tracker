@@ -39,6 +39,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 
 - Clone the repository
 - Run `npm install` or `yarn install` to install dependencies
+- Add Credentials and other secret keys in .env file
 - Run `npm run dev` or `yarn dev` to start the development server
 - Open [http://localhost:3000](http://localhost:3000) in your browser to see the result
 
