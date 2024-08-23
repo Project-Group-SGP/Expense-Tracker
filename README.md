@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/HQABOAl.jpg" width="400" height="400" />
+  <img src="https://i.imgur.com/HQABOAl.jpg" width="300" height="300" />
 </p>
 
 ## Spendwise - Expense Tracker
