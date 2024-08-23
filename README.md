@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="https://i.imgur.com/HQABOAl.jpg" width="600" />
+</p>
 ## Spendwise - Expense Tracker
 
 Spendwise is an expense tracking website that allows you to easily log and categorize your expenses, set budgets, and track your spending habits. The website is built with Next.js, a popular React-based framework for server-rendered and statically generated websites and applications.
@@ -25,7 +28,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - PostgreSQL (database)
 - NextAuth (authentication and authorization)
 - ShadCN UI (UI library)
-- Prsima (ORM)
+- Prisma (ORM)
 - Recharts (Data Visualization)
 - jspdf (Report Generation)
 - Nodemailer (Emails)
