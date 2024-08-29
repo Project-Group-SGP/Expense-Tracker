@@ -1,3 +1,4 @@
+import RegisterServiceWorker from "@/components/RegisterServiceWorker"
 import Navbar from "./dashboard/_components/Navbar"
 
 export default function RootLayout({
@@ -9,6 +10,7 @@ export default function RootLayout({
     <>
       <Navbar />
       {children}
+      <RegisterServiceWorker />
     </>
   )
 }

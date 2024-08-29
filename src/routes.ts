@@ -48,7 +48,8 @@ export const apiRoutes = [
   "/api/totalIncome",
   "/api/allData",
   "/api/joinin-date",
-  "/api/budget-category"
+  "/api/budget-category",
+  "/api/register-push",
 ]
 
 export const privateRoutes = [

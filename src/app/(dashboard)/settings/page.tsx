@@ -40,7 +40,7 @@ import {
   registerPushNotifications,
   unregisterPushNotification,
 } from "@/notifications/pushService"
-import { BellOff, BellRing } from "lucide-react"
+import { BellOff, BellRing, Loader2 } from "lucide-react"
 
 const SettingsPage = () => {
   // ... (keep the existing state and hooks)
@@ -406,37 +406,36 @@ const SettingsPage = () => {
 function PushSubscriptionToggleButton() {
   const [hasActivePushSubscription, setHasActivePushSubscription] =
     useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isToggling, setIsToggling] = useState(false)
 
   useEffect(() => {
     async function getActivePushSubscription() {
-      const subscription = await getCurrentPushSubscription()
-      setHasActivePushSubscription(!!subscription)
+      try {
+        const subscription = await getCurrentPushSubscription()
+        setHasActivePushSubscription(!!subscription)
+      } catch (error) {
+        console.error("Error fetching push subscription:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
     getActivePushSubscription()
   }, [])
 
   async function setPushNotificationEnabled(enabled: boolean) {
-    setIsLoading(true)
+    setIsToggling(true)
     try {
       if (enabled) {
         await registerPushNotifications()
       } else {
         await unregisterPushNotification()
       }
-
       setHasActivePushSubscription(enabled)
     } catch (error) {
-      console.error(error)
-      if (enabled && Notification.permission === "denied") {
-        toast.warning(
-          "Please enable push notifications in your browser settings"
-        )
-      } else {
-        toast.error("Something went wrong, please try again later")
-      }
+      console.error("Error toggling push notification:", error)
     } finally {
-      setIsLoading(false)
+      setIsToggling(false)
     }
   }
 
@@ -458,13 +457,25 @@ function PushSubscriptionToggleButton() {
               Receive push notifications on this device
             </div>
           </div>
-          <Switch
-            checked={hasActivePushSubscription}
-            onCheckedChange={setPushNotificationEnabled}
-            disabled={isLoading}
-          />
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Switch
+              checked={hasActivePushSubscription}
+              onCheckedChange={setPushNotificationEnabled}
+              disabled={isToggling}
+            />
+          )}
         </div>
-        {isLoading && <p>Loading...</p>}
+        {isToggling && (
+          <div className="mt-2 flex items-center justify-center">
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <span className="text-sm text-muted-foreground">
+              {hasActivePushSubscription ? "Disabling" : "Enabling"}{" "}
+              notifications...
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

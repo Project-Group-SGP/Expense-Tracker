@@ -21,6 +21,8 @@ model User {
   incomes               Income[]
   expenses              Expense[]
   twoFactorConfirmation TwoFactorConfirmation?
+  pushSubscriptions     PushSubscription[]
+
 
   @@map("users")
 }
@@ -85,6 +87,15 @@ model TwoFactorConfirmation {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       String
+  endpoint     String   @unique
+  auth         String
+  p256dh       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 
