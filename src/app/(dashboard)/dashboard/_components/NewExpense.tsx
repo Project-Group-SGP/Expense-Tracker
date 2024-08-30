@@ -98,7 +98,7 @@ export function NewExpense() {
 
   // handle submit
   const handleSubmit = async (data: ExpenseFormData) => {
-    console.log(data)
+    // console.log(data)
 
     try {
       const result = await AddnewExpense(data)
