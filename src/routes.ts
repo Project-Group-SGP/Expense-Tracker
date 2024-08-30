@@ -71,4 +71,5 @@ export const privateRoutes = [
   "/budget/bills",
   "/budget/fuel",
   "/budget/emi",
+  "/group",
 ]
