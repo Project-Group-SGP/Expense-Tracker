@@ -59,7 +59,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
           <section className="pb-2 ml-2 pr-2 mt-4 grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <Card_budget
               title="Remaining"
-              amount={Number(data.categoryBudget[lastRouteName] || 0)}
+              amount={Number(data.categoryBudget[lastRouteName] - totalAmount || 0)}
               color="text-bills"
               icon={Wallet}
             />

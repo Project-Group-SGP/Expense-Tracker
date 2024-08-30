@@ -84,7 +84,7 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
       <div onClick={() => setOpen(true)}>
         <DialogTrigger asChild>
           <CategoryCard
-            title="Set Budget"
+            title="Budget"
             amount={currentBudget}
             color="text-blue-700"
             icon={CircleGauge}
