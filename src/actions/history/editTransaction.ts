@@ -1,3 +1,4 @@
+"use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
 import { editTransactionProps } from "@/index";
@@ -15,15 +16,15 @@ export const editTransaction = async(values:z.infer<typeof editTransactionProps>
   if (validationeddFields.error)
     return { error: "Invalid fields!"};
 
-  try{
-    singledeleteProps
-    }
+  // try{
+  //   //  singledeleteProps
+  
+  // }
 
-    //TODO:-> Add revalidations here for UI
-
-    return {success:"Successfully updated!!"};
-  }catch(e){
-    console.error("Error updating transaction:", e)
-    return { error:"Failed to updating transaction"};
-  }
+  //   return {success:"Successfully updated!!"};
+    
+  // }catch(e){
+  //   console.error("Error updating transaction:", e)
+  //   return { error:"Failed to updating transaction"};
+  // }
 }

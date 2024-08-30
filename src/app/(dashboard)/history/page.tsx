@@ -30,7 +30,7 @@ const data :ResponceType[] =[
     description: "lol",
   },
   {
-    category: "income",
+    category: "Income",
     amount: 1000,
     date: new Date("6-9-2004").toDateString(),
     description: "lol",
@@ -56,14 +56,27 @@ const data :ResponceType[] =[
 ]
 
 
+
 const HistoryPage =  () => {
- 
   const transactionsQuery = useGetTransactions();
+
   const transactions = transactionsQuery.data || [];
 
   const deleteTransactions = useBulkDeleteTransaction();
 
-  // const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending ;
+  const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
+
+  const HandleDelete = (value:{
+        ids: string,
+        category: "Income" | "Expense",
+      }[]) => {
+
+      console.log("page delete",value);
+
+      deleteTransactions.mutate({props:value});
+  }
+
+  console.log("\n\n\n",transactionsQuery.data,"\n\n\n",isDisabled);
   return (
     <>
   <Suspense>
@@ -77,10 +90,11 @@ const HistoryPage =  () => {
           </div>
         </div> 
         <div className="container mx-auto py-10 px-4">
-          <DataTable columns={columns} data={data} filterKey="email" onDelete={()=>{
-            console.log("\n\n\n\nDeleted!!\n\n\n")
-            return;
-          }}/>
+          {isDisabled ?  
+            <h1 className="text-xl flex justify-center items-center">Loading...</h1>
+          :
+          <DataTable columns={columns} data={transactions} filterKey="category" onDelete={HandleDelete}/>
+          }
         </div>      
       </div>
   </Suspense>

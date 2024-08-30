@@ -21,7 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import * as React from "react"
+import * as React from "react";
+import { bulkdeleteProps } from "@/index";;
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -36,10 +37,13 @@ import {
 import { Trash } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterKey: string
-  onDelete: (rows:Row<TData>[]) => void;
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  filterKey: string;
+  onDelete: (rows:{
+    ids: string,
+    category: "Income" | "Expense",
+  }[]) => void;
   disabled?:boolean;
 }
 
@@ -77,20 +81,30 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   })
+  const HandleOnclick = () => {
+    const array:{
+      ids: string,
+      category: "Income" | "Expense",
+      //@ts-ignore
+    }[] = table.getFilteredSelectedRowModel().rows.map((arr)=>{return {ids: arr.original.id ,category:arr.original.amount>0?"Income":"Expense"}});
+    console.log("array",array);
+    onDelete(array);
+  }
+
+  console.log("sarthak",table.getFilteredSelectedRowModel());
   return (
   <div>
-    <div className="flex items-center py-4">
+   <div className="flex items-center py-4">
         <Input
           placeholder={`Filter ${filterKey}...`}
           value={(table.getColumn(filterKey)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("category")?.setFilterValue(event.target.value)
           }
           className="max-w-sm mr-2"
         />
         {table.getFilteredSelectedRowModel().rows.length> 0 && (
-          <Button size={"sm"} variant={"outline" } className="ml-auto font-normal text-xs" disabled={disabled}>
-          
+          <Button size={"sm"} variant={"outline" } className="ml-auto font-normal text-xs" disabled={disabled} onClick={HandleOnclick}>
           <Trash className="mr-2 size-4"/>  Delete ({table.getFilteredSelectedRowModel().rows.length})
           </Button>
         )}
