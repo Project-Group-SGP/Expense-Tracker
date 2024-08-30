@@ -1,25 +1,9 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartConfig, ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { usePathname } from "next/navigation";
-import { CategoryTypes } from "@prisma/client";
-
 
 const chartConfig = {
   desktop: {
@@ -39,20 +23,14 @@ type Expense = {
 
 export type Expenses = Expense[];
 
-// month wise category data
-
-
 function getMonthName(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleString('default', { month: 'long' });
 }
 
-export function Category_Graph({ data }: { data: Expenses }) {
+export function Category_Graph({ data }: { data: { expenses: Expenses; categoryBudget: any } }) {
   const pathname = usePathname();
-  const lastRouteName = pathname?.split("/").pop();
-  console.log("Last Route Name:", lastRouteName);
-
-  console.log("Data:", data);
+  const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || '';
 
   const categoryWiseData: { [key: string]: number } = {
     January: 0,
@@ -69,11 +47,9 @@ export function Category_Graph({ data }: { data: Expenses }) {
     December: 0,
   };
   
-  // Filter data for the specific category
-  const targetCategory = lastRouteName?.toUpperCase() || '';
-  data.filter(transaction => transaction.category.toLowerCase() === targetCategory.toLowerCase()).forEach(transaction => {
-   
-    // Update categoryWiseData
+  // Filter and aggregate data for the specific category
+  const targetCategory = lastRouteName;
+  data.expenses.filter(transaction => transaction.category.toUpperCase() === targetCategory).forEach(transaction => {
     const month = getMonthName(transaction.date);
     if (categoryWiseData[month] !== undefined) {
       categoryWiseData[month] += parseFloat(transaction.amount);
@@ -83,13 +59,10 @@ export function Category_Graph({ data }: { data: Expenses }) {
   // Convert the categoryWiseData object to an array for the BarChart
   const chartData = Object.entries(categoryWiseData).map(([month, spend]) => ({ month, spend }));
 
-  // console.log(chartData);
-
- 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{lastRouteName?.toUpperCase()}</CardTitle>
+        <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>All month Data</CardDescription>
       </CardHeader>
       <CardContent>

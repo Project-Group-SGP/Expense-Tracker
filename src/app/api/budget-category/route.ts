@@ -71,6 +71,35 @@ export async function GET(req: NextRequest) {
       },
     })
 
+    //get category data
+    const categoryData = await db.category.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+
+    console.log("categoryData:", categoryData);
+    
+    // category budget
+    const categoryBudget = {
+      Other: 0,
+      Bills: 0,
+      Food: 0,
+      Entertainment: 0,
+      Transportation: 0,
+      EMI: 0,
+      Healthcare: 0,
+      Education: 0,
+      Investment: 0,
+      Shopping: 0,
+      Fuel: 0,
+      Groceries: 0,
+    }
+
+    categoryData.forEach((category) => {
+      categoryBudget[category.id] = category.budget;
+    });
+
     // category
     const category = {
       Other: 0,
@@ -114,7 +143,7 @@ export async function GET(req: NextRequest) {
     // console.log("expenses:", expenses)
     // console.log("category:", category)
 
-    return NextResponse.json({ totalIncome, budget, expenses, perDayBudget ,totalExpense ,category })
+    return NextResponse.json({ totalIncome, categoryBudget ,budget, expenses, perDayBudget ,totalExpense ,category })
   } catch (error) {
     console.error("Error in GET function:", error)
     return NextResponse.json(

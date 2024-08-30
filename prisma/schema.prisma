@@ -23,7 +23,6 @@ model User {
   twoFactorConfirmation TwoFactorConfirmation?
   pushSubscriptions     PushSubscription[]
 
-
   @@map("users")
 }
 

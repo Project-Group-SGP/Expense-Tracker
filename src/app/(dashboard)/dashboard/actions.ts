@@ -45,6 +45,7 @@ export async function AddnewExpense(data: ExpenseFormData) {
     },
   })
 
+    //Notification
   const pushPayload = JSON.stringify({
     title: "New Expense Added",
     body: `${category}: $${amount} - ${description}`,
