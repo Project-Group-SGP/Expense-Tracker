@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import { CategoryTypes } from '@prisma/client';
 import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
+import { toast } from 'sonner';
 
 //Set Budget
 export async function SetBudgetDb(budget:number){
@@ -114,6 +115,8 @@ export async function fetchBudgetData() {
       // console.log(data.expenses);
       // console.log(data);
       
+      
+     
       return data;
   }catch(error){
     console.error('Error fetching budget data:', error);

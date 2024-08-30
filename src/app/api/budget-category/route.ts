@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    console.log("categoryData:", categoryData);
+    // console.log("categoryData:", categoryData);
     
     // category budget
     const categoryBudget = {

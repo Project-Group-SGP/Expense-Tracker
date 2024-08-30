@@ -36,7 +36,7 @@ export async function SaveTransactions(data: Transaction[]) {
       description: t.Description,
     }))
 
-  console.log(incomeData, expenseData)
+  // console.log(incomeData, expenseData)
 
   try {
     await db.$transaction([

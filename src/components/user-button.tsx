@@ -18,7 +18,7 @@ export const UserButton = () => {
   const handleSettingsClick = () => {
     router.push('/settings'); 
   };
-  console.log("\n\n\n",user,"\n\n\n")
+  // console.log("\n\n\n",user,"\n\n\n")
 
   return (
     <DropdownMenu>

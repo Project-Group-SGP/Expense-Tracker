@@ -21,9 +21,9 @@ export type chartDataBar1 = {
 }
 
 export function ChartBar_3({ chartData }: chartDataBar1) {
-  console.log("inside ChartBar_3")
+  // console.log("inside ChartBar_3")
 
-  console.log(chartData)
+  // console.log(chartData)
 
   return (
     <ChartContainer config={chartConfig}>

@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       }),
     ])
 
-    console.log(whereClause)
+    // console.log(whereClause)
 
     // console.log("Income data");
     // console.log(income);

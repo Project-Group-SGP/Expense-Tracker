@@ -96,7 +96,7 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
     })
   }
 
-  console.log("expense Data", expenseData)
+  // console.log("expense Data", expenseData)
 
   // income data
   if (data.income && Array.isArray(data.income)) {
@@ -108,7 +108,7 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
     })
   }
 
-  console.log("income Data", incomeData)
+  // console.log("income Data", incomeData)
 
   // income - expanse data
   if (data.expense && Array.isArray(data.expense)) {
@@ -129,7 +129,7 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
     })
   }
 
-  console.log("Income-expense Data", incomeExpenseData)
+  // console.log("Income-expense Data", incomeExpenseData)
 
   // console.log("month wise data");
   // console.log(chartData1)

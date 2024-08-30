@@ -47,6 +47,8 @@ const Page = async () => {
   const data = await GetExpensesData();
   // console.log(data);
   
+  
+
   return (
     <div className='mt-20 ml-6 mr-6 pb-10'>
       <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
