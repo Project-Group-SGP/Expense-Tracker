@@ -4,19 +4,88 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { UserPlus, Users } from "lucide-react"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
-import GroupList from "./_components/groupList"
 import { AddGroupModal } from "./_components/addGroup"
+import CreatedGroupsList from "./_components/CreatedGroups"
+import MemberGroupsList from "./_components/MemberGroup"
+import PendingRequestsList from "./_components/PendingRequest"
+import { Group, JoinRequest } from "@prisma/client"
+import { JoinGroupModal } from "./_components/joinGroup"
+
+export type CreatedGroup = {
+  id: string
+  name: string
+  description: string | null
+  code: string
+  membersCount: number
+  pendingRequestsCount: number
+}
+
+type MemberGroup = Group & {
+  members: { userId: string }[]
+}
+
+type PendingRequest = JoinRequest & {
+  group: Group
+}
 
 export default async function GroupManagementPage() {
   const user = await currentUserServer()
+
   if (!user) {
     redirect("/auth/signin")
   }
 
-  const userGroups = await db.groupMember.findMany({
-    where: { userId: user.id },
-    include: { group: true },
+  const createdGroups = await db.group.findMany({
+    where: {
+      creatorId: user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      code: true,
+      _count: {
+        select: {
+          members: true,
+          joinRequests: {
+            where: { status: "PENDING" },
+          },
+        },
+      },
+    },
   })
+
+  const createdGroupsData: CreatedGroup[] = createdGroups.map((group) => ({
+    id: group.id,
+    name: group.name,
+    description: group.description,
+    code: group.code,
+    membersCount: group._count.members,
+    pendingRequestsCount: group._count.joinRequests,
+  }))
+
+  const memberGroups = (await db.group.findMany({
+    where: {
+      members: {
+        some: { userId: user.id },
+      },
+    },
+    include: {
+      members: {
+        select: { userId: true },
+      },
+    },
+  })) as MemberGroup[]
+
+  const pendingRequests = (await db.joinRequest.findMany({
+    where: {
+      userId: user.id,
+      status: "PENDING",
+    },
+    include: {
+      group: true,
+    },
+  })) as PendingRequest[]
 
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -27,34 +96,38 @@ export default async function GroupManagementPage() {
           </h1>
           <div className="mt-3 flex w-full flex-row gap-2 sm:mt-0 sm:w-auto">
             <AddGroupModal />
-            <Button
-              variant="outline"
-              className="flex flex-1 items-center justify-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 sm:flex-none"
-            >
-              <UserPlus size={20} />
-              <span>Join Group</span>
-            </Button>
+            <JoinGroupModal memberGroups={memberGroups} />
           </div>
         </div>
 
-        {userGroups.length > 0 ? (
-          <GroupList groups={userGroups.map((member) => member.group)} />
-        ) : (
-          <Card className="bg-white dark:bg-zinc-900">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                <Users size={24} />
-                No Groups Yet
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-400">
-                You haven't joined any groups yet. Create a new group or join an
-                existing one to get started!
-              </p>
-            </CardContent>
-          </Card>
+        {createdGroupsData.length > 0 && (
+          <CreatedGroupsList groups={createdGroupsData} />
         )}
+
+        {memberGroups.length > 0 && <MemberGroupsList groups={memberGroups} />}
+
+        {pendingRequests.length > 0 && (
+          <PendingRequestsList requests={pendingRequests} />
+        )}
+
+        {createdGroupsData.length === 0 &&
+          memberGroups.length === 0 &&
+          pendingRequests.length === 0 && (
+            <Card className="bg-white dark:bg-zinc-900">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                  <Users size={24} />
+                  No Groups Yet
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 dark:text-gray-400">
+                  You haven't joined any groups yet. Create a new group or join
+                  an existing one to get started!
+                </p>
+              </CardContent>
+            </Card>
+          )}
       </div>
     </div>
   )

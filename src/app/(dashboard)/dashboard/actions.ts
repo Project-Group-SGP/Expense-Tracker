@@ -47,27 +47,34 @@ export async function AddnewExpense(data: ExpenseFormData) {
 
   const pushPayload = JSON.stringify({
     title: "New Expense Added",
-    body: `${category}: $${amount} - ${description}`,
+    body: `${category}: ${amount} - ${description}`,
+    type: "new-expense",
   })
 
-  const pushPromises = usersPush.map((subscription) => {
-    return webPush.sendNotification(
-      {
-        endpoint: subscription.endpoint,
-        keys: {
-          auth: subscription.auth,
-          p256dh: subscription.p256dh,
+  const pushPromises = usersPush.map(async (subscription) => {
+    try {
+      await webPush.sendNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: {
+            auth: subscription.auth,
+            p256dh: subscription.p256dh,
+          },
         },
-      },
-      pushPayload,
-      {
-        vapidDetails: {
-          subject: "mailto:1hDkS@example.com",
-          publicKey: process.env.NEXT_PUBLIC_VAPID_KEY as string,
-          privateKey: process.env.PRIVATE_VAPID_KEY as string,
-        },
-      }
-    )
+        pushPayload,
+        {
+          vapidDetails: {
+            subject: "mailto:etracker690@gmail.com",
+            publicKey: process.env.NEXT_PUBLIC_VAPID_KEY as string,
+            privateKey: process.env.PRIVATE_VAPID_KEY as string,
+          },
+        }
+      )
+      console.log("Push notification sent successfully")
+    } catch (error) {
+      console.error("Error sending push notification:", error)
+      // Consider implementing retry logic or subscription cleanup here
+    }
   })
 
   await Promise.all(pushPromises)
