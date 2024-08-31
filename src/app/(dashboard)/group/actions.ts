@@ -226,3 +226,37 @@ export async function joinGroup(code: string) {
     }
   }
 }
+
+export async function cancelPendingRequest(requestId: string) {
+  try {
+    const user = await currentUserServer()
+
+    if (!user || !user.id) {
+      return { success: false, message: "User not authenticated" }
+    }
+
+    const request = await db.joinRequest.findUnique({
+      where: { id: requestId },
+    })
+
+    if (!request) {
+      return { success: false, message: "Request not found" }
+    }
+
+    if (request.userId !== user.id) {
+      return {
+        success: false,
+        message: "You are not authorized to cancel this request",
+      }
+    }
+
+    await db.joinRequest.delete({ where: { id: requestId } })
+    return { success: true, message: "Request canceled successfully" }
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Failed to cancel request",
+    }
+  }
+}

@@ -3,7 +3,6 @@ import Navbar from "@/components/Navbar"
 import Link from "next/link"
 import { ArrowRight, BarChart2, Check, Coins } from "lucide-react"
 import Image from "next/image"
-import RegisterServiceWorker from "@/components/RegisterServiceWorker"
 const features = [
   {
     icon: Check,
