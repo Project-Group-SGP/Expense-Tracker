@@ -15,7 +15,7 @@ export const generateTwoFactorToken = async(email:string) => {
 
   const existingToken = await getTwoFactorTokenByEmail(email);
 
-  console.log(existingToken);
+  // console.log(existingToken);
   
   if(existingToken)
     await db.tokens.delete({where:{id:existingToken.id}});

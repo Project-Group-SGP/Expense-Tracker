@@ -1,3 +1,4 @@
+"use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
 import { singledeleteProps } from "@/index";

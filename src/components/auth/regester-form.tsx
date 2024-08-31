@@ -32,9 +32,9 @@ export const RegisterForm = () => {
   const [errorpassword,setErrorpassword] = useState<string|undefined>("");
 
   const Password_testResult =useMemo(()=>zxcvbn(password),[password]);
-  console.log(Password_testResult);
+  // console.log(Password_testResult);
   const password_score = useMemo(()=>(Password_testResult.score * 100)/4,[Password_testResult.score]);
-  console.log(password_score);  
+  // console.log(password_score);  
 
     const PassProgressColor = useCallback(() => {
       switch(Password_testResult.score){

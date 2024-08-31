@@ -8,6 +8,7 @@ import { DataTable } from "./data-table"
 import { useGetTransactions } from "./_hooks/use-get-transactions"
 import { useGetTransaction } from "./_hooks/use-get-transaction"
 import { useBulkDeleteTransaction } from "./_hooks/use-bulk-delete-transactions"
+import DatePicker from "./_components/DatePicker"
 
 // async function getData(): Promise<Payment[]> {
 //   // Fetch data from your API here.
@@ -30,7 +31,7 @@ const data :ResponceType[] =[
     description: "lol",
   },
   {
-    category: "income",
+    category: "Income",
     amount: 1000,
     date: new Date("6-9-2004").toDateString(),
     description: "lol",
@@ -57,13 +58,25 @@ const data :ResponceType[] =[
 
 
 const HistoryPage =  () => {
- 
   const transactionsQuery = useGetTransactions();
+
   const transactions = transactionsQuery.data || [];
 
   const deleteTransactions = useBulkDeleteTransaction();
 
-  // const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending ;
+  const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
+
+  const HandleDelete = (value:{
+        ids: string,
+        category: "Income" | "Expense",
+      }[]) => {
+
+      console.log("page delete",value);
+
+      deleteTransactions.mutate({props:value});
+  }
+
+  console.log("\n\n\n",transactionsQuery.data,"\n\n\n",isDisabled);
   return (
     <>
   <Suspense>
@@ -71,16 +84,16 @@ const HistoryPage =  () => {
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title="Transaction History" />
           <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
-          <div className="ml-auto flex gap-2">
-            <Newincome />
-            <NewExpense />
+          <div className="flex justify-between">
+            <DatePicker/>
+            <div className="ml-auto flex gap-2">
+              <Newincome />
+              <NewExpense />
+            </div>
           </div>
         </div> 
         <div className="container mx-auto py-10 px-4">
-          <DataTable columns={columns} data={data} filterKey="email" onDelete={()=>{
-            console.log("\n\n\n\nDeleted!!\n\n\n")
-            return;
-          }}/>
+          <DataTable columns={columns} data={transactions} filterKey="category" onDelete={HandleDelete} disabled={isDisabled}/>
         </div>      
       </div>
   </Suspense>

@@ -1,13 +1,4 @@
-"use client"
-
-import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts"
-
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -16,125 +7,91 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-
-import { HandCoins, CircleGauge, Wallet } from "lucide-react"
-import Card_click from "./Card_unclick"
+import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
-
-type OverallGraphProps = {
+type BudgetUsageGraphProps = {
   totalIncome: number
   budget: number
   perDayBudget: number
   totalExpense: number
 }
 
-export function OverallGraph(props: OverallGraphProps) {
+export function OverallGraph(props: BudgetUsageGraphProps) {
   const month = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ]
 
   const currentMonth = new Date().getMonth()
 
   const remainingBudget = props.budget - props.totalExpense
-  const isOverBudget = remainingBudget < 0;
+  const isOverBudget = remainingBudget < 0
   const budgetColor = isOverBudget ? "text-emi" : "text-blue-700"
 
-  const chartData = [
-    {
-      browser: "safari",
-      visitors: props.totalExpense,
-      fill: isOverBudget ? "var(--color-emi)" : "var(--color-safari)",
-    },
-  ]
+  // Calculate the percentage of the budget used
+  const percentUsed = Math.min((props.totalExpense / props.budget) * 100, 100)
+
+  // SVG parameters
+  const size = 180  
+  const strokeWidth = 15  
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const fillPercentage = (percentUsed / 100) * circumference
+
+  const circleColor = "#4A4A4A" 
+  const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"  
 
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
-        <CardTitle className="text-lg font-semibold">Overall Summary</CardTitle>
+        <CardTitle className="text-lg font-semibold">Budget Usage</CardTitle>
         <CardDescription className="text-sm text-gray-500">
           {month[currentMonth]}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <RadialBarChart
-            data={chartData}
-            startAngle={0}
-            endAngle={250}
-            innerRadius={80}
-            outerRadius={110}
-          >
-            <PolarGrid
-              gridType="circle"
-              radialLines={false}
-              stroke="none"
-              className="first:fill-muted last:fill-background"
-              polarRadius={[86, 74]}
+      <CardContent className="flex-1 pb-2">
+        <div className="flex justify-center items-center">
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={circleColor}
+              strokeWidth={strokeWidth}
             />
-            <RadialBar dataKey="visitors" background cornerRadius={10} />
-            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-4xl font-bold"
-                        >
-                          {chartData[0].visitors.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground text-sm"
-                        >
-                          Spend
-                        </tspan>
-                      </text>
-                    )
-                  }
-                }}
-              />
-            </PolarRadiusAxis>
-          </RadialBarChart>
-        </ChartContainer>
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={filledColor}
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference - fillPercentage}
+              strokeLinecap="round"
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+            <text
+              x="50%"
+              y="50%"
+              dominantBaseline="middle"
+              textAnchor="middle"
+              fontSize="28"
+              fontWeight="bold"
+              fill='white'
+            >
+              {props.totalExpense} <br />
+              
+            </text>
+          </svg>
+        </div>
       </CardContent>
       <CardFooter>
         <div className="flex w-full justify-around gap-2">
-          <div className=" max-w-[300px] flex-1 ">
+          <div className="max-w-[300px] flex-1">
             <Card_unclick
               title="Income"
               amount={Number(props.totalIncome)}
@@ -142,15 +99,13 @@ export function OverallGraph(props: OverallGraphProps) {
               icon={HandCoins}
             />
           </div>
-
           <div className="max-w-[300px] flex-1">
             <SetBudget currentBudget={Number(props.budget)} />
           </div>
-
           <div className="max-w-[300px] flex-1">
             <Card_unclick
-              title="Safe to spend per day"
-              amount={Number(props.perDayBudget)}
+              title="Remaining"
+              amount={Number(remainingBudget)}
               color={budgetColor}
               icon={Wallet}
             />

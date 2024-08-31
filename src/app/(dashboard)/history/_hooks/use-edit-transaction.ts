@@ -17,10 +17,9 @@ export const useEditTransaction = (values : z.infer<typeof editTransactionProps>
       //queryclient.invalidateQueries({queryKey:["transaction",{values.id}]});
       queryclient.invalidateQueries({queryKey:["transactions"]});
 
-      // TODO inVAlidate summary
     },
     onError: ()=>{
       toast.error("Failed to edit transaction");
     }
-  })
+  })  
 } 

@@ -11,11 +11,15 @@ export const useBulkDeleteTransaction = (props ?: z.infer<typeof bulkdeleteProps
   const mutation = useMutation({
     mutationFn: async(json:z.infer<typeof bulkdeleteProps>) => {
       const responce = await bulkdelete(json);
+      if(responce.error)
+        toast.error(responce.error);
+      else  
+        toast.success(responce.success);
       return responce;
     },
     onSuccess : () => {
       toast.success("Transaction's deleted");
-      queryclient.invalidateQueries({queryKey:["transaction",{/* id */}]});
+      // queryclient.invalidateQueries({queryKey:["transaction",{/* id */}]});
       queryclient.invalidateQueries({queryKey:["transactions"]});
 
       // TODO inVAlidate summary
@@ -23,5 +27,7 @@ export const useBulkDeleteTransaction = (props ?: z.infer<typeof bulkdeleteProps
     onError: ()=>{
       toast.error("Failed to delete transaction's");
     }
-  })
+  });
+
+  return mutation;
 } 

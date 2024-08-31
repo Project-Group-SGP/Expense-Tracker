@@ -17,8 +17,9 @@ export async function AddnewIncome(data: IncomeFormData) {
   const newIncome = await db.income.create({
     data: { userId: user?.id, amount, date: transactionDate, description },
   })
-  revalidateTag("totalIncome")
-  revalidateTag("getAllData")
+  revalidateTag("totalIncome");
+  revalidateTag("getAllData");
+  revalidateTag("getTransactions");
   return newIncome ? "success" : "error"
 }
 
@@ -45,6 +46,7 @@ export async function AddnewExpense(data: ExpenseFormData) {
     },
   })
 
+    //Notification
   const pushPayload = JSON.stringify({
     title: "New Expense Added",
     body: `${category}: ${amount} - ${description}`,
@@ -81,7 +83,8 @@ export async function AddnewExpense(data: ExpenseFormData) {
 
   // console.log("newExpense", newExpense);
 
-  revalidateTag("totalExpense")
-  revalidateTag("getAllData")
+  revalidateTag("totalExpense");
+  revalidateTag("getAllData");
+  revalidateTag("getTransactions");
   return newExpense ? "success" : "error"
 }

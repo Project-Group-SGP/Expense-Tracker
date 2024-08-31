@@ -1,5 +1,6 @@
 import { currentUserServer } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { CategoryTypes } from "@prisma/client";
 import { subDays,parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,26 +12,28 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const userId = user?.id;
     
-    if(!userId)
-      return NextResponse.json({ error:"Unauthorized!!"},{status:401});
-    
-    const defaultTo = new Date();
-    const defaultFrom = subDays(defaultTo,30);
-
-    const startDate = from
-    ? parse(from,"yyyy-MM-dd",new Date())
-    : defaultFrom;
-
-    const endDate = to
-    ? parse(to,"yyyy-MM-dd",new Date())
-    : defaultTo;
-
     if (!userId || typeof userId !== "string") {
       console.log("No user ID provided");
       return NextResponse.json(
         { error: "User ID Not Provided" },
         { status: 400 }
       );
+    }
+    
+    const defaultTo = new Date();
+    const defaultFrom = subDays(defaultTo,30);
+
+   
+    let startDate;
+    let endDate;
+
+    try {
+      startDate = from ? parse(from, "yyyy-MM-dd",new Date()) : defaultFrom;
+      endDate = to ? parse(to, "yyyy-MM-dd",new Date()) : defaultTo;
+    } catch (error) {
+      console.error("Invalid date format provided. Using defaults.");
+      startDate = defaultFrom;
+      endDate = defaultTo;
     }
 
     let whereClause: any = { userId: userId };
@@ -39,40 +42,32 @@ export async function GET(req: NextRequest) {
     start.setHours(0, 0, 0, 0);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
+
     whereClause.date = {
       gte: start,
       lte: end,
     };
 
-    const expense = await db.expense.findMany({
+    const expensecall = db.expense.findMany({
       where: whereClause,
       orderBy:{
         date:"asc"
       }
     });
 
-    const income = await db.income.findMany({
+    const incomecall = db.income.findMany({
       where: whereClause,
       orderBy:{
         date:"asc"
       }
     });
 
-    const updatedIncome = income.map(item => ({
-      ...item,
-      category: 'I  ncome',
-    }));
+    const [income,expense]= await db.$transaction([incomecall,expensecall]);
 
-    const updatedexpance = expense.map(item => ({
-      ...item,
-      amount:-item.amount,
-    }));
-
-    const transactions = { ...updatedexpance,...updatedIncome }.sort((a, b) => {
-      if (a.date < b.date) return -1;
-      return 0;
-   });
-
+    const transactions = [
+      ...income.map(item => ({ ...item, category: 'Income' })),
+      ...expense.map(item => ({ ...item, amount: -item.amount }))
+    ];
     return NextResponse.json({transactions});
   } catch (error) {
     console.error("Error in GET function:", error);

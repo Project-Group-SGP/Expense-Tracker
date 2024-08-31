@@ -23,9 +23,12 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
-import CategoryCard from "./Card_Category"
+// import CategoryCard from ".../Card_Category"
 import { CircleGauge } from "lucide-react"
-import { SetBudgetDb } from "../actions"
+
+import Card_budget from "./Card_budget"
+import { SetCategoryBudgetDb } from "../../actions"
+
 
 // form validation schema
 const formSchema = z.object({
@@ -38,13 +41,18 @@ const formSchema = z.object({
 
 export type BudgetFormData = z.infer<typeof formSchema>
 
-export function SetBudget({ currentBudget }: { currentBudget: number }) {
+type SetCategroy_BudgetProps = {
+  currentBudget: number,
+  category: string
+}
+
+export function SetCategroy_Budget(prop:SetCategroy_BudgetProps) {
   const [open, setOpen] = useState(false)
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: currentBudget.toString(),
+      amount: prop.currentBudget.toString(),
     },
   })
 
@@ -57,7 +65,7 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
 
       const budget = Number(data.amount);
 
-      const result = await SetBudgetDb(budget);
+      const result = await SetCategoryBudgetDb(prop.category ,budget);
 
       if(result == "success"){
         toast.success("Budget updated successfully", {
@@ -83,12 +91,14 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <div onClick={() => setOpen(true)}>
         <DialogTrigger asChild>
-          <CategoryCard
-            title="Budget"
-            amount={currentBudget}
+          <Card_budget
+            title="Set Budget"
+            amount={prop.currentBudget}
             color="text-blue-700"
             icon={CircleGauge}
+            class = "cursor-pointer"
             />
+
         </DialogTrigger>
             </div>
 

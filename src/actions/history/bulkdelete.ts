@@ -1,13 +1,16 @@
+"use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
 import { bulkdeleteProps } from "@/index";
 import { currentUserServer } from "@/lib/auth";
 
-export const bulkdelete = async(values:z.infer<typeof  bulkdeleteProps>)=>{
+export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
+  console.log("\n\n\n\ndeleteProps",values);
+  
   const user = await currentUserServer();
-
   if(!user)
     return {error:"unAuthorized!!"};
+
 
   const validationeddFields = bulkdeleteProps.safeParse(values)
 
@@ -42,8 +45,6 @@ export const bulkdelete = async(values:z.infer<typeof  bulkdeleteProps>)=>{
         }
       }),
     ]);
-
-    //TODO:-> Add revalidations here for UI
 
     return {success:"Successfully Deleted!!"}
   }catch(e){

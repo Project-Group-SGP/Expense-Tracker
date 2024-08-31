@@ -43,7 +43,7 @@ export const LoginForm = () => {
       ? "Email already in use with different provider!"
       : "";
   const callbackUrl = searchparams.get("callbackUrl")
-  console.log(urlError);
+  // console.log(urlError);
 
   const form = useForm<z.infer<typeof SigninSchema>>({
     resolver: zodResolver(SigninSchema),
