@@ -1,9 +1,4 @@
 "use client"
-import React, { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -22,9 +17,14 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Group } from "@prisma/client"
 import { UserPlus } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Group, JoinRequest } from "@prisma/client"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 import { joinGroup } from "../actions"
 
 const formSchema = z.object({
@@ -35,11 +35,6 @@ const formSchema = z.object({
 })
 
 type JoinGroupFormData = z.infer<typeof formSchema>
-
-interface JoinGroupResult {
-  success: boolean
-  message: string
-}
 
 export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   const [open, setOpen] = useState(false)

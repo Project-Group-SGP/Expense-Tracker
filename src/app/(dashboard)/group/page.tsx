@@ -1,15 +1,14 @@
-import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { UserPlus, Users } from "lucide-react"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { Group, JoinRequest } from "@prisma/client"
+import { Users } from "lucide-react"
+import { redirect } from "next/navigation"
 import { AddGroupModal } from "./_components/addGroup"
 import CreatedGroupsList from "./_components/CreatedGroups"
+import { JoinGroupModal } from "./_components/joinGroup"
 import MemberGroupsList from "./_components/MemberGroup"
 import PendingRequestsList from "./_components/PendingRequest"
-import { Group, JoinRequest } from "@prisma/client"
-import { JoinGroupModal } from "./_components/joinGroup"
 
 export type CreatedGroup = {
   id: string
