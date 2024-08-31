@@ -1,12 +1,11 @@
 "use client"
-import React, { Suspense, useEffect } from "react"
+import React, { Suspense, useCallback, useEffect, useState } from "react"
 import { NewExpense } from "../dashboard/_components/NewExpense"
 import { Newincome } from "../dashboard/_components/Newincome"
 import PageTitle from "../dashboard/_components/PageTitle"
 import { columns, ResponceType } from "./columns"
 import { DataTable } from "./data-table"
 import { useGetTransactions } from "./_hooks/use-get-transactions"
-import { useGetTransaction } from "./_hooks/use-get-transaction"
 import { useBulkDeleteTransaction } from "./_hooks/use-bulk-delete-transactions"
 import DatePicker from "./_components/DatePicker"
 import { useQueryClient } from "@tanstack/react-query"
@@ -60,6 +59,10 @@ const data :ResponceType[] =[
 
 
 const HistoryPage =  () => {
+  const [lol,setlol] = useState<boolean>(false);
+
+  const query =  useQueryClient();
+
   const transactionsQuery = useGetTransactions();
   
   const transactions = transactionsQuery.data || [];
@@ -67,8 +70,12 @@ const HistoryPage =  () => {
   const deleteTransactions = useBulkDeleteTransaction();
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
+
+  if(lol){
+    query.invalidateQueries({ queryKey: ['transactions'] });
+  }
   
-  const HandleDelete = (value:{
+  const HandleDelete = useCallback((value:{
         ids: string,
         category: "Income" | "Expense",
       }[]) => {
@@ -76,18 +83,17 @@ const HistoryPage =  () => {
       console.log("page delete",value);
 
       deleteTransactions.mutate({props:value});
-  }
+  },[]);
 
-  console.log("\n\n\n",transactionsQuery.data,"\n\n\n",isDisabled);
   return (
-    <>
+  <>
   <Suspense>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title="Transaction History" />
           <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
           <div className="flex justify-between">
-            <DatePicker/>
+            <DatePicker setlol={setlol}/>
             <div className="ml-auto flex gap-2">
               <Newincome />
               <NewExpense />
