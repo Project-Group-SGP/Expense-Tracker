@@ -22,7 +22,11 @@ model User {
   expenses              Expense[]
   twoFactorConfirmation TwoFactorConfirmation?
   pushSubscriptions     PushSubscription[]
+  createdGroups         Group[]                @relation("GroupCreator")
+  groupMemberships      GroupMember[]
+  joinRequests          JoinRequest[]
 
+  @@index([email])
   @@map("users")
 }
 
@@ -42,6 +46,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Category {
@@ -50,6 +55,8 @@ model Category {
   category CategoryTypes
   budget   Decimal
   user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, category])
 }
 
 model Income {
@@ -59,6 +66,8 @@ model Income {
   date        DateTime
   description String?
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
 }
 
 model Expense {
@@ -69,8 +78,9 @@ model Expense {
   date        DateTime
   description String?
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
+  @@index([userId, category, date])
+}
 
 model Tokens {
   id      String     @id @default(cuid())
@@ -80,6 +90,7 @@ model Tokens {
   type    TokenTypes
 
   @@unique([email, token, type])
+  @@index([email, type])
 }
 
 model TwoFactorConfirmation {
@@ -95,8 +106,52 @@ model PushSubscription {
   auth         String
   p256dh       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  photo       String?
+  code        String        @unique
+  creatorId   String
+  creator     User          @relation("GroupCreator", fields: [creatorId], references: [id])
+  members     GroupMember[]
+  joinRequests JoinRequest[]
+
+  @@index([creatorId])
+}
+
+model GroupMember {
+  id      String @id @default(cuid())
+  userId  String
+  groupId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model JoinRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  status    JoinRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@index([groupId, status])
+}
+
+enum JoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
 
 enum CategoryTypes {
   Other

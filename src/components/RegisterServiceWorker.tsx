@@ -7,6 +7,7 @@ import {
 import { useEffect } from "react"
 
 export default function RegisterServiceWorker() {
+  console.log("Registering service worker...")
   useEffect(() => {
     async function register() {
       try {

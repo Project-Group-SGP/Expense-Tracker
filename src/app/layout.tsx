@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/Providers/Providers"
 import { Toaster } from "@/components/ui/sonner"
-import RegisterServiceWorker from "@/components/RegisterServiceWorker"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -24,7 +23,6 @@ export default function RootLayout({
           {children}
           <Toaster richColors />
         </Providers>
-        <RegisterServiceWorker />
       </body>
     </html>
   )

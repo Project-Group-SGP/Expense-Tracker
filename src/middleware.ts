@@ -23,14 +23,16 @@ export default auth((req): any => {
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
   const isPrivateRoute = privateRoutes.includes(nextUrl.pathname)
+  const isGroupRoute = nextUrl.pathname.startsWith("/group/")
 
   const routeExists =
     isApiAuthRoute ||
     isPublicRoute ||
     isAuthRoute ||
     isPrivateRoute ||
-    isApiRoute
-  nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
+    isApiRoute ||
+    isGroupRoute ||
+    nextUrl.pathname === DEFAULT_LOGIN_REDIRECT
 
   if (!routeExists) {
     return NextResponse.redirect(new URL("/404", nextUrl))
@@ -51,7 +53,7 @@ export default auth((req): any => {
     return null
   }
 
-  if (!isLoggedIn && !isPublicRoute) {
+  if (!isLoggedIn && (isGroupRoute || (!isPublicRoute && !isGroupRoute))) {
     let callbackUrl = nextUrl.pathname
     if (nextUrl.search) {
       callbackUrl += nextUrl.search

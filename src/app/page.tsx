@@ -224,7 +224,6 @@ export default async function Home() {
           </div>
         </section>
       </MaxWidthWrapper>
-      <RegisterServiceWorker />
     </>
   )
 }

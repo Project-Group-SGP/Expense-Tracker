@@ -5,7 +5,6 @@ import { db } from "@/lib/db"
 import { ExpenseFormData } from "./_components/NewExpense"
 import { IncomeFormData } from "./_components/Newincome"
 import { revalidateTag } from "next/cache"
-import webPush from "web-push"
 
 // add new income
 export async function AddnewIncome(data: IncomeFormData) {
@@ -17,9 +16,9 @@ export async function AddnewIncome(data: IncomeFormData) {
   const newIncome = await db.income.create({
     data: { userId: user?.id, amount, date: transactionDate, description },
   })
-  revalidateTag("totalIncome");
-  revalidateTag("getAllData");
-  revalidateTag("getTransactions");
+  revalidateTag("totalIncome")
+  revalidateTag("getAllData")
+  revalidateTag("getTransactions")
   return newIncome ? "success" : "error"
 }
 
@@ -40,44 +39,8 @@ export async function AddnewExpense(data: ExpenseFormData) {
     },
   })
 
-  const usersPush = await db.pushSubscription.findMany({
-    where: {
-      userId: user.id,
-    },
-  })
-
-    //Notification
-  const pushPayload = JSON.stringify({
-    title: "New Expense Added",
-    body: `${category}: $${amount} - ${description}`,
-  })
-
-  const pushPromises = usersPush.map((subscription) => {
-    return webPush.sendNotification(
-      {
-        endpoint: subscription.endpoint,
-        keys: {
-          auth: subscription.auth,
-          p256dh: subscription.p256dh,
-        },
-      },
-      pushPayload,
-      {
-        vapidDetails: {
-          subject: "mailto:1hDkS@example.com",
-          publicKey: process.env.NEXT_PUBLIC_VAPID_KEY as string,
-          privateKey: process.env.PRIVATE_VAPID_KEY as string,
-        },
-      }
-    )
-  })
-
-  await Promise.all(pushPromises)
-
-  // console.log("newExpense", newExpense);
-
-  revalidateTag("totalExpense");
-  revalidateTag("getAllData");
-  revalidateTag("getTransactions");
+  revalidateTag("totalExpense")
+  revalidateTag("getAllData")
+  revalidateTag("getTransactions")
   return newExpense ? "success" : "error"
 }
