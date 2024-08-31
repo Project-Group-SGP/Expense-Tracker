@@ -67,7 +67,8 @@ export async function GET(req: NextRequest) {
     const transactions = [
       ...income.map(item => ({ ...item, category: 'Income' })),
       ...expense.map(item => ({ ...item, amount: -item.amount }))
-    ];
+    ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
     return NextResponse.json({transactions});
   } catch (error) {
     console.error("Error in GET function:", error);

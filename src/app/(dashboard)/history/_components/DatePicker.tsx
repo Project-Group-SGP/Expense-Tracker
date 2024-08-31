@@ -23,7 +23,7 @@ const DatePicker = () => {
           const formattedStartDate = format(joininDate, 'yyyy-MM-dd');
           const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
 
-          router.push(`?startDate=${formattedStartDate}&endDate=${formattedEndDate}`, { scroll: false });
+          router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
         }
       } catch (error) {
         console.error('Error fetching joinin date:', error);
@@ -47,7 +47,7 @@ const DatePicker = () => {
         const formattedStartDate = format(newDateRange.from, 'yyyy-MM-dd');
         const formattedEndDate = format(newDateRange.to, 'yyyy-MM-dd');
 
-        router.push(`?=${formattedStartDate}&endDate=${formattedEndDate}`, { scroll: false });
+        router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
       }
     }
   };
