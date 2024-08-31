@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 export const useGetTransactions = () => {
   const params = useSearchParams();

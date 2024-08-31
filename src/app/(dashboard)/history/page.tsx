@@ -1,5 +1,5 @@
 "use client"
-import { Suspense } from "react"
+import React, { Suspense, useEffect } from "react"
 import { NewExpense } from "../dashboard/_components/NewExpense"
 import { Newincome } from "../dashboard/_components/Newincome"
 import PageTitle from "../dashboard/_components/PageTitle"
@@ -9,6 +9,8 @@ import { useGetTransactions } from "./_hooks/use-get-transactions"
 import { useGetTransaction } from "./_hooks/use-get-transaction"
 import { useBulkDeleteTransaction } from "./_hooks/use-bulk-delete-transactions"
 import DatePicker from "./_components/DatePicker"
+import { useQueryClient } from "@tanstack/react-query"
+import { revalidateTag } from "next/cache"
 
 // async function getData(): Promise<Payment[]> {
 //   // Fetch data from your API here.
@@ -59,13 +61,13 @@ const data :ResponceType[] =[
 
 const HistoryPage =  () => {
   const transactionsQuery = useGetTransactions();
-
+  
   const transactions = transactionsQuery.data || [];
-
+  
   const deleteTransactions = useBulkDeleteTransaction();
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
-
+  
   const HandleDelete = (value:{
         ids: string,
         category: "Income" | "Expense",

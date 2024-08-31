@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { DatePickerWithRange } from '../../dashboard/_components/DatePickerWithRange';
 
@@ -33,6 +33,7 @@ const DatePicker = () => {
     fetchJoininDate();
   }, [router]);
 
+
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
     if (newDateRange) {
       if (!newDateRange.from) {
@@ -47,7 +48,7 @@ const DatePicker = () => {
         const formattedStartDate = format(newDateRange.from, 'yyyy-MM-dd');
         const formattedEndDate = format(newDateRange.to, 'yyyy-MM-dd');
 
-        router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
+        router.push(`/history?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
       }
     }
   };
