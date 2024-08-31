@@ -1,8 +1,15 @@
+import { db } from "@/lib/db"
+import { redirect } from "next/navigation"
+
 export default async function GroupPage({
   params,
 }: {
   params: { groupID: string }
 }) {
+  const group = await db.group.findUnique({ where: { id: params.groupID } })
+  if (!group) {
+    redirect("/404")
+  }
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
       <div className="mt-20 flex w-full flex-col gap-5 px-4">

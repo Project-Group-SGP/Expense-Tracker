@@ -54,6 +54,7 @@ export function AddGroupModal() {
   })
 
   const handleSubmit = async (data: GroupFormData) => {
+    const loadingToast = toast.loading("Creating group...")
     try {
       const result = await AddnewGroup({ data })
       if (result.success && result.code) {
@@ -61,6 +62,7 @@ export function AddGroupModal() {
         toast.success("Group created successfully", {
           closeButton: true,
           duration: 4500,
+          id: loadingToast,
         })
       } else {
         throw new Error(result.error || "Failed to create group")
@@ -68,7 +70,8 @@ export function AddGroupModal() {
     } catch (error) {
       console.error("Error creating group:", error)
       toast.error(
-        error instanceof Error ? error.message : "Failed to create group"
+        error instanceof Error ? error.message : "Failed to create group",
+        { id: loadingToast }
       )
     }
   }

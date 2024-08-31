@@ -18,16 +18,19 @@ export default function PendingRequestsList({
   const router = useRouter()
 
   async function cancelRequest(id: string) {
+    const loadingToast = toast.loading("Cancelling request...")
     try {
       const response = await cancelPendingRequest(id)
       if (response.success) {
-        toast.success(response.message)
+        toast.success(response.message, { id: loadingToast })
         router.refresh()
       } else {
-        toast.error(response.message)
+        toast.error(response.message, { id: loadingToast })
       }
     } catch (error) {
-      toast.error("Failed to cancel request")
+      toast.error("Failed to cancel request", {
+        id: loadingToast,
+      })
     }
   }
   return (

@@ -48,19 +48,20 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   })
 
   const handleSubmit = async (data: JoinGroupFormData) => {
+    const loadingToast = toast.loading("Sending join request...")
     try {
       // Client-side validation
       const validationResult = validateJoinRequest(data.code)
       if (!validationResult.canJoin) {
-        toast.error(validationResult.message)
+        toast.error(validationResult.message, { id: loadingToast })
         return
       }
-
       const result = await joinGroup(data.code)
       if (result.success) {
         toast.success(result.message, {
           closeButton: true,
           duration: 4500,
+          id: loadingToast,
         })
         handleClose()
       } else {
@@ -68,7 +69,8 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to join group"
+        error instanceof Error ? error.message : "Failed to join group",
+        { id: loadingToast }
       )
     }
   }
