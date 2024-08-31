@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
-import { DatePickerWithRange } from './DatePickerWithRange';
+import { DatePickerWithRange } from '../../dashboard/_components/DatePickerWithRange';
 
-const DateSelect = () => {
+const DatePicker = () => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -47,7 +47,7 @@ const DateSelect = () => {
         const formattedStartDate = format(newDateRange.from, 'yyyy-MM-dd');
         const formattedEndDate = format(newDateRange.to, 'yyyy-MM-dd');
 
-        router.push(`?startDate=${formattedStartDate}&endDate=${formattedEndDate}`, { scroll: false });
+        router.push(`?=${formattedStartDate}&endDate=${formattedEndDate}`, { scroll: false });
       }
     }
   };
@@ -57,4 +57,4 @@ const DateSelect = () => {
   );
 };
 
-export default DateSelect;
+export default DatePicker;

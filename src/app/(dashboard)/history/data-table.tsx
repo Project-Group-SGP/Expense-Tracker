@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import * as React from "react";
-import { bulkdeleteProps } from "@/index";;
+import { bulkdeleteProps } from "@/index";
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -176,7 +177,17 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                {!disabled?
+                  "No results."
+                  :
+                  <div className="flex flex-col gap-4">
+                    {[...Array(5)].map((_, index) => (
+                      <Skeleton
+                        key={index}
+                        className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
+                      />
+                    ))}
+                </div>}
               </TableCell>
             </TableRow>
           )}
