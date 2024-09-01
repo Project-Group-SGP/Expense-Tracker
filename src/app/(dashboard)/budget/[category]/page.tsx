@@ -5,7 +5,7 @@ import Transaction from './_components/Transaction'
 import { headers } from 'next/headers'
 
 // Fetch expenses data
-export const GetExpensesData = async () => {
+const GetExpensesData = async () => {
   const headersList = headers();
   const cookie = headersList.get('cookie') || '';
 
