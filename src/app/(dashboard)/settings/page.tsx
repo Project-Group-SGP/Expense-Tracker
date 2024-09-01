@@ -428,12 +428,21 @@ function PushSubscriptionToggleButton() {
     try {
       if (enabled) {
         await registerPushNotifications()
+        toast.success("Push notifications enabled")
       } else {
         await unregisterPushNotification()
+        toast.success("Push notifications disabled")
       }
       setHasActivePushSubscription(enabled)
     } catch (error) {
       console.error("Error toggling push notification:", error)
+      if (enabled && Notification.permission === "denied") {
+        toast.warning(
+          "Please enable push notifications in your browser settings"
+        )
+      } else {
+        toast.error("Something went wrong, please try again later")
+      }
     } finally {
       setIsToggling(false)
     }

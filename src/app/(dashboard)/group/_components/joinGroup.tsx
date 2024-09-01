@@ -27,11 +27,14 @@ import { toast } from "sonner"
 import * as z from "zod"
 import { joinGroup } from "../actions"
 
+// Client-side validation
+// Only allow letters and numbers with the length 6
 const formSchema = z.object({
   code: z
     .string()
     .min(1, "Group code is required")
-    .length(6, "Invalid Group Code!"),
+    .length(6, "Invalid Group Code!")
+    .regex(/[A-Za-z0-9]{6}/, "Invalid Group Code!"),
 })
 
 type JoinGroupFormData = z.infer<typeof formSchema>

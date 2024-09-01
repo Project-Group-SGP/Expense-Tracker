@@ -1,7 +1,7 @@
 "use server"
-import { db } from "@/lib/db"
 import { currentUserServer } from "@/lib/auth"
-import webpush, { WebPushError } from "web-push"
+import { db } from "@/lib/db"
+import webpush from "web-push"
 
 interface AddGroupData {
   name: string
@@ -14,12 +14,15 @@ interface AddGroupResult {
   error?: string
 }
 
+//Code to generate unique code for group
 async function generateUniqueCode(length: number = 6): Promise<string> {
+  // Generate a random string of the specified length
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   let code: string
 
   while (true) {
+    // Generate a random string of the specified length
     code = Array.from(
       { length },
       () => characters[Math.floor(Math.random() * characters.length)]

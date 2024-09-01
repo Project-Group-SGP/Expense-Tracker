@@ -29,10 +29,10 @@ import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   name: z.string().min(1, "Group name is required"),
-  description: z.string().default(""),
+  description: z.string().max(50, "Group description is too long").default(""),
 })
 
-type GroupFormData = z.infer<typeof formSchema>
+export type GroupFormData = z.infer<typeof formSchema>
 
 export function AddGroupModal() {
   const [open, setOpen] = useState(false)
