@@ -1,3 +1,4 @@
+import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 
@@ -6,7 +7,13 @@ export default async function GroupPage({
 }: {
   params: { groupID: string }
 }) {
-  const group = await db.group.findUnique({ where: { id: params.groupID } })
+  const user = await currentUserServer()
+  if (!user) {
+    redirect("/auth/signin")
+  }
+  const group = await db.group.findUnique({
+    where: { id: params.groupID, members: { some: { userId: user.id } } },
+  })
   if (!group) {
     redirect("/404")
   }

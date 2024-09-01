@@ -34,12 +34,6 @@ const formSchema = z.object({
 
 type GroupFormData = z.infer<typeof formSchema>
 
-interface AddGroupResult {
-  success: boolean
-  code?: string
-  error?: string
-}
-
 export function AddGroupModal() {
   const [open, setOpen] = useState(false)
   const [groupCode, setGroupCode] = useState<string | null>(null)
@@ -61,7 +55,6 @@ export function AddGroupModal() {
         setGroupCode(result.code)
         toast.success("Group created successfully", {
           closeButton: true,
-          duration: 4500,
           id: loadingToast,
         })
       } else {

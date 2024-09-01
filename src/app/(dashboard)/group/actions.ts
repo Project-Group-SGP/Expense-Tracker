@@ -83,15 +83,17 @@ async function sendJoinRequestNotification(
     `Attempting to send notification for group ${groupId} and requester ${requesterId}`
   )
   try {
-    const group = await db.group.findUnique({
+    const groupQuery = db.group.findUnique({
       where: { id: groupId },
       include: { creator: { include: { pushSubscriptions: true } } },
     })
 
-    const requester = await db.user.findUnique({
+    const requesterQueryb = db.user.findUnique({
       where: { id: requesterId },
       select: { name: true },
     })
+
+    const [group, requester] = await Promise.all([groupQuery, requesterQueryb])
 
     if (!group || !group.creator.pushSubscriptions.length || !requester) {
       console.log(
@@ -130,34 +132,18 @@ async function sendJoinRequestNotification(
               },
             }
           )
-          return { success: true, subscription }
         } catch (error: any) {
           if (error.statusCode === 410) {
             console.log(
               `Subscription expired for endpoint: ${subscription.endpoint}`
             )
             await db.pushSubscription.delete({ where: { id: subscription.id } })
-            return { success: false, subscription, reason: "expired" }
           }
-          return { success: false, subscription, reason: "error", error }
         }
       }
     )
 
-    const results = await Promise.all(sendPromises)
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.length - successCount
-
-    console.log(
-      `Push notifications sent. Success: ${successCount}, Failures: ${failureCount}`
-    )
-
-    if (failureCount > 0) {
-      console.log(
-        "Failed notifications:",
-        results.filter((r) => !r.success)
-      )
-    }
+    await Promise.all(sendPromises)
   } catch (error) {
     console.error("Error in sendJoinRequestNotification:", error)
   }

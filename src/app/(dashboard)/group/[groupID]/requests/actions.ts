@@ -143,7 +143,6 @@ async function sendRejectNotification(groupName: string, userId: string) {
             },
           }
         )
-        return { success: true, subscription }
       } catch (error: any) {
         if (error.statusCode === 410) {
           console.log(
@@ -152,26 +151,11 @@ async function sendRejectNotification(groupName: string, userId: string) {
           await db.pushSubscription.delete({
             where: { id: subscription.id },
           })
-          return { success: false, subscription, reason: "expired" }
         }
-        return { success: false, subscription, reason: "error", error }
       }
     })
 
-    const results = await Promise.all(sendPromises)
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.length - successCount
-
-    console.log(
-      `Push notifications sent. Success: ${successCount}, Failures: ${failureCount}`
-    )
-
-    if (failureCount > 0) {
-      console.log(
-        "Failed notifications:",
-        results.filter((r) => !r.success)
-      )
-    }
+    await Promise.all(sendPromises)
   } catch (error) {
     console.error("Error in sendJoinRequestNotification:", error)
   }
@@ -225,33 +209,17 @@ async function sendJoinAcceptedNotification(
             },
           }
         )
-        return { success: true, subscription }
       } catch (error: any) {
         if (error.statusCode === 410) {
           console.log(
             `Subscription expired for endpoint: ${subscription.endpoint}`
           )
           await db.pushSubscription.delete({ where: { id: subscription.id } })
-          return { success: false, subscription, reason: "expired" }
         }
-        return { success: false, subscription, reason: "error", error }
       }
     })
 
-    const results = await Promise.all(sendPromises)
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.length - successCount
-
-    console.log(
-      `Push notifications sent. Success: ${successCount}, Failures: ${failureCount}`
-    )
-
-    if (failureCount > 0) {
-      console.log(
-        "Failed notifications:",
-        results.filter((r) => !r.success)
-      )
-    }
+    await Promise.all(sendPromises)
   } catch (error) {
     console.error("Error in sendJoinRequestNotification:", error)
   }
@@ -318,33 +286,17 @@ async function sendJoinNotificationToGroupMembers(
             },
           }
         )
-        return { success: true, subscription }
       } catch (error: any) {
         if (error.statusCode === 410) {
           console.log(
             `Subscription expired for endpoint: ${subscription.endpoint}`
           )
           await db.pushSubscription.delete({ where: { id: subscription.id } })
-          return { success: false, subscription, reason: "expired" }
         }
-        return { success: false, subscription, reason: "error", error }
       }
     })
 
-    const results = await Promise.all(sendPromises)
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.length - successCount
-
-    console.log(
-      `Push notifications sent. Success: ${successCount}, Failures: ${failureCount}`
-    )
-
-    if (failureCount > 0) {
-      console.log(
-        "Failed notifications:",
-        results.filter((r) => !r.success)
-      )
-    }
+    await Promise.all(sendPromises)
   } catch (error) {
     console.error("Error in sendJoinRequestNotification:", error)
   }
