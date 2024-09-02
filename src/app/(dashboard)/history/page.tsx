@@ -59,8 +59,6 @@ const data :ResponceType[] =[
 
 
 const HistoryPage =  () => {
-  const [lol,setlol] = useState<boolean>(false);
-
   const query =  useQueryClient();
 
   const transactionsQuery = useGetTransactions();
@@ -71,9 +69,9 @@ const HistoryPage =  () => {
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
 
-  if(lol){
-    query.invalidateQueries({ queryKey: ['transactions'] });
-  }
+  // if(lol){
+  //   query.invalidateQueries({ queryKey: ['transactions'] });
+  // }
   
   const HandleDelete = useCallback((value:{
         ids: string,
@@ -93,7 +91,7 @@ const HistoryPage =  () => {
           <PageTitle title="Transaction History" />
           <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
           <div className="flex justify-between">
-            <DatePicker setlol={setlol}/>
+            <DatePicker/>
             <div className="ml-auto flex gap-2">
               <Newincome />
               <NewExpense />
