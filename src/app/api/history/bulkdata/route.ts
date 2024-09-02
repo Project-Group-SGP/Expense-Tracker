@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
     const defaultTo = new Date();
     const defaultFrom = subDays(defaultTo,30);
 
-   
     let startDate;
     let endDate;
 
@@ -62,30 +61,12 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    const [income,expense]= await db.$transaction([incomecall,expensecall]);
+    const [income,expense]= await Promise.all([incomecall,expensecall]);
 
     const transactions = [
       ...income.map(item => ({ ...item, category: 'Income' })),
       ...expense.map(item => ({ ...item, amount: -item.amount }))
     ].sort((a, b) => b.date.getTime() - a.date.getTime());
-
-    // const transactions = await db.$queryRaw<{ category: string; id: string; userId: string; amount: number; date: Date; description: string | null }[]>(`
-    //   SELECT * FROM income
-    //   WHERE userId = ? AND date BETWEEN ? AND ?
-    //   UNION ALL
-    //   SELECT * FROM expense
-    //   WHERE userId = ? AND date BETWEEN ? AND ?
-    //   ORDER BY date ASC
-    // `, userId, start, end, userId, start, end);
-
-    // const transactions = await db.$queryRaw`
-    //   SELECT *, 'Income' AS category FROM Income
-    //   WHERE userId = ${"userId"} AND date BETWEEN ${"startDate"} AND ${"endDate"}
-    //   UNION ALL
-    //   SELECT *, -amount AS amount FROM Expense
-    //   WHERE userId = ${"userId"} AND date BETWEEN ${"startDate"} AND ${"endDate"}
-    //   ORDER BY date ASC
-    // `;
     
     return NextResponse.json({transactions});
   } catch (error) {

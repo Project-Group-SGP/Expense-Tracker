@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { DatePickerWithRange } from '../../dashboard/_components/DatePickerWithRange';
 
-const DatePicker = ({setlol}:{setlol:React.Dispatch<React.SetStateAction<boolean>>}) => {
+const DatePicker = () => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -22,7 +22,6 @@ const DatePicker = ({setlol}:{setlol:React.Dispatch<React.SetStateAction<boolean
 
           const formattedStartDate = format(joininDate, 'yyyy-MM-dd');
           const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
-          setlol(true);
           router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
         }
       } catch (error) {
@@ -48,7 +47,6 @@ const DatePicker = ({setlol}:{setlol:React.Dispatch<React.SetStateAction<boolean
         const formattedStartDate = format(newDateRange.from, 'yyyy-MM-dd');
         const formattedEndDate = format(newDateRange.to, 'yyyy-MM-dd');
 
-        setlol(true);
         router.push(`/history?from=${formattedStartDate}&to=${formattedEndDate}`, { scroll: false });
       }
     }
