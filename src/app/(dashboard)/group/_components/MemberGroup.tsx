@@ -18,27 +18,27 @@ export default function MemberGroupsList({ groups }: MemberGroupsListProps) {
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((group) => (
-          <Link href={`/group/${group.id}`} key={group.id}>
-            <Card
-              key={group.id}
-              className="hover:scale-102 transform overflow-hidden rounded-lg border  transition-all duration-300 hover:shadow-lg"
-            >
-              <CardHeader className="bg-gradient-to-r  p-4 ">
-                <section className="flex items-center justify-between">
+          <Card
+            key={group.id}
+            className="hover:scale-102 transform overflow-hidden rounded-lg border transition-all duration-300 hover:shadow-lg"
+          >
+            <CardHeader className="bg-gradient-to-r p-4">
+              <section className="flex items-center justify-between">
+                <Link href={`/group/${group.id}`} key={group.id}>
                   <CardTitle className="text-xl font-bold">
                     {group.name}
                   </CardTitle>
-                  <Trash
-                    className="cursor-pointer transition-colors duration-200 hover:text-red-600"
-                    size={20}
-                  />
-                </section>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600">{group.description}</p>
-              </CardContent>
-            </Card>
-          </Link>
+                </Link>
+                <Trash
+                  className="cursor-pointer transition-colors duration-200 hover:text-red-600"
+                  size={20}
+                />
+              </section>
+            </CardHeader>
+            <CardContent className="p-4">
+              <p className="text-sm text-gray-600">{group.description}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
