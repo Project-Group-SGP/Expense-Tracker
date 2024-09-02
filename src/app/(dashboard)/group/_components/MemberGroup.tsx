@@ -20,7 +20,7 @@ export default function MemberGroupsList({ groups }: MemberGroupsListProps) {
         {groups.map((group) => (
           <Card
             key={group.id}
-            className="hover:scale-102 transform overflow-hidden rounded-lg border transition-all duration-300 hover:shadow-lg"
+            className="transform transition-transform hover:scale-105 hover:shadow-lg"
           >
             <CardHeader className="bg-gradient-to-r p-4">
               <section className="flex items-center justify-between">
