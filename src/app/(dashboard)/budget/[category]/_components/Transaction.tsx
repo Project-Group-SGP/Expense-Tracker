@@ -51,6 +51,10 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
     return total + parseFloat(transaction.amount);
   }, 0);
 
+  const remainingBudget = data.categoryBudget[lastRouteName] - totalAmount;
+  const isOverBudget = remainingBudget < 0
+  const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700"
+
   return (
     <Card>
       <CardHeader>
@@ -60,7 +64,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
             <Card_budget
               title="Remaining"
               amount={Number(data.categoryBudget[lastRouteName] - totalAmount || 0)}
-              color="text-bills"
+              color={budgetColor}
               icon={Wallet}
             />
             <Card_budget

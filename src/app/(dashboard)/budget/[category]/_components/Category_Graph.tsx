@@ -63,7 +63,7 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; categoryB
     <Card>
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
-        <CardDescription>All month Data</CardDescription>
+        <CardDescription>This month Data</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
