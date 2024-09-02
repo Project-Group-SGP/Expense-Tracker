@@ -1,6 +1,14 @@
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { Suspense } from "react"
+import PageTitle from "../../dashboard/_components/PageTitle"
+
+import { SettleUp } from "./_components/SettleUp"
+import { AddExpense } from "./_components/AddExpense"
+import { Cardcontent } from "../../dashboard/_components/Card"
+import GroupMember from "./_components/GroupMember"
+import Transaction from "./_components/Transaction"
 
 export default async function GroupPage({
   params,
@@ -14,18 +22,46 @@ export default async function GroupPage({
   const group = await db.group.findUnique({
     where: { id: params.groupID, members: { some: { userId: user.id } } },
   })
+  // console.log("Group Details : ");
+  // console.log(group);
+
   if (!group) {
     redirect("/404")
   }
   return (
-    <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
-      <div className="mt-20 flex w-full flex-col gap-5 px-4">
-        <div className="z-10 mb-4 flex flex-col items-start justify-between gap-4 bg-white py-4 dark:bg-zinc-950 sm:flex-row sm:items-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            GroupID: {params.groupID}
-          </h1>
+    <Suspense>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="mt-20 flex w-full flex-col gap-5 px-4">
+          <PageTitle title={group.name} />
+
+          <div className="flex w-full flex-wrap items-center justify-between gap-4">
+            <p className="mr-auto">
+              Welcome Back,
+              <span className="text font-semibold text-orange-500 dark:text-sky-500">
+                {" "}
+                {user?.name.split(" ")[0]}{" "}
+              </span>
+              👋
+            </p>
+            <div className="ml-auto flex gap-2">
+              <AddExpense />
+              <SettleUp />
+            </div>
+          </div>
+
+          <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
+            {/* Set budget for a particular category */}
+            <Cardcontent className="border-none p-0 md:col-span-2 lg:col-span-2">
+              {/* Group transaction */}
+              <Transaction />
+            </Cardcontent>
+            <Cardcontent className="border-none p-0">
+              {/* Group member balance */}
+              <GroupMember />
+            </Cardcontent>
+          </section>
         </div>
       </div>
-    </div>
+    </Suspense>
   )
 }
