@@ -1,7 +1,7 @@
 "use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
-import { singledeleteProps } from "@/index";
+import { singledeleteProps } from "@/lib/index";
 import { currentUserServer } from "@/lib/auth";
 singledeleteProps
 export const deleteSingleTransaction = async(values:z.infer<typeof singledeleteProps>)=>{

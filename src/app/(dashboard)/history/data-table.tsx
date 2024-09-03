@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import * as React from "react";
-import { bulkdeleteProps } from "@/index";
+import { bulkdeleteProps } from "@/lib/index";
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { Input } from "@/components/ui/input"

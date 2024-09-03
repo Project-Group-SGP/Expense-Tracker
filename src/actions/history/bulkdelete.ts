@@ -1,9 +1,9 @@
 "use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
-import { bulkdeleteProps } from "@/index";
+import { bulkdeleteProps } from "@/lib/index";
 import { currentUserServer } from "@/lib/auth";
-
+import { revalidateTag } from "next/cache"
 export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
   console.log("\n\n\n\ndeleteProps",values);
   
@@ -45,10 +45,11 @@ export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
         }
       }),
     ]);
-
-    return {success:"Successfully Deleted!!"}
+    revalidateTag("getTransactions");
+    return {success:"Successfully Deleted!!"};
   }catch(e){
-    console.error("Error deleting transactions:", e)
-    return { error:"Failed to delete transactions" }
+    console.error("Error deleting transactions:", e);
+    revalidateTag("getTransactions");
+    return { error:"Failed to delete transactions" };
   }
 }

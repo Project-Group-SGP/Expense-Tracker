@@ -2,13 +2,11 @@ import {toast} from "sonner";
 import { useMutation,useQueryClient } from "@tanstack/react-query";
 import { bulkdelete } from "@/actions/history/bulkdelete";
 import { z } from "zod";
-import { bulkdeleteProps } from "@/index";
+import { bulkdeleteProps } from "@/lib/index";
 
 type catagory = "Income"|"Expance";
 
 export const useBulkDeleteTransaction = () => {
-  const queryclient = useQueryClient();
-
   const mutation = useMutation({
     mutationFn: async(json:z.infer<typeof bulkdeleteProps>) => {
       const responce = await bulkdelete(json);
@@ -19,12 +17,11 @@ export const useBulkDeleteTransaction = () => {
       return responce;
     },
     onSuccess : () => {
-
-      queryclient.invalidateQueries({queryKey:["transactions"]});
-      
+      console.log("Deleted successfully");
     },
     onError: ()=>{
       // toast.error("Failed to delete transaction's");
+      console.log("Deleted failed");
     }
   });
 

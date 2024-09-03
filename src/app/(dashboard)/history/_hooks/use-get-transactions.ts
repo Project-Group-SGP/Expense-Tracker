@@ -12,8 +12,9 @@ export const useGetTransactions = () => {
     queryKey:["transactions"],
     queryFn: async () => {  
       const responce = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`,{
-        // TODO:Don't invalidate cache use invaidate tag
+        // // TODO:Don't invalidate cache use invaidate tag
         cache:"no-cache",
+        method: "GET",
         next:{tags: ["getTransactions"] }
       });
 

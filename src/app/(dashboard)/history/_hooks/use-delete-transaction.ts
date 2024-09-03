@@ -2,7 +2,7 @@ import {toast} from "sonner";
 import { QueryClient, useMutation,useQueryClient } from "@tanstack/react-query";
 import { deleteSingleTransaction } from "@/actions/history/deleteTransaction";
 import { z } from "zod";
-import { singledeleteProps } from "@/index";
+import { singledeleteProps } from "@/lib/index";
 
 export const useDeleteTransaction = (values:z.infer<typeof singledeleteProps>) => {
   const queryclient = useQueryClient();
