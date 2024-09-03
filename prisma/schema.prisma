@@ -25,6 +25,8 @@ model User {
   createdGroups         Group[]                @relation("GroupCreator")
   groupMemberships      GroupMember[]
   joinRequests          JoinRequest[]
+  paidExpenses         GroupExpense[] @relation("PaidExpenses")
+  expenseSplits        ExpenseSplit[] @relation("ExpenseSplits")
 
   @@index([email])
   @@map("users")
@@ -120,6 +122,7 @@ model Group {
   creator     User          @relation("GroupCreator", fields: [creatorId], references: [id])
   members     GroupMember[]
   joinRequests JoinRequest[]
+  expenses    GroupExpense[]
 
   @@index([creatorId])
 }
@@ -145,6 +148,63 @@ model JoinRequest {
 
   @@unique([userId, groupId])
   @@index([groupId, status])
+}
+
+model GroupExpense {
+  id          String        @id @default(cuid())
+  groupId     String
+  paidById    String
+  category    CategoryTypes?
+  amount      Decimal
+  description String
+  date        DateTime
+  status      ExpenseStatus @default(UNSETTLED)
+
+  createdAt   DateTime      @default(now())
+  group       Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy      User          @relation("PaidExpenses", fields: [paidById], references: [id], onDelete: Cascade)
+  splits      ExpenseSplit[]
+
+  @@index([groupId, date])
+  @@index([paidById])
+}
+
+model ExpenseSplit {
+  id          String       @id @default(cuid())
+  expenseId   String
+  userId      String
+  amount      Decimal     @default(0)
+  isPaid      SplitStatus @default(UNPAID)
+  expense     GroupExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user        User         @relation("ExpenseSplits", fields: [userId], references: [id], onDelete: Cascade)
+  payments    Payment[]
+
+  @@unique([expenseId, userId])
+  @@index([userId])
+}
+
+model Payment {
+  id            String       @id @default(cuid())
+  expenseSplitId String
+  amount        Decimal
+  paidAt        DateTime     @default(now())
+  expenseSplit  ExpenseSplit @relation(fields: [expenseSplitId], references: [id], onDelete: Cascade)
+
+  @@index([expenseSplitId])
+}
+
+enum SplitStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+
+enum ExpenseStatus {
+  UNSETTLED
+  PARTIALLY_SETTLED
+  SETTLED
+  CANCELLED
 }
 
 enum JoinRequestStatus {
