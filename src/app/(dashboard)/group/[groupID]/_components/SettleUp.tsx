@@ -1,11 +1,10 @@
 "use client"
-
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -15,7 +14,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -25,233 +23,385 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
-
-import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, icons, X } from "lucide-react"
+import { cn } from "@/lib/utils"
+import * as z from "zod"
+import { toast } from "sonner"
+
+const formSchema = z.object({
+  fromUser: z.number().min(1, "Please select a valid payer."),
+  toUser: z.number().min(1, "Please select a valid recipient."),
+  amount: z.string().refine(
+    (val) => {
+      const parsed = parseFloat(val);
+      return !isNaN(parsed) && parsed > 0;
+    },
+    {
+      message: "Amount must be a valid number greater than 0",
+    }
+  ),
+  transactionDate: z.date().max(new Date(), {
+    message: "Transaction date cannot be in the future",
+  }),
+  notes: z.string().optional(),
+  group: z.string().optional(),
+})
+.refine(data => data.fromUser !== data.toUser, {
+  message: "Payer and recipient cannot be the same person",
+  path: ["toUser"], // Add the error to the 'toUser' field
+});
 
 
-const defaultCategories = [
-  "EMI",
-  "Bills",
-  "Groceries",
-  "Shopping",
-  "Transportation",
-  "Entertainment",
-  "Health",
-  "Education",
-  "Other",
+type FormSchema = z.infer<typeof formSchema>
+
+interface User {
+  id: number
+  name: string
+  avatar?: string
+}
+
+interface User {
+  id: number
+  name: string
+  avatar?: string
+}
+
+const users: User[] = [
+  { id: 1, name: "Ayush Kalathiya" },
+  { id: 2, name: "Sarthak" },
+  { id: 3, name: "Meet" },
+  { id: 4, name: "Mit" },
+  { id: 5, name: "Ayush Kalathiya" },
+  { id: 6, name: "Sarthak" },
+  { id: 7, name: "Vandit" },
+  { id: 8, name: "Kotak" },
+  // Add more users here
 ]
 
-// form validation schema
-const formSchema = z.object({
-  description: z.string().optional(),
-  amount: z
-    .string()
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a valid number greater than 0",
-    }),
-  transactionDate: z.date(),
-})
-
-export type IncomeFormData = z.infer<typeof formSchema>
-
-export function SettleUp() {
-  const form = useForm<IncomeFormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      description: "",
-      amount: "",
-      transactionDate: new Date(),
-    },
-  })
-
-  const [open, setOpen] = useState(false)
-  // handle submit
-  const handleSubmit = async (data: IncomeFormData) => {
-    // try {
-    //   // const result = await AddnewIncome(data)
-
-    //   // if (result === "success") {
-    //   //   toast.success("Income added successfully", {
-    //   //     closeButton: true,
-    //   //     icon: "🤑",
-    //   //     duration: 4500,
-    //   //   })
-
-    //     setOpen(false)
-    //     form.reset()
-    //   } else {
-    //     throw new Error("Income not added")
-    //   }
-    // } catch (error) {
-    //   console.error("Error adding income:", error)
-    //   toast.error("Failed to add income")
-    // }
+// User Avatar
+const UserAvatar: React.FC<{ user: User; size?: number }> = ({
+  user,
+  size = 20,
+}) => {
+  if (user.avatar) {
+    return (
+      <img
+        src={user.avatar}
+        alt={user.name}
+        className={`rounded-full`}
+        style={{ width: size, height: size }}
+      />
+    )
   }
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+  const color = `hsl(${(user.id * 100) % 360}, 70%, 50%)`
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full text-white`}
+      style={{ width: size, height: size, backgroundColor: color }}
+    >
+      {initials}
+    </div>
+  )
+}
 
-  const [categories, setCategories] = useState(defaultCategories)
-  // const [newCategory, setNewCategory] = useState("")
-  // const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false)
+const UserSelectionModal: React.FC<{
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (user: User) => void
+}> = ({ isOpen, onClose, onSelect }) => {
+  if (!isOpen) return null
 
   return (
-    // useing state to open dialog
-    <Dialog open={open} onOpenChange={setOpen}>
-      <div>
-        {/* New Income button */}
-        <DialogTrigger asChild>
-          <Button
-            className="w-full border-green-500 text-green-500 hover:bg-green-700 hover:text-white sm:w-[150px]"
-            variant="outline"
-          >
-            Settle up 🤝
-          </Button>
-        </DialogTrigger>
-
-        {/* Dialog of New Income */}
-        <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-center sm:text-left">
-              Create a new <span className="text-green-500">income</span>{" "}
-              transaction
-            </DialogTitle>
-          </DialogHeader>
-
-          {/* Form */}
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-                console.log("Form validation errors:", errors)
-              })}
-              className="mt-4 space-y-4"
-            >
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Amount */}
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter amount"
-                        type="number"
-                        step="0.01"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Category
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Category</FormLabel>
-                    <div className="flex space-x-2">
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent
-                          position="popper"
-                          side="bottom"
-                          align="start"
-                        >
-                          {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                       <NewCategoryDialog />   
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-
-              {/* Transaction Date */}
-              <FormField
-                control={form.control}
-                name="transactionDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Transaction Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal sm:w-[240px]",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className="w-full sm:w-auto">
-                  Add new income
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Select Member</DialogTitle>
+        </DialogHeader>
+        <div className="max-h-[50vh] overflow-y-auto pb-5">
+          <div className="grid grid-cols-2 gap-4">
+            {users.map((user) => (
+              <Button
+                key={user.id}
+                variant="outline"
+                className="flex h-full items-center justify-start space-x-2 p-2"
+                onClick={() => {
+                  onSelect(user)
+                  onClose()
+                }}
+              >
+                <UserAvatar user={user} size={40} />
+                <span className="truncate text-sm">{user.name}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      </DialogContent>
     </Dialog>
   )
 }
+
+export function SettleUp() {
+  const [open, setOpen] = useState(false)
+  const [userSelectionOpen, setUserSelectionOpen] = useState(false)
+  const [selectingFor, setSelectingFor] = useState<
+    "fromUser" | "toUser" | null
+  >(null)
+
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      fromUser: users[0].id,
+      toUser: users[1].id,
+      amount: "",
+      transactionDate: new Date(),
+      notes: "",
+      group: "No group",
+    },
+  })
+
+
+  // handle submit
+  const handleSubmit = async (data: FormSchema) => {
+    console.log("Form submitted:", data)
+    
+    toast.success("Settling up... ",{
+      closeButton: true,
+      icon: "🤝",
+      duration: 4500,
+    });
+    
+    form.reset()
+
+    setOpen(false)
+  }
+
+  const handleUserSelect = (user: User) => {
+    if (selectingFor) {
+      form.setValue(selectingFor, user.id)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          className="w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
+          variant="outline"
+          onClick={() => setOpen(false)}
+        >
+          Settle up 🤝
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center sm:text-left">
+            <span className="text-green-500">Settle up</span> 🤝
+          </DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <div className="flex items-center justify-center space-x-4">
+              {/* Memeber selection */}
+              <FormField
+                control={form.control}
+                name="fromUser"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-24 w-24 rounded-full border-none p-0"
+                        onClick={() => {
+                          setSelectingFor("fromUser")
+                          setUserSelectionOpen(true)
+                        }}
+                      >
+                        <UserAvatar
+                          user={
+                            users.find((u) => u.id === field.value) || users[0]
+                          }
+                          size={85}
+                        />
+                      </Button>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <div className="text-2xl">→</div>
+              <FormField
+                control={form.control}
+                name="toUser"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-24 w-24 rounded-full border-none p-0"
+                        onClick={() => {
+                          setSelectingFor("toUser")
+                          setUserSelectionOpen(true)
+                        }}
+                      >
+                        <UserAvatar
+                          user={
+                            users.find((u) => u.id === field.value) || users[1]
+                          }
+                          size={85}
+                        />
+                      </Button>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="text-center">
+              <span className="text-green-500">
+                {users.find((u) => u.id === form.watch("fromUser"))?.name}
+              </span>{" "}
+              paid{" "}
+              <span className="text-blue-500">
+                {users.find((u) => u.id === form.watch("toUser"))?.name}
+              </span>
+            </div>
+
+            {/* Amount */}
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="₹ 0"
+                      className="text-center text-3xl font-bold"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="transactionDate"
+              render={({ field }) => (
+                <FormItem>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "MMMM d, yyyy")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date: Date | undefined) =>
+                          field.onChange(date)
+                        }
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        // Open a modal or expand a section for adding notes/images
+                      }}
+                    >
+                      Add image/notes
+                    </Button>
+                  </FormControl>
+                </FormItem>
+              )}
+            /> */}
+            {/* <FormField
+              control={form.control}
+              name="group"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        // Open a modal for selecting or creating a group
+                      }}
+                    >
+                      {field.value || "No group"}
+                    </Button>
+                  </FormControl>
+                </FormItem>
+              )}
+            /> */}
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-green-500 text-white hover:bg-green-600"
+              >
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+      <UserSelectionModal
+        isOpen={userSelectionOpen}
+        onClose={() => setUserSelectionOpen(false)}
+        onSelect={handleUserSelect}
+      />
+    </Dialog>
+  )
+}
+
+export default SettleUp
