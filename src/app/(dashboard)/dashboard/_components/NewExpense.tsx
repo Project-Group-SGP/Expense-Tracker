@@ -50,7 +50,6 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
 const defaultCategories = [
   "Other",
   "Bills",
@@ -99,7 +98,6 @@ export function NewExpense() {
   // handle submit
   const handleSubmit = async (data: ExpenseFormData) => {
     // console.log(data)
-
     try {
       const result = await AddnewExpense(data)
       if (result === "success") {
@@ -108,9 +106,8 @@ export function NewExpense() {
           icon: "😤",
           duration: 4500,
         })
-
         setOpen(false)
-        form.reset()
+        form.reset();
       } else {
         throw new Error("Expense not added")
       }

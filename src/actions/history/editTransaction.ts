@@ -1,7 +1,7 @@
 "use server"
 import * as  z from "zod";
 import { db } from "@/lib/db";
-import { editTransactionProps } from "@/index";
+import { editTransactionProps } from "@/lib/index";
 import { currentUserServer } from "@/lib/auth";
 import { validate } from "uuid";
 

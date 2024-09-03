@@ -1,7 +1,7 @@
 import {toast} from "sonner";
 import { useMutation,useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { editTransactionProps } from "@/index";
+import { editTransactionProps } from "@/lib/index";
 import { editTransaction } from "@/actions/history/editTransaction";
 
 export const useEditTransaction = (values : z.infer<typeof editTransactionProps>) => {

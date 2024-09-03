@@ -8,7 +8,7 @@ import { settings } from "@/actions/auth/settings"
 import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SettingsSchema } from "@/index"
+import { SettingsSchema } from "@/lib/index"
 import {
   Form,
   FormControl,

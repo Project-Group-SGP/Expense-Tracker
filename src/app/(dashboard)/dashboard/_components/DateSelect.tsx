@@ -35,11 +35,10 @@ const DateSelect = () => {
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
     if (newDateRange) {
-      if (!newDateRange.from) {
+      if (!newDateRange.from) 
         newDateRange.from = newDateRange.to;
-      } else if (!newDateRange.to) {
+      else if (!newDateRange.to) 
         newDateRange.to = newDateRange.from;
-      }
 
       setDateRange(newDateRange);
 

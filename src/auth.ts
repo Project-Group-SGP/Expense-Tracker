@@ -24,7 +24,7 @@ export const {
           data: { emailVerified: new Date() },
         })
       } catch (error) {
-        console.error("Error in linkAccount event:", error)
+        console.error("Error in linkAccount event:", error);
       }
     },
   },
