@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react"
 import {
   Card,
   CardContent,
@@ -20,8 +20,18 @@ type BudgetUsageGraphProps = {
 
 export function OverallGraph(props: BudgetUsageGraphProps) {
   const month = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ]
 
   const currentMonth = new Date().getMonth()
@@ -34,14 +44,14 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
   const percentUsed = Math.min((props.totalExpense / props.budget) * 100, 100)
 
   // SVG parameters
-  const size = 180  
-  const strokeWidth = 15  
+  const size = 180
+  const strokeWidth = 15
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   const fillPercentage = (percentUsed / 100) * circumference
 
-  const circleColor = "#4A4A4A" 
-  const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"  
+  const circleColor = "#4A4A4A"
+  const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"
 
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
@@ -52,7 +62,7 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-2">
-        <div className="flex justify-center items-center">
+        <div className="flex items-center justify-center">
           <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             <circle
               cx={size / 2}
@@ -81,10 +91,9 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
               textAnchor="middle"
               fontSize="28"
               fontWeight="bold"
-              fill='white'
+              fill={"black"}
             >
               {props.totalExpense} <br />
-              
             </text>
           </svg>
         </div>
