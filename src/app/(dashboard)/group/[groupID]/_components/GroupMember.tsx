@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import React from "react"
 import { Member } from "./Member"
 
+
 const GroupMember = () => {
   return (
     <Card>
