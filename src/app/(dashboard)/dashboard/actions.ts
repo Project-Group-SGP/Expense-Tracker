@@ -1,3 +1,4 @@
+'use server'
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ExpenseFormData } from "./_components/NewExpense"

@@ -29,30 +29,31 @@ import { CalendarIcon, icons, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import * as z from "zod"
 import { toast } from "sonner"
+import { UserAvatar } from "./UserAvatar"
 
-const formSchema = z.object({
-  fromUser: z.number().min(1, "Please select a valid payer."),
-  toUser: z.number().min(1, "Please select a valid recipient."),
-  amount: z.string().refine(
-    (val) => {
-      const parsed = parseFloat(val);
-      return !isNaN(parsed) && parsed > 0;
-    },
-    {
-      message: "Amount must be a valid number greater than 0",
-    }
-  ),
-  transactionDate: z.date().max(new Date(), {
-    message: "Transaction date cannot be in the future",
-  }),
-  notes: z.string().optional(),
-  group: z.string().optional(),
-})
-.refine(data => data.fromUser !== data.toUser, {
-  message: "Payer and recipient cannot be the same person",
-  path: ["toUser"], // Add the error to the 'toUser' field
-});
-
+const formSchema = z
+  .object({
+    fromUser: z.number().min(1, "Please select a valid payer."),
+    toUser: z.number().min(1, "Please select a valid recipient."),
+    amount: z.string().refine(
+      (val) => {
+        const parsed = parseFloat(val)
+        return !isNaN(parsed) && parsed > 0
+      },
+      {
+        message: "Amount must be a valid number greater than 0",
+      }
+    ),
+    transactionDate: z.date().max(new Date(), {
+      message: "Transaction date cannot be in the future",
+    }),
+    notes: z.string().optional(),
+    group: z.string().optional(),
+  })
+  .refine((data) => data.fromUser !== data.toUser, {
+    message: "Payer and recipient cannot be the same person",
+    path: ["toUser"], // Add the error to the 'toUser' field
+  })
 
 type FormSchema = z.infer<typeof formSchema>
 
@@ -81,35 +82,6 @@ const users: User[] = [
 ]
 
 // User Avatar
-const UserAvatar: React.FC<{ user: User; size?: number }> = ({
-  user,
-  size = 20,
-}) => {
-  if (user.avatar) {
-    return (
-      <img
-        src={user.avatar}
-        alt={user.name}
-        className={`rounded-full`}
-        style={{ width: size, height: size }}
-      />
-    )
-  }
-  const initials = user.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-  const color = `hsl(${(user.id * 100) % 360}, 70%, 50%)`
-  return (
-    <div
-      className={`flex items-center justify-center rounded-full text-white`}
-      style={{ width: size, height: size, backgroundColor: color }}
-    >
-      {initials}
-    </div>
-  )
-}
 
 const UserSelectionModal: React.FC<{
   isOpen: boolean
@@ -166,17 +138,16 @@ export function SettleUp() {
     },
   })
 
-
   // handle submit
   const handleSubmit = async (data: FormSchema) => {
     console.log("Form submitted:", data)
-    
-    toast.success("Settling up... ",{
+
+    toast.success("Settling up... ", {
       closeButton: true,
       icon: "🤝",
       duration: 4500,
-    });
-    
+    })
+
     form.reset()
 
     setOpen(false)
@@ -295,6 +266,8 @@ export function SettleUp() {
                 </FormItem>
               )}
             />
+
+            {/* Transaction Date */}
             <FormField
               control={form.control}
               name="transactionDate"
@@ -326,9 +299,13 @@ export function SettleUp() {
                         onSelect={(date: Date | undefined) =>
                           field.onChange(date)
                         }
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
+                        disabled={(date) => {
+                          console.log("Checking date:", date)
+                          console.log("Current date:", new Date())
+                          return (
+                            date > new Date() || date < new Date("1900-01-01")
+                          )
+                        }}
                         initialFocus
                       />
                     </PopoverContent>

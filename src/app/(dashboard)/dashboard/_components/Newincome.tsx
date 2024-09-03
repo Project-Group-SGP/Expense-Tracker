@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { AddnewIncome } from "../actions"
+import { log } from "node:console"
 
 const defaultCategories = [
   "EMI",
@@ -89,7 +90,8 @@ export function Newincome() {
         throw new Error("Income not added")
       }
     } catch (error) {
-      console.error("Error adding income:", error)
+      // console.error("Error adding income:", error)
+      console.log(error);
       toast.error("Failed to add income")
     }
   }
