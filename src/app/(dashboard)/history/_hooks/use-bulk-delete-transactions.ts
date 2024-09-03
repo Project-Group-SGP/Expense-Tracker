@@ -5,7 +5,8 @@ import { z } from "zod";
 import { bulkdeleteProps } from "@/index";
 
 type catagory = "Income"|"Expance";
-export const useBulkDeleteTransaction = (props ?: z.infer<typeof bulkdeleteProps>) => {
+
+export const useBulkDeleteTransaction = () => {
   const queryclient = useQueryClient();
 
   const mutation = useMutation({
@@ -18,14 +19,12 @@ export const useBulkDeleteTransaction = (props ?: z.infer<typeof bulkdeleteProps
       return responce;
     },
     onSuccess : () => {
-      toast.success("Transaction's deleted");
-      // queryclient.invalidateQueries({queryKey:["transaction",{/* id */}]});
-      queryclient.invalidateQueries({queryKey:["transactions"]});
 
-      // TODO inVAlidate summary
+      queryclient.invalidateQueries({queryKey:["transactions"]});
+      
     },
     onError: ()=>{
-      toast.error("Failed to delete transaction's");
+      // toast.error("Failed to delete transaction's");
     }
   });
 

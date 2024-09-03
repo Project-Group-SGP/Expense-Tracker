@@ -1,7 +1,6 @@
 import { currentUserServer } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { Sql } from "@prisma/client/runtime/library";
-import { subDays,parse } from "date-fns";
+import { parse, subDays } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

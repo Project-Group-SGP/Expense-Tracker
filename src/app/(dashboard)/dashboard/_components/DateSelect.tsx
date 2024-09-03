@@ -5,19 +5,19 @@ import { DateRange } from 'react-day-picker';
 import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { DatePickerWithRange } from './DatePickerWithRange';
+import { currentUserServer } from '@/lib/auth';
 
 const DateSelect = () => {
   const router = useRouter();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
   useEffect(() => {
     const fetchJoininDate = async () => {
       try {
-        const response = await fetch('/api/joinin-date');
-        const data = await response.json();
+        const user = await currentUserServer();
+        const data = user?.joininDate;
 
-        if (data.joininDate) {
-          const joininDate = parseISO(data.joininDate);
+        if (data) {
+          const joininDate = parseISO(data);
           setDateRange({ from: joininDate, to: new Date() });
 
           const formattedStartDate = format(joininDate, 'yyyy-MM-dd');

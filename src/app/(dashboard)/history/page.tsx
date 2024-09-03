@@ -59,8 +59,6 @@ const data :ResponceType[] =[
 
 
 const HistoryPage =  () => {
-  const query =  useQueryClient();
-
   const transactionsQuery = useGetTransactions();
   
   const transactions = transactionsQuery.data || [];
@@ -69,11 +67,7 @@ const HistoryPage =  () => {
 
   const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending;
 
-  // if(lol){
-  //   query.invalidateQueries({ queryKey: ['transactions'] });
-  // }
-  
-  const HandleDelete = useCallback((value:{
+  const HandleDelete =(value:{
         ids: string,
         category: "Income" | "Expense",
       }[]) => {
@@ -81,7 +75,7 @@ const HistoryPage =  () => {
       console.log("page delete",value);
 
       deleteTransactions.mutate({props:value});
-  },[]);
+  }
 
   return (
   <>
@@ -99,7 +93,7 @@ const HistoryPage =  () => {
           </div>
         </div> 
         <div className="container mx-auto py-10 px-4">
-          <DataTable columns={columns} data={transactions} filterKey="category" onDelete={HandleDelete} disabled={isDisabled}/>
+          <DataTable columns={columns} data={transactions} filterKey="description" onDelete={HandleDelete} disabled={isDisabled}/>
         </div>      
       </div>
   </Suspense>

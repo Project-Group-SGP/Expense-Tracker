@@ -29,7 +29,7 @@ export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
   }
 
   try{
-    await db.$transaction([
+    await Promise.all([
       db.income.deleteMany({
         where:{
           id: {
