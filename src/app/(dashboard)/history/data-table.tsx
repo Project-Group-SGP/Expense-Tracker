@@ -177,7 +177,7 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                {!disabled?
+                {/* {!disabled?
                   "No results."
                   :
                   <div className="flex flex-col gap-4">
@@ -187,7 +187,8 @@ export function DataTable<TData, TValue>({
                         className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
                       />
                     ))}
-                </div>}
+                </div>} */}
+                No results.
               </TableCell>
             </TableRow>
           )}

@@ -1,10 +1,9 @@
 "use server"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { ExpenseFormData } from "./_components/NewExpense"
-import { IncomeFormData } from "./_components/Newincome"
 import { revalidateTag } from "next/cache"
-
+import {ExpenseFormData} from "./_components/Expance"
+import {IncomeFormData} from "./_components/Income"
 // add new income
 export async function AddnewIncome(data: IncomeFormData) {
   const user = await currentUserServer()
@@ -15,8 +14,6 @@ export async function AddnewIncome(data: IncomeFormData) {
   const newIncome = await db.income.create({
     data: { userId: user?.id, amount, date: transactionDate, description },
   })
-  revalidateTag("totalIncome")
-  revalidateTag("getAllData")
   revalidateTag("getTransactions")
   return newIncome ? "success" : "error"
 }
@@ -37,9 +34,6 @@ export async function AddnewExpense(data: ExpenseFormData) {
       category,
     },
   })
-
-  revalidateTag("totalExpense")
-  revalidateTag("getAllData")
   revalidateTag("getTransactions")
   return newExpense ? "success" : "error"
 }
