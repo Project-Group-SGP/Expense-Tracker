@@ -7,6 +7,7 @@ type User = {
   id: string
   isTwoFactorEnable: boolean
   isOAuth : boolean
+  joininDate :string| null;
 }
 
 /**

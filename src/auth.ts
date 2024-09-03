@@ -46,6 +46,8 @@ export const {
         token.name = existingUser.name
         token.email = existingUser.email
         token.isTwoFactorEnable = existingUser.isTwoFactorEnable
+        if(existingUser.emailVerified !== null)
+          token.joininDate = existingUser.emailVerified.toISOString().split("T")[0];
 
         return token
       } catch (error) {
@@ -67,6 +69,8 @@ export const {
         session.user.email = token.email as string;
 
         session.user.isOAuth = token.isOAuth as boolean;
+        if(token.joininDate)
+          session.user.joininDate = token.joininDate as string;
       }
 
       return session
