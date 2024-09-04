@@ -1,0 +1,25 @@
+{
+  "theme_color": "#2D9E5D",
+  "background_color": "#2EC6FE",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "sizes": "512x512",
+      "src": "icon512_maskable.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "512x512",
+      "src": "icon512_rounded.png",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "any",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "en-US",
+  "name": "Spendwise",
+  "short_name": "Spendwise",
+  "description": "A free platform for all your financial needs"
+}

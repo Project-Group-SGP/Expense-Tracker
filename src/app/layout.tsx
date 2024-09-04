@@ -9,6 +9,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 export const metadata: Metadata = {
   title: "Expense Tracker",
   description: "Track your expenses with simplicity and effectively",
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
@@ -18,6 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="theme-color" content="#2D9E5D" />
       <body className={poppins.className}>
         <Providers>
           {children}

@@ -7,7 +7,8 @@ export const useGetTransactions = () => {
   const to = params.get("to") || "";
 
   return useQuery({
-    queryKey: ["transactions", from, to],
+    // queryKey: ["transactions", from, to],
+    queryKey: ["transactions"],
     queryFn: async () => {  
       const response = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`, {
         cache: "no-store",

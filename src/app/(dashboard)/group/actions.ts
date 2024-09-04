@@ -205,7 +205,7 @@ export async function joinGroup(code: string) {
       },
     })
 
-    await sendJoinRequestNotification(group.id, user.id)
+    sendJoinRequestNotification(group.id, user.id)
 
     return { success: true, message: "Join request sent successfully" }
   } catch (error) {

@@ -17,18 +17,18 @@ export function TransactionButtons() {
   return (
     <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
       <Button
-        className="w-full border-blue-500 text-blue-500 hover:bg-blue-700 hover:text-white sm:w-[180px]"
+        className="w-full border-blue-500 text-blue-500 hover:bg-blue-700 hover:text-white sm:w-[150px]"
         variant="outline"
         onClick={handleImport}
       >
-        Import Transactions 📥
+        Import 📥
       </Button>
       <Button
-        className="w-full border-purple-500 text-purple-500 hover:bg-purple-700 hover:text-white sm:w-[180px]"
+        className="w-full border-purple-500 text-purple-500 hover:bg-purple-700 hover:text-white sm:w-[150px]"
         variant="outline"
         onClick={handleExport}
       >
-        Export Transactions 📤
+        Report 📤
       </Button>
     </div>
   )
