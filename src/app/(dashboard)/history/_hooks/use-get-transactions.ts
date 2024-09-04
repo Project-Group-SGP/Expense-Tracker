@@ -1,32 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { Dispatch, SetStateAction } from "react";
 
 export const useGetTransactions = () => {
   const params = useSearchParams();
   const from = params.get("from") || "";
   const to = params.get("to") || "";
 
-  const query = useQuery({
-    //Todo check i params are needed in key
-    queryKey:["transactions"],
+  return useQuery({
+    queryKey: ["transactions", from, to],
     queryFn: async () => {  
-      const responce = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`,{
-        // // TODO:Don't invalidate cache use invaidate tag
-        cache:"no-cache",
+      const response = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`, {
+        cache: "no-store",
         method: "GET",
-        next:{tags: ["getTransactions"] }
+        next: { tags: ["getTransactions"] }
       });
 
-      if(!responce.ok){
+      if (!response.ok) {
         throw new Error("Failed to fetch transactions"); 
       }
       
-      const {transactions} = await responce.json();
-
+      const { transactions } = await response.json();
       return transactions;
     },
   });
-
-  return query;
 }

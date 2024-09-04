@@ -7,6 +7,7 @@ import { bulkdeleteProps } from "@/lib/index";
 type catagory = "Income"|"Expance";
 
 export const useBulkDeleteTransaction = () => {
+  const queryclient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async(json:z.infer<typeof bulkdeleteProps>) => {
       const responce = await bulkdelete(json);
@@ -14,6 +15,7 @@ export const useBulkDeleteTransaction = () => {
         toast.error(responce.error);
       else  
         toast.success(responce.success);
+      queryclient.invalidateQueries({queryKey:["transactions"]});
       return responce;
     },
     onSuccess : () => {
