@@ -93,6 +93,7 @@ export function DataTable<TData, TValue>({
   }
 
   console.log("sarthak",table.getFilteredSelectedRowModel());
+  
   return (
   <div>
    <div className="flex items-center py-4">
@@ -177,17 +178,17 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                {/* {!disabled?
+                {!disabled?
                   "No results."
                   :
                   <div className="flex flex-col gap-4">
-                    {[...Array(5)].map((_, index) => (
+                    {[...Array(10)].map((_, index) => (
                       <Skeleton
                         key={index}
                         className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
                       />
                     ))}
-                </div>} */}
+                </div>}
                 No results.
               </TableCell>
             </TableRow>

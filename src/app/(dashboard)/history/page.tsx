@@ -1,7 +1,7 @@
 "use client"
 import React, { Suspense } from "react"
-import { NewExpense } from "../dashboard/_components/NewExpense"
-import { Newincome } from "../dashboard/_components/Newincome"
+import { NewExpense } from "./_components/Expance"
+import { Newincome } from "./_components/Income"
 import PageTitle from "./_components/PageTitle"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
@@ -28,8 +28,8 @@ const HistoryPage = () => {
     console.log("page delete", value);
     
     await deleteTransactions.mutateAsync({ props: value });
-    // Manually invalidate the transactions query after successful deletion
-    queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    // // Manually invalidate the transactions query after successful deletion
+    // queryClient.invalidateQueries({ queryKey: ["transactions"] });
   }
 
   return (

@@ -16,11 +16,10 @@ export const useDeleteTransaction = (values:z.infer<typeof singledeleteProps>) =
       toast.success("Transaction deleted");
       //queryclient.invalidateQueries({queryKey:["transaction",{values.id}]});
       queryclient.invalidateQueries({queryKey:["transactions"]});
-
-      // TODO inVAlidate summary
     },
     onError: ()=>{
       toast.error("Failed to delete transaction");
     }
   })
+  return mutation;
 } 
