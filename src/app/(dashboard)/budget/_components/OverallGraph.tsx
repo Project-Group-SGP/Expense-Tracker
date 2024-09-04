@@ -91,7 +91,7 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
               textAnchor="middle"
               fontSize="28"
               fontWeight="bold"
-              fill={"black"}
+              fill={"white"}
             >
               {props.totalExpense} <br />
             </text>

@@ -1,44 +1,40 @@
 "use client"
-import React, { useState } from "react"
-import { format } from "date-fns"
-import { CalendarIcon, Camera, Tag, ChevronDown, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { UserSelectionModal } from "./SettleUp" // Ensure this component is correctly imported
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+// Adjust the path based on your file structure
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { UserSelectionModal } from "./SettleUp"; // Ensure this component is correctly imported
+import { cn } from "@/lib/utils";
 
+// Enum for Category Types
+enum CategoryTypes {
+  Other = "Other",
+  Bills = "Bills",
+  Food = "Food",
+  Entertainment = "Entertainment",
+  Transportation = "Transportation",
+  EMI = "EMI",
+  Healthcare = "Healthcare",
+  Education = "Education",
+  Investment = "Investment",
+  Shopping = "Shopping",
+  Fuel = "Fuel",
+  Groceries = "Groceries",
+}
+
+// form schema
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   amount: z
@@ -52,11 +48,68 @@ const formSchema = z.object({
   splitWith: z
     .array(z.string())
     .min(1, "At least one person must be selected to split with"),
-})
+  category: z.nativeEnum(CategoryTypes) // Add category to the form schema
+});
 
+
+
+// Mapping categories to emojis
+const categoryEmojis: Record<CategoryTypes, string> = {
+  [CategoryTypes.Other]: "🔖",
+  [CategoryTypes.Bills]: "🧾",
+  [CategoryTypes.Food]: "🍽️",
+  [CategoryTypes.Entertainment]: "🎮",
+  [CategoryTypes.Transportation]: "🚗",
+  [CategoryTypes.EMI]: "💳",
+  [CategoryTypes.Healthcare]: "🏥",
+  [CategoryTypes.Education]: "🎓",
+  [CategoryTypes.Investment]: "💼",
+  [CategoryTypes.Shopping]: "🛒",
+  [CategoryTypes.Fuel]: "⛽",
+  [CategoryTypes.Groceries]: "🛍️",
+}
+
+interface CategorySelectorProps {
+  selectedCategory: CategoryTypes;
+  onCategoryChange: (value: CategoryTypes) => void;
+}
+
+function CategorySelector({ selectedCategory, onCategoryChange }: CategorySelectorProps) {
+  const [localCategory, setLocalCategory] = useState(selectedCategory);
+
+  useEffect(() => {
+    setLocalCategory(selectedCategory);
+  }, [selectedCategory]);
+
+  const handleChange = (value: string) => {
+    const category = CategoryTypes[value as keyof typeof CategoryTypes];
+    setLocalCategory(category);
+    onCategoryChange(category);
+  };
+
+  return (
+    <Select value={localCategory} onValueChange={handleChange}>
+      <SelectTrigger className="w-[70px]">
+        <SelectValue>
+          {categoryEmojis[localCategory] || "Select a category"}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent className="h-60">
+        {Object.values(CategoryTypes).map((category) => (
+          <SelectItem key={category} value={category}>
+            {categoryEmojis[category]} {category}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+
+// AddExpense
 export function AddExpense() {
-  const [open, setOpen] = useState(false) // Initialize the Dialog open state
-  const [userSelectionOpen, setUserSelectionOpen] = useState(false) // For User Selection Modal
+  const [open, setOpen] = useState(false);
+  const [userSelectionOpen, setUserSelectionOpen] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,20 +119,25 @@ export function AddExpense() {
       date: new Date(),
       splitType: "Equally",
       splitWith: ["Ayush (me)"],
+      category: CategoryTypes.Food, // Default category value
     },
-  })
+  });
 
+  // Handle form submission
   const onSubmit = (data) => {
-    console.log(data)
+    console.log(data);
     // Handle form submission, such as sending data to the server
-  }
+    setOpen(false);
+  };
 
+  // Handle user selection
   const handleUserSelect = (user) => {
-    form.setValue("paidBy", user)
-  }
+    form.setValue("paidBy", user);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      
       <DialogTrigger asChild>
         <Button
           className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
@@ -89,21 +147,26 @@ export function AddExpense() {
           Add an Expense 😤
         </Button>
       </DialogTrigger>
+      
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             <span className="text-red-500">Add an Expense</span> 😤
           </DialogTitle>
         </DialogHeader>
+        
+        {/* from */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            
+            {/* Title */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">Title</FormLabel>
-                  <div className="flex">
+                  <div className="flex gap-2">
                     <FormControl>
                       <Input
                         placeholder="E.g. Drinks"
@@ -111,15 +174,18 @@ export function AddExpense() {
                         className="flex-grow"
                       />
                     </FormControl>
-                    <Button type="button" variant="outline" className="ml-2">
-                      <Tag className="h-4 w-4" />
-                      
-                    </Button>
+                    
+                      <CategorySelector
+                        selectedCategory={form.getValues("category")}
+                        onCategoryChange={(category) => form.setValue("category", category)}
+                      />
+                   
                   </div>
                 </FormItem>
               )}
             />
 
+            {/* Amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -153,6 +219,7 @@ export function AddExpense() {
               )}
             />
 
+            {/* Paid By */}
             <div className="flex justify-between">
               <FormField
                 control={form.control}
@@ -178,6 +245,7 @@ export function AddExpense() {
                   </FormItem>
                 )}
               />
+
 
               <FormField
                 control={form.control}
@@ -217,6 +285,7 @@ export function AddExpense() {
             </div>
 
 
+            {/* Split Type */}
             <FormField
               control={form.control}
               name="splitType"
@@ -253,7 +322,9 @@ export function AddExpense() {
               )}
             />
 
-            <div className="flex justify-end space-x-1">
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-2">
               <Button
                 type="button"
                 variant="outline"
@@ -263,7 +334,8 @@ export function AddExpense() {
               </Button>
               <Button
                 type="submit"
-                className="bg-green-500 text-white hover:bg-green-600"
+                variant="outline"
+                className="border-red-500 text-red-500 hover:bg-red-600"
               >
                 Add Expense
               </Button>
@@ -271,13 +343,13 @@ export function AddExpense() {
           </form>
         </Form>
       </DialogContent>
-      <UserSelectionModal
+      {/* <UserSelectionModal
         isOpen={userSelectionOpen}
         onClose={() => setUserSelectionOpen(false)}
         onSelect={handleUserSelect}
-      />
+      /> */}
     </Dialog>
-  )
+  );
 }
 
-export default AddExpense
+export default AddExpense;
