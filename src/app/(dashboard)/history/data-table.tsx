@@ -93,6 +93,7 @@ export function DataTable<TData, TValue>({
   }
 
   console.log("sarthak",table.getFilteredSelectedRowModel());
+  
   return (
   <div>
    <div className="flex items-center py-4">
