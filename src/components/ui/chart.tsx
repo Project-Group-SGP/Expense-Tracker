@@ -79,6 +79,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   return (
     <style
       dangerouslySetInnerHTML={{
+        //@ts-ignore
         __html: Object.entries(THEMES).map(
           ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
@@ -196,7 +197,7 @@ const ChartTooltipContent = React.forwardRef<
                   indicator === "dot" && "items-center"
                 )}
               >
-                {formatter && (item?.value !== undefined) && item.name ? (
+                {formatter && item?.value !== undefined && item.name ? (
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
