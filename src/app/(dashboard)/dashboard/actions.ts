@@ -17,7 +17,6 @@ export async function AddnewIncome(data: IncomeFormData) {
   })
   revalidateTag("totalIncome")
   revalidateTag("getAllData")
-  revalidateTag("getTransactions")
   return newIncome ? "success" : "error"
 }
 
@@ -40,6 +39,5 @@ export async function AddnewExpense(data: ExpenseFormData) {
 
   revalidateTag("totalExpense")
   revalidateTag("getAllData")
-  revalidateTag("getTransactions")
   return newExpense ? "success" : "error"
 }

@@ -182,7 +182,7 @@ export function DataTable<TData, TValue>({
                   "No results."
                   :
                   <div className="flex flex-col gap-4">
-                    {[...Array(5)].map((_, index) => (
+                    {[...Array(10)].map((_, index) => (
                       <Skeleton
                         key={index}
                         className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
