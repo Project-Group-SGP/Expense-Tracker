@@ -28,8 +28,8 @@ const HistoryPage = () => {
     console.log("page delete", value);
     
     await deleteTransactions.mutateAsync({ props: value });
-    // Manually invalidate the transactions query after successful deletion
-    queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    // // Manually invalidate the transactions query after successful deletion
+    // queryClient.invalidateQueries({ queryKey: ["transactions"] });
   }
 
   return (
