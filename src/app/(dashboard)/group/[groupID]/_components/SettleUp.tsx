@@ -14,6 +14,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -25,11 +26,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { format } from "date-fns"
-import { CalendarIcon, icons, X } from "lucide-react"
+import { CalendarIcon, icons, Tag, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import * as z from "zod"
 import { toast } from "sonner"
 import { UserAvatar } from "./UserAvatar"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const formSchema = z
   .object({
@@ -44,7 +47,7 @@ const formSchema = z
         message: "Amount must be a valid number greater than 0",
       }
     ),
-    transactionDate: z.date().max(new Date(), {
+    transactionDate: z.date().refine((date) => date <= new Date(), {
       message: "Transaction date cannot be in the future",
     }),
     notes: z.string().optional(),
@@ -69,6 +72,62 @@ interface User {
   avatar?: string
 }
 
+// Enum for Category Types
+enum CategoryTypes {
+  Other = "Other",
+  Bills = "Bills",
+  Food = "Food",
+  Entertainment = "Entertainment",
+  Transportation = "Transportation",
+  EMI = "EMI",
+  Healthcare = "Healthcare",
+  Education = "Education",
+  Investment = "Investment",
+  Shopping = "Shopping",
+  Fuel = "Fuel",
+  Groceries = "Groceries",
+}
+
+// Mapping categories to emojis
+const categoryEmojis: { [key in CategoryTypes]: string } = {
+  [CategoryTypes.Other]: "🔖",
+  [CategoryTypes.Bills]: "🧾",
+  [CategoryTypes.Food]: "🍽️",
+  [CategoryTypes.Entertainment]: "🎮",
+  [CategoryTypes.Transportation]: "🚗",
+  [CategoryTypes.EMI]: "💳",
+  [CategoryTypes.Healthcare]: "🏥",
+  [CategoryTypes.Education]: "🎓",
+  [CategoryTypes.Investment]: "💼",
+  [CategoryTypes.Shopping]: "🛒",
+  [CategoryTypes.Fuel]: "⛽",
+  [CategoryTypes.Groceries]: "🛍️",
+};
+
+// Component to select and display the category
+function CategorySelector({ selectedCategory, onCategoryChange }) {
+  return (
+    <Select
+      onValueChange={onCategoryChange}
+      defaultValue={selectedCategory}
+    >
+      <SelectTrigger className="w-[200px]">
+        <SelectValue>
+          {categoryEmojis[selectedCategory]} {selectedCategory}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        {Object.keys(CategoryTypes).map((category) => (
+          <SelectItem key={category} value={category}>
+            {categoryEmojis[category]} {category}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+// Users -> which have to pay the bill from current user
 const users: User[] = [
   { id: 1, name: "Ayush Kalathiya" },
   { id: 2, name: "Sarthak" },
@@ -78,12 +137,12 @@ const users: User[] = [
   { id: 6, name: "Sarthak" },
   { id: 7, name: "Vandit" },
   { id: 8, name: "Kotak" },
-  // Add more users here
 ]
 
-// User Avatar
+// also get user Id with pending amount
 
-const UserSelectionModal: React.FC<{
+// User Avatar
+export const UserSelectionModal: React.FC<{
   isOpen: boolean
   onClose: () => void
   onSelect: (user: User) => void
@@ -125,6 +184,8 @@ export function SettleUp() {
   const [selectingFor, setSelectingFor] = useState<
     "fromUser" | "toUser" | null
   >(null)
+
+  // Set the form values -> as current user
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -183,32 +244,16 @@ export function SettleUp() {
           >
             <div className="flex items-center justify-center space-x-4">
               {/* Memeber selection */}
-              <FormField
-                control={form.control}
-                name="fromUser"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-24 w-24 rounded-full border-none p-0"
-                        onClick={() => {
-                          setSelectingFor("fromUser")
-                          setUserSelectionOpen(true)
-                        }}
-                      >
-                        <UserAvatar
-                          user={
-                            users.find((u) => u.id === field.value) || users[0]
-                          }
-                          size={85}
-                        />
-                      </Button>
-                    </FormControl>
-                  </FormItem>
-                )}
+
+              {/* assign current user */}
+              <UserAvatar
+                user={
+                  users.find((u) => u.id === form.watch("fromUser")) || users[0]
+                }
+                size={85}
               />
+
+              {/* select to user */}
               <div className="text-2xl">→</div>
               <FormField
                 control={form.control}
@@ -272,19 +317,20 @@ export function SettleUp() {
               control={form.control}
               name="transactionDate"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
+                  <FormLabel>Transaction Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant="outline"
+                          variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal sm:w-[240px]",
                             !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "MMMM d, yyyy")
+                            format(field.value, "PPP")
                           ) : (
                             <span>Pick a date</span>
                           )}
@@ -296,16 +342,10 @@ export function SettleUp() {
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={(date: Date | undefined) =>
-                          field.onChange(date)
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
                         }
-                        disabled={(date) => {
-                          console.log("Checking date:", date)
-                          console.log("Current date:", new Date())
-                          return (
-                            date > new Date() || date < new Date("1900-01-01")
-                          )
-                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -314,46 +354,7 @@ export function SettleUp() {
                 </FormItem>
               )}
             />
-            {/* <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        // Open a modal or expand a section for adding notes/images
-                      }}
-                    >
-                      Add image/notes
-                    </Button>
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
-            {/* <FormField
-              control={form.control}
-              name="group"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        // Open a modal for selecting or creating a group
-                      }}
-                    >
-                      {field.value || "No group"}
-                    </Button>
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
+
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
@@ -362,11 +363,14 @@ export function SettleUp() {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="bg-green-500 text-white hover:bg-green-600"
-              >
-                Save
+              <Button type="button" variant="outline" className="ml-2">
+                <Tag className="h-4 w-4" />
+                <CategorySelector
+                  selectedCategory={CategoryTypes.Other}
+                  onCategoryChange={(category) =>
+                    console.log("Selected category:", category)
+                  }
+                />
               </Button>
             </div>
           </form>

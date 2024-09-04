@@ -1,33 +1,23 @@
 "use client"
-
+import React, { useState } from "react"
+import { format } from "date-fns"
+import { CalendarIcon, Camera, Tag, ChevronDown, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-
 import {
   Select,
   SelectContent,
@@ -35,222 +25,179 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
-import { cn } from "@/lib/utils"
-import { CategoryTypes } from "@prisma/client"
-import { format } from "date-fns"
-import { CalendarIcon, Check, ChevronDown } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
-// import { AddnewExpense } from "../actions"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { UserSelectionModal } from "./SettleUp" // Ensure this component is correctly imported
 
-const defaultCategories = [
-  "Other",
-  "Bills",
-  "Food",
-  "Entertainment",
-  "Transportation",
-  "EMI",
-  "Healthcare",
-  "Education",
-  "Investment",
-  "Shopping",
-  "Fuel",
-  "Groceries",
-]
-
-const CategoryTypesSchema = z.nativeEnum(CategoryTypes)
-
-// form validation schema
 const formSchema = z.object({
-  description: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
   amount: z
     .string()
     .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
       message: "Amount must be a valid number greater than 0",
     }),
-  transactionDate: z.date(),
-  category: CategoryTypesSchema,
+  paidBy: z.string(),
+  date: z.date(),
+  splitType: z.enum(["Equally", "As Parts", "As Amounts"]),
+  splitWith: z
+    .array(z.string())
+    .min(1, "At least one person must be selected to split with"),
 })
 
-export type ExpenseFormData = z.infer<typeof formSchema>
-
-type NewExpenseProps = {
-  onSuccessfulAdd: () => void
-}
-
 export function AddExpense() {
-  const form = useForm<ExpenseFormData>({
+  const [open, setOpen] = useState(false) // Initialize the Dialog open state
+  const [userSelectionOpen, setUserSelectionOpen] = useState(false) // For User Selection Modal
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
+      title: "",
       amount: "",
-      transactionDate: new Date(),
+      paidBy: "Ayush (me)",
+      date: new Date(),
+      splitType: "Equally",
+      splitWith: ["Ayush (me)"],
     },
   })
 
-  // handle submit
-  const handleSubmit = async (data: ExpenseFormData) => {
-    // console.log(data)
-
-    // try {
-    //   const result = await AddnewExpense(data)
-    //   if (result === "success") {
-    //     toast.success("Expense added successfully", {
-    //       closeButton: true,
-    //       icon: "😤",
-    //       duration: 4500,
-    //     })
-
-    //     setOpen(false)
-    //     form.reset()
-    //   } else {
-    //     throw new Error("Expense not added")
-    //   }
-    // } catch (error) {
-    //   console.error("Error adding Expense:", error)
-    //   toast.error("Failed to add Expense")
-    // }
+  const onSubmit = (data) => {
+    console.log(data)
+    // Handle form submission, such as sending data to the server
   }
 
-  const [open, setOpen] = useState(false)
+  const handleUserSelect = (user) => {
+    form.setValue("paidBy", user)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div>
-        {/* New Income button */}
-        <DialogTrigger asChild>
-          <Button
-            className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
-            variant="outline"
-            onClick={() => setOpen(true)}
-          >
-            Add an Expense 😤
-          </Button>
-        </DialogTrigger>
-
-        {/* Dialog of New Income */}
-        <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-center sm:text-left">
-              Create a new <span className="text-red-500">expense</span>{" "}
-              transaction
-            </DialogTitle>
-          </DialogHeader>
-
-          {/* Form */}
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="mt-4 space-y-4"
-            >
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Amount */}
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
+      <DialogTrigger asChild>
+        <Button
+          className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          variant="outline"
+          onClick={() => setOpen(true)}
+        >
+          Add an Expense 😤
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center sm:text-left">
+            <span className="text-red-500">Add an Expense</span> 😤
+          </DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Title</FormLabel>
+                  <div className="flex">
                     <FormControl>
                       <Input
-                        placeholder="Enter amount"
-                        type="number"
-                        step="0.01"
+                        placeholder="E.g. Drinks"
                         {...field}
+                        className="flex-grow"
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <Button type="button" variant="outline" className="ml-2">
+                      <Tag className="h-4 w-4" />
+                      
+                    </Button>
+                  </div>
+                </FormItem>
+              )}
+            />
 
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Amount</FormLabel>
+                  <div className="flex">
+                    <Select
+                      defaultValue="₹"
+                      onValueChange={(val) =>
+                        console.log(`Currency changed to ${val}`)
+                      }
+                    >
+                      <SelectTrigger className="w-[60px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="₹">₹</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        {...field}
+                        className="ml-2 flex-grow"
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-between">
               <FormField
                 control={form.control}
-                name="category"
+                name="paidBy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-between"
-                          >
-                            {field.value || "Select a category"}
-                            <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full">
-                          <ScrollArea className="h-52 w-full">
-                            {defaultCategories.map((category) => (
-                              <DropdownMenuItem
-                                key={category}
-                                onSelect={() => field.onChange(category)}
-                              >
-                                <Check
-                                  className={`mr-2 h-4 w-4 ${
-                                    category === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  }`}
-                                />
-                                {category}
-                              </DropdownMenuItem>
-                            ))}
-                          </ScrollArea>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </FormControl>
-                    <FormMessage />
+                    <FormLabel>Paid By</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger
+                        className="w-[140px]"
+                        onClick={() => setUserSelectionOpen(true)}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Ayush (me)">Ayush (me)</SelectItem>
+                        {/* Add other options as needed */}
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />
 
-              {/* Transaction Date */}
               <FormField
                 control={form.control}
-                name="transactionDate"
+                name="date"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Transaction Date</FormLabel>
+                  <FormItem>
+                    <FormLabel>When</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant={"outline"}
+                            variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal sm:w-[240px]",
+                              "w-[180px] pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
+                            {field.value
+                              ? format(field.value, "MMMM d, yyyy")
+                              : "Pick a date"}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
@@ -260,27 +207,77 @@ export function AddExpense() {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
                           initialFocus
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className="w-full sm:w-auto">
-                  Add Expense
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </div>
+
+            <FormField
+              control={form.control}
+              name="splitType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Split</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Switch
+                        id="split-type-switch"
+                        className="mr-2"
+                        checked={field.value !== "Equally"}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked ? "As Parts" : "Equally")
+                        }
+                      />
+                      <label htmlFor="split-type-switch">Ayush (me)</label>
+                    </div>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Equally">Equally</SelectItem>
+                        <SelectItem value="As Parts">As Parts</SelectItem>
+                        <SelectItem value="As Amounts">As Amounts</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-end space-x-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-green-500 text-white hover:bg-green-600"
+              >
+                Add Expense
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+      <UserSelectionModal
+        isOpen={userSelectionOpen}
+        onClose={() => setUserSelectionOpen(false)}
+        onSelect={handleUserSelect}
+      />
     </Dialog>
   )
 }
+
+export default AddExpense
