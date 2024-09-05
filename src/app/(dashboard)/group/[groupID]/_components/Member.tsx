@@ -3,23 +3,34 @@ import { CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { IndianRupee, LucideIcon } from 'lucide-react'
 import React from 'react'
-
-type CateroyCardType = {
-
-};
+import { UserAvatar } from './UserAvatar'
 
 
-export const Member = ({ name, status, amount, amountColor, avatarColor }) => {
+
+interface MemberProps {
+  name: string;
+  status: string;
+  amount: string;
+  amountColor: string;
+  avatar: string;
+  userId: string;
+}
+
+export const Member = ({ name,
+  status,
+  amount,
+  amountColor,
+  avatar,
+  userId, }: MemberProps) => {
   return (
     <CardContent className="flex w-full m-2 flex-col gap-3 rounded-xl border p-5 shadow dark:bg-Neutral-100">
       <section className="flex justify-between gap-2">
         {/* Avatar and Name Section */}
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div
-            className="w-10 h-10 rounded-full"
-            style={{ backgroundColor: avatarColor }}
-          ></div>
+          {/* <UserAvatar  */}
+          <UserAvatar user={{ id: parseInt(userId), name, avatar }} size={40} />
+          
           {/* Name and Status */}
           <div className="flex flex-col">
             <span className="text-lg font-medium">{name}</span>
@@ -38,4 +49,31 @@ export const Member = ({ name, status, amount, amountColor, avatarColor }) => {
   );
 };
 
+
+
+
+
+
+
+// export const Member: React.FC<MemberProps> = ({
+//   name,
+//   status,
+//   amount,
+//   amountColor,
+//   avatar,
+//   userId,
+// }) => {
+//   return (
+//     <div className="flex items-center space-x-4">
+      
+//       <div className="flex flex-col">
+//         <p className="text-lg font-semibold">{name}</p>
+//         <p className="text-sm">{status}</p>
+//       </div>
+//       <p className={`text-sm font-semibold`} style={{ color: amountColor }}>
+//         {amount}
+//       </p>
+//     </div>
+//   );
+// };
 

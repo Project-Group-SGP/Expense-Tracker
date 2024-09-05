@@ -61,19 +61,19 @@ type FormSchema = z.infer<typeof formSchema>;
 interface User {
   id: number;
   name: string;
-  avatar?: string;
+  avatar: string;
 }
 
 // Users -> which have to pay the bill from current user
 const users: User[] = [
-  { id: 1, name: "Ayush Kalathiya" },
-  { id: 2, name: "Sarthak" },
-  { id: 3, name: "Meet" },
-  { id: 4, name: "Mit" },
-  { id: 5, name: "Ayush Kalathiya" },
-  { id: 6, name: "Sarthak" },
-  { id: 7, name: "Vandit" },
-  { id: 8, name: "Kotak" },
+  { id: 1, name: "Ayush b Kalathiya" , avatar:""},
+  { id: 2, name: "Sarthak A Mayani",avatar:"" },
+  { id: 3, name: "Meet",avatar:"" },
+  { id: 4, name: "Mit",avatar:"" },
+  { id: 5, name: "Ayush Kalathiya",avatar:"" },
+  { id: 6, name: "Sarthak",avatar:"" },
+  { id: 7, name: "Vandit",avatar:"" },
+  { id: 8, name: "Kotak",avatar:"" },
 ];
 
 // User Avatar
