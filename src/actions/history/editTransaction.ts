@@ -16,15 +16,37 @@ export const editTransaction = async(values:z.infer<typeof editTransactionProps>
   if (validationeddFields.error)
     return { error: "Invalid fields!"};
 
-  // try{
-  //   //  singledeleteProps
-  
-  // }
+  const transaction = validationeddFields.data.transaction;
 
-  //   return {success:"Successfully updated!!"};
-    
-  // }catch(e){
-  //   console.error("Error updating transaction:", e)
-  //   return { error:"Failed to updating transaction"};
-  // }
+  console.log("\n\n\nEdit transactions",transaction);
+
+  const find = {id:transaction.id,userId:transaction.userId};
+  try{
+    if(values.type==="Income"){
+      const update = {amount:transaction.amount, date:transaction.transactionDate,description:transaction.describe};
+      await db.income.update({
+        where:{
+          ...find,
+        },
+        data:{
+          ...update,
+        }
+      });
+    }else{
+      const update = {amount:transaction.amount, date:transaction.transactionDate,description:transaction.describe
+        ,category:transaction.category};
+      await db.expense.update({
+        where:{
+          ...find,
+        },
+        data:{
+          ...update,
+        }
+      });
+    }
+    return {success:"Successfully updated!!"};
+  }catch(e){
+    console.error("Error updating transaction:", e)
+    return { error:"Failed to updating transaction"};
+  }
 }

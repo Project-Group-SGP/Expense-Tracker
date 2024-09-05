@@ -14,7 +14,7 @@ export async function AddnewIncome(data: IncomeFormData) {
   const newIncome = await db.income.create({
     data: { userId: user?.id, amount, date: transactionDate, description },
   })
-  revalidateTag("getTransactions")
+  // revalidateTag("getTransactions")
   return newIncome ? "success" : "error"
 }
 
@@ -34,6 +34,6 @@ export async function AddnewExpense(data: ExpenseFormData) {
       category,
     },
   })
-  revalidateTag("getTransactions")
+  // revalidateTag("getTransactions")
   return newExpense ? "success" : "error"
 }

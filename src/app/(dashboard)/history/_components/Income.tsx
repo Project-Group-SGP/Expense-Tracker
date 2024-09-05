@@ -34,6 +34,7 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { AddnewIncome } from "../action"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useSearchParams } from "next/navigation"
 
 // form validation schema
 const formSchema = z.object({
@@ -51,6 +52,9 @@ export type IncomeFormData = z.infer<typeof formSchema>
 export function Newincome() {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
+  const params = useSearchParams();
+  const from = params.get("from") || "";
+  const to = params.get("to") || "";
 
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -70,9 +74,9 @@ export function Newincome() {
         duration: 4500,
       })
       setOpen(false)
-      form.reset()
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["transactions",from,to] })
+      form.reset()
     },
     onError: (error) => {
       console.error("Error adding income:", error)

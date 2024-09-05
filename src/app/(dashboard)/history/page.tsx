@@ -9,8 +9,13 @@ import { useGetTransactions } from "./_hooks/use-get-transactions"
 import { useBulkDeleteTransaction } from "./_hooks/use-bulk-delete-transactions"
 import DatePicker from "./_components/DatePicker"
 import { useQueryClient } from "@tanstack/react-query"
+import { useSearchParams } from "next/navigation"
 
 const HistoryPage = () => {
+  const params = useSearchParams();
+  const from = params.get("from") || "";
+  const to = params.get("to") || "";
+
   const queryClient = useQueryClient();
 
   const transactionsQuery = useGetTransactions();
@@ -29,7 +34,7 @@ const HistoryPage = () => {
     
     await deleteTransactions.mutateAsync({ props: value });
     // // Manually invalidate the transactions query after successful deletion
-    // queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    queryClient.invalidateQueries({ queryKey: ["transactions",from,to] });
   }
 
   return (

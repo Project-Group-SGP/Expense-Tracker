@@ -42,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useSearchParams } from "next/navigation"
 
 const defaultCategories = [
   "Other",
@@ -76,6 +77,9 @@ export type ExpenseFormData = z.infer<typeof formSchema>
 export function NewExpense() {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
+  const params = useSearchParams();
+  const from = params.get("from") || "";
+  const to = params.get("to") || "";
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -95,9 +99,9 @@ export function NewExpense() {
         duration: 4500,
       })
       setOpen(false)
-      form.reset()
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["transactions",from,to] })
+      form.reset()
     },
     onError: (error) => {
       console.error("Error adding expense:", error)

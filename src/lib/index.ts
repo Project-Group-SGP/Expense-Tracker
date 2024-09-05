@@ -1,3 +1,5 @@
+import { CategoryTypes } from "@prisma/client"
+import { describe } from "node:test"
 import * as z from "zod"
 
 const passwordValidation = new RegExp(
@@ -81,12 +83,24 @@ export const singledeleteProps = z.object({
   category: z.enum(["Income", "Expense"]),
 })
 
+// export const editTransactionProps = z.object({
+//   id: z.string(),
+//   category: z.enum(["Income", "Expense"]),
+//   props: z.object({
+//     amount: z.optional(z.number()),
+//     date: z.optional(z.date()),
+//     description: z.optional(z.string()),
+//   }),
+// })
+
 export const editTransactionProps = z.object({
-  id: z.string(),
-  category: z.enum(["Income", "Expense"]),
-  props: z.object({
-    amount: z.optional(z.number()),
-    date: z.optional(z.date()),
-    description: z.optional(z.string()),
+  transaction : z.object({
+    id: z.string(),
+    userId: z.string(),
+    category: z.optional(z.nativeEnum(CategoryTypes)),
+    amount: z.string(),
+    transactionDate: z.date(),
+    describe: z.string(),
   }),
+  type: z.enum(["Expense", "Income"]),
 })

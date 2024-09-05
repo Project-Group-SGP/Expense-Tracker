@@ -36,6 +36,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Trash } from "lucide-react"
+import DeleteButton from "./_components/Deletebutton";
+import { TableSkeleton } from "./_components/TableSkeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -106,9 +108,10 @@ export function DataTable<TData, TValue>({
           className="max-w-sm mr-2"
         />
         {table.getFilteredSelectedRowModel().rows.length> 0 && (
-          <Button size={"sm"} variant={"outline" } className="ml-auto font-normal text-xs" disabled={disabled} onClick={HandleOnclick}>
-          <Trash className="mr-2 size-4"/>  Delete ({table.getFilteredSelectedRowModel().rows.length})
-          </Button>
+          <DeleteButton disabled={disabled} handleOnClick={HandleOnclick} selectedCount={table.getFilteredSelectedRowModel().rows.length}/>
+          // <Button size={"sm"} variant={"outline" } className="ml-auto font-normal text-xs" disabled={disabled} onClick={HandleOnclick}>
+          // <Trash className="mr-2 size-4"/>  Delete ({table.getFilteredSelectedRowModel().rows.length})
+          // </Button>
         )}
         {table.getFilteredSelectedRowModel().rows.length === 0 && (
         <DropdownMenu>
@@ -183,13 +186,13 @@ export function DataTable<TData, TValue>({
                   :
                   <div className="flex flex-col gap-4">
                     {[...Array(10)].map((_, index) => (
-                      <Skeleton
-                        key={index}
-                        className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
-                      />
+                      // <Skeleton
+                      //   key={index}
+                      //   className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
+                      // />
+                      <TableSkeleton/>
                     ))}
                 </div>}
-                No results.
               </TableCell>
             </TableRow>
           )}
