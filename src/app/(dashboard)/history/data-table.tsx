@@ -188,7 +188,7 @@ export function DataTable<TData, TValue>({
                       //   key={index}
                       //   className="mt-2 h-10 w-full bg-gray-200 dark:bg-gray-700"
                       // />
-                      <TableSkeleton/>
+                      <TableSkeleton key={index}/>
                     ))}
                 </div>}
               </TableCell>

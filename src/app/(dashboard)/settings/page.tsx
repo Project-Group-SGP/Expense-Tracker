@@ -428,10 +428,14 @@ function PushSubscriptionToggleButton() {
     try {
       if (enabled) {
         await registerPushNotifications()
-        toast.success("Push notifications enabled")
+        toast.success("Push notifications enabled", {
+          closeButton: true,
+        })
       } else {
         await unregisterPushNotification()
-        toast.success("Push notifications disabled")
+        toast.success("Push notifications disabled", {
+          closeButton: true,
+        })
       }
       setHasActivePushSubscription(enabled)
     } catch (error) {
@@ -441,7 +445,9 @@ function PushSubscriptionToggleButton() {
           "Please enable push notifications in your browser settings"
         )
       } else {
-        toast.error("Something went wrong, please try again later")
+        toast.error("Something went wrong, please try again later", {
+          closeButton: true,
+        })
       }
     } finally {
       setIsToggling(false)
