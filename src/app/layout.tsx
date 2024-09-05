@@ -7,9 +7,51 @@ import { Toaster } from "@/components/ui/sonner"
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
 export const metadata: Metadata = {
-  title: "Expense Tracker",
-  description: "Track your expenses with simplicity and effectively",
+  title: "Spendwise - Expense Tracker",
+  description:
+    "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
   manifest: "/manifest.json",
+  referrer: "origin-when-cross-origin",
+  keywords: [
+    "expense tracker",
+    "budget planner",
+    "finance management",
+    "personal finance",
+    "spending analysis",
+  ],
+  authors: [{ name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani" }],
+  creator: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
+  openGraph: {
+    type: "website",
+    url: process.env.BASE_URL,
+    title: "Spendwise - Expense Tracker",
+    description:
+      "Easily log and categorize your expenses, set budgets, and track your spending habits.",
+    siteName: "Spendwise - Expense Tracker",
+    images: [
+      {
+        url: "/og_image.png",
+        width: 1200,
+        height: 630,
+        alt: "Spendwise Expense Tracker",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Spendwise - Expense Tracker",
+    description:
+      "Easily log and categorize your expenses, set budgets, and track your spending habits.",
+    images: ["/og_image.png"],
+  },
+  alternates: {
+    canonical: process.env.BASE_URL,
+    languages: {
+      "en-US": "/en-US",
+      "es-ES": "/es-ES",
+    },
+  },
+  category: "Finance",
 }
 
 export default function RootLayout({
@@ -19,7 +61,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <meta name="theme-color" content="#2D9E5D" />
       <body className={poppins.className}>
         <Providers>
           {children}
