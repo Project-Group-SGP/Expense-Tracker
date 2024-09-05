@@ -4,10 +4,10 @@ import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import PageTitle from "../../dashboard/_components/PageTitle"
 
-import { SettleUp } from "./_components/SettleUp"
-import { AddExpense } from "./_components/AddExpense"
 import { Cardcontent } from "../../dashboard/_components/Card"
+import { AddExpense } from "./_components/AddExpense"
 import GroupMember from "./_components/GroupMember"
+import { SettleUp } from "./_components/SettleUp"
 import Transaction from "./_components/Transaction"
 
 export default async function GroupPage({
@@ -21,7 +21,7 @@ export default async function GroupPage({
   }
   const group = await db.group.findUnique({
     where: { id: params.groupID, members: { some: { userId: user.id } } },
-  })
+  });
   // console.log("Group Details : ");
   // console.log(group);
 

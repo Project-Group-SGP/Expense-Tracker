@@ -52,7 +52,10 @@ export default async function GroupManagementPage() {
         },
       },
     },
-  })
+  });
+
+ 
+  
 
   const createdGroupsData: CreatedGroup[] = createdGroups.map((group) => ({
     id: group.id,
@@ -75,6 +78,8 @@ export default async function GroupManagementPage() {
       },
     },
   })) as MemberGroup[]
+
+ 
 
   const pendingRequests = (await db.joinRequest.findMany({
     where: {

@@ -14,6 +14,10 @@ export async function GET(request: Request) {
             id: user.id,
           },
         });
+        console.log("inside getGroup route");
+        
+        console.log( group );
+        
         return NextResponse.json(group);
       }
     } catch (error) {    

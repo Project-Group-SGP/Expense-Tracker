@@ -2,31 +2,29 @@
 
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  useReactTable,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  VisibilityState,
-  Row,
-} from "@tanstack/react-table"
+  useReactTable,
+  VisibilityState
+} from "@tanstack/react-table";
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
-import { bulkdeleteProps } from "@/lib/index";
-import { Skeleton } from "@/components/ui/skeleton"
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,8 +32,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Trash } from "lucide-react"
+} from "@/components/ui/table";
+import { Trash } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

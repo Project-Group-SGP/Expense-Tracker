@@ -1,21 +1,40 @@
-"use client"
-
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-// Adjust the path based on your file structure
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { UserSelectionModal } from "./SettleUp"; // Ensure this component is correctly imported
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 // Enum for Category Types
@@ -34,27 +53,8 @@ enum CategoryTypes {
   Groceries = "Groceries",
 }
 
-// form schema
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  amount: z
-    .string()
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a valid number greater than 0",
-    }),
-  paidBy: z.string(),
-  date: z.date(),
-  splitType: z.enum(["Equally", "As Parts", "As Amounts"]),
-  splitWith: z
-    .array(z.string())
-    .min(1, "At least one person must be selected to split with"),
-  category: z.nativeEnum(CategoryTypes) // Add category to the form schema
-});
-
-
-
 // Mapping categories to emojis
-const categoryEmojis: Record<CategoryTypes, string> = {
+const categoryEmojis = {
   [CategoryTypes.Other]: "🔖",
   [CategoryTypes.Bills]: "🧾",
   [CategoryTypes.Food]: "🍽️",
@@ -69,29 +69,33 @@ const categoryEmojis: Record<CategoryTypes, string> = {
   [CategoryTypes.Groceries]: "🛍️",
 }
 
-interface CategorySelectorProps {
-  selectedCategory: CategoryTypes;
-  onCategoryChange: (value: CategoryTypes) => void;
-}
+// Form schema
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  amount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+    message: "Amount must be a valid number greater than 0",
+  }),
+  paidBy: z.string(),
+  date: z.date(),
+  splitType: z.enum(["Equally", "As Amounts"]),
+  splitWith: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      included: z.boolean(),
+      amount: z.number().optional(),
+    })
+  ).min(1, "At least one person must be selected to split with"),
+  category: z.nativeEnum(CategoryTypes),
+});
 
-function CategorySelector({ selectedCategory, onCategoryChange }: CategorySelectorProps) {
-  const [localCategory, setLocalCategory] = useState(selectedCategory);
-
-  useEffect(() => {
-    setLocalCategory(selectedCategory);
-  }, [selectedCategory]);
-
-  const handleChange = (value: string) => {
-    const category = CategoryTypes[value as keyof typeof CategoryTypes];
-    setLocalCategory(category);
-    onCategoryChange(category);
-  };
-
+// category selector
+const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
   return (
-    <Select value={localCategory} onValueChange={handleChange}>
+    <Select value={selectedCategory} onValueChange={onCategoryChange}>
       <SelectTrigger className="w-[70px]">
         <SelectValue>
-          {categoryEmojis[localCategory] || "Select a category"}
+          {categoryEmojis[selectedCategory] || "Select a category"}
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="h-60">
@@ -103,13 +107,19 @@ function CategorySelector({ selectedCategory, onCategoryChange }: CategorySelect
       </SelectContent>
     </Select>
   );
-}
+};
 
-
-// AddExpense
 export function AddExpense() {
   const [open, setOpen] = useState(false);
-  const [userSelectionOpen, setUserSelectionOpen] = useState(false);
+  
+  // state for members
+  const [members, setMembers] = useState([
+    { id: 1, name: "Ayush (me)", included: true, isMe: true, amount: 0 },
+    { id: 2, name: "Sarthak", included: true, isMe: false, amount: 0 },
+    { id: 3, name: "Vandit", included: true, isMe: false, amount: 0 },
+    { id: 4, name: "Kotak", included: true, isMe: false, amount: 0 },
+  ]);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -118,26 +128,53 @@ export function AddExpense() {
       paidBy: "Ayush (me)",
       date: new Date(),
       splitType: "Equally",
-      splitWith: ["Ayush (me)"],
-      category: CategoryTypes.Food, // Default category value
+      splitWith: members,
+      category: CategoryTypes.Food,
     },
   });
 
-  // Handle form submission
-  const onSubmit = (data) => {
-    console.log(data);
-    // Handle form submission, such as sending data to the server
-    setOpen(false);
+  const watchAmount = form.watch("amount");
+  const watchSplitType = form.watch("splitType");
+
+  useEffect(() => {
+    const totalAmount = parseFloat(watchAmount) || 0;
+    const splitType = watchSplitType;
+
+    const includedMembers = members.filter(m => m.included);
+    let updatedMembers = [...members];
+
+    if (splitType === "Equally") {
+      const splitAmount = totalAmount / includedMembers.length;
+      updatedMembers = updatedMembers.map(member => ({
+        ...member,
+        amount: member.included ? splitAmount : 0,
+      }));
+    } 
+    
+
+    const hasChanged = JSON.stringify(members) !== JSON.stringify(updatedMembers);
+    if (hasChanged) {
+      setMembers(updatedMembers);
+      form.setValue("splitWith", updatedMembers);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchAmount, watchSplitType]);
+
+  const handleMemberToggle = (id, included) => {
+    const updatedMembers = members.map(m =>
+      m.id === id ? { ...m, included } : m
+    );
+    setMembers(updatedMembers);
   };
 
-  // Handle user selection
-  const handleUserSelect = (user) => {
-    form.setValue("paidBy", user);
+  const onSubmit = (data) => {
+    console.log(data);
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      
       <DialogTrigger asChild>
         <Button
           className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
@@ -147,45 +184,44 @@ export function AddExpense() {
           Add an Expense 😤
         </Button>
       </DialogTrigger>
-      
-      <DialogContent className="sm:max-w-[425px]">
+
+      <DialogContent className="h-[90vh] overflow-y-auto scale-2 sm:w-[450px]">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             <span className="text-red-500">Add an Expense</span> 😤
           </DialogTitle>
         </DialogHeader>
-        
-        {/* from */}
+
+      {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            
-            {/* Title */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="h-full space-y-4">
+            {/* category */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Title</FormLabel>
+                  <FormLabel className="text-white">Description</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input
-                        placeholder="E.g. Drinks"
-                        {...field}
-                        className="flex-grow"
-                      />
+                      <Input placeholder="E.g. Drinks" {...field} className="flex-grow" />
                     </FormControl>
-                    
-                      <CategorySelector
-                        selectedCategory={form.getValues("category")}
-                        onCategoryChange={(category) => form.setValue("category", category)}
-                      />
-                   
+                    <Controller
+                      name="category"
+                      control={form.control}
+                      render={({ field }) => (
+                        <CategorySelector
+                          selectedCategory={field.value}
+                          onCategoryChange={field.onChange}
+                        />
+                      )}
+                    />
                   </div>
                 </FormItem>
               )}
             />
 
-            {/* Amount */}
+              {/* amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -193,25 +229,16 @@ export function AddExpense() {
                 <FormItem>
                   <FormLabel className="text-white">Amount</FormLabel>
                   <div className="flex">
-                    <Select
-                      defaultValue="₹"
-                      onValueChange={(val) =>
-                        console.log(`Currency changed to ${val}`)
-                      }
-                    >
-                      <SelectTrigger className="w-[60px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="₹">₹</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">₹</div>
                     <FormControl>
                       <Input
                         type="number"
                         placeholder="0.00"
                         {...field}
                         className="ml-2 flex-grow"
+                        onChange={(e) => {
+                          field.onChange(e);
+                        }}
                       />
                     </FormControl>
                   </div>
@@ -219,8 +246,8 @@ export function AddExpense() {
               )}
             />
 
-            {/* Paid By */}
-            <div className="flex justify-between">
+            {/* paid by */}
+            <div className="flex items-end space-x-4">
               <FormField
                 control={form.control}
                 name="paidBy"
@@ -231,22 +258,22 @@ export function AddExpense() {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger
-                        className="w-[140px]"
-                        onClick={() => setUserSelectionOpen(true)}
-                      >
-                        <SelectValue />
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select user" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Ayush (me)">Ayush (me)</SelectItem>
-                        {/* Add other options as needed */}
+                        {members.map((member) => (
+                          <SelectItem key={member.id} value={member.name}>
+                            {member.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormItem>
                 )}
               />
 
-
+              {/* date */}
               <FormField
                 control={form.control}
                 name="date"
@@ -275,6 +302,9 @@ export function AddExpense() {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -284,28 +314,19 @@ export function AddExpense() {
               />
             </div>
 
-
-            {/* Split Type */}
+            {/* split type */}
             <FormField
               control={form.control}
               name="splitType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Split</FormLabel>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Switch
-                        id="split-type-switch"
-                        className="mr-2"
-                        checked={field.value !== "Equally"}
-                        onCheckedChange={(checked) =>
-                          field.onChange(checked ? "As Parts" : "Equally")
-                        }
-                      />
-                      <label htmlFor="split-type-switch">Ayush (me)</label>
-                    </div>
+                  <div className="mb-4 flex items-center justify-between">
+                  
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
                       defaultValue={field.value}
                     >
                       <SelectTrigger className="w-[120px]">
@@ -313,17 +334,55 @@ export function AddExpense() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Equally">Equally</SelectItem>
-                        <SelectItem value="As Parts">As Parts</SelectItem>
                         <SelectItem value="As Amounts">As Amounts</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    {members.map((member) => (
+                      <div key={member.id} className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Switch
+                            id={`member-${member.id}`}
+                            className="mr-2"
+                            checked={member.included}
+                            onCheckedChange={(checked) =>
+                              handleMemberToggle(member.id, checked)
+                            }
+                          />
+                          <label htmlFor={`member-${member.id}`}>
+                            {member.name} {member.isMe && "(me)"}
+                          </label>
+                        </div>
+                        <div>
+                          {watchSplitType === "As Amounts" ? (
+                            <Input
+                              type="number"
+                              value={member.amount}
+                              onChange={(e) => {
+                                const updatedMembers = members.map((m) =>
+                                  m.id === member.id
+                                    ? { ...m, amount: parseFloat(e.target.value) }
+                                    : m
+                                );
+                                setMembers(updatedMembers);
+                                form.setValue("splitWith", updatedMembers);
+                              }}
+                              className="w-20"
+                            />
+                          ) : (
+                            `₹${member.amount.toFixed(2)}`
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </FormItem>
               )}
             />
 
-
-            {/* Buttons */}
+            {/* Button */}
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
@@ -343,11 +402,6 @@ export function AddExpense() {
           </form>
         </Form>
       </DialogContent>
-      {/* <UserSelectionModal
-        isOpen={userSelectionOpen}
-        onClose={() => setUserSelectionOpen(false)}
-        onSelect={handleUserSelect}
-      /> */}
     </Dialog>
   );
 }
