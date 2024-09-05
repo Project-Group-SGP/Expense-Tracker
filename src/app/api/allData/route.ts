@@ -1,22 +1,29 @@
+import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams
-    const userId = searchParams.get("userId")
+    // const userId = searchParams.get("userId")
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")
 
-    if (!userId || typeof userId !== "string") {
-      console.log("No user ID provided")
-      return NextResponse.json(
-        { error: "User ID Not Provided" },
-        { status: 400 }
-      )
+    const user = await currentUserServer()
+
+    if (!user || !user.id) {
+      return NextResponse.json({ error: "User Not Found" }, { status: 400 })
     }
 
-    let whereClause: any = { userId: userId }
+    // if (!userId || typeof userId !== "string") {
+    //   console.log("No user ID provided")
+    //   return NextResponse.json(
+    //     { error: "User ID Not Provided" },
+    //     { status: 400 }
+    //   )
+    // }
+
+    let whereClause: any = { userId: user.id }
 
     if (startDate && endDate) {
       const start = new Date(startDate)
