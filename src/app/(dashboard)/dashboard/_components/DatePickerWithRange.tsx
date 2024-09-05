@@ -36,7 +36,11 @@ export function DatePickerWithRange({
     // Fetch the join date from the server
     const fetchJoinDate = async () => {
       try {
-        const response = await fetch("/api/joinin-date")
+        const response = await fetch("/api/joinin-date", {
+          method: "GET",
+          next: { tags: ["joinin-date"] },
+          cache: "force-cache",
+        })
         const data = await response.json()
 
         if (data.joininDate) {
