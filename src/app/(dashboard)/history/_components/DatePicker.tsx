@@ -25,7 +25,7 @@ const DatePicker = () => {
         })
       }
     } catch (error) {
-      console.error("Error n date:", error)
+      // console.error("Error n date:", error)
     }
   }, [router])
 
