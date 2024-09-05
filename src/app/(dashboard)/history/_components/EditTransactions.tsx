@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { editTransaction } from "@/actions/history/editTransaction";
 import { useSearchParams } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"; 
+import { Description } from '@radix-ui/react-dialog';
 
 const defaultCategories = [
   "Other", "Bills", "Food", "Entertainment", "Transportation",
@@ -53,6 +54,7 @@ type EditTransactionProps = {
   };
   type: 'Expense' | 'Income';
 };
+
 
 export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, type }) => {
   const [open, setOpen] = React.useState(false);
@@ -97,7 +99,16 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    editMutation.mutate(data);
+    if (
+      data.description === transaction.description &&
+      data.amount === transaction.amount.toString() &&
+      //@ts-ignore
+      ((new Date(data.transactionDate).toISOString())===transaction.date)
+    ) {
+      toast.info("No changes are Made!!");
+    }else{
+      editMutation.mutate(data);
+    }
   };
 
   return (

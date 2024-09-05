@@ -8,7 +8,7 @@ export const useGetTransaction = (id:string,category:categoryprop) => {
     enabled:!!id,
     queryKey:["transactions",{id}],
     queryFn: async () => {  
-      const responce = await fetch(`${process.env.BASE_URL}/api/history/singletransaction?id=${id}&category=${category}`,{
+      const responce = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history/singletransaction?id=${id}&category=${category}`,{
         cache:"no-cache",
         next:{tags: ["getTransaction"] }
       })

@@ -136,5 +136,4 @@ export const columns: ColumnDef<ResponceType>[] = [
       return <EditTransaction transaction={{...row.original,amount}} type={row.original.category==="Income" ? "Income" : "Expense"} />
     },
   },
-
 ]

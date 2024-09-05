@@ -10,7 +10,7 @@ export const useGetTransactions = () => {
     queryKey: ["transactions", from, to],
     // queryKey: ["transactions"],
     queryFn: async () => {  
-      const response = await fetch(`http://localhost:3000/api/history/bulkdata?from=${from}&to=${to}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/history/bulkdata?from=${from}&to=${to}`, {
         cache: "no-store",
         method: "GET",
         next: { tags: ["getTransactions"] }
