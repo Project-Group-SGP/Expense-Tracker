@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/Providers/Providers"
 import { Toaster } from "@/components/ui/sonner"
+import Script from "next/script"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -44,14 +45,19 @@ export const metadata: Metadata = {
       "Easily log and categorize your expenses, set budgets, and track your spending habits.",
     images: ["/og_image.png"],
   },
-  alternates: {
-    canonical: process.env.BASE_URL,
-    languages: {
-      "en-US": "/en-US",
-      "es-ES": "/es-ES",
+  viewport: "width=device-width, initial-scale=1.0",
+  category: "Finance",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
-  category: "Finance",
 }
 
 export default function RootLayout({
@@ -67,6 +73,25 @@ export default function RootLayout({
           <Toaster richColors />
         </Providers>
       </body>
+      <Script type="application/ld+json">
+        {`
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": "Spendwise - Expense Tracker",
+      "url": "${process.env.BASE_URL}",
+      "description": "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
+      "creator": {
+        "@type": "Person",
+        "name": "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani"
+      },
+    }
+  `}
+      </Script>
     </html>
   )
 }
