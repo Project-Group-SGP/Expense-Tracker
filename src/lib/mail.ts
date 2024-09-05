@@ -1,8 +1,7 @@
 import nodemailer from "nodemailer";
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const VerificationLink = `http://localhost:3000/auth/new-verification?token=${token}`;
-
+  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -57,7 +56,7 @@ export async function sendVerificationEmail(email: string, token: string) {
 
 // RESET PASSWORD EMAIL
 export const sendPasswordResetEmail = async(email:string,token:string) => {
-  const resetLink = `http://localhost:3000/auth/new-password?token=${token}`;
+  const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
