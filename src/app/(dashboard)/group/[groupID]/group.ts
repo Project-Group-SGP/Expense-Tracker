@@ -61,3 +61,29 @@ export async function AddGroupExpense(params: {
 
     return { success: true };
 }
+
+// add settle up
+export async function settleUp(params: {
+    groupID: string,
+    userId: string,
+    amount: number
+}){
+
+    const user = await currentUserServer();
+    if (!user) {    
+        throw new Error("Login Please");
+    }
+
+    const groupMembers = await db.groupMember.findMany({
+        where: {
+            groupId: params.groupID 
+        }
+    });
+
+    // Check if the user is a member of the group
+    if (groupMembers.some(member => member.id.toString() == params.userId.toString())) {
+        throw new Error("User is not a member of the group");
+    }
+
+    // Create the settle up record
+}

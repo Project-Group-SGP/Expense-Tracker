@@ -3,12 +3,23 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import PageTitle from "../../dashboard/_components/PageTitle";
-
 import { Cardcontent } from "../../dashboard/_components/Card";
 import { AddExpense } from "./_components/AddExpense";
 import { GroupMember } from "./_components/GroupMember";
 import { SettleUp } from "./_components/SettleUp";
 import Transaction from "./_components/Transaction";
+
+// Define types for the Group and GroupMember
+interface Group {
+  id: string;
+  name: string;
+}
+
+interface GroupMember {
+  userId: string;
+  name: string;
+  avatar: string;
+}
 
 export default async function GroupPage({
   params,
@@ -19,7 +30,7 @@ export default async function GroupPage({
   if (!user) {
     redirect("/auth/signin");
   }
-  
+
   const group = await db.group.findUnique({
     where: { id: params.groupID, members: { some: { userId: user.id } } },
   });
@@ -29,15 +40,13 @@ export default async function GroupPage({
   }
 
   // Get group members
-  const groupMember = await db.groupMember.findMany({
-    where: {
-      groupId: params.groupID,
-    },
+  const groupMembers = await db.groupMember.findMany({
+    where: { groupId: params.groupID },
   });
 
-  // Get group members' name and avatar
-  const groupMemberName = await Promise.all(
-    groupMember.map(async (member) => {
+  // Get group members' names and avatars
+  const groupMemberName: GroupMember[] = await Promise.all(
+    groupMembers.map(async (member) => {
       const user = await db.user.findUnique({
         where: { id: member.userId },
         select: { name: true, image: true },
@@ -50,10 +59,8 @@ export default async function GroupPage({
     })
   );
 
-  console.log(groupMemberName);
-
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title={group.name} />
@@ -68,12 +75,12 @@ export default async function GroupPage({
               👋
             </p>
             <div className="ml-auto flex gap-2">
-              <AddExpense 
+              <AddExpense
                 params={{ groupID: params.groupID }}
-                groupMemberName={groupMemberName} // Correct prop name
-                user={user.id} 
+                groupMemberName={groupMemberName}
+                user={user.id}
               />
-              <SettleUp />
+              <SettleUp groupMemberName={groupMemberName} />
             </div>
           </div>
 

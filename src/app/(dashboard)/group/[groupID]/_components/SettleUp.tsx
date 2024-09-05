@@ -32,8 +32,8 @@ import { UserAvatar } from "./UserAvatar";
 // Define the form schema using Zod
 const formSchema = z
   .object({
-    fromUser: z.number().min(1, "Please select a valid payer."),
-    toUser: z.number().min(1, "Please select a valid recipient."),
+    fromUser: z.string().min(1, "Please select a valid payer."),
+    toUser: z.string().min(1, "Please select a valid recipient."),
     amount: z.string().refine(
       (val) => {
         const parsed = parseFloat(val);
@@ -51,37 +51,29 @@ const formSchema = z
   })
   .refine((data) => data.fromUser !== data.toUser, {
     message: "Payer and recipient cannot be the same person",
-    path: ["toUser"], // Add the error to the 'toUser' field
+    path: ["toUser"],
   });
 
 // Define types for the form schema
 type FormSchema = z.infer<typeof formSchema>;
 
-// Define the User interface
-interface User {
-  id: number;
+interface GroupMember {
+  userId: string;
   name: string;
   avatar: string;
 }
 
-// Users -> which have to pay the bill from current user
-const users: User[] = [
-  { id: 1, name: "Ayush b Kalathiya" , avatar:""},
-  { id: 2, name: "Sarthak A Mayani",avatar:"" },
-  { id: 3, name: "Meet",avatar:"" },
-  { id: 4, name: "Mit",avatar:"" },
-  { id: 5, name: "Ayush Kalathiya",avatar:"" },
-  { id: 6, name: "Sarthak",avatar:"" },
-  { id: 7, name: "Vandit",avatar:"" },
-  { id: 8, name: "Kotak",avatar:"" },
-];
+// Define the User interface
+interface SettleUpProps {
+  groupMemberName: GroupMember[];
+}
 
-// User Avatar
 export const UserSelectionModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (user: User) => void;
-}> = ({ isOpen, onClose, onSelect }) => {
+  onSelect: (user: GroupMember) => void;
+  groupMemberName: GroupMember[];
+}> = ({ isOpen, onClose, onSelect, groupMemberName }) => {
   if (!isOpen) return null;
 
   return (
@@ -92,9 +84,9 @@ export const UserSelectionModal: React.FC<{
         </DialogHeader>
         <div className="max-h-[50vh] overflow-y-auto pb-5">
           <div className="grid grid-cols-2 gap-4">
-            {users.map((user) => (
+            {groupMemberName.map((user) => (
               <Button
-                key={user.id}
+                key={user.userId}
                 variant="outline"
                 className="flex h-full items-center justify-start space-x-2 p-2"
                 onClick={() => {
@@ -113,7 +105,7 @@ export const UserSelectionModal: React.FC<{
   );
 };
 
-export function SettleUp() {
+export function SettleUp({ groupMemberName }: SettleUpProps) {
   const [open, setOpen] = useState(false);
   const [userSelectionOpen, setUserSelectionOpen] = useState(false);
   const [selectingFor, setSelectingFor] = useState<"fromUser" | "toUser" | null>(null);
@@ -122,8 +114,8 @@ export function SettleUp() {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fromUser: users[0].id,
-      toUser: users[1].id,
+      fromUser: groupMemberName[0]?.userId || "",
+      toUser: groupMemberName[1]?.userId || "",
       amount: "",
       transactionDate: new Date(),
       notes: "",
@@ -155,9 +147,9 @@ export function SettleUp() {
   };
 
   // Handle user selection
-  const handleUserSelect = (user: User) => {
+  const handleUserSelect = (user: GroupMember) => {
     if (selectingFor) {
-      form.setValue(selectingFor, user.id);
+      form.setValue(selectingFor, user.userId);
     }
     setUserSelectionOpen(false);
   };
@@ -168,7 +160,7 @@ export function SettleUp() {
         <Button
           className="w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
           variant="outline"
-          onClick={() => setOpen(true)} // Open the dialog
+          onClick={() => setOpen(true)}
         >
           Settle up 🤝
         </Button>
@@ -183,10 +175,11 @@ export function SettleUp() {
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="flex items-center justify-center space-x-4">
               <UserAvatar
-                user={users.find((u) => u.id === form.watch("fromUser")) || users[0]}
+                user={groupMemberName.find((u) => u.userId === form.watch("fromUser")) || groupMemberName[0]}
                 size={85}
               />
               <div className="text-2xl">→</div>
+              
               <FormField
                 control={form.control}
                 name="toUser"
@@ -203,7 +196,7 @@ export function SettleUp() {
                         }}
                       >
                         <UserAvatar
-                          user={users.find((u) => u.id === field.value) || users[1]}
+                          user={groupMemberName.find((u) => u.userId === field.value) || groupMemberName[1]}
                           size={85}
                         />
                       </Button>
@@ -215,11 +208,11 @@ export function SettleUp() {
             </div>
             <div className="text-center">
               <span className="text-green-500">
-                {users.find((u) => u.id === form.watch("fromUser"))?.name}
+                {groupMemberName.find((u) => u.userId === form.watch("fromUser"))?.name}
               </span>{" "}
               paid{" "}
               <span className="text-blue-500">
-                {users.find((u) => u.id === form.watch("toUser"))?.name}
+                {groupMemberName.find((u) => u.userId === form.watch("toUser"))?.name}
               </span>
             </div>
             <FormField
@@ -299,6 +292,7 @@ export function SettleUp() {
         isOpen={userSelectionOpen}
         onClose={() => setUserSelectionOpen(false)}
         onSelect={handleUserSelect}
+        groupMemberName={groupMemberName}
       />
     </Dialog>
   );

@@ -1,43 +1,43 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+"use client"
+import React, { useState, useEffect } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { AddGroupExpense } from "../requests/group";
-import { toast } from "sonner";
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+import { AddGroupExpense } from "../group"
+import { toast } from "sonner"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -74,22 +74,26 @@ const categoryEmojis = {
 // Form schema
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  amount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Amount must be a valid number greater than 0",
-  }),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a valid number greater than 0",
+    }),
   paidBy: z.string(),
   date: z.date(),
   splitType: z.enum(["Equally", "As Amounts"]),
-  splitWith: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      included: z.boolean(),
-      amount: z.number().optional(),
-    })
-  ).min(1, "At least one person must be selected to split with"),
+  splitWith: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        included: z.boolean(),
+        amount: z.number().optional(),
+      })
+    )
+    .min(1, "At least one person must be selected to split with"),
   category: z.nativeEnum(CategoryTypes),
-});
+})
 
 // category selector
 const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
@@ -108,19 +112,19 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
         ))}
       </SelectContent>
     </Select>
-  );
-};
+  )
+}
 
 export function AddExpense({
   params,
   groupMemberName,
-  user
+  user,
 }: {
-  params: { groupID: string },
-  groupMemberName: { userId: string; name: string; avatar: string }[],
+  params: { groupID: string }
+  groupMemberName: { userId: string; name: string; avatar: string }[]
   user: string
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   // State for members
   const [members, setMembers] = useState<
@@ -132,7 +136,7 @@ export function AddExpense({
       isMe: boolean
       amount: number
     }[]
-  >([]);
+  >([])
 
   useEffect(() => {
     setMembers(
@@ -144,8 +148,8 @@ export function AddExpense({
         isMe: member.userId === user,
         amount: 0,
       }))
-    );
-  }, [groupMemberName, user]);
+    )
+  }, [groupMemberName, user])
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -213,6 +217,8 @@ export function AddExpense({
       amount: member.amount || 0,
     }))
 
+    const loading = toast.loading("Adding Expense...")
+    setOpen(false)
     try {
       const response = await AddGroupExpense({
         groupID: groupId,
@@ -229,10 +235,16 @@ export function AddExpense({
           closeButton: true,
           icon: "😤",
           duration: 4500,
+          id: loading,
         })
-        setOpen(false)
       } else {
-        console.error("Failed to add expense")
+        console.error("Failed to Add Expense")
+
+        toast.error("Error Adding Expense", {
+          closeButton: true,
+          icon: "❌",
+          duration: 4500,
+        })
       }
     } catch (error) {
       console.error("Error adding expense:", error)
