@@ -80,7 +80,7 @@ model Expense {
   date        DateTime
   description String?
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  
   @@index([userId, category, date])
 }
 

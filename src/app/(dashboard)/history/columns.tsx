@@ -8,14 +8,13 @@ import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+import { EditTransaction } from "./_components/EditTransactions"
 export type ResponceType = {
   category: CategoryTypes | 'Income';
-  id ?: string;
-  userId ?: string;
+  id : string;
+  userId : string;
   amount: number;
-  date: string;
+  date: Date;
   description: string | null;
 };
 
@@ -115,6 +114,27 @@ export const columns: ColumnDef<ResponceType>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell:({row}) => {
+      if(row.original.description === null)
+        return <></>
+      
+      return (
+        <span>
+          {row.original.description.length>20?row.original.description?.slice(0,19)+"..." :row.original.description}
+        </span>
+      )
+    }
+  },
+  {
+    id: "Edit",
+    accessorKey: "Edit",
+    header: "Edit",
+    cell: ({ row }) => {
+      let amount = row.original.amount;
+      if(row.original.category!=="Income")
+        amount = -1*amount;
+      return <EditTransaction transaction={{...row.original,amount}} type={row.original.category==="Income" ? "Income" : "Expense"} />
+    },
   },
 
 ]

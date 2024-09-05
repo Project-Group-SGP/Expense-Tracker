@@ -19,7 +19,8 @@ const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
       const res = await fetch(
-        `${process.env.BASE_URL}/api/totalIncome?userId=${id}`,
+        // `${process.env.BASE_URL}/api/totalIncome?userId=${id}`,
+        `${process.env.BASE_URL}/api/totalIncome`,
         {
           method: "GET",
           headers: { Cookie: cookie },
@@ -30,7 +31,7 @@ const getTotalIncome = cache(
       const data = await res.json()
       return { amount: Number(data) || 0 }
     } catch (error) {
-      console.error("Error fetching total income:", error)
+      // console.error("Error fetching total income:", error)
       return { amount: 0 }
     }
   }
@@ -40,7 +41,8 @@ const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
       const res = await fetch(
-        `${process.env.BASE_URL}/api/totalExpense?userId=${id}`,
+        // `${process.env.BASE_URL}/api/totalExpense?userId=${id}`,
+        `${process.env.BASE_URL}/api/totalExpense`,
         {
           method: "GET",
           headers: { Cookie: cookie },
@@ -51,7 +53,7 @@ const getTotalExpense = cache(
       const data = await res.json()
       return { amount: Number(data) || 0 }
     } catch (error) {
-      console.error("Error fetching total expense:", error)
+      // console.error("Error fetching total expense:", error)
       return { amount: 0 }
     }
   }
@@ -89,7 +91,9 @@ const getAllData = cache(
   ): Promise<FinancialData_> => {
     try {
       const res = await fetch(
-        `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
+        // `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
+        `${process.env.BASE_URL}/api/allData?&startDate=${startDate}&endDate=${endDate}`,
+
         {
           method: "GET",
           headers: { Cookie: cookie },
@@ -102,7 +106,7 @@ const getAllData = cache(
       const data: FinancialData_ = await res.json()
       return data
     } catch (error) {
-      console.error("Error fetching data:", error)
+      // console.error("Error fetching data:", error)
       return { expense: [], income: [] }
     }
   }
@@ -157,8 +161,6 @@ export default async function Dashboard({
               <NewExpense />
             </div>
           </div>
-
-       
 
           <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card
