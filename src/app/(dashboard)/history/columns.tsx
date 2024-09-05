@@ -126,7 +126,7 @@ export const columns: ColumnDef<ResponceType>[] = [
     }
   },
   {
-    id: "actions",
+    id: "Edit",
     accessorKey: "Edit",
     header: "Edit",
     cell: ({ row }) => {
