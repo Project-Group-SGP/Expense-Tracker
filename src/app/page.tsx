@@ -110,6 +110,7 @@ export default async function Home() {
                 width={900}
                 height={900}
                 alt="Financial management illustration"
+                priority
               />
             </div>
           </div>

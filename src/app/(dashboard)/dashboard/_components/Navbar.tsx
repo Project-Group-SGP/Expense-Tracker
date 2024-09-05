@@ -62,7 +62,7 @@ const Navbar = () => {
                 <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
               </Button>
               </form> */}
-              <UserButton />
+            <UserButton />
           </div>
         </div>
       </div>

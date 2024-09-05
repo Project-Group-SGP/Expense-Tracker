@@ -73,7 +73,7 @@ export default function RootLayout({
           <Toaster richColors />
         </Providers>
       </body>
-      <Script type="application/ld+json">
+      <Script type="application/ld+json" id="schema">
         {`
     {
       "@context": "http://schema.org",
