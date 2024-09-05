@@ -30,7 +30,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden justify-center gap-11 md:flex">
+        {/* <div className="hidden justify-center gap-11 md:flex">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
@@ -40,7 +40,7 @@ const Navbar = () => {
               {label}
             </Link>
           ))}
-        </div>
+        </div> */}
 
         {/* Action Buttons */}
         <div className="flex space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">

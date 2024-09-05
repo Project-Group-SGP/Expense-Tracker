@@ -36,6 +36,7 @@ export function PendingJoinRequests({
       router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
+      router.refresh()
     }
   }
 
@@ -47,6 +48,7 @@ export function PendingJoinRequests({
       router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
+      router.refresh()
     }
   }
 

@@ -1,73 +1,79 @@
-"use client";
-import * as React from "react";
-import { format, subMonths, isBefore, startOfTomorrow, parseISO } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+"use client"
+import * as React from "react"
+import {
+  format,
+  subMonths,
+  isBefore,
+  startOfTomorrow,
+  parseISO,
+} from "date-fns"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"
 
 export function DatePickerWithRange({
   className,
   onDateRangeChange,
   defaultDateRange,
 }: React.HTMLAttributes<HTMLDivElement> & {
-  onDateRangeChange?: (dateRange: DateRange | undefined) => void;
-  defaultDateRange?: DateRange;
+  onDateRangeChange?: (dateRange: DateRange | undefined) => void
+  defaultDateRange?: DateRange
 }) {
   const [date, setDate] = React.useState<DateRange>({
     from: undefined,
     to: new Date(),
-  });
-  
+  })
+
   // ṣet start date to joing Date
   React.useEffect(() => {
     // Fetch the join date from the server
     const fetchJoinDate = async () => {
       try {
-        const response = await fetch('/api/joinin-date');
-        const data = await response.json();
-  
+        const response = await fetch("/api/joinin-date")
+        const data = await response.json()
+
         if (data.joininDate) {
-          const joinDate = parseISO(data.joininDate);
+          const joinDate = parseISO(data.joininDate)
           setDate({
             from: joinDate,
             to: new Date(),
-          });
+          })
         }
       } catch (error) {
-        console.error('Error fetching join date:', error);
+        // console.error('Error fetching join date:', error);
       }
-    };
-  
-    fetchJoinDate();
-  }, []);
+    }
+
+    fetchJoinDate()
+  }, [])
 
   const handleSelect = (range: DateRange | undefined) => {
     if (range) {
       if (!range.from) {
-        range.from = range.to;
+        range.from = range.to
       } else if (!range.to) {
-        range.to = range.from;
+        range.to = range.from
       }
-      setDate(range);
+      setDate(range)
     }
-  };
+  }
 
   React.useEffect(() => {
     if (onDateRangeChange) {
-      onDateRangeChange(date);
+      onDateRangeChange(date)
     }
-  }, [date, onDateRangeChange]);
+  }, [date, onDateRangeChange])
 
   const disabledDays = {
     after: new Date(),
-  };
+  }
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -109,5 +115,5 @@ export function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
-  );
+  )
 }

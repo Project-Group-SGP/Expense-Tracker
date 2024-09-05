@@ -1,50 +1,49 @@
-"use client"
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { format } from "date-fns"
-import { CalendarIcon, icons, X } from "lucide-react"
-import { cn } from "@/lib/utils"
-import * as z from "zod"
-import { toast } from "sonner"
-import { UserAvatar } from "./UserAvatar"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import * as z from "zod";
+import { toast } from "sonner";
+import { UserAvatar } from "./UserAvatar";
 
+// Define the form schema using Zod
 const formSchema = z
   .object({
     fromUser: z.number().min(1, "Please select a valid payer."),
     toUser: z.number().min(1, "Please select a valid recipient."),
     amount: z.string().refine(
       (val) => {
-        const parsed = parseFloat(val)
-        return !isNaN(parsed) && parsed > 0
+        const parsed = parseFloat(val);
+        return !isNaN(parsed) && parsed > 0;
       },
       {
         message: "Amount must be a valid number greater than 0",
       }
     ),
-    transactionDate: z.date().max(new Date(), {
+    transactionDate: z.date().refine((date) => date <= new Date(), {
       message: "Transaction date cannot be in the future",
     }),
     notes: z.string().optional(),
@@ -53,22 +52,19 @@ const formSchema = z
   .refine((data) => data.fromUser !== data.toUser, {
     message: "Payer and recipient cannot be the same person",
     path: ["toUser"], // Add the error to the 'toUser' field
-  })
+  });
 
-type FormSchema = z.infer<typeof formSchema>
+// Define types for the form schema
+type FormSchema = z.infer<typeof formSchema>;
 
+// Define the User interface
 interface User {
-  id: number
-  name: string
-  avatar?: string
+  id: number;
+  name: string;
+  avatar?: string;
 }
 
-interface User {
-  id: number
-  name: string
-  avatar?: string
-}
-
+// Users -> which have to pay the bill from current user
 const users: User[] = [
   { id: 1, name: "Ayush Kalathiya" },
   { id: 2, name: "Sarthak" },
@@ -78,17 +74,15 @@ const users: User[] = [
   { id: 6, name: "Sarthak" },
   { id: 7, name: "Vandit" },
   { id: 8, name: "Kotak" },
-  // Add more users here
-]
+];
 
 // User Avatar
-
-const UserSelectionModal: React.FC<{
-  isOpen: boolean
-  onClose: () => void
-  onSelect: (user: User) => void
+export const UserSelectionModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (user: User) => void;
 }> = ({ isOpen, onClose, onSelect }) => {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -104,8 +98,8 @@ const UserSelectionModal: React.FC<{
                 variant="outline"
                 className="flex h-full items-center justify-start space-x-2 p-2"
                 onClick={() => {
-                  onSelect(user)
-                  onClose()
+                  onSelect(user);
+                  onClose();
                 }}
               >
                 <UserAvatar user={user} size={40} />
@@ -116,16 +110,15 @@ const UserSelectionModal: React.FC<{
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export function SettleUp() {
-  const [open, setOpen] = useState(false)
-  const [userSelectionOpen, setUserSelectionOpen] = useState(false)
-  const [selectingFor, setSelectingFor] = useState<
-    "fromUser" | "toUser" | null
-  >(null)
+  const [open, setOpen] = useState(false);
+  const [userSelectionOpen, setUserSelectionOpen] = useState(false);
+  const [selectingFor, setSelectingFor] = useState<"fromUser" | "toUser" | null>(null);
 
+  // Initialize the form
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -136,28 +129,38 @@ export function SettleUp() {
       notes: "",
       group: "No group",
     },
-  })
+  });
 
-  // handle submit
+  // Handle form submission
   const handleSubmit = async (data: FormSchema) => {
-    console.log("Form submitted:", data)
+    try {
+      console.log("Form submitted:", data);
 
-    toast.success("Settling up... ", {
-      closeButton: true,
-      icon: "🤝",
-      duration: 4500,
-    })
+      toast.success("Settling up...", {
+        closeButton: true,
+        icon: "🤝",
+        duration: 4500,
+      });
 
-    form.reset()
+      form.reset();
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error settling up", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
+      });
+    }
+  };
 
-    setOpen(false)
-  }
-
+  // Handle user selection
   const handleUserSelect = (user: User) => {
     if (selectingFor) {
-      form.setValue(selectingFor, user.id)
+      form.setValue(selectingFor, user.id);
     }
-  }
+    setUserSelectionOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -165,7 +168,7 @@ export function SettleUp() {
         <Button
           className="w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
           variant="outline"
-          onClick={() => setOpen(false)}
+          onClick={() => setOpen(true)} // Open the dialog
         >
           Settle up 🤝
         </Button>
@@ -177,37 +180,11 @@ export function SettleUp() {
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="flex items-center justify-center space-x-4">
-              {/* Memeber selection */}
-              <FormField
-                control={form.control}
-                name="fromUser"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-24 w-24 rounded-full border-none p-0"
-                        onClick={() => {
-                          setSelectingFor("fromUser")
-                          setUserSelectionOpen(true)
-                        }}
-                      >
-                        <UserAvatar
-                          user={
-                            users.find((u) => u.id === field.value) || users[0]
-                          }
-                          size={85}
-                        />
-                      </Button>
-                    </FormControl>
-                  </FormItem>
-                )}
+              <UserAvatar
+                user={users.find((u) => u.id === form.watch("fromUser")) || users[0]}
+                size={85}
               />
               <div className="text-2xl">→</div>
               <FormField
@@ -221,14 +198,12 @@ export function SettleUp() {
                         variant="outline"
                         className="h-24 w-24 rounded-full border-none p-0"
                         onClick={() => {
-                          setSelectingFor("toUser")
-                          setUserSelectionOpen(true)
+                          setSelectingFor("toUser");
+                          setUserSelectionOpen(true);
                         }}
                       >
                         <UserAvatar
-                          user={
-                            users.find((u) => u.id === field.value) || users[1]
-                          }
+                          user={users.find((u) => u.id === field.value) || users[1]}
                           size={85}
                         />
                       </Button>
@@ -247,8 +222,6 @@ export function SettleUp() {
                 {users.find((u) => u.id === form.watch("toUser"))?.name}
               </span>
             </div>
-
-            {/* Amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -266,28 +239,23 @@ export function SettleUp() {
                 </FormItem>
               )}
             />
-
-            {/* Transaction Date */}
             <FormField
               control={form.control}
               name="transactionDate"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
+                  <FormLabel>Transaction Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant="outline"
+                          variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal sm:w-[360px]",
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value ? (
-                            format(field.value, "MMMM d, yyyy")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
+                          {field.value ? format(field.value, "PPP") : "Pick a date"}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -296,16 +264,10 @@ export function SettleUp() {
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={(date: Date | undefined) =>
-                          field.onChange(date)
+                        onSelect={(date) => field.onChange(date)}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
                         }
-                        disabled={(date) => {
-                          console.log("Checking date:", date)
-                          console.log("Current date:", new Date())
-                          return (
-                            date > new Date() || date < new Date("1900-01-01")
-                          )
-                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -314,46 +276,6 @@ export function SettleUp() {
                 </FormItem>
               )}
             />
-            {/* <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        // Open a modal or expand a section for adding notes/images
-                      }}
-                    >
-                      Add image/notes
-                    </Button>
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
-            {/* <FormField
-              control={form.control}
-              name="group"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        // Open a modal for selecting or creating a group
-                      }}
-                    >
-                      {field.value || "No group"}
-                    </Button>
-                  </FormControl>
-                </FormItem>
-              )}
-            /> */}
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
@@ -364,9 +286,10 @@ export function SettleUp() {
               </Button>
               <Button
                 type="submit"
-                className="bg-green-500 text-white hover:bg-green-600"
+                variant="outline"
+                className="ml-2 border-green-500 text-green-500 hover:bg-green-600"
               >
-                Save
+                Settle up
               </Button>
             </div>
           </form>
@@ -378,7 +301,7 @@ export function SettleUp() {
         onSelect={handleUserSelect}
       />
     </Dialog>
-  )
+  );
 }
 
-export default SettleUp
+export default SettleUp;

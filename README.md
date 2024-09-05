@@ -40,6 +40,8 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - Fast, secure, and scalable
 - Clean and intuitive interface
 - Dark Mode support
+- Web Push Notifications
+- Group Expense Splitting
 
 ### Tech Stack
 
@@ -55,6 +57,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - Nodemailer (Emails): Enables sending emails from the application, useful for notifications and reports.
 - tanstack/react-query (React Query): Manages server-state and caching, improving data fetching and synchronization.
 - next-themes (Theme management): Provides support for dark mode and theme switching, enhancing the user experience.
+- web-push (Web Push Notifications): Enables sending push notifications to users' devices for important updates and reminders.
 
 ### Development
 

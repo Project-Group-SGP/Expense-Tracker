@@ -49,9 +49,9 @@ export async function acceptJoinRequest(groupId: string, requestId: string) {
       }),
     ])
 
-    await sendJoinAcceptedNotification(group.name, joinRequest.userId, groupId)
+    sendJoinAcceptedNotification(group.name, joinRequest.userId, groupId)
 
-    await sendJoinNotificationToGroupMembers(
+    sendJoinNotificationToGroupMembers(
       group.name,
       joinRequest.userId,
       groupId,
@@ -88,12 +88,20 @@ export async function declineJoinRequest(groupId: string, requestId: string) {
       }
     }
 
+    const userId = await db.joinRequest.findUnique({
+      where: { id: requestId },
+      select: { userId: true },
+    })
+
+    if (!userId) {
+      return { success: false, message: "Join request not found." }
+    }
     // Decline the join request by updating its status
     await db.joinRequest.delete({
       where: { id: requestId },
     })
 
-    await sendRejectNotification(group.name, user.id)
+    sendRejectNotification(group.name, userId.userId)
 
     return { success: true, message: "Join request declined." }
   } catch (error) {
