@@ -6,7 +6,7 @@ interface GroupMember {
 
 export const UserAvatar: React.FC<{ user: GroupMember; size?: number }> = ({
   user,
-  size = 40, // Set a default size
+  size = 45, // Set a default size
 }) => {
   if (user.avatar) {
     return (
@@ -29,13 +29,29 @@ export const UserAvatar: React.FC<{ user: GroupMember; size?: number }> = ({
     .map((n) => n[0])
     .join('')
     .toUpperCase();
+  
+    
 
-  // Ensure color calculation works with string IDs
-  const color = `hsl(${((parseInt(user.userId, 10) * 100) % 360) + 30}, 70%, 50%)`;
+// Hash function to generate a numeric value from a string
+const hashStringToNumber = (str) => {
+  if (!str) return 0;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash &= hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash); // Ensure the hash is a positive number
+};
+
+// Use the hash function to compute the color
+const color = `hsl(${((hashStringToNumber(user.userId) * 100) % 360) + 30}, 70%, 50%)`;
+
+
 
   return (
     <div
-      className="flex items-center justify-center rounded-full text-white font-bold"
+      className="flex items-center justify-center rounded-full text-white"
       style={{
         width: size,
         height: size,

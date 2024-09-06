@@ -156,7 +156,7 @@ export function AddExpense({
     defaultValues: {
       title: "",
       amount: "",
-      paidBy: "Ayush (me)",
+      paidBy: user,
       date: new Date(),
       splitType: "Equally",
       splitWith: members,

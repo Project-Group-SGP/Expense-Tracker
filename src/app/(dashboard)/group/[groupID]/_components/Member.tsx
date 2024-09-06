@@ -29,7 +29,7 @@ export const Member = ({ name,
         <div className="flex items-center gap-3">
           {/* Avatar */}
           {/* <UserAvatar  */}
-          <UserAvatar user={{ id: parseInt(userId), name, avatar }} size={40} />
+          <UserAvatar user={{ userId, name, avatar }} size={40} />
           
           {/* Name and Status */}
           <div className="flex flex-col">
@@ -50,30 +50,4 @@ export const Member = ({ name,
 };
 
 
-
-
-
-
-
-// export const Member: React.FC<MemberProps> = ({
-//   name,
-//   status,
-//   amount,
-//   amountColor,
-//   avatar,
-//   userId,
-// }) => {
-//   return (
-//     <div className="flex items-center space-x-4">
-      
-//       <div className="flex flex-col">
-//         <p className="text-lg font-semibold">{name}</p>
-//         <p className="text-sm">{status}</p>
-//       </div>
-//       <p className={`text-sm font-semibold`} style={{ color: amountColor }}>
-//         {amount}
-//       </p>
-//     </div>
-//   );
-// };
 
