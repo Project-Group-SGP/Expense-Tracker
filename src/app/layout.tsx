@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/Providers/Providers"
@@ -6,6 +6,13 @@ import { Toaster } from "@/components/ui/sonner"
 import Script from "next/script"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export const metadata: Metadata = {
   title: "Spendwise - Expense Tracker",
@@ -45,7 +52,6 @@ export const metadata: Metadata = {
       "Easily log and categorize your expenses, set budgets, and track your spending habits.",
     images: ["/og_image.png"],
   },
-  viewport: "width=device-width, initial-scale=1.0",
   category: "Finance",
   robots: {
     index: true,
