@@ -135,9 +135,9 @@ export async function settleUp(params: {
     
     const paymentAmount = params.amount;
     
-    if (paymentAmount > remainingAmount) {
-      throw new Error("Payment amount exceeds the remaining unpaid portion.");
-    }
+    // if (paymentAmount > remainingAmount) {
+    //   throw new Error("Payment amount exceeds the remaining unpaid portion.");
+    // }
     
     // Create a payment record
     await db.payment.create({

@@ -215,7 +215,6 @@ export function SettleUp({
           closeButton: true,
           icon: "🤝",
           duration: 4500,
-          id: loading,
         })
 
         form.reset() // Reset the form fields

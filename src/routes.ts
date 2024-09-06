@@ -53,6 +53,7 @@ export const apiRoutes = [
   "/api/register-push",
   "/api/history/bulkdata",
   "/api/history/singletransaction",
+  "/api/getGroup",
 ]
 
 export const privateRoutes = [
