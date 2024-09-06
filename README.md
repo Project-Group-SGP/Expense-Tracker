@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/HQABOAl.jpg" width="200" height="200" />
+  <img src="https://i.imgur.com/AOMmh8Z.jpg" width="200" height="200" />
 </p>
 
 <div align="center">
@@ -42,6 +42,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - Dark Mode support
 - Web Push Notifications
 - Group Expense Splitting
+- Progressive Web App
 
 ### Tech Stack
 
@@ -58,6 +59,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - tanstack/react-query (React Query): Manages server-state and caching, improving data fetching and synchronization.
 - next-themes (Theme management): Provides support for dark mode and theme switching, enhancing the user experience.
 - web-push (Web Push Notifications): Enables sending push notifications to users' devices for important updates and reminders.
+- next-pwa (Progressive Web App): Adds support for progressive web apps, enabling offline functionality and improved user experience.
 
 ### Development
 
