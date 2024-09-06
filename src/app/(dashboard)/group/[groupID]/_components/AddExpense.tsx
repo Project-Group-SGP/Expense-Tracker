@@ -1,41 +1,43 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+"use client"
+import React, { useState, useEffect } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+import { AddGroupExpense } from "../group"
+import { toast } from "sonner"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -72,22 +74,26 @@ const categoryEmojis = {
 // Form schema
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  amount: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Amount must be a valid number greater than 0",
-  }),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a valid number greater than 0",
+    }),
   paidBy: z.string(),
   date: z.date(),
   splitType: z.enum(["Equally", "As Amounts"]),
-  splitWith: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string(),
-      included: z.boolean(),
-      amount: z.number().optional(),
-    })
-  ).min(1, "At least one person must be selected to split with"),
+  splitWith: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        included: z.boolean(),
+        amount: z.number().optional(),
+      })
+    )
+    .min(1, "At least one person must be selected to split with"),
   category: z.nativeEnum(CategoryTypes),
-});
+})
 
 // category selector
 const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
@@ -106,19 +112,44 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
         ))}
       </SelectContent>
     </Select>
-  );
-};
+  )
+}
 
-export function AddExpense() {
-  const [open, setOpen] = useState(false);
-  
-  // state for members
-  const [members, setMembers] = useState([
-    { id: 1, name: "Ayush (me)", included: true, isMe: true, amount: 0 },
-    { id: 2, name: "Sarthak", included: true, isMe: false, amount: 0 },
-    { id: 3, name: "Vandit", included: true, isMe: false, amount: 0 },
-    { id: 4, name: "Kotak", included: true, isMe: false, amount: 0 },
-  ]);
+export function AddExpense({
+  params,
+  groupMemberName,
+  user,
+}: {
+  params: { groupID: string }
+  groupMemberName: { userId: string; name: string; avatar: string }[]
+  user: string
+}) {
+  const [open, setOpen] = useState(false)
+
+  // State for members
+  const [members, setMembers] = useState<
+    {
+      id: string
+      name: string
+      avatar: string
+      included: boolean
+      isMe: boolean
+      amount: number
+    }[]
+  >([])
+
+  useEffect(() => {
+    setMembers(
+      groupMemberName.map((member) => ({
+        id: member.userId,
+        name: member.name,
+        avatar: member.avatar,
+        included: true,
+        isMe: member.userId === user,
+        amount: 0,
+      }))
+    )
+  }, [groupMemberName, user])
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -131,47 +162,94 @@ export function AddExpense() {
       splitWith: members,
       category: CategoryTypes.Food,
     },
-  });
+  })
 
-  const watchAmount = form.watch("amount");
-  const watchSplitType = form.watch("splitType");
+  const watchAmount = form.watch("amount")
+  const watchSplitType = form.watch("splitType")
 
   useEffect(() => {
-    const totalAmount = parseFloat(watchAmount) || 0;
-    const splitType = watchSplitType;
+    const totalAmount = parseFloat(watchAmount) || 0
+    const splitType = watchSplitType
 
-    const includedMembers = members.filter(m => m.included);
-    let updatedMembers = [...members];
+    const includedMembers = members.filter((m) => m.included)
+    let updatedMembers = [...members]
 
     if (splitType === "Equally") {
-      const splitAmount = totalAmount / includedMembers.length;
-      updatedMembers = updatedMembers.map(member => ({
+      const splitAmount = totalAmount / includedMembers.length
+      updatedMembers = updatedMembers.map((member) => ({
         ...member,
         amount: member.included ? splitAmount : 0,
-      }));
-    } 
-    
+      }))
+    }
 
-    const hasChanged = JSON.stringify(members) !== JSON.stringify(updatedMembers);
+    const hasChanged =
+      JSON.stringify(members) !== JSON.stringify(updatedMembers)
     if (hasChanged) {
-      setMembers(updatedMembers);
-      form.setValue("splitWith", updatedMembers);
+      setMembers(updatedMembers)
+      form.setValue("splitWith", updatedMembers)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchAmount, watchSplitType]);
+  }, [watchAmount, watchSplitType])
 
-  const handleMemberToggle = (id, included) => {
-    const updatedMembers = members.map(m =>
+  const handleMemberToggle = (id: string, included: boolean) => {
+    const updatedMembers = members.map((m) =>
       m.id === id ? { ...m, included } : m
-    );
-    setMembers(updatedMembers);
-  };
+    )
+    setMembers(updatedMembers)
+    form.setValue("splitWith", updatedMembers)
+  }
 
-  const onSubmit = (data) => {
-    console.log(data);
-    setOpen(false);
-  };
+  // Form submission
+  const onSubmit = async (data) => {
+    console.log(data)
+
+    const groupId = params.groupID
+    const paidById = members.find((member) => member.name === data.paidBy)?.id
+
+    if (!paidById) {
+      console.error("PaidBy user ID not found")
+      return
+    }
+
+    const splits = data.splitWith.map((member) => ({
+      userId: member.id,
+      amount: member.amount || 0,
+    }))
+
+    const loading = toast.loading("Adding Expense...")
+    setOpen(false)
+    try {
+      const response = await AddGroupExpense({
+        groupID: groupId,
+        paidById: String(paidById),
+        title: data.title,
+        amount: parseFloat(data.amount),
+        date: data.date,
+        category: data.category,
+        splits: splits,
+      })
+
+      if (response.success) {
+        toast.success("Expense added successfully", {
+          closeButton: true,
+          icon: "😤",
+          duration: 4500,
+          id: loading,
+        })
+      } else {
+        console.error("Failed to Add Expense")
+
+        toast.error("Error Adding Expense", {
+          closeButton: true,
+          icon: "❌",
+          duration: 4500,
+        })
+      }
+    } catch (error) {
+      console.error("Error adding expense:", error)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -185,16 +263,19 @@ export function AddExpense() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="h-[90vh] overflow-y-auto scale-2 sm:w-[450px]">
+      <DialogContent className="scale-2 h-[90vh] overflow-y-auto sm:w-[450px]">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             <span className="text-red-500">Add an Expense</span> 😤
           </DialogTitle>
         </DialogHeader>
 
-      {/* Form */}
+        {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="h-full space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="h-full space-y-4"
+          >
             {/* category */}
             <FormField
               control={form.control}
@@ -204,15 +285,21 @@ export function AddExpense() {
                   <FormLabel className="text-white">Description</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input placeholder="E.g. Drinks" {...field} className="flex-grow" />
+                      <Input
+                        placeholder="E.g. Drinks"
+                        {...field}
+                        className="flex-grow"
+                      />
                     </FormControl>
                     <Controller
                       name="category"
                       control={form.control}
                       render={({ field }) => (
                         <CategorySelector
-                          selectedCategory={field.value}
-                          onCategoryChange={field.onChange}
+                          selectedCategory={form.watch("category")}
+                          onCategoryChange={(value) =>
+                            form.setValue("category", value)
+                          }
                         />
                       )}
                     />
@@ -221,7 +308,7 @@ export function AddExpense() {
               )}
             />
 
-              {/* amount */}
+            {/* amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -229,7 +316,9 @@ export function AddExpense() {
                 <FormItem>
                   <FormLabel className="text-white">Amount</FormLabel>
                   <div className="flex">
-                    <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">₹</div>
+                    <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">
+                      ₹
+                    </div>
                     <FormControl>
                       <Input
                         type="number"
@@ -237,7 +326,7 @@ export function AddExpense() {
                         {...field}
                         className="ml-2 flex-grow"
                         onChange={(e) => {
-                          field.onChange(e);
+                          field.onChange(e)
                         }}
                       />
                     </FormControl>
@@ -322,10 +411,9 @@ export function AddExpense() {
                 <FormItem>
                   <FormLabel>Split</FormLabel>
                   <div className="mb-4 flex items-center justify-between">
-                  
                     <Select
                       onValueChange={(value) => {
-                        field.onChange(value);
+                        field.onChange(value)
                       }}
                       defaultValue={field.value}
                     >
@@ -341,7 +429,10 @@ export function AddExpense() {
 
                   <div className="space-y-2">
                     {members.map((member) => (
-                      <div key={member.id} className="flex items-center justify-between">
+                      <div
+                        key={member.id}
+                        className="flex items-center justify-between"
+                      >
                         <div className="flex items-center">
                           <Switch
                             id={`member-${member.id}`}
@@ -363,11 +454,14 @@ export function AddExpense() {
                               onChange={(e) => {
                                 const updatedMembers = members.map((m) =>
                                   m.id === member.id
-                                    ? { ...m, amount: parseFloat(e.target.value) }
+                                    ? {
+                                        ...m,
+                                        amount: parseFloat(e.target.value),
+                                      }
                                     : m
-                                );
-                                setMembers(updatedMembers);
-                                form.setValue("splitWith", updatedMembers);
+                                )
+                                setMembers(updatedMembers)
+                                form.setValue("splitWith", updatedMembers)
                               }}
                               className="w-20"
                             />
@@ -403,7 +497,7 @@ export function AddExpense() {
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
-export default AddExpense;
+export default AddExpense

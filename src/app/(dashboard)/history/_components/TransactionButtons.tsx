@@ -28,7 +28,7 @@ export function TransactionButtons() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Add transactions VIA Bank Statement</p>
+                <p>Add transaction's VIA Bank Statement</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -44,7 +44,7 @@ export function TransactionButtons() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Generate Transaction Report</p>
+                <p>Generate Transaction's Report</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

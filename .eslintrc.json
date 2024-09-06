@@ -3,6 +3,13 @@
   "rules": {
     "react/no-unescaped-entities": "off",
     "@next/next/no-img-element": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value='http://localhost:3000/']",
+        "message": "Do not use 'http://localhost:3000/'. Use environment variables or a config file instead."
+      }
+    ]
   }
 }

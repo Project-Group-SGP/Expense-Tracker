@@ -1,35 +1,66 @@
-import { currentUserServer } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { redirect } from "next/navigation"
-import { Suspense } from "react"
-import PageTitle from "../../dashboard/_components/PageTitle"
+import { currentUserServer } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import PageTitle from "../../dashboard/_components/PageTitle";
+import { Cardcontent } from "../../dashboard/_components/Card";
+import { AddExpense } from "./_components/AddExpense";
+import { GroupMember } from "./_components/GroupMember";
+import { SettleUp } from "./_components/SettleUp";
+import Transaction from "./_components/Transaction";
 
-import { Cardcontent } from "../../dashboard/_components/Card"
-import { AddExpense } from "./_components/AddExpense"
-import GroupMember from "./_components/GroupMember"
-import { SettleUp } from "./_components/SettleUp"
-import Transaction from "./_components/Transaction"
+// Define types for the Group and GroupMember
+interface Group {
+  id: string;
+  name: string;
+}
+
+interface GroupMember {
+  userId: string;
+  name: string;
+  avatar: string;
+}
 
 export default async function GroupPage({
   params,
 }: {
-  params: { groupID: string }
+  params: { groupID: string };
 }) {
-  const user = await currentUserServer()
+  const user = await currentUserServer();
   if (!user) {
-    redirect("/auth/signin")
+    redirect("/auth/signin");
   }
+
   const group = await db.group.findUnique({
     where: { id: params.groupID, members: { some: { userId: user.id } } },
   });
-  // console.log("Group Details : ");
-  // console.log(group);
 
   if (!group) {
-    redirect("/404")
+    redirect("/404");
   }
+
+  // Get group members
+  const groupMembers = await db.groupMember.findMany({
+    where: { groupId: params.groupID },
+  });
+
+  // Get group members' names and avatars
+  const groupMemberName: GroupMember[] = await Promise.all(
+    groupMembers.map(async (member) => {
+      const user = await db.user.findUnique({
+        where: { id: member.userId },
+        select: { name: true, image: true },
+      });
+      return {
+        userId: member.userId,
+        name: user?.name || "Unknown",
+        avatar: user?.image || "", // Handle potential null values
+      };
+    })
+  );
+
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title={group.name} />
@@ -44,8 +75,12 @@ export default async function GroupPage({
               👋
             </p>
             <div className="ml-auto flex gap-2">
-              <AddExpense />
-              <SettleUp />
+              <AddExpense
+                params={{ groupID: params.groupID }}
+                groupMemberName={groupMemberName}
+                user={user.id}
+              />
+              <SettleUp groupMemberName={groupMemberName} />
             </div>
           </div>
 
@@ -57,11 +92,11 @@ export default async function GroupPage({
             </Cardcontent>
             <Cardcontent className="border-none p-0">
               {/* Group member balance */}
-              <GroupMember />
+              <GroupMember groupMemberName={groupMemberName} />
             </Cardcontent>
           </section>
         </div>
       </div>
     </Suspense>
-  )
+  );
 }
