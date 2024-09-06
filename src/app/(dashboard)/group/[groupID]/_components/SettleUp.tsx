@@ -1,14 +1,14 @@
-"use client";
-import React, { useState, useMemo, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+"use client"
+import React, { useState, useMemo, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -16,17 +16,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import * as z from "zod";
-import { toast } from "sonner";
-import { UserAvatar } from "./UserAvatar";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import * as z from "zod"
+import { toast } from "sonner"
+import { UserAvatar } from "./UserAvatar"
+import { settleUp } from "../group"
 
 const formSchema = z
   .object({
@@ -34,8 +39,8 @@ const formSchema = z
     toUser: z.string().min(1, "Please select a valid recipient."),
     amount: z.string().refine(
       (val) => {
-        const parsed = parseFloat(val);
-        return !isNaN(parsed) && parsed > 0;
+        const parsed = parseFloat(val)
+        return !isNaN(parsed) && parsed > 0
       },
       {
         message: "Amount must be a valid number greater than 0",
@@ -48,29 +53,34 @@ const formSchema = z
   .refine((data) => data.fromUser !== data.toUser, {
     message: "Payer and recipient cannot be the same person",
     path: ["toUser"],
-  });
+  })
 
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<typeof formSchema>
 
 interface GroupMember {
-  userId: string;
-  name: string;
-  avatar: string;
+  userId: string
+  name: string
+  avatar: string
 }
 
 interface SettleUpProps {
-  groupMemberName: GroupMember[];
-  usersYouNeedToPay: { memberName: string; memberId: string; amountToPay: number }[];
-  user: string;
+  groupMemberName: GroupMember[]
+  usersYouNeedToPay: {
+    memberName: string
+    memberId: string
+    amountToPay: number
+  }[]
+  user: string
+  params: { groupID: string }
 }
 
 export const UserSelectionModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (user: GroupMember) => void;
-  availableUsers: GroupMember[];
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (user: GroupMember) => void
+  availableUsers: GroupMember[]
 }> = ({ isOpen, onClose, onSelect, availableUsers }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -91,8 +101,8 @@ export const UserSelectionModal: React.FC<{
                   variant="outline"
                   className="flex h-full items-center justify-start space-x-2 p-2"
                   onClick={() => {
-                    onSelect(user);
-                    onClose();
+                    onSelect(user)
+                    onClose()
                   }}
                 >
                   <UserAvatar user={user} size={40} />
@@ -104,29 +114,37 @@ export const UserSelectionModal: React.FC<{
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpProps) {
-  const [open, setOpen] = useState(false);
-  const [userSelectionOpen, setUserSelectionOpen] = useState(false);
-  const [selectingFor, setSelectingFor] = useState<"fromUser" | "toUser" | null>(null);
+export function SettleUp({
+  groupMemberName,
+  usersYouNeedToPay,
+  user,
+  params: { groupID },
+}: SettleUpProps) {
+  const [open, setOpen] = useState(false)
+  const [userSelectionOpen, setUserSelectionOpen] = useState(false)
+  const [selectingFor, setSelectingFor] = useState<
+    "fromUser" | "toUser" | null
+  >(null)
 
-  const availableRecipients = useMemo(() => 
-    groupMemberName.filter(member => 
-      usersYouNeedToPay.some(user => user.memberId === member.userId)
-    ),
+  const availableRecipients = useMemo(
+    () =>
+      groupMemberName.filter((member) =>
+        usersYouNeedToPay.some((user) => user.memberId === member.userId)
+      ),
     [groupMemberName, usersYouNeedToPay]
-  );
+  )
 
   const defaultToUser = useMemo(() => {
-    return usersYouNeedToPay.length > 0 ? usersYouNeedToPay[0].memberId : "";
-  }, [usersYouNeedToPay]);
+    return usersYouNeedToPay.length > 0 ? usersYouNeedToPay[0].memberId : ""
+  }, [usersYouNeedToPay])
 
   const calculateDefaultAmount = (userId: string) => {
-    const userToPay = usersYouNeedToPay.find(user => user.memberId === userId);
-    return userToPay ? userToPay.amountToPay.toFixed(2) : "";
-  };
+    const userToPay = usersYouNeedToPay.find((user) => user.memberId === userId)
+    return userToPay ? userToPay.amountToPay.toFixed(2) : ""
+  }
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -136,45 +154,88 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
       amount: calculateDefaultAmount(defaultToUser),
       transactionDate: new Date(),
     },
-  });
+  })
 
   useEffect(() => {
     if (defaultToUser) {
-      form.setValue("toUser", defaultToUser);
-      form.setValue("amount", calculateDefaultAmount(defaultToUser));
+      form.setValue("toUser", defaultToUser)
+      form.setValue("amount", calculateDefaultAmount(defaultToUser))
     }
-  }, [defaultToUser, form]);
+  }, [defaultToUser, form])
 
   const handleUserSelect = (selectedUser: GroupMember) => {
     if (selectingFor) {
-      form.setValue(selectingFor, selectedUser.userId);
+      form.setValue(selectingFor, selectedUser.userId)
       if (selectingFor === "toUser") {
-        const amount = calculateDefaultAmount(selectedUser.userId);
-        form.setValue("amount", amount);
+        const amount = calculateDefaultAmount(selectedUser.userId)
+        form.setValue("amount", amount)
       }
     }
-    setUserSelectionOpen(false);
-  };
+    setUserSelectionOpen(false)
+  }
 
+  // Handle form submission
   const handleSubmit = async (data: FormSchema) => {
     try {
-      console.log("Form submitted:", data);
-      toast.success("Settling up...", {
-        closeButton: true,
-        icon: "🤝",
-        duration: 4500,
-      });
-      form.reset();
-      setOpen(false);
+      const { fromUser, toUser, amount } = data
+
+      // Find the amount to be paid for the selected recipient
+      const recipient = usersYouNeedToPay.find(
+        (user) => user.memberId === toUser
+      )
+      if (!recipient) {
+        throw new Error(
+          "Recipient not found in the list of users you need to pay."
+        )
+      }
+
+      // Convert amount to a number for validation
+      const amountToPay = parseFloat(amount)
+      if (amountToPay > recipient.amountToPay) {
+        throw new Error(
+          "Amount to pay exceeds the pending amount for the recipient."
+        )
+      }
+
+      const loading = toast.loading("Adding Expense...")
+      setOpen(false)
+      try {
+        // Call settleUp API
+        await settleUp({
+          payerId: fromUser,
+          groupID: groupID,
+          recipientId: toUser,
+          amount: amountToPay,
+        })
+
+        console.log("Form submitted:", data)
+
+        // Show success message and reset form
+        toast.success("Settling up...", {
+          closeButton: true,
+          icon: "🤝",
+          duration: 4500,
+          id: loading,
+        })
+
+        form.reset() // Reset the form fields
+        setOpen(false) // Close the form/modal after submission
+      } catch (error) {
+        console.error(error)
+
+        // Display error message using toast
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred"
+        toast.error(errorMessage, {
+          closeButton: true,
+          icon: "❌",
+          duration: 4500,
+        })
+      }
     } catch (error) {
-      console.error(error);
-      toast.error("Error settling up", {
-        closeButton: true,
-        icon: "❌",
-        duration: 4500,
-      });
+      console.error(error)
     }
-  };
+  }
 
   if (usersYouNeedToPay.length === 0) {
     return (
@@ -185,7 +246,7 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
       >
         No users to pay
       </Button>
-    );
+    )
   }
 
   return (
@@ -206,14 +267,20 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <div className="flex items-center justify-center space-x-4">
               <UserAvatar
-                user={groupMemberName.find((u) => u.userId === user) || groupMemberName[0]}
+                user={
+                  groupMemberName.find((u) => u.userId === user) ||
+                  groupMemberName[0]
+                }
                 size={85}
               />
               <div className="text-2xl">→</div>
-              
+
               <FormField
                 control={form.control}
                 name="toUser"
@@ -225,12 +292,16 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
                         variant="outline"
                         className="h-24 w-24 rounded-full border-none p-0"
                         onClick={() => {
-                          setSelectingFor("toUser");
-                          setUserSelectionOpen(true);
+                          setSelectingFor("toUser")
+                          setUserSelectionOpen(true)
                         }}
                       >
                         <UserAvatar
-                          user={groupMemberName.find((u) => u.userId === field.value) || {userId: "", name: "Select", avatar: ""}}
+                          user={
+                            groupMemberName.find(
+                              (u) => u.userId === field.value
+                            ) || { userId: "", name: "Select", avatar: "" }
+                          }
                           size={85}
                         />
                       </Button>
@@ -246,7 +317,8 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
               </span>{" "}
               paid{" "}
               <span className="text-blue-500">
-                {groupMemberName.find((u) => u.userId === form.watch("toUser"))?.name || "Select recipient"}
+                {groupMemberName.find((u) => u.userId === form.watch("toUser"))
+                  ?.name || "Select recipient"}
               </span>
             </div>
             <FormField
@@ -282,7 +354,9 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value ? format(field.value, "PPP") : "Pick a date"}
+                          {field.value
+                            ? format(field.value, "PPP")
+                            : "Pick a date"}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -303,7 +377,7 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
                 </FormItem>
               )}
             />
-           
+
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
@@ -330,7 +404,8 @@ export function SettleUp({ groupMemberName, usersYouNeedToPay, user }: SettleUpP
         availableUsers={availableRecipients}
       />
     </Dialog>
-  );
+  )
 }
 
-export default SettleUp;
+export default SettleUp
+ 

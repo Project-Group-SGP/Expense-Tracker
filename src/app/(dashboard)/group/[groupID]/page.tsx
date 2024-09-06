@@ -196,6 +196,7 @@ export default async function GroupPage({
                 user={user.id}
               />
               <SettleUp
+                params={{ groupID: params.groupID }}
                 groupMemberName={groupMemberName}
                 usersYouNeedToPay={usersYouNeedToPay}
                 user={user.id}
