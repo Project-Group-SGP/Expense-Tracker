@@ -100,12 +100,12 @@ export default async function GroupPage({
   })
 
   if (!group) {
+    console.log("\n\n\n\nsarthak jokes on you!!");
     redirect("/404")
   }
 
   const data = await getAllData(params.groupID, cookie);
 
-  const groupMembers = data.groupMembers
   const groupMemberName: GroupMember[] = data.groupMembers
   const usersYouNeedToPay = data.usersToPay // Get users the current user needs to pay
 

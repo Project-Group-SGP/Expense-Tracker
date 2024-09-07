@@ -9,10 +9,11 @@ import { UserButton } from "@/components/user-button"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/transaction", label: "Transactions" },
+  // { href: "/transaction", label: "Transactions" },
   // { href: "/settings", label: "Settings" },
   { href: "/history", label: "History" },
   { href: "/budget", label: "Budget" },
+  { href: "/group", label: "Group" },
 ]
 
 const Navbar = () => {

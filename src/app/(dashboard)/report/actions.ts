@@ -1,5 +1,4 @@
 "use server"
-
 import { startOfMonth, endOfMonth, subMonths, format } from "date-fns"
 import { db } from "@/lib/db"
 import { currentUserServer } from "@/lib/auth"
