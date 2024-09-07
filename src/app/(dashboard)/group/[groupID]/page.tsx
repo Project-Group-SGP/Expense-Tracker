@@ -2,20 +2,22 @@ import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { cache, Suspense } from "react"
-import PageTitle from "../../dashboard/_components/PageTitle"
-import { Cardcontent } from "../../dashboard/_components/Card"
-import { AddExpense } from "./_components/AddExpense"
-import { GroupMember } from "./_components/GroupMember"
-import { SettleUp } from "./_components/SettleUp"
-import Transaction from "./_components/Transaction"
+
 import { headers } from "next/headers"
+import { Cardcontent } from "../../dashboard/_components/Card"
+import Transaction from "./_components/Transaction"
+import { GroupMember } from "./_components/GroupMember"
+import SettleUp from "./_components/SettleUp"
+import AddExpense from "./_components/AddExpense"
+import PageTitle from "../../dashboard/_components/PageTitle"
+
 
 interface Group {
   id: string;
   name: string;
 }
 
-interface GroupMember {
+interface GroupMemberDetails {
   userId: string;
   name: string;
   avatar: string;
@@ -41,24 +43,18 @@ interface ExpenseSplit {
   payments: Payment[];
 }
 
-interface GroupMemberDetails {
-  userId: string;
-  name: string;
-  avatar: string;
-}
-
 interface GetResponse {
   group: Group | null;
   groupMembers: GroupMemberDetails[];
   pendingPayments: ExpenseSplit[];
-  usersToPay: { memberName: string; memberId: string; amountToPay: number }[]; // Add usersToPay here
+  usersToPay: { memberName: string; memberId: string; amountToPay: number }[];
 }
 
 const getAllData = cache(
-  async (id: string, cookie: string): Promise<GetResponse> => {
+  async (groupID: string, cookie: string): Promise<GetResponse> => {
     try {
       const res = await fetch(
-        `${process.env.BASE_URL}/api/getGroup`,
+        `${process.env.BASE_URL}/api/get-group?groupID=${groupID}`,
         {
           method: "GET",
           headers: { Cookie: cookie },
@@ -106,6 +102,7 @@ export default async function GroupPage({
 
   const data = await getAllData(params.groupID, cookie);
 
+  const groupMembers = data.groupMembers
   const groupMemberName: GroupMember[] = data.groupMembers
   const usersYouNeedToPay = data.usersToPay // Get users the current user needs to pay
 
@@ -127,13 +124,13 @@ export default async function GroupPage({
             <div className="ml-auto flex gap-2">
               <AddExpense
                 params={{ groupID: params.groupID }}
-                groupMemberName={groupMemberName}
+                groupMemberName={groupMembers}
                 user={user.id}
               />
               <SettleUp
                 params={{ groupID: params.groupID }}
-                groupMemberName={groupMemberName}
-                usersYouNeedToPay={usersYouNeedToPay} // Pass users to pay
+                groupMemberName={groupMembers}
+                usersYouNeedToPay={usersYouNeedToPay}
                 user={user.id}
               />
             </div>
@@ -144,7 +141,7 @@ export default async function GroupPage({
               <Transaction />
             </Cardcontent>
             <Cardcontent className="border-none p-0">
-              <GroupMember groupMemberName={groupMemberName} />
+              <GroupMember groupMemberName={groupMembers} />
             </Cardcontent>
           </section>
         </div>
