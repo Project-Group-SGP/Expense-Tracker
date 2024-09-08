@@ -34,28 +34,48 @@ export default async function GroupManagementPage() {
     redirect("/auth/signin")
   }
 
-  const createdGroups = await db.group.findMany({
-    where: {
-      creatorId: user.id,
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      code: true,
-      _count: {
-        select: {
-          members: true,
-          joinRequests: {
-            where: { status: "PENDING" },
+  const [createdGroups, memberGroups, pendingRequests] = await Promise.all([
+    db.group.findMany({
+      where: {
+        creatorId: user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        code: true,
+        _count: {
+          select: {
+            members: true,
+            joinRequests: {
+              where: { status: "PENDING" },
+            },
           },
         },
       },
-    },
-  });
-
- 
-  
+    }),
+    db.group.findMany({
+      where: {
+        members: {
+          some: { userId: user.id },
+        },
+      },
+      include: {
+        members: {
+          select: { userId: true },
+        },
+      },
+    }) as Promise<MemberGroup[]>,
+    db.joinRequest.findMany({
+      where: {
+        userId: user.id,
+        status: "PENDING",
+      },
+      include: {
+        group: true,
+      },
+    }) as Promise<PendingRequest[]>,
+  ])
 
   const createdGroupsData: CreatedGroup[] = createdGroups.map((group) => ({
     id: group.id,
@@ -65,31 +85,6 @@ export default async function GroupManagementPage() {
     membersCount: group._count.members,
     pendingRequestsCount: group._count.joinRequests,
   }))
-
-  const memberGroups = (await db.group.findMany({
-    where: {
-      members: {
-        some: { userId: user.id },
-      },
-    },
-    include: {
-      members: {
-        select: { userId: true },
-      },
-    },
-  })) as MemberGroup[]
-
- 
-
-  const pendingRequests = (await db.joinRequest.findMany({
-    where: {
-      userId: user.id,
-      status: "PENDING",
-    },
-    include: {
-      group: true,
-    },
-  })) as PendingRequest[]
 
   return (
     <>
