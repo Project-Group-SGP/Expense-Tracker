@@ -47,7 +47,7 @@ interface GetResponse {
   group: Group | null;
   groupMembers: GroupMemberDetails[];
   pendingPayments: ExpenseSplit[];
-  usersToPay: { memberName: string; memberId: string; amountToPay: number }[];
+  usersToPay: {id:string, memberName: string; memberId: string; amountToPay: number }[];
 }
 
 const getAllData = cache(

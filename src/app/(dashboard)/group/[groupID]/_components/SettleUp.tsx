@@ -33,6 +33,7 @@ import { toast } from "sonner"
 import { UserAvatar } from "./UserAvatar"
 import { settleUp } from "../group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useRouter } from "next/navigation"
 
 interface GroupMember {
   userId: string
@@ -60,6 +61,7 @@ interface Expense {
 }
 
 interface EnhancedUserToPay {
+  id: string
   memberName: string
   memberId: string
   expenses: Expense[]
@@ -117,29 +119,23 @@ export const UserSelectionModal: React.FC<{
 
 const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
   // Check if the current expense is selected
-  const isChecked = selectedExpenses?.includes(expense.memberId)
+  const isChecked = selectedExpenses?.includes(expense.id)
 
   // Handle checkbox state changes
   const handleCheckboxChange = (checked) => {
-    if (checked) {
-      onExpenseChange("selectedExpenses", [
-        ...selectedExpenses,
-        expense.memberId,
-      ])
-    } else {
-      onExpenseChange(
-        "selectedExpenses",
-        selectedExpenses.filter((id) => id !== expense.memberId)
-      )
-    }
-  }
+    const updatedExpenses = checked
+      ? [...selectedExpenses, expense.id]
+      : selectedExpenses.filter((id) => id !== expense.id);
+    onExpenseChange("selectedExpenses", updatedExpenses);
+  };
+  
 
   return (
     <div className="flex cursor-pointer items-center justify-between rounded-md border p-4 shadow-sm transition-shadow hover:shadow-md">
       <div>
-        <p className="font-semibold">{expense.memberName}</p>
-        <p className="text-sm text-gray-600">
-          Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
+        <p className="font-semibold">{expense.description}</p>
+        <p className="text-sm  text-gray-600">
+        Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
         </p>
       </div>
       <div>
@@ -152,6 +148,7 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
     </div>
   )
 }
+
 // Function to open the dialog
 const openSettleDialog = (expense) => {
   // Implement the logic to open the dialog with expense details
@@ -170,6 +167,7 @@ export function SettleUp({
     "fromUser" | "toUser" | null
   >(null)
 
+  const route = useRouter();
   const safeUsersYouNeedToPay = usersYouNeedToPay || []
 
   const availableRecipients = useMemo(
@@ -211,55 +209,63 @@ export function SettleUp({
   }
 
   const handleSubmit = async (data: FormSchema) => {
+    const { fromUser, toUser, selectedExpenses, transactionDate } = data
+  
+    const selectedUser = usersYouNeedToPay.find(
+      (user) => user.memberId === toUser
+    )
+    if (!selectedUser) {
+      toast.error("Selected user not found.", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
+      })
+      return
+    }
+  
+    const totalAmount = selectedExpenses.reduce((sum, expenseId) => {
+      if (!selectedUser || !Array.isArray(selectedUser.expenses)) {
+        return sum;
+      }
+      const expense = selectedUser.expenses.find((e) => e.id === expenseId);
+      return sum + (expense ? Number(expense.amount) : 0);
+    }, 0);
+    
+  
+    const loadingToast = toast.loading("Settling up...")
+    setOpen(false)
+  
     try {
-      const { fromUser, toUser, selectedExpenses, transactionDate } = data
-
-      const selectedUser = usersYouNeedToPay.find(
-        (user) => user.memberId === toUser
-      )
-      if (!selectedUser) {
-        throw new Error("Selected user not found.")
-      }
-
-      const totalAmount = selectedExpenses.reduce((sum, expenseId) => {
-        const expense = selectedUser.expenses.find((e) => e.id === expenseId)
-        return sum + (expense ? expense.amount : 0)
-      }, 0)
-
-      const loading = toast.loading("Settling up...")
-      setOpen(false)
-
-      try {
-        await settleUp({
-          payerId: fromUser,
-          groupID: groupID,
-          recipientId: toUser,
-          amount: totalAmount,
-          expenseIds: selectedExpenses,
-          transactionDate: transactionDate,
-        })
-
-        toast.success("Successfully settled up!", {
-          closeButton: true,
-          icon: "🤝",
-          duration: 4500,
-        })
-
-        form.reset()
-      } catch (error) {
-        console.error(error)
-        const errorMessage =
-          error instanceof Error ? error.message : "An unknown error occurred"
-        toast.error(errorMessage, {
-          closeButton: true,
-          icon: "❌",
-          duration: 4500,
-        })
-      } finally {
-        toast.dismiss(loading)
-      }
+      await settleUp({
+        payerId: fromUser,
+        groupID: groupID,
+        recipientId: toUser,
+        amount: totalAmount,
+        expenseIds: selectedExpenses,
+        transactionDate: transactionDate,
+      })
+  
+      toast.success("Successfully settled up!", {
+        closeButton: true,
+        icon: "🤝",
+        duration: 4500,
+      })
+  
+      // Reset the form
+      route.refresh();
+      
+      form.reset()
     } catch (error) {
       console.error(error)
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred"
+      toast.error(errorMessage, {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
+      })
+    } finally {
+      toast.dismiss(loadingToast)
     }
   }
 
@@ -367,6 +373,7 @@ export function SettleUp({
                   <div className="grid grid-cols-1 gap-4">
                     {selectedUserExpenses.map((expense) => (
                       <ExpenseCard
+                        //@ts-ignore
                         key={expense.memberId + expense.amountToPay} // Assuming memberId and amountToPay combination is unique
                         expense={expense}
                         selectedExpenses={form.watch("selectedExpenses")}
