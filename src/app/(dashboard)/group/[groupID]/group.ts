@@ -64,36 +64,40 @@ export async function AddGroupExpense(params: {
 
 
 export async function settleUp(params: {
-    groupID: string;
-    payerId: string;
-    recipientId: string;
-    amount: number;
-  }) {
-    console.log("Params:", params);
+  groupID: string;
+  payerId: string;
+  recipientId: string;
+  amount: number;
+  expenseIds: string[];
+  transactionDate: Date;
+}) {
+  console.log("Params:", params);
 
-    const user = await currentUserServer();
-    if (!user || user.id != params.payerId) {
-      throw new Error("Please log in with the correct account.");
-    }
-    
-    // Fetch group members to ensure both users are part of the group
-    const groupMembers = await db.groupMember.findMany({
-      where: {
-        groupId: params.groupID,
-      },
-    });
-    console.log("Group members:", groupMembers);
-    
-    // Check if both users are members
-    const isPayerMember = groupMembers.some(member => member.userId === params.payerId);
-    const isRecipientMember = groupMembers.some(member => member.userId === params.recipientId);
-    if (!isPayerMember || !isRecipientMember) {
-      throw new Error("Both users must be members of the group.");
-    }
-    
-    // Retrieve the group expense where the recipient is owed money
+  const user = await currentUserServer();
+  if (!user || user.id != params.payerId) {
+    throw new Error("Please log in with the correct account.");
+  }
+
+  // Fetch group members to ensure both users are part of the group
+  const groupMembers = await db.groupMember.findMany({
+    where: {
+      groupId: params.groupID,
+    },
+  });
+  console.log("Group members:", groupMembers);
+
+  // Check if both users are members
+  const isPayerMember = groupMembers.some(member => member.userId === params.payerId);
+  const isRecipientMember = groupMembers.some(member => member.userId === params.recipientId);
+  if (!isPayerMember || !isRecipientMember) {
+    throw new Error("Both users must be members of the group.");
+  }
+
+  // Process each selected expense
+  for (const expenseId of params.expenseIds) {
     const groupExpense = await db.groupExpense.findFirst({
       where: {
+        id: expenseId,
         groupId: params.groupID,
         paidById: params.recipientId,
         status: {
@@ -104,24 +108,20 @@ export async function settleUp(params: {
         splits: true,
       },
     });
-    console.log("Inside group.ts");
-    
-    console.log("Group expense:", groupExpense);
-    
+
     if (!groupExpense) {
-      throw new Error("No valid group expense found for settlement.");
+      throw new Error(`No valid group expense found for settlement with ID: ${expenseId}`);
     }
-    
+
     // Find the payer's specific split for the expense
     const payerSplit = groupExpense.splits.find(
       (split) => split.userId === params.payerId
     );
-    console.log("Payer's expense split:", payerSplit);
-    
+
     if (!payerSplit) {
-      throw new Error("No expense split found for the payer.");
+      throw new Error(`No expense split found for the payer in expense with ID: ${expenseId}`);
     }
-    
+
     // Calculate total paid for the split
     const totalPaidForSplit = await db.payment.aggregate({
       where: { expenseSplitId: payerSplit.id },
@@ -129,53 +129,42 @@ export async function settleUp(params: {
         amount: true,
       },
     });
-    
+
     const totalPaidAmount = totalPaidForSplit._sum?.amount ?? 0;
     const remainingAmount = Number(payerSplit.amount) - Number(totalPaidAmount);
-    
-    const paymentAmount = params.amount;
-    
-    // if (paymentAmount > remainingAmount) {
-    //   throw new Error("Payment amount exceeds the remaining unpaid portion.");
-    // }
-    
+
+    // Determine the payment amount for this specific expense
+    const paymentAmount = Math.min(params.amount, remainingAmount);
+
     // Create a payment record
     await db.payment.create({
       data: {
         expenseSplitId: payerSplit.id,
         amount: paymentAmount,
+        paidAt: params.transactionDate,
       },
     });
-    
+
     // Update the status of the split
-    let newSplitStatus: "PAID" | "PARTIALLY_PAID";
-    if (paymentAmount === remainingAmount) {
-      newSplitStatus = "PAID";
-    } else {
-      newSplitStatus = "PARTIALLY_PAID";
-    }
-    
+    let newSplitStatus: "PAID" | "PARTIALLY_PAID" = 
+      paymentAmount >= remainingAmount ? "PAID" : "PARTIALLY_PAID";
+
     await db.expenseSplit.update({
       where: { id: payerSplit.id },
       data: {
         isPaid: newSplitStatus,
       },
     });
-    
+
     // Check the status of all splits for the expense
     const allSplits = await db.expenseSplit.findMany({
       where: { expenseId: groupExpense.id },
     });
-    
+
     const allPaid = allSplits.every((split) => split.isPaid === "PAID");
-    let newExpenseStatus: "SETTLED" | "PARTIALLY_SETTLED";
-    
-    if (allPaid) {
-      newExpenseStatus = "SETTLED";
-    } else {
-      newExpenseStatus = "PARTIALLY_SETTLED";
-    }
-    
+    let newExpenseStatus: "SETTLED" | "PARTIALLY_SETTLED" = 
+      allPaid ? "SETTLED" : "PARTIALLY_SETTLED";
+
     // Update the overall group expense status
     await db.groupExpense.update({
       where: { id: groupExpense.id },
@@ -183,6 +172,11 @@ export async function settleUp(params: {
         status: newExpenseStatus,
       },
     });
-    
-    return { message: "Payment to group member completed successfully!" };
+
+    // Reduce the remaining amount to settle for the next expense
+    params.amount -= paymentAmount;
+    if (params.amount <= 0) break;
+  }
+
+  return { message: "Payment to group member completed successfully!" };
 }

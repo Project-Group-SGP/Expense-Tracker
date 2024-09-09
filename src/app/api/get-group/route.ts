@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
       pendingPayments,
       usersToPay,
     });
+    
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

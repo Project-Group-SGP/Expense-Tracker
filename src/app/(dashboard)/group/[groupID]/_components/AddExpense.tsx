@@ -38,6 +38,7 @@ import {
 import { cn } from "@/lib/utils"
 import { AddGroupExpense } from "../group"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -163,10 +164,11 @@ export function AddExpense({
       category: CategoryTypes.Food,
     },
   })
-
+  
+  const router = useRouter();
   const watchAmount = form.watch("amount")
   const watchSplitType = form.watch("splitType")
-
+  
   useEffect(() => {
     const totalAmount = parseFloat(watchAmount) || 0
     const splitType = watchSplitType
@@ -204,6 +206,7 @@ export function AddExpense({
   const onSubmit = async (data) => {
     console.log(data)
 
+
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
 
@@ -229,6 +232,8 @@ export function AddExpense({
         category: data.category,
         splits: splits,
       })
+
+      router.refresh()
 
       if (response.success) {
         toast.success("Expense added successfully", {
