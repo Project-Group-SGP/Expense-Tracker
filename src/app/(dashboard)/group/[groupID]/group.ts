@@ -145,7 +145,7 @@ export async function settleUp(params: {
     });
 
     console.log("inside group.ts");
-    console.log();
+    console.log(update);
     
 
     const unpaidSplits = await db.expenseSplit.findMany({

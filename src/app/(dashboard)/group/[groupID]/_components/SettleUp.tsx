@@ -228,9 +228,11 @@ export function SettleUp({
         return sum;
       }
       const expense = selectedUser.expenses.find((e) => e.id === expenseId);
+      console.log(`Expense ID: ${expenseId}, Amount: ${expense?.amount}`); // Debug statement
       return sum + (expense ? Number(expense.amount) : 0);
     }, 0);
-    
+  
+    console.log(`Total Amount: ${totalAmount}`); // Debug statement
   
     const loadingToast = toast.loading("Settling up...")
     setOpen(false)
@@ -268,6 +270,7 @@ export function SettleUp({
       toast.dismiss(loadingToast)
     }
   }
+  
 
   const selectedUserExpenses = useMemo(() => {
     const selectedUser = safeUsersYouNeedToPay.filter(
