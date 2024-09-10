@@ -125,17 +125,16 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
   const handleCheckboxChange = (checked) => {
     const updatedExpenses = checked
       ? [...selectedExpenses, expense.id]
-      : selectedExpenses.filter((id) => id !== expense.id);
-    onExpenseChange("selectedExpenses", updatedExpenses);
-  };
-  
+      : selectedExpenses.filter((id) => id !== expense.id)
+    onExpenseChange("selectedExpenses", updatedExpenses)
+  }
 
   return (
     <div className="flex cursor-pointer items-center justify-between rounded-md border p-4 shadow-sm transition-shadow hover:shadow-md">
       <div>
         <p className="font-semibold">{expense.description}</p>
-        <p className="text-sm  text-gray-600">
-        Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
+        <p className="text-sm text-gray-600">
+          Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
         </p>
       </div>
       <div>
@@ -167,7 +166,7 @@ export function SettleUp({
     "fromUser" | "toUser" | null
   >(null)
 
-  const route = useRouter();
+  const route = useRouter()
   const safeUsersYouNeedToPay = usersYouNeedToPay || []
 
   const availableRecipients = useMemo(
@@ -208,9 +207,10 @@ export function SettleUp({
     setUserSelectionOpen(false)
   }
 
+  // handle form submission
   const handleSubmit = async (data: FormSchema) => {
     const { fromUser, toUser, selectedExpenses, transactionDate } = data
-  
+
     const selectedUser = usersYouNeedToPay.find(
       (user) => user.memberId === toUser
     )
@@ -222,40 +222,49 @@ export function SettleUp({
       })
       return
     }
-  
-    const totalAmount = selectedExpenses.reduce((sum, expenseId) => {
-      if (!selectedUser || !Array.isArray(selectedUser.expenses)) {
-        return sum;
-      }
-      const expense = selectedUser.expenses.find((e) => e.id === expenseId);
-      console.log(`Expense ID: ${expenseId}, Amount: ${expense?.amount}`); // Debug statement
-      return sum + (expense ? Number(expense.amount) : 0);
-    }, 0);
-  
-    console.log(`Total Amount: ${totalAmount}`); // Debug statement
-  
+
+    console.log("Selected User: ", selectedUser)
+
+    console.log("reciptientId: ", selectedExpenses)
+
+    console.log("usersYouNeedToPay: ", usersYouNeedToPay)
+
+    //selectedExpenses has all expense Id which is selected by user
+    //usersYouNeedToPay has all user data which is available in group
+
+    const expenseDetails = usersYouNeedToPay
+      .filter((user) => selectedExpenses.includes(user.id))
+      .map((user) => ({
+        expenseid: user.id,
+        amount: user.amountToPay,
+      }))
+
+    console.log(expenseDetails)
+
     const loadingToast = toast.loading("Settling up...")
     setOpen(false)
-  
+
     try {
-      await settleUp({
-        payerId: fromUser,
-        groupID: groupID,
-        recipientId: toUser,
-        amount: totalAmount,
-        expenseIds: selectedExpenses,
-        transactionDate: transactionDate,
-      })
-  
+      // await settleUp({
+      //   payerId: fromUser,
+      //   groupID: groupID,
+      //   recipientId: toUser,
+      //   amount: totalAmount,
+      //   expenseIds: selectedExpenses,
+      //   transactionDate: transactionDate,
+      // })
+
+      console.log("expenseIds: ", selectedExpenses)
+
       toast.success("Successfully settled up!", {
         closeButton: true,
         icon: "🤝",
         duration: 4500,
       })
-  
+
       // Reset the form
-      route.refresh();
-      
+      route.refresh()
+
       form.reset()
     } catch (error) {
       console.error(error)
@@ -270,7 +279,6 @@ export function SettleUp({
       toast.dismiss(loadingToast)
     }
   }
-  
 
   const selectedUserExpenses = useMemo(() => {
     const selectedUser = safeUsersYouNeedToPay.filter(
