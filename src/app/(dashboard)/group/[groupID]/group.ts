@@ -3,6 +3,7 @@
 import { currentUserServer } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { CategoryTypes } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 import { revalidateTag } from "next/cache";
 import { split } from "postcss/lib/list";
 
@@ -63,126 +64,113 @@ export async function AddGroupExpense(params: {
 }
 
 
-export async function settleUp(params: {
-    groupID: string;
-    payerId: string;
-    recipientId: string;
-    amount: number;
-  }) {
-    console.log("Params:", params);
 
-    const user = await currentUserServer();
-    if (!user || user.id != params.payerId) {
-      throw new Error("Please log in with the correct account.");
-    }
-    
-    // Fetch group members to ensure both users are part of the group
-    const groupMembers = await db.groupMember.findMany({
-      where: {
-        groupId: params.groupID,
-      },
-    });
-    console.log("Group members:", groupMembers);
-    
-    // Check if both users are members
-    const isPayerMember = groupMembers.some(member => member.userId === params.payerId);
-    const isRecipientMember = groupMembers.some(member => member.userId === params.recipientId);
-    if (!isPayerMember || !isRecipientMember) {
-      throw new Error("Both users must be members of the group.");
-    }
-    
-    // Retrieve the group expense where the recipient is owed money
+export async function settleUp(params: {
+  groupID: string;
+  payerId: string;
+  recipientId: string;
+  amount: number;
+  expenseIds: string[];
+  transactionDate: Date;
+}) {
+  console.log("Params:", params);
+
+  const user = await currentUserServer();
+  if (!user || user.id !== params.payerId) {
+    throw new Error("Please log in with the correct account.");
+  }
+
+  const groupMembers = await db.groupMember.findMany({
+    where: { groupId: params.groupID },
+  });
+  console.log("Group members:", groupMembers);
+
+  const isPayerMember = groupMembers.some(member => member.userId === params.payerId);
+  const isRecipientMember = groupMembers.some(member => member.userId === params.recipientId);
+  if (!isPayerMember || !isRecipientMember) {
+    throw new Error("Both users must be members of the group.");
+  }
+
+  let remainingAmountToSettle = new Decimal(params.amount);
+
+  for (const expenseId of params.expenseIds) {
+    if (remainingAmountToSettle.lte(0)) break;
+
     const groupExpense = await db.groupExpense.findFirst({
       where: {
+        id: expenseId,
         groupId: params.groupID,
         paidById: params.recipientId,
-        status: {
-          not: "CANCELLED",
-        },
+        status: { not: "CANCELLED" },
       },
-      include: {
-        splits: true,
-      },
+      include: { splits: true },
     });
-    console.log("Inside group.ts");
-    
-    console.log("Group expense:", groupExpense);
-    
+
     if (!groupExpense) {
-      throw new Error("No valid group expense found for settlement.");
+      console.warn(`Group expense with ID ${expenseId} not found or invalid.`);
+      continue;
     }
-    
-    // Find the payer's specific split for the expense
-    const payerSplit = groupExpense.splits.find(
-      (split) => split.userId === params.payerId
-    );
-    console.log("Payer's expense split:", payerSplit);
-    
+
+    const payerSplit = groupExpense.splits.find((split) => split.userId === params.payerId);
     if (!payerSplit) {
-      throw new Error("No expense split found for the payer.");
+      console.warn(`No split found for payer in expense ID: ${expenseId}`);
+      continue;
     }
-    
-    // Calculate total paid for the split
+
     const totalPaidForSplit = await db.payment.aggregate({
       where: { expenseSplitId: payerSplit.id },
-      _sum: {
-        amount: true,
-      },
+      _sum: { amount: true },
     });
-    
-    const totalPaidAmount = totalPaidForSplit._sum?.amount ?? 0;
-    const remainingAmount = Number(payerSplit.amount) - Number(totalPaidAmount);
-    
-    const paymentAmount = params.amount;
-    
-    // if (paymentAmount > remainingAmount) {
-    //   throw new Error("Payment amount exceeds the remaining unpaid portion.");
-    // }
-    
-    // Create a payment record
+
+    const totalPaidAmount = totalPaidForSplit._sum?.amount ?? new Decimal(0);
+    const remainingAmount = payerSplit.amount.sub(totalPaidAmount);
+    const paymentAmount = Decimal.min(remainingAmountToSettle, remainingAmount);
+
     await db.payment.create({
       data: {
         expenseSplitId: payerSplit.id,
         amount: paymentAmount,
+        paidAt: params.transactionDate,
       },
     });
-    
-    // Update the status of the split
-    let newSplitStatus: "PAID" | "PARTIALLY_PAID";
-    if (paymentAmount === remainingAmount) {
-      newSplitStatus = "PAID";
-    } else {
-      newSplitStatus = "PARTIALLY_PAID";
-    }
-    
-    await db.expenseSplit.update({
+
+    const newTotalPaidAmount = totalPaidAmount.add(paymentAmount);
+    const newSplitStatus: SplitStatus = 
+      newTotalPaidAmount.gte(payerSplit.amount) ? "PAID" :
+      newTotalPaidAmount.gt(0) ? "PARTIALLY_PAID" : "UNPAID";
+
+    const update = await db.expenseSplit.update({
       where: { id: payerSplit.id },
-      data: {
-        isPaid: newSplitStatus,
+      data: { isPaid: newSplitStatus },
+    });
+
+    console.log("inside group.ts");
+    console.log(update);
+    
+
+    const unpaidSplits = await db.expenseSplit.findMany({
+      where: { 
+        expenseId: groupExpense.id, 
+        isPaid: { in: ["UNPAID", "PARTIALLY_PAID"] }
       },
     });
-    
-    // Check the status of all splits for the expense
-    const allSplits = await db.expenseSplit.findMany({
-      where: { expenseId: groupExpense.id },
-    });
-    
-    const allPaid = allSplits.every((split) => split.isPaid === "PAID");
-    let newExpenseStatus: "SETTLED" | "PARTIALLY_SETTLED";
-    
-    if (allPaid) {
-      newExpenseStatus = "SETTLED";
-    } else {
-      newExpenseStatus = "PARTIALLY_SETTLED";
-    }
-    
-    // Update the overall group expense status
+
+    const newExpenseStatus: ExpenseStatus = 
+      unpaidSplits.length === 0 ? "SETTLED" : 
+      unpaidSplits.some(split => split.isPaid === "PARTIALLY_PAID") || 
+      (unpaidSplits.length < groupExpense.splits.length) ? "PARTIALLY_SETTLED" : 
+      "UNSETTLED";
+
     await db.groupExpense.update({
       where: { id: groupExpense.id },
-      data: {
-        status: newExpenseStatus,
-      },
+      data: { status: newExpenseStatus },
     });
-    
-    return { message: "Payment to group member completed successfully!" };
+
+    remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
+  }
+
+  return { message: "Payment to group member completed successfully!" };
 }
+
+type SplitStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID";
+type ExpenseStatus = "UNSETTLED" | "PARTIALLY_SETTLED" | "SETTLED" | "CANCELLED";

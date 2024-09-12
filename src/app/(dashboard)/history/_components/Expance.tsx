@@ -630,6 +630,7 @@ export function NewExpense({ onAdd }: NewExpenseProps) {
   const handleSubmit = async(data: ExpenseFormData) => {
     setisPending(true);
     await onAdd(data);
+    form.reset();
     setOpen(false);
     setisPending(false);
   }

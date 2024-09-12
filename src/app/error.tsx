@@ -3222,6 +3222,7 @@ const SVGComponent = (props) => (
   </svg>
 )
 
+
 export default function ErrorBoundary({
   error,
   reset,

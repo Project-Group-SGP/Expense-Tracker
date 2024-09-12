@@ -263,6 +263,7 @@ export function Newincome({ onAdd }: NewIncomeProps) {
   const handleSubmit = async(data: IncomeFormData) => {
     setisPending(true);
     await onAdd(data);
+    form.reset();
     setOpen(false);
     setisPending(false);
   }

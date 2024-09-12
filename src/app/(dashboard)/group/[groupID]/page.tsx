@@ -45,7 +45,7 @@ interface GetResponse {
   group: Group | null;
   groupMembers: GroupMemberDetails[];
   pendingPayments: ExpenseSplit[];
-  usersToPay: { memberName: string; memberId: string; amountToPay: number }[];
+  usersToPay: {id:string, memberName: string; memberId: string; amountToPay: number }[];
 }
     
 const getAllData = cache(
@@ -120,17 +120,20 @@ export default async function GroupPage({
               👋
             </p>
             <div className="ml-auto flex gap-2">
+              
               <AddExpense
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
                 user={user.id}
               />
+
               <SettleUp
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
                 usersYouNeedToPay={usersYouNeedToPay}
                 user={user.id}
               />
+              
             </div>
           </div>
 

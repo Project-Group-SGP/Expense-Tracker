@@ -62,7 +62,7 @@ const color = `hsl(${((hashStringToNumber(user.userId) * 100) % 360) + 30}, 70%,
         fontSize: size / 2, // Adjust font size based on the avatar size
       }}
     >
-      {initials}
+      {initials.slice(0,2)}
     </div>
   );
 };

@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
         isPaid: "UNPAID",
       },
       select: {
+        id:true,
         amount: true,
         expense: {
           select: {
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest) {
         isPaid: { in: ["UNPAID", "PARTIALLY_PAID"] },
       },
       select: {
+        id: true,
         amount: true,
         expense: {
           select: {
@@ -90,6 +92,7 @@ export async function GET(req: NextRequest) {
           0
         );
         return {
+          id: split.id,
           memberName: split.expense.paidBy.name,
           memberId: split.expense.paidBy.id,
           amountToPay: split.amount.toNumber() - totalPayments,
@@ -97,7 +100,7 @@ export async function GET(req: NextRequest) {
       })
       .filter((payment) => payment.amountToPay > 0 && payment.memberId !== user.id);
 
-    console.log("usersToPay: ", usersToPay);
+    // console.log("usersToPay: ", usersToPay);
     console.log("pendingPayments: ", pendingPayments);
     
     return NextResponse.json({
@@ -106,6 +109,7 @@ export async function GET(req: NextRequest) {
       pendingPayments,
       usersToPay,
     });
+    
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

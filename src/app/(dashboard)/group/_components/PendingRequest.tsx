@@ -58,7 +58,7 @@ export default function PendingRequestsList({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="mb-2 text-sm text-muted-foreground">
+              <p className="mb-2 text-sm text-gray-600 text-muted-foreground dark:text-gray-400">
                 {request.group.description}
               </p>
               <div className="text-sm">

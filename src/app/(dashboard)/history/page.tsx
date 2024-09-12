@@ -90,17 +90,15 @@ import { useEditTransaction } from "./_hooks/use-edit-transaction" // Import the
 import DatePicker from "./_components/DatePicker"
 import { useQueryClient } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
-// import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic';
 
-// const NewExpense = dynamic(() => import('./_components/Expance').then((mod) => mod.NewExpense), {
-//   ssr: false, 
-// });
+const NewExpense = dynamic(() => import('./_components/Expance').then((mod) => mod.NewExpense), {
+  ssr: false, 
+});
 
-// const Newincome = dynamic(() => import('./_components/Income').then((mod) => mod.Newincome), {
-//   ssr: false, 
-// });
-import { NewExpense } from "./_components/Expance"
-import { Newincome } from "./_components/Income"
+const Newincome = dynamic(() => import('./_components/Income').then((mod) => mod.Newincome), {
+  ssr: false, 
+});
 const HistoryPage = () => {
   const params = useSearchParams();
   const from = params.get("from") || "";

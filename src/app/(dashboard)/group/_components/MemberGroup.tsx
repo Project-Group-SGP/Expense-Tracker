@@ -36,7 +36,9 @@ export default function MemberGroupsList({ groups }: MemberGroupsListProps) {
               </section>
             </CardHeader>
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600">{group.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {group.description}
+              </p>
             </CardContent>
           </Card>
         ))}
