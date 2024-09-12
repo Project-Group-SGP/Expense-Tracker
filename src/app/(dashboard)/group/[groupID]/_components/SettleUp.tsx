@@ -614,6 +614,13 @@ export function SettleUp({
     return selectedUser ? selectedUser : []
   }, [safeUsersYouNeedToPay, toUser])
 
+
+  const totalAmount = useMemo(() => {
+    return selectedUserExpenses
+      .filter((expense) => form.watch("selectedExpenses").includes(expense.id))
+      .reduce((sum, expense) => sum + expense.amountToPay, 0);
+  }, [selectedUserExpenses,form.watch("selectedExpenses")])
+
   if (safeUsersYouNeedToPay.length === 0) {
     return (
       <Button
@@ -637,7 +644,7 @@ export function SettleUp({
           Settle up 🤝
         </Button>
       </DialogTrigger>
-      <DialogContent className="h-max-[90vh] overflow-y-auto sm:max-w-[425px]">
+      <DialogContent className="h-max-[90vh] sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             <span className="text-green-500">Settle up</span> 🤝
@@ -707,7 +714,7 @@ export function SettleUp({
                       Select expenses to settle:
                     </FormLabel>
                   </div>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-4 h-[30vh] overflow-y-auto ">
                     {selectedUserExpenses.map((expense) => (
                       <ExpenseCard
                         //@ts-ignore
@@ -761,21 +768,26 @@ export function SettleUp({
                 </FormItem>
               )}
             />
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="outline"
-                className="ml-2 border-green-500 text-green-500 hover:bg-green-600"
-              >
-                Settle up
-              </Button>
+            <div className="flex justify-between space-x-2">
+              <div className="text-lg font-semibold text-left">
+                Total: ₹{totalAmount.toFixed(2)}
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="ml-2 border-green-500 text-green-500 hover:bg-green-600"
+                >
+                  Settle up
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
