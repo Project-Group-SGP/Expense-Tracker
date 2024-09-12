@@ -2,7 +2,6 @@ import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { cache, Suspense } from "react"
-
 import { headers } from "next/headers"
 import { Cardcontent } from "../../dashboard/_components/Card"
 import Transaction from "./_components/Transaction"
@@ -10,7 +9,6 @@ import { GroupMember } from "./_components/GroupMember"
 import SettleUp from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "../../dashboard/_components/PageTitle"
-
 
 interface Group {
   id: string;
@@ -49,7 +47,7 @@ interface GetResponse {
   pendingPayments: ExpenseSplit[];
   usersToPay: { memberName: string; memberId: string; amountToPay: number }[];
 }
-
+    
 const getAllData = cache(
   async (groupID: string, cookie: string): Promise<GetResponse> => {
     try {
@@ -102,9 +100,9 @@ export default async function GroupPage({
 
   const data = await getAllData(params.groupID, cookie);
 
-  const groupMembers = data.groupMembers
-  const groupMemberName: GroupMember[] = data.groupMembers
-  const usersYouNeedToPay = data.usersToPay // Get users the current user needs to pay
+  const groupMembers = data.groupMembers;
+  const groupMemberName: GroupMemberDetails[] = data.groupMembers;
+  const usersYouNeedToPay = data.usersToPay;
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       ...expense.map(item => ({ ...item, amount: -item.amount }))
     ].sort((a, b) => b.date.getTime() - a.date.getTime());
     
-    return NextResponse.json({transactions});
+    return NextResponse.json({ transactions }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json(

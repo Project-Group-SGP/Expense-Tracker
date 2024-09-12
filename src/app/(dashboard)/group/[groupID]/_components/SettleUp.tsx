@@ -197,7 +197,7 @@ export function SettleUp({
         )
       }
 
-      const loading = toast.loading("Adding Expense...")
+      // const loading = toast.loading("Adding Expense...")
       setOpen(false)
       try {
         // Call settleUp API
