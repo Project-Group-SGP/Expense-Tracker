@@ -6,6 +6,7 @@ import { CategoryTypes } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidateTag } from "next/cache";
 import { split } from "postcss/lib/list";
+import { Prisma } from "@prisma/client";
 
 export async function AddGroupExpense(params: { 
   groupID: string, 
@@ -63,14 +64,23 @@ export async function AddGroupExpense(params: {
     return { success: true };
 }
 
+interface expenseDetails {
+  expenseid: string
+  amount: number
+}
 
-
+interface Payment {
+  id: string;
+  expenseSplitId: string;
+  amount: Decimal;
+  paidAt: Date;
+}
 export async function settleUp(params: {
   groupID: string;
   payerId: string;
   recipientId: string;
-  amount: number;
-  expenseIds: string[];
+  // amount: number;
+  expenseIds:expenseDetails[];
   transactionDate: Date;
 }) {
   console.log("Params:", params);
@@ -91,86 +101,202 @@ export async function settleUp(params: {
     throw new Error("Both users must be members of the group.");
   }
 
-  let remainingAmountToSettle = new Decimal(params.amount);
+  // let remainingAmountToSettle = new Decimal(params.amount);
+  let promises: any[] = [];
+  for (const expense of params.expenseIds) {
+    // if (remainingAmountToSettle.lte(0)) break;
+    // const groupExpense = await db.groupExpense.findFirst({
+    //   where: {
+    //     id: expenseId,
+    //     groupId: params.groupID,
+    //     paidById: params.recipientId,
+    //     status: { not: "CANCELLED" },
+    //   },
+    //   include: { splits: true },
+    // });
+    
+    // if (!groupExpense) {
+    //   console.warn(`Group expense with ID ${expenseId} not found or invalid.`);
+    //   continue;
+    // }
 
-  for (const expenseId of params.expenseIds) {
-    if (remainingAmountToSettle.lte(0)) break;
+    // const payerSplit = groupExpense.splits.find((split) => split.userId === params.payerId);
+    // if (!payerSplit) {
+    //   console.warn(`No split found for payer in expense ID: ${expenseId}`);
+    //   continue;
+    // }
 
-    const groupExpense = await db.groupExpense.findFirst({
-      where: {
-        id: expenseId,
-        groupId: params.groupID,
-        paidById: params.recipientId,
-        status: { not: "CANCELLED" },
-      },
-      include: { splits: true },
-    });
+    // const totalPaidForSplit = await db.payment.aggregate({
+    //   where: { expenseSplitId: expense.expenseid },
+    //   _sum: { amount: true },
+    // });
 
-    if (!groupExpense) {
-      console.warn(`Group expense with ID ${expenseId} not found or invalid.`);
-      continue;
-    }
+    // const totalPaidAmount = totalPaidForSplit._sum?.amount ?? new Decimal(0);
+    // const remainingAmount = payerSplit.amount.sub(totalPaidAmount);
+    // const paymentAmount = Decimal.min(remainingAmountToSettle, remainingAmount);
 
-    const payerSplit = groupExpense.splits.find((split) => split.userId === params.payerId);
-    if (!payerSplit) {
-      console.warn(`No split found for payer in expense ID: ${expenseId}`);
-      continue;
-    }
-
-    const totalPaidForSplit = await db.payment.aggregate({
-      where: { expenseSplitId: payerSplit.id },
-      _sum: { amount: true },
-    });
-
-    const totalPaidAmount = totalPaidForSplit._sum?.amount ?? new Decimal(0);
-    const remainingAmount = payerSplit.amount.sub(totalPaidAmount);
-    const paymentAmount = Decimal.min(remainingAmountToSettle, remainingAmount);
-
-    await db.payment.create({
+    const payment = db.payment.create({
       data: {
-        expenseSplitId: payerSplit.id,
-        amount: paymentAmount,
+        expenseSplitId: expense.expenseid,
+        amount: expense.amount,
         paidAt: params.transactionDate,
       },
     });
 
-    const newTotalPaidAmount = totalPaidAmount.add(paymentAmount);
-    const newSplitStatus: SplitStatus = 
-      newTotalPaidAmount.gte(payerSplit.amount) ? "PAID" :
-      newTotalPaidAmount.gt(0) ? "PARTIALLY_PAID" : "UNPAID";
-
-    const update = await db.expenseSplit.update({
-      where: { id: payerSplit.id },
-      data: { isPaid: newSplitStatus },
+    promises.push(payment);
+    // const newTotalPaidAmount = totalPaidAmount.add(paymentAmount);
+    // const newSplitStatus: SplitStatus = 
+    //   newTotalPaidAmount.gte(payerSplit.amount) ? "PAID" :
+    //   newTotalPaidAmount.gt(0) ? "PARTIALLY_PAID" : "UNPAID";
+    const update = db.expenseSplit.update({
+      where: { id: expense.expenseid },
+      data: { isPaid: "PAID" },
     });
 
-    console.log("inside group.ts");
-    console.log(update);
-    
+    promises.push(update);
+    // const unpaidSplits = await db.expenseSplit.findMany({
+    //   where: { 
+    //     expenseId: groupExpense.id, 
+    //     isPaid: { in: ["UNPAID", "PARTIALLY_PAID"] }
+    //   },
+    // });
 
-    const unpaidSplits = await db.expenseSplit.findMany({
-      where: { 
-        expenseId: groupExpense.id, 
-        isPaid: { in: ["UNPAID", "PARTIALLY_PAID"] }
-      },
-    });
+    // const newExpenseStatus: ExpenseStatus = 
+    //   unpaidSplits.length === 0 ? "SETTLED" : 
+    //   unpaidSplits.some(split => split.isPaid === "PARTIALLY_PAID") || 
+    //   (unpaidSplits.length < groupExpense.splits.length) ? "PARTIALLY_SETTLED" : 
+    //   "UNSETTLED";
 
-    const newExpenseStatus: ExpenseStatus = 
-      unpaidSplits.length === 0 ? "SETTLED" : 
-      unpaidSplits.some(split => split.isPaid === "PARTIALLY_PAID") || 
-      (unpaidSplits.length < groupExpense.splits.length) ? "PARTIALLY_SETTLED" : 
-      "UNSETTLED";
+    // await db.groupExpense.update({
+    //   where: { id: groupExpense.id },
+    //   data: { status: newExpenseStatus },
+    // });
 
-    await db.groupExpense.update({
-      where: { id: groupExpense.id },
-      data: { status: newExpenseStatus },
-    });
-
-    remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
+    // remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
   }
+
+  await Promise.all(promises);
 
   return { message: "Payment to group member completed successfully!" };
 }
 
 type SplitStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID";
 type ExpenseStatus = "UNSETTLED" | "PARTIALLY_SETTLED" | "SETTLED" | "CANCELLED";
+// interface ExpenseDetail {
+//   expenseid: string;
+//   amount: number;
+// }
+
+// interface SettleUpParams {
+//   groupID: string;
+//   payerId: string;
+//   recipientId: string;
+//   expenseIds: ExpenseDetail[];
+//   transactionDate: Date;
+// }
+
+// export async function settleUp(params: SettleUpParams) {
+//   const { groupID, payerId, recipientId, expenseIds, transactionDate } = params;
+
+//   return db.$transaction(async (tx) => {
+//     // Validate user
+//     const user = await currentUserServer();
+//     if (!user || user.id !== payerId) {
+//       throw new Error("Unauthorized: Please log in with the correct account.");
+//     }
+
+//     // Validate group membership
+//     const groupMembers = await tx.groupMember.findMany({
+//       where: { groupId: groupID },
+//       select: { userId: true },
+//     });
+//     const memberIds = groupMembers.map(member => member.userId);
+//     if (!memberIds.includes(payerId) || !memberIds.includes(recipientId)) {
+//       throw new Error("Invalid operation: Both users must be members of the group.");
+//     }
+
+//     // Process each expense
+//     for (const { expenseid, amount } of expenseIds) {
+//       const expenseSplit = await tx.expenseSplit.findUnique({
+//         where: { id: expenseid },
+//         include: { expense: true },
+//       });
+
+//       if (!expenseSplit) {
+//         throw new Error(`Expense split with ID ${expenseid} not found.`);
+//       }
+
+//       if (expenseSplit.expense.groupId !== groupID) {
+//         throw new Error(`Expense ${expenseid} does not belong to the specified group.`);
+//       }
+
+//       if (expenseSplit.userId !== payerId) {
+//         throw new Error(`Expense ${expenseid} is not associated with the payer.`);
+//       }
+
+//       const totalPaid = await tx.payment.aggregate({
+//         where: { expenseSplitId: expenseid },
+//         _sum: { amount: true },
+//       });
+
+//       const currentPaidAmount = totalPaid._sum?.amount ?? new Prisma.Decimal(0);
+//       const newTotalPaidAmount = currentPaidAmount.add(amount);
+
+//       if (newTotalPaidAmount.gt(expenseSplit.amount)) {
+//         throw new Error(`Payment amount for expense ${expenseid} exceeds the owed amount.`);
+//       }
+
+//       // Create payment
+//       await tx.payment.create({
+//         data: {
+//           expenseSplitId: expenseid,
+//           amount: new Prisma.Decimal(amount),
+//           paidAt: transactionDate,
+//         },
+//       });
+
+//       // Update expense split status
+//       const newStatus = newTotalPaidAmount.equals(expenseSplit.amount)
+//         ? "PAID"
+//         : newTotalPaidAmount.gt(0)
+//         ? "PARTIALLY_PAID"
+//         : "UNPAID";
+
+//       await tx.expenseSplit.update({
+//         where: { id: expenseid },
+//         data: { isPaid: newStatus },
+//       });
+//     }
+
+//     // Perform group expense status updates outside of the loop
+//     const groupExpenseStatusUpdate = async () => {
+//       for (const { expenseid } of expenseIds) {
+//         const unpaidSplits = await tx.expenseSplit.count({
+//           where: {
+//             expenseId: expenseid,
+//             isPaid: { in: ["UNPAID", "PARTIALLY_PAID"] },
+//           },
+//         });
+
+//         const totalSplits = await tx.expenseSplit.count({
+//           where: { expenseId: expenseid },
+//         });
+
+//         const newExpenseStatus = unpaidSplits === 0
+//           ? "SETTLED"
+//           : unpaidSplits < totalSplits
+//           ? "PARTIALLY_SETTLED"
+//           : "UNSETTLED";
+
+//         await tx.groupExpense.update({
+//           where: { id: expenseid },
+//           data: { status: newExpenseStatus },
+//         });
+//       }
+//     };
+
+//     await groupExpenseStatusUpdate();
+
+//     return { message: "Payment to group member completed successfully!" };
+//   });
+// }
