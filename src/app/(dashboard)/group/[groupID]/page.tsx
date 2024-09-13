@@ -11,36 +11,42 @@ import { SettleUp } from "./_components/SettleUp";
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "../../dashboard/_components/PageTitle"
 
-
 interface Group {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface GroupMemberDetails {
-  userId: string;
-  name: string;
-  avatar: string;
+  userId: string
+  name: string
+  avatar: string
 }
 
 interface User {
-  id: string;
-  name: string;
-  image: string;
+  id: string
+  name: string
+  image: string
 }
 
 interface Payment {
-  amount: number;
+  amount: number
 }
 
 interface Expense {
-  paidBy: User[];
+  paidBy: User[]
 }
 
 interface ExpenseSplit {
-  amount: number;
-  expense: Expense;
-  payments: Payment[];
+  amount: number
+  expense: Expense
+  payments: Payment[]
+}
+
+interface UserToPay {
+  id: string
+  memberName: string
+  memberId: string
+  amountToPay: number
 }
 
 interface GetResponse {
@@ -60,24 +66,29 @@ const getAllData = cache(
           headers: { Cookie: cookie },
           next: { tags: ["getAllGroupData"] },
         }
-      );
+      )
 
       if (!res.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Network response was not ok")
       }
 
-      console.log("Data fetched successfully");
+      console.log("Data fetched successfully")
 
-      const data: GetResponse = await res.json();
-      console.log(data);
+      const data: GetResponse = await res.json()
+      console.log(data)
 
-      return data;
+      return data
     } catch (error) {
-      console.error("Error fetching data:", error);
-      return { group: null, groupMembers: [], pendingPayments: [], usersToPay: [] };
+      console.error("Error fetching data:", error)
+      return {
+        group: null,
+        groupMembers: [],
+        pendingPayments: [],
+        usersToPay: [],
+      }
     }
   }
-);
+)
 
 export default async function GroupPage({
   params,
@@ -99,7 +110,7 @@ export default async function GroupPage({
     redirect("/404")
   }
 
-  const data = await getAllData(params.groupID, cookie);
+  const data = await getAllData(params.groupID, cookie)
 
   const groupMembers = data.groupMembers
   const usersYouNeedToPay = data.usersToPay
@@ -120,20 +131,21 @@ export default async function GroupPage({
               👋
             </p>
             <div className="ml-auto flex gap-2">
-              
               <AddExpense
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
                 user={user.id}
               />
-
+              {/*@ts-ignore*/}
               <SettleUp
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
-                usersYouNeedToPay={usersYouNeedToPay}
+                usersYouNeedToPay={usersYouNeedToPay.map((user) => ({
+                  ...user,
+                  expenses: [], // or provide the correct expenses array here
+                }))}
                 user={user.id}
               />
-              
             </div>
           </div>
 

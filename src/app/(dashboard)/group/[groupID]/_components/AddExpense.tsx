@@ -164,11 +164,11 @@ export function AddExpense({
       category: CategoryTypes.Food,
     },
   })
-  
-  const router = useRouter();
+
+  const router = useRouter()
   const watchAmount = form.watch("amount")
   const watchSplitType = form.watch("splitType")
-  
+
   useEffect(() => {
     const totalAmount = parseFloat(watchAmount) || 0
     const splitType = watchSplitType
@@ -205,7 +205,6 @@ export function AddExpense({
   // Form submission
   const onSubmit = async (data) => {
     console.log(data)
-
 
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
@@ -260,7 +259,7 @@ export function AddExpense({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-[150px]"
           variant="outline"
           onClick={() => setOpen(true)}
         >
@@ -268,27 +267,23 @@ export function AddExpense({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="scale-2 sm:w-[450px]">
+      <DialogContent className="sm:max-w-[450px] w-[95vw] max-h-[95vh] overflow-y-auto rounded-lg">
         <DialogHeader>
-          <DialogTitle className="text-center sm:text-left mb-2">
+          <DialogTitle className="mb-2 text-center sm:text-left">
             <span className="text-red-500">Add an Expense</span> 😤
           </DialogTitle>
         </DialogHeader>
 
-        {/* Form */}
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="h-full space-y-4"
-          >
-            {/* category */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-md">
+            {/* Description and Category */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-white">Description</FormLabel>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <FormControl>
                       <Input
                         placeholder="E.g. Drinks"
@@ -313,7 +308,7 @@ export function AddExpense({
               )}
             />
 
-            {/* amount */}
+            {/* Amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -340,19 +335,19 @@ export function AddExpense({
               )}
             />
 
-            {/* paid by */}
-            <div className="flex items-end space-x-4">
+            {/* Paid By and Date */}
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-end sm:space-x-4 sm:space-y-0">
               <FormField
                 control={form.control}
                 name="paidBy"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex-grow">
                     <FormLabel>Paid By</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Select user" />
                       </SelectTrigger>
                       <SelectContent>
@@ -367,12 +362,11 @@ export function AddExpense({
                 )}
               />
 
-              {/* date */}
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex-grow">
                     <FormLabel>When</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -380,7 +374,7 @@ export function AddExpense({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-[180px] pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal sm:w-[180px]",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -408,21 +402,21 @@ export function AddExpense({
               />
             </div>
 
-            {/* split type */}
+            {/* Split Type */}
             <FormField
               control={form.control}
               name="splitType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Split</FormLabel>
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className="mb-4">
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value)
                       }}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger className="w-[120px]">
+                      <SelectTrigger className="w-full sm:w-[120px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -432,7 +426,9 @@ export function AddExpense({
                     </Select>
                   </div>
 
-                  <div className={`grid grid-cols-1 gap-2 content-start ${members.length<3?'':'h-[12vh]'} overflow-y-auto`}>
+                  <div
+                    className={`grid grid-cols-1 content-start gap-2 ${members.length < 3 ? "" : "max-h-[40vh] sm:max-h-[30vh]"} overflow-y-auto`}
+                  >
                     {members.map((member) => (
                       <div
                         key={member.id}
@@ -481,19 +477,20 @@ export function AddExpense({
               )}
             />
 
-            {/* Button */}
-            <div className="flex justify-end space-x-2">
+            {/* Buttons */}
+            <div className="flex flex-col justify-end space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                 className="w-full sm:w-auto rounded-md"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 variant="outline"
-                className="border-red-500 text-red-500 hover:bg-red-600"
+               className="w-full sm:w-auto border-red-500 text-red-500 hover:bg-red-600 rounded-md"
               >
                 Add Expense
               </Button>

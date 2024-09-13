@@ -1,5 +1,10 @@
 "use client"
-
+import React, { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { toast } from "sonner"
+import { Wallet, CircleGauge, AlertCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,16 +23,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
 import CategoryCard from "./Card_Category"
-import { CircleGauge } from "lucide-react"
 import { SetBudgetDb } from "../actions"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-// form validation schema
 const formSchema = z.object({
   amount: z
     .string()
@@ -38,8 +37,15 @@ const formSchema = z.object({
 
 export type BudgetFormData = z.infer<typeof formSchema>
 
-export function SetBudget({ currentBudget }: { currentBudget: number }) {
+export function SetBudget({
+  currentBudget,
+  expense,
+}: {
+  currentBudget: number
+  expense: number
+}) {
   const [open, setOpen] = useState(false)
+  const [toastShown, setToastShown] = useState(false)
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -48,28 +54,53 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
     },
   })
 
-  // form handler
+  // Show warning toast when expense exceeds budget
+  useEffect(() => {
+    if (!toastShown && expense && currentBudget && currentBudget < expense) {
+      toast.custom(
+        (t) => (
+          <Alert className="relative w-full max-w-md border-none border-red-800 bg-red-600 shadow-lg">
+            <AlertTitle className="flex items-center text-[13px] font-bold text-white">
+              <AlertCircle className="mr-2 h-6 w-6 text-red-200" />
+              Warning: Budget Exceeded!
+            </AlertTitle>
+            <AlertDescription className="mt-2 text-[12px] text-red-100">
+              You've exceeded your budget! Please review your expenses.
+            </AlertDescription>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="absolute right-2 top-2 text-red-100 hover:bg-red-700 hover:text-white"
+              onClick={() => toast.dismiss(t)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </Alert>
+        ),
+        {
+          duration: 5000,
+          position: "top-right",
+        }
+      )
+      setToastShown(true)
+    }
+  }, [currentBudget, expense, toastShown])
+
   const handleSubmit = async (data: BudgetFormData) => {
     try {
-      
-      // For now, we'll just simulate a successful update
-      // await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulating API call
+      const budget = Number(data.amount)
+      const result = await SetBudgetDb(budget)
 
-      const budget = Number(data.amount);
-
-      const result = await SetBudgetDb(budget);
-
-      if(result == "success"){
+      if (result === "success") {
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
         })
-        form.reset();
-      }else{
-        toast.error("Budget not set");
+        form.reset()
+      } else {
+        toast.error("Budget update failed")
       }
-     
 
       setOpen(false)
       form.reset({ amount: data.amount })
@@ -81,16 +112,16 @@ export function SetBudget({ currentBudget }: { currentBudget: number }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div onClick={() => setOpen(true)}>
-        <DialogTrigger asChild>
+      <DialogTrigger asChild>
+        <div onClick={() => setOpen(true)}>
           <CategoryCard
             title="Budget"
             amount={currentBudget}
             color="text-blue-700"
             icon={CircleGauge}
-            />
-        </DialogTrigger>
-            </div>
+          />
+        </div>
+      </DialogTrigger>
 
       <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
         <DialogHeader>

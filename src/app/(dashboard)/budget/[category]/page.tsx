@@ -57,7 +57,7 @@ const Page = async () => {
           {/* Pass data to Category_Graph */}
           <Category_Graph data={data} />
         </Cardcontent>
-        <Cardcontent className="p-0 border-none">
+        <Cardcontent className="p-0 !border-none shadow-none">
           {/* Pass data to Transaction */}
           <Transaction data={data} />
         </Cardcontent>
