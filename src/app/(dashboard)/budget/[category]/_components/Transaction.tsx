@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { SetCategroy_Budget } from "./SetCategory_Budget";
 import Card_budget from "./Card_budget";
 import { Wallet } from "lucide-react";
+import { toast } from "sonner";
 
 type Expense = {
   id: string;
@@ -50,6 +51,10 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
   const totalAmount = categoryTransaction.reduce((total, transaction) => {
     return total + parseFloat(transaction.amount);
   }, 0);
+
+  if(totalAmount > data.categoryBudget[lastRouteName]) {
+      toast.success("Budget exceeded. Please settle up!");
+  }
 
   const remainingBudget = data.categoryBudget[lastRouteName] - totalAmount;
   const isOverBudget = remainingBudget < 0

@@ -236,7 +236,7 @@ export function SettleUp({
       .filter((user) => selectedExpenses.includes(user.id))
       .map((user) => ({
         expenseid: user.id,
-        amount: user.amountToPay,
+        // amount: user.amountToPay,
       }))
 
     console.log(expenseDetails)
@@ -454,12 +454,14 @@ export function SettleUp({
           </form>
         </Form>
       </DialogContent>
+      
       <UserSelectionModal
         isOpen={userSelectionOpen}
         onClose={() => setUserSelectionOpen(false)}
         onSelect={handleUserSelect}
         availableUsers={availableRecipients}
       />
+
     </Dialog>
   )
 }
