@@ -9,7 +9,7 @@ import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 const DatePicker = () => {
   const router = useRouter()
-  const user = useCurrentUserClient()
+  const user = useCurrentUserClient();
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
   useEffect(() => {

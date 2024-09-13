@@ -7,7 +7,7 @@ import { headers } from "next/headers"
 import { Cardcontent } from "../../dashboard/_components/Card"
 import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
-import SettleUp from "./_components/SettleUp"
+import { SettleUp } from "./_components/SettleUp";
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "../../dashboard/_components/PageTitle"
 
@@ -50,15 +50,10 @@ interface UserToPay {
 }
 
 interface GetResponse {
-  group: Group | null
-  groupMembers: GroupMemberDetails[]
-  pendingPayments: ExpenseSplit[]
-  usersToPay: {
-    id: string
-    memberName: string
-    memberId: string
-    amountToPay: number
-  }[]
+  group: Group | null;
+  groupMembers: GroupMemberDetails[];
+  pendingPayments: ExpenseSplit[];
+  usersToPay: {id:string, memberName: string; memberId: string; amountToPay: number, groupexpanceid: string }[];
 }
 
 const getAllData = cache(

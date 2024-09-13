@@ -73,6 +73,7 @@ export async function GET(req: NextRequest) {
         amount: true,
         expense: {
           select: {
+            id:true,
             paidBy: {
               select: {
                 id: true,
@@ -93,6 +94,7 @@ export async function GET(req: NextRequest) {
         );
         return {
           id: split.id,
+          groupexpanceid:split.expense.id,
           memberName: split.expense.paidBy.name,
           memberId: split.expense.paidBy.id,
           amountToPay: split.amount.toNumber() - totalPayments,

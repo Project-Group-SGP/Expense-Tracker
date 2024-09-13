@@ -189,7 +189,7 @@ model Payment {
   amount        Decimal
   paidAt        DateTime     @default(now())
   expenseSplit  ExpenseSplit @relation(fields: [expenseSplitId], references: [id], onDelete: Cascade)
-
+  
   @@index([expenseSplitId])
 }
 
