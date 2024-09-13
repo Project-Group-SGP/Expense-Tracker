@@ -4,10 +4,11 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { usePathname } from "next/navigation";
-import { SetCategroy_Budget } from "./SetCategory_Budget";
+
 import Card_budget from "./Card_budget";
 import { Wallet } from "lucide-react";
 import { toast } from "sonner";
+import { SetCategory_Budget } from "./SetCategory_Budget";
 
 type Expense = {
   id: string;
@@ -78,7 +79,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
               color="text-emi"
               icon={Wallet}
             />
-            <SetCategroy_Budget category={lastRouteName} currentBudget={Number(data.categoryBudget[lastRouteName] || 0)} />
+            <SetCategory_Budget category={lastRouteName} currentBudget={Number(data.categoryBudget[lastRouteName] || 0)} />
           </section>
           All {lastRouteName} Transactions
         </CardDescription>

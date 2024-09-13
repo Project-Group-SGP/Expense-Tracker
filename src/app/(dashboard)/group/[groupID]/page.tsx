@@ -136,7 +136,7 @@ export default async function GroupPage({
                 groupMemberName={groupMembers}
                 user={user.id}
               />
-              @ts-ignore
+              {/*@ts-ignore*/}
               <SettleUp
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}

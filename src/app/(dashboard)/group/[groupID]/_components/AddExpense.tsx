@@ -260,7 +260,7 @@ export function AddExpense({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          className="w-[150px]  border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
           variant="outline"
           onClick={() => setOpen(true)}
         >
@@ -268,7 +268,7 @@ export function AddExpense({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="scale-2 sm:w-[450px]">
+      <DialogContent className="scale-2 sm:h-[95vh] sm:overflow-y-auto sm:w-[450px]">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left mb-2">
             <span className="text-red-500">Add an Expense</span> 😤
