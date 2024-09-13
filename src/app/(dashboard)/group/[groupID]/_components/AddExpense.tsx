@@ -268,9 +268,9 @@ export function AddExpense({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="scale-2 h-[90vh] overflow-y-auto sm:w-[450px]">
+      <DialogContent className="scale-2 sm:w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-center sm:text-left">
+          <DialogTitle className="text-center sm:text-left mb-2">
             <span className="text-red-500">Add an Expense</span> 😤
           </DialogTitle>
         </DialogHeader>
@@ -432,7 +432,7 @@ export function AddExpense({
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className={`grid grid-cols-1 gap-2 content-start ${members.length<3?'':'h-[12vh]'} overflow-y-auto`}>
                     {members.map((member) => (
                       <div
                         key={member.id}

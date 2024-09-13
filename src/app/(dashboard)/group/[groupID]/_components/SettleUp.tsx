@@ -389,6 +389,7 @@ interface EnhancedUserToPay {
   memberId: string
   // expenses: Expense[]
   amountToPay:number
+  groupexpanceid: string 
 }
 
 interface SettleUpProps {
@@ -454,7 +455,7 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
   }
 
   return (
-    <div className="flex cursor-pointer items-center justify-between rounded-md border p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex cursor-pointer items-center justify-between rounded-md border p-4 shadow-sm transition-shadow hover:shadow-md h-[9vh]">
       <div>
         <p className="font-semibold">{expense.description}</p>
         <p className="text-sm text-gray-600">
@@ -561,6 +562,7 @@ export function SettleUp({
       .map((user) => ({
         expenseid: user.id,
         amount: user.amountToPay,
+        groupexpenceid:user.groupexpanceid,
       }))
 
     console.log(expenseDetails)
@@ -714,10 +716,9 @@ export function SettleUp({
                       Select expenses to settle:
                     </FormLabel>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 h-[30vh] overflow-y-auto ">
+                  <div className={`grid grid-cols-1 gap-4 content-start ${selectedUserExpenses.length<3?'':'h-[30vh]'} overflow-y-auto`}>
                     {selectedUserExpenses.map((expense) => (
                       <ExpenseCard
-                        //@ts-ignore
                         key={expense.memberId + expense.amountToPay} // Assuming memberId and amountToPay combination is unique
                         expense={expense}
                         selectedExpenses={form.watch("selectedExpenses")}
@@ -770,7 +771,7 @@ export function SettleUp({
             />
             <div className="flex justify-between space-x-2">
               <div className="text-lg font-semibold text-left">
-                Total: ₹{totalAmount.toFixed(2)}
+                Total: ₹{totalAmount.toFixed(2)} 
               </div>
               <div className="flex justify-end space-x-2">
                 <Button
