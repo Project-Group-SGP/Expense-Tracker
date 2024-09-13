@@ -36,23 +36,49 @@ import {
 import { Trash } from "lucide-react"
 import DeleteButton from "./_components/Deletebutton";
 import { TableSkeleton } from "./_components/TableSkeleton";
+import { useRouter } from "next/navigation";
+import { bulkdelete } from "@/actions/history/bulkdelete";
+import { toast } from "sonner";
+import { z } from "zod";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterKey: string;
-  onDelete: (rows:{
-    ids: string,
-    category: "Income" | "Expense",
-  }[]) => void;
-  disabled?:boolean;
+  disabled:boolean;
+}
+
+const bulkdeleteProps = z.object({
+  props: z.array(
+    z.object({
+      ids: z.string(),
+      category: z.enum(["Income", "Expense"]),
+    })
+  ),
+  id:z.any(),
+})
+
+const deleteTransactions = async(json:z.infer<typeof bulkdeleteProps>) => {
+  try{
+    const responce = await bulkdelete({props:json.props});
+    if(responce.error)
+      toast.error(responce.error,{
+        id:json.id
+      });
+    else  
+      toast.success(responce.success,{
+        id:json.id
+      });
+    return responce;
+  }catch(e){
+    toast.error("Failed to delete transaction's");
+  }
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterKey,
-  onDelete,
   disabled,
 }: DataTableProps<TData, TValue>) {
 
@@ -82,14 +108,38 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   })
-  const HandleOnclick = () => {
+
+  const[disabledi,setdisabled] = React.useState(!!data);
+
+  React.useEffect(()=>{
+    setdisabled(false);
+  },[data])
+  
+  const router = useRouter();
+
+  const onDelete = async (value: {
+    ids: string,
+    category: "Income" | "Expense",
+  }[]) => {
+    console.log("page delete", value);
+
+    setdisabled(true);
+
+    const loading = toast.loading("Deleting transactions!!");
+    
+    await deleteTransactions({ props: value , id:loading});
+    setRowSelection({});
+    router.refresh();
+  }
+
+  const HandleOnclick = async () => {
     const array:{
       ids: string,
       category: "Income" | "Expense",
       //@ts-ignore
     }[] = table.getFilteredSelectedRowModel().rows.map((arr)=>{return {ids: arr.original.id ,category:arr.original.amount>0?"Income":"Expense"}});
     console.log("array",array);
-    onDelete(array);
+    await onDelete(array);
   }
 
   console.log("sarthak",table.getFilteredSelectedRowModel());
@@ -106,7 +156,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm mr-2"
         />
         {table.getFilteredSelectedRowModel().rows.length> 0 && (
-          <DeleteButton disabled={disabled} handleOnClick={HandleOnclick} selectedCount={table.getFilteredSelectedRowModel().rows.length}/>
+          <DeleteButton disabled={disabledi} handleOnClick={HandleOnclick} selectedCount={table.getFilteredSelectedRowModel().rows.length}/>
           // <Button size={"sm"} variant={"outline" } className="ml-auto font-normal text-xs" disabled={disabled} onClick={HandleOnclick}>
           // <Trash className="mr-2 size-4"/>  Delete ({table.getFilteredSelectedRowModel().rows.length})
           // </Button>

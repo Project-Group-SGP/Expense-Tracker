@@ -578,6 +578,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { AddnewExpense } from "../action"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 // Categories should align with CategoryTypes enum
 const defaultCategories = [
@@ -614,9 +617,11 @@ interface NewExpenseProps {
   onAdd: (data: ExpenseFormData) => void;
 }
 
-export function NewExpense({ onAdd }: NewExpenseProps) {
+export function NewExpense() {
   const [open, setOpen] = useState<boolean>(false);
   const [isPending, setisPending] = useState<boolean>(false);
+  
+  const router = useRouter();
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -626,12 +631,31 @@ export function NewExpense({ onAdd }: NewExpenseProps) {
       transactionDate: new Date(),
     },
   })
+  
+  const onAdd = async(data: ExpenseFormData) => {
+    try{
+      const responce = await AddnewExpense(data);
+      if(responce==="success"){
+        toast.success("Expense added successfully", {
+          closeButton: true,
+          icon: "💸",
+          duration: 4500,
+        });
 
+        setOpen(false);
+        router.refresh();
+        form.reset();
+      }else{
+        throw new Error("Income not added")
+      }
+    }catch(error){
+      console.error("Error adding expense:", error);
+      toast.error("Failed to add expense");
+    }
+  }
   const handleSubmit = async(data: ExpenseFormData) => {
     setisPending(true);
     await onAdd(data);
-    form.reset();
-    setOpen(false);
     setisPending(false);
   }
 

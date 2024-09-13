@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { bulkdeleteProps } from "@/lib/index";
 import { currentUserServer } from "@/lib/auth";
 import { revalidateTag } from "next/cache"
+
 export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
   console.log("\n\n\n\ndeleteProps",values);
   

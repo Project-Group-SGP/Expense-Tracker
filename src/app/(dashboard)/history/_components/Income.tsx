@@ -228,6 +228,9 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { useState } from "react"
+import { AddnewIncome } from "../action"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 // form validation schema
 const formSchema = z.object({
@@ -246,9 +249,11 @@ interface NewIncomeProps {
   onAdd: (data: IncomeFormData) => void;
 }
 
-export function Newincome({ onAdd }: NewIncomeProps) {
+export function Newincome() {
   const [open, setOpen] = useState(false)
   const [isPending, setisPending] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -259,12 +264,31 @@ export function Newincome({ onAdd }: NewIncomeProps) {
     },
   })
 
-  
+  const onAdd = async(data: IncomeFormData) => {
+    try{
+      const responce = await AddnewIncome(data);
+      if(responce==="success"){
+        toast.success("Income added successfully", {
+          closeButton: true,
+          icon: "🤑",
+          duration: 4500,
+        });
+
+        setOpen(false);
+        router.refresh();
+        form.reset();
+      }else{
+        throw new Error("Income not added")
+      }
+    }catch(error){
+      console.error("Error adding expense:", error);
+      toast.error("Failed to add income");
+    }
+  }
+
   const handleSubmit = async(data: IncomeFormData) => {
     setisPending(true);
     await onAdd(data);
-    form.reset();
-    setOpen(false);
     setisPending(false);
   }
 
@@ -278,7 +302,7 @@ export function Newincome({ onAdd }: NewIncomeProps) {
           New Income 🤑
         </Button>
       </DialogTrigger>
-
+    
       <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">

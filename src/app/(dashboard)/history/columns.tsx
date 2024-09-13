@@ -130,10 +130,16 @@ export const columns: ColumnDef<ResponceType>[] = [
     accessorKey: "Edit",
     header: "Edit",
     cell: ({ row }) => {
-      let amount = row.original.amount;
-      if(row.original.category!=="Income")
-        amount = -1*amount;
-      return <EditTransaction transaction={{...row.original,amount}} type={row.original.category==="Income" ? "Income" : "Expense"} />
+      const transaction = row.original;
+      const isIncome = transaction.category === "Income";
+      const amount = isIncome ? transaction.amount : -1 * transaction.amount;
+     
+      return (
+        <EditTransaction
+          transaction={{...transaction, amount}}
+          type={isIncome ? "Income" : "Expense"}
+        />
+      );
     },
   },
 ]
