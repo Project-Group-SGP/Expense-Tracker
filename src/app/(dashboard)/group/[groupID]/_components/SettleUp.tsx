@@ -357,6 +357,7 @@ import { UserAvatar } from "./UserAvatar"
 import { settleUp } from "../group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter } from "next/navigation"
+import { revalidateTag } from "next/cache"
 
 interface GroupMember {
   userId: string
@@ -473,7 +474,7 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
 // Function to open the dialog
 const openSettleDialog = (expense) => {
   // Implement the logic to open the dialog with expense details
-  console.log("Open settle dialog for:", expense)
+  // console.log("Open settle dialog for:", expense)
 }
 
 export function SettleUp({
@@ -545,11 +546,11 @@ export function SettleUp({
       return
     }
 
-    console.log("Selected User: ", selectedUser)
+    // console.log("Selected User: ", selectedUser)
 
-    console.log("reciptientId: ", selectedExpenses)
+    // console.log("reciptientId: ", selectedExpenses)
 
-    console.log("usersYouNeedToPay: ", usersYouNeedToPay)
+    // console.log("usersYouNeedToPay: ", usersYouNeedToPay)
 
     //selectedExpenses has all expense Id which is selected by user
     //usersYouNeedToPay has all user data which is available in group
@@ -562,7 +563,7 @@ export function SettleUp({
         groupexpenceid:user.groupexpanceid,
       }))
 
-    console.log(expenseDetails)
+    // console.log(expenseDetails)
 
     const loadingToast = toast.loading("Settling up...")
     setOpen(false)
@@ -585,9 +586,11 @@ export function SettleUp({
         duration: 4500,
       })
 
+      
       // Reset the form
       route.refresh()
-
+      
+      // revalidateTag("getGroupTransactionData");
       form.reset()
     } catch (error) {
       console.error(error)
@@ -609,7 +612,7 @@ export function SettleUp({
     const selectedUser = safeUsersYouNeedToPay.filter(
       (user) => user.memberId === toUser
     )
-    console.log(safeUsersYouNeedToPay, toUser, selectedUser)
+    // console.log(safeUsersYouNeedToPay, toUser, selectedUser)
     return selectedUser ? selectedUser : []
   }, [safeUsersYouNeedToPay, toUser])
 

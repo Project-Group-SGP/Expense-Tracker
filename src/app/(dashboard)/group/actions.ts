@@ -44,7 +44,7 @@ export async function AddnewGroup({
 }: {
   data: AddGroupData
 }): Promise<AddGroupResult> {
-  console.log("Function called", data)
+  // console.log("Function called", data)
   try {
     const user = await currentUserServer()
 

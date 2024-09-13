@@ -6,9 +6,9 @@ import CategoryList from "./_components/CategoryList"
 const Page = async () => {
   const data = await fetchBudgetData()
 
-  console.log("Inside main Page.tsx");
+  // console.log("Inside main Page.tsx");
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="mb-10 mr-10 mt-20">

@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
       .filter((payment) => payment.amountToPay > 0 && payment.memberId !== user.id);
 
     // console.log("usersToPay: ", usersToPay);
-    console.log("pendingPayments: ", pendingPayments);
+    // console.log("pendingPayments: ", pendingPayments);
     
     return NextResponse.json({
       group,

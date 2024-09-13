@@ -29,16 +29,16 @@ export async function AddGroupExpense(params: {
         }
     });
 
-    console.log(params.splits);
+    // console.log(params.splits);
     
 
-    console.log( "paidById : " + params.paidById);
+    // console.log( "paidById : " + params.paidById);
     
 
     // Check if the user is a member of the group
     if (groupMembers.some(member => member.id.toString() === params.paidById.toString())) {
-        console.log('Invalid ID:', params.paidById);
-        console.log("Group members:", groupMembers);
+        // console.log('Invalid ID:', params.paidById);
+        // console.log("Group members:", groupMembers);
         
         throw new Error("User is not a member of the group");
     }
@@ -83,7 +83,7 @@ export async function settleUp(params: {
   expenseIds:expenseDetails[];
   transactionDate: Date;
 }) {
-  console.log("Params:", params);
+  // console.log("Params:", params);
 
   const user = await currentUserServer();
   if (!user || user.id !== params.payerId) {
@@ -93,7 +93,7 @@ export async function settleUp(params: {
   const groupMembers = await db.groupMember.findMany({
     where: { groupId: params.groupID },
   });
-  console.log("Group members:", groupMembers);
+  // console.log("Group members:", groupMembers);
 
   const isPayerMember = groupMembers.some(member => member.userId === params.payerId);
   const isRecipientMember = groupMembers.some(member => member.userId === params.recipientId);

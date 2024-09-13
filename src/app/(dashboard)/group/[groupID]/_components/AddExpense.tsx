@@ -39,6 +39,7 @@ import { cn } from "@/lib/utils"
 import { AddGroupExpense } from "../group"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { revalidateTag } from "next/cache"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -204,7 +205,7 @@ export function AddExpense({
 
   // Form submission
   const onSubmit = async (data) => {
-    console.log(data)
+    // console.log(data)
 
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
@@ -241,6 +242,9 @@ export function AddExpense({
           duration: 4500,
           id: loading,
         })
+
+        form.reset();
+        revalidateTag("getGroupTransactionData");
       } else {
         console.error("Failed to Add Expense")
 

@@ -2,12 +2,11 @@ import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { cache, Suspense } from "react"
-
 import { headers } from "next/headers"
 import { Cardcontent } from "../../dashboard/_components/Card"
 import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
-import { SettleUp } from "./_components/SettleUp";
+import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "../../dashboard/_components/PageTitle"
 
@@ -47,48 +46,90 @@ interface UserToPay {
   memberName: string
   memberId: string
   amountToPay: number
+  groupexpanceid: string
 }
 
 interface GetResponse {
-  group: Group | null;
-  groupMembers: GroupMemberDetails[];
-  pendingPayments: ExpenseSplit[];
-  usersToPay: {id:string, memberName: string; memberId: string; amountToPay: number, groupexpanceid: string }[];
+  group: Group | null
+  groupMembers: GroupMemberDetails[]
+  pendingPayments: ExpenseSplit[]
+  usersToPay: UserToPay[]
 }
 
-const getAllData = cache(
-  async (groupID: string, cookie: string): Promise<GetResponse> => {
-    try {
-      const res = await fetch(
-        `${process.env.BASE_URL}/api/get-group?groupID=${groupID}`,
-        {
-          method: "GET",
-          headers: { Cookie: cookie },
-          next: { tags: ["getAllGroupData"] },
-        }
-      )
+type ExpenseSplitStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID"
 
-      if (!res.ok) {
-        throw new Error("Network response was not ok")
+interface ExpenseSplit {
+  userId: string
+  expenseId: string
+  amount: number
+  isPaid: ExpenseSplitStatus
+}
+
+export interface FormattedExpenseData {
+  groupId: string
+  expenseId: string
+  amount: number
+  category: string
+  paidById: string
+  description: string
+  date: string
+  expenseSplits: ExpenseSplit[]
+}
+
+async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
+  try {
+    const res = await fetch(
+      `${process.env.BASE_URL}/api/get-group?groupID=${groupID}`,
+      {
+        method: "GET",
+        headers: { Cookie: cookie },
+        cache: 'no-store',
       }
+    )
 
-      console.log("Data fetched successfully")
+    if (!res.ok) {
+      throw new Error("Network response was not ok")
+    }
 
-      const data: GetResponse = await res.json()
-      console.log(data)
-
-      return data
-    } catch (error) {
-      console.error("Error fetching data:", error)
-      return {
-        group: null,
-        groupMembers: [],
-        pendingPayments: [],
-        usersToPay: [],
-      }
+    const data: GetResponse = await res.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return {
+      group: null,
+      groupMembers: [],
+      pendingPayments: [],
+      usersToPay: [],
     }
   }
-)
+}
+
+async function getGroupTransactionData(groupID: string, cookie: string): Promise<FormattedExpenseData[]> {
+  try {
+    const res = await fetch(
+      `${process.env.BASE_URL}/api/get-group-transaction?groupID=${groupID}`,
+      {
+        method: "GET",
+        headers: { Cookie: cookie },
+        cache: 'no-store',
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok")
+    }
+
+    console.log("Data fetched successfully in getGroupTransactionData")
+
+    const data: FormattedExpenseData[] = await res.json()
+    console.log(data)
+
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return []
+  }
+}
 
 export default async function GroupPage({
   params,
@@ -109,6 +150,10 @@ export default async function GroupPage({
   if (!group) {
     redirect("/404")
   }
+
+  const transactionData = await getGroupTransactionData(params.groupID, cookie)
+  console.log("Inside [groupID]/page.tsx")
+  console.log("Group 1: ", JSON.stringify(transactionData, null, 2))
 
   const data = await getAllData(params.groupID, cookie)
 
@@ -136,13 +181,12 @@ export default async function GroupPage({
                 groupMemberName={groupMembers}
                 user={user.id}
               />
-              {/*@ts-ignore*/}
               <SettleUp
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
                 usersYouNeedToPay={usersYouNeedToPay.map((user) => ({
                   ...user,
-                  expenses: [], // or provide the correct expenses array here
+                  expenses: [],
                 }))}
                 user={user.id}
               />
@@ -151,7 +195,7 @@ export default async function GroupPage({
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
             <Cardcontent className="border-none p-0 md:col-span-2 lg:col-span-2">
-              <Transaction />
+              <Transaction transactionsData={transactionData} />
             </Cardcontent>
             <Cardcontent className="border-none p-0">
               <GroupMember groupMemberName={groupMembers} />
@@ -162,3 +206,5 @@ export default async function GroupPage({
     </Suspense>
   )
 }
+
+export const dynamic = 'force-dynamic'
