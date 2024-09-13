@@ -1,22 +1,19 @@
-"use client"
-import React, { useState } from "react"
-import Link from "next/link"
-import clsx from "clsx"
-import { IoClose } from "react-icons/io5"
-import { CiMenuFries } from "react-icons/ci"
-import { Button } from "@/components/ui/button"
-import { logout } from "@/actions/auth/logout"
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import clsx from "clsx";
+import { IoClose } from "react-icons/io5";
+import { CiMenuFries } from "react-icons/ci";
+import { Button } from "@/components/ui/button";
+import { logout } from "@/actions/auth/logout";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/transaction", label: "Transaction" },
-  { href: "/", label: "About" },
-  { href: "/", label: "Contact" },
-  { href: "/settings", label: "Settings" },
   { href: "/history", label: "History" },
   { href: "/budget", label: "Budget" },
   { href: "/group", label: "Group" },
-]
+  { href: "/settings", label: "Settings" },
+];
 
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,23 +21,30 @@ const MobileNav = () => {
 
   return (
     <>
+      {/* Menu Icon */}
       <CiMenuFries
         className="cursor-pointer text-2xl md:hidden"
         onClick={toggleMenu}
         aria-label="Toggle mobile menu"
       />
+
+      {/* Mobile Navigation */}
       <div
         className={clsx(
           "fixed left-0 top-0 z-50 h-full w-screen backdrop-blur-sm transition-all lg:hidden",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full" // Updated to slide in/out from the left
         )}
       >
+        {/* Menu Section */}
         <section className="absolute left-0 top-0 h-screen w-56 flex-col gap-8 bg-white p-8 shadow-lg dark:bg-black">
+          {/* Close Button */}
           <IoClose
             onClick={toggleMenu}
             className="mb-8 cursor-pointer text-3xl"
             aria-label="Close mobile menu"
           />
+
+          {/* Navigation Links */}
           <div className="flex flex-col items-center justify-center gap-4">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -52,6 +56,8 @@ const MobileNav = () => {
                 {label}
               </Link>
             ))}
+
+            {/* Logout Button */}
             <form action={logout}>
               <Button
                 variant="link"
@@ -60,12 +66,12 @@ const MobileNav = () => {
               >
                 Logout
               </Button>
-              </form>
+            </form>
           </div>
         </section>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default MobileNav
+export default MobileNav;

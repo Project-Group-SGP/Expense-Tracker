@@ -409,7 +409,7 @@ export const UserSelectionModal: React.FC<{
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[425px]">
+      <DialogContent className="rounded-lg max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Select Member</DialogTitle>
         </DialogHeader>
@@ -443,10 +443,8 @@ export const UserSelectionModal: React.FC<{
 }
 
 const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
-  // Check if the current expense is selected
   const isChecked = selectedExpenses?.includes(expense.id)
 
-  // Handle checkbox state changes
   const handleCheckboxChange = (checked) => {
     const updatedExpenses = checked
       ? [...selectedExpenses, expense.id]
@@ -455,10 +453,10 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
   }
 
   return (
-    <div className="flex cursor-pointer items-center justify-between rounded-md border p-4 shadow-sm transition-shadow hover:shadow-md h-[9vh]">
-      <div>
-        <p className="font-semibold">{expense.description}</p>
-        <p className="text-sm text-gray-600">
+    <div className="flex cursor-pointer  items-center justify-between rounded-lg border p-2 sm:p-4 shadow-sm transition-shadow hover:shadow-md min-h-[9vh]">
+      <div className="flex-grow pr-2">
+        <p className="font-semibold text-sm sm:text-base truncate">{expense.description}</p>
+        <p className="text-xs sm:text-sm text-gray-600">
           Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
         </p>
       </div>
@@ -472,7 +470,6 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
     </div>
   )
 }
-
 // Function to open the dialog
 const openSettleDialog = (expense) => {
   // Implement the logic to open the dialog with expense details
@@ -637,171 +634,171 @@ export function SettleUp({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
-          variant="outline"
-          onClick={() => setOpen(true)}
+    <DialogTrigger asChild>
+      <Button
+        className="w-full rounded-lg sm:w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
+        variant="outline"
+        onClick={() => setOpen(true)}
+      >
+        Settle up 🤝
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="max-h-[90vh] rounded-lg w-[95vw] sm:max-w-[425px] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="text-center sm:text-left">
+          <span className="text-green-500">Settle up</span> 🤝
+        </DialogTitle>
+      </DialogHeader>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4"
         >
-          Settle up 🤝
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="h-max-[90vh] sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="text-center sm:text-left">
-            <span className="text-green-500">Settle up</span> 🤝
-          </DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
-            <div className="flex items-center justify-center space-x-4">
-              <UserAvatar
-                user={
-                  groupMemberName.find((u) => u.userId === user) ||
-                  groupMemberName[0]
-                }
-                size={85}
-              />
-              <div className="text-2xl">→</div>
-              <FormField
-                control={form.control}
-                name="toUser"
-                render={({ field }) => (
-                  <FormItem>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <UserAvatar
+              user={
+                groupMemberName.find((u) => u.userId === user) ||
+                groupMemberName[0]
+              }
+              size={85}
+            />
+            <div className="text-2xl transform rotate-90 sm:rotate-0">→</div>
+            <FormField
+              control={form.control}
+              name="toUser"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-24 w-24  rounded-full border-none p-0"
+                      onClick={() => {
+                        setSelectingFor("toUser")
+                        setUserSelectionOpen(true)
+                      }}
+                    >
+                      <UserAvatar
+                        user={
+                          groupMemberName.find(
+                            (u) => u.userId === field.value
+                          ) || { userId: "", name: "Select", avatar: "" }
+                        }
+                        size={85}
+                      />
+                    </Button>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="text-center">
+            <span className="text-green-500">
+              {groupMemberName.find((u) => u.userId === user)?.name}
+            </span>{" "}
+            paid{" "}
+            <span className="text-blue-500">
+              {groupMemberName.find((u) => u.userId === form.watch("toUser"))
+                ?.name || "Select recipient"}
+            </span>
+          </div>
+          <FormField
+            control={form.control}
+            name="selectedExpenses"
+            render={() => (
+              <FormItem>
+                <div className="mb-4">
+                  <FormLabel className="text-base">
+                    Select expenses to settle:
+                  </FormLabel>
+                </div>
+                <div className={`grid grid-cols-1 gap-4 content-start ${selectedUserExpenses.length < 3 ? '' : 'max-h-[30vh] sm:max-h-[40vh]'} overflow-y-auto`}>
+                  {selectedUserExpenses.map((expense) => (
+                    <ExpenseCard
+                      key={expense.memberId + expense.amountToPay}
+                      expense={expense}
+                      selectedExpenses={form.watch("selectedExpenses")}
+                      onExpenseChange={form.setValue}
+                    />
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="transactionDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Transaction Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        type="button"
-                        variant="outline"
-                        className="h-24 w-24 rounded-full border-none p-0"
-                        onClick={() => {
-                          setSelectingFor("toUser")
-                          setUserSelectionOpen(true)
-                        }}
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
                       >
-                        <UserAvatar
-                          user={
-                            groupMemberName.find(
-                              (u) => u.userId === field.value
-                            ) || { userId: "", name: "Select", avatar: "" }
-                          }
-                          size={85}
-                        />
+                        {field.value
+                          ? format(field.value, "PPP")
+                          : "Pick a date"}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-2">
+            <div className="text-lg font-semibold text-center sm:text-left w-full sm:w-auto">
+              Total: ₹{totalAmount.toFixed(2)} 
             </div>
-            <div className="text-center">
-              <span className="text-green-500">
-                {groupMemberName.find((u) => u.userId === user)?.name}
-              </span>{" "}
-              paid{" "}
-              <span className="text-blue-500">
-                {groupMemberName.find((u) => u.userId === form.watch("toUser"))
-                  ?.name || "Select recipient"}
-              </span>
+            <div className="flex flex-col sm:flex-row justify-center sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="w-full rounded-lg sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full rounded-lg sm:w-auto border-green-500 text-green-500 hover:bg-green-600"
+              >
+                Settle up
+              </Button>
             </div>
-            <FormField
-              control={form.control}
-              name="selectedExpenses"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">
-                      Select expenses to settle:
-                    </FormLabel>
-                  </div>
-                  <div className={`grid grid-cols-1 gap-4 content-start ${selectedUserExpenses.length<3?'':'h-[30vh]'} overflow-y-auto`}>
-                    {selectedUserExpenses.map((expense) => (
-                      <ExpenseCard
-                        key={expense.memberId + expense.amountToPay} // Assuming memberId and amountToPay combination is unique
-                        expense={expense}
-                        selectedExpenses={form.watch("selectedExpenses")}
-                        onExpenseChange={form.setValue}
-                      />
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="transactionDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Transaction Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? format(field.value, "PPP")
-                            : "Pick a date"}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex justify-between space-x-2">
-              <div className="text-lg font-semibold text-left">
-                Total: ₹{totalAmount.toFixed(2)} 
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="ml-2 border-green-500 text-green-500 hover:bg-green-600"
-                >
-                  Settle up
-                </Button>
-              </div>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-      
-      <UserSelectionModal
-        isOpen={userSelectionOpen}
-        onClose={() => setUserSelectionOpen(false)}
-        onSelect={handleUserSelect}
-        availableUsers={availableRecipients}
-      />
-
-    </Dialog>
+          </div>
+        </form>
+      </Form>
+    </DialogContent>
+    
+    <UserSelectionModal
+      isOpen={userSelectionOpen}
+      onClose={() => setUserSelectionOpen(false)}
+      onSelect={handleUserSelect}
+      availableUsers={availableRecipients}
+    />
+  </Dialog>
   )
 }
 export default SettleUp

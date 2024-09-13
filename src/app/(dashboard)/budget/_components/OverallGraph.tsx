@@ -1,4 +1,3 @@
-
 import React from "react"
 import {
   Card,
@@ -45,7 +44,6 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
   // Calculate the percentage of the budget used
   const percentUsed = Math.min((props.totalExpense / props.budget) * 100, 100)
 
- 
   // SVG parameters
   const size = 180
   const strokeWidth = 15
@@ -94,7 +92,8 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
               textAnchor="middle"
               fontSize="28"
               fontWeight="bold"
-              fill={"white"}
+              fill="currentColor"
+              className="text-gray-900 dark:text-white" // Adjust text colors based on theme
             >
               {props.totalExpense} <br />
             </text>
@@ -112,7 +111,10 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
             />
           </div>
           <div className="max-w-[300px] flex-1">
-            <SetBudget currentBudget={Number(props.budget)} expense={props.totalExpense} />
+            <SetBudget
+              currentBudget={Number(props.budget)}
+              expense={props.totalExpense}
+            />
           </div>
           <div className="max-w-[300px] flex-1">
             <Card_unclick
