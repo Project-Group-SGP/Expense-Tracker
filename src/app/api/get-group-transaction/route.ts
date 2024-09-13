@@ -34,6 +34,10 @@ export async function GET(req: NextRequest) {
             },
         },
     });
+
+    console.log("groupMembers : ", groupMembers);
+    
+
     // chek if current user is in group
 
     const groupMember = groupMembers.find((member) => member.userId === user.id);
@@ -74,6 +78,10 @@ export async function GET(req: NextRequest) {
       });
       
      
+      
+      console.log("group : ", group);
+      
+
       // format data According to required 
       const formattedData = groupTransations.map(expense => ({
         groupId: expense.groupId,
@@ -83,14 +91,22 @@ export async function GET(req: NextRequest) {
         paidById: expense.paidById,
         description: expense.description,
         date: expense.date,
-        expenseSplits: expense.splits.map(split => ({
-          userId: split.userId,
-          expenseId: split.expenseId,
-          amount: split.amount,
-          isPaid: split.isPaid,
-        })),
+        expenseSplits: expense.splits.map(split => {
+          // Find the matching group member by userId
+          const member = groupMembers.find(member => member.userId === split.userId);
+          return {
+            userName: member ? member.user.name : 'Unknown', // Use 'Unknown' if the member is not found
+            expenseId: split.expenseId,
+            amount: split.amount,
+            isPaid: split.isPaid,
+          };
+        })
       }));
       
+      console.log("formattedData: ",JSON.stringify(formattedData, null, 2));
+      console.log("group : ", );
+      
+
 
 
     //   console.log("formattedData: ", formattedData[0]);

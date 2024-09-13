@@ -59,7 +59,7 @@ interface GetResponse {
 type ExpenseSplitStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID"
 
 interface ExpenseSplit {
-  userId: string
+  userName: string
   expenseId: string
   amount: number
   isPaid: ExpenseSplitStatus
@@ -152,8 +152,8 @@ export default async function GroupPage({
   }
 
   const transactionData = await getGroupTransactionData(params.groupID, cookie)
-  console.log("Inside [groupID]/page.tsx")
-  console.log("Group 1: ", JSON.stringify(transactionData, null, 2))
+  // console.log("Inside [groupID]/page.tsx")
+  // console.log("Group 1: ", JSON.stringify(transactionData, null, 2))
 
   const data = await getAllData(params.groupID, cookie)
 

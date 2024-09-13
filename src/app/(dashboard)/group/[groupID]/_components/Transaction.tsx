@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 interface ExpenseSplit {
-  userId: string
+  userName: string
   expenseId: string
   amount: number 
   isPaid: 'PAID' | 'UNPAID' | 'PARTIALLY_PAID' 
@@ -109,7 +109,7 @@ export default function Transaction({ transactionsData }: { transactionsData: Tr
                           <TableBody>
                             {transaction.expenseSplits.map((split, index) => (
                               <TableRow key={index} className="hover:bg-muted/70 dark:hover:bg-muted/30 transition-colors">
-                                <TableCell className="font-medium">{split.userId}</TableCell>
+                                <TableCell className="font-medium">{split.userName}</TableCell>
                                 <TableCell>
                                   <span
                                     className={`px-2 py-1 rounded-full text-xs font-semibold ${

@@ -154,6 +154,7 @@ export async function settleUp(params: {
       data: { isPaid: newSplitStatus },
     });
 
+    
 
     const unpaidSplits = await db.expenseSplit.findMany({
       where: { 
@@ -168,13 +169,16 @@ export async function settleUp(params: {
       (unpaidSplits.length < groupExpense.splits.length) ? "PARTIALLY_SETTLED" : 
       "UNSETTLED";
 
-    await db.groupExpense.update({
+    const result = await db.groupExpense.update({
       where: { id: groupExpense.id },
       data: { status: newExpenseStatus },
     });
 
     remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
   }
+
+
+  
 
   await Promise.all(promises);
 
