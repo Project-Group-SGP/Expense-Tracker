@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { editTransaction } from "@/actions/history/editTransaction";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"; 
 import { Description } from '@radix-ui/react-dialog';
 
@@ -58,12 +58,9 @@ type EditTransactionProps = {
 
 export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, type }) => {
   const [open, setOpen] = React.useState(false);
-  const queryClient = useQueryClient();
-  const params = useSearchParams();
-  const from = params.get("from") || "";
-  const to = params.get("to") || "";
-
+  const router = useRouter();
   const schema = type === 'Income' ? incomeSchema : expenseSchema;
+
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -74,6 +71,30 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
       ...(type === 'Expense' ? { category: transaction.category } : {}),
     },
   });
+
+  // const editTransactions = async(data: z.infer<typeof schema>) => {
+  //   try{
+  //     const response:{success:string,error:string} = await editTransaction({ transaction: { ...data, describe: data.description || "", userId: transaction.userId }, type });
+  //     if(response.error===""){
+  //       toast.success(`${type} updated successfully`, {
+  //         closeButton: true,
+  //         icon: type === 'Income' ? "🤑" : "😤",
+  //         duration: 4500,
+  //       });
+  //       setOpen(false);
+  //       form.reset();
+  //       router.refresh();
+  //     }else{
+  //       throw new Error(response.error)
+  //     }
+  //     return response;
+  //   }catch(error){
+  //     toast.error(`Failed to update ${type}`, {
+  //       closeButton: true,
+  //     });
+  //   }
+  // }
+
 
   const editMutation = useMutation({
     mutationFn: async (data: z.infer<typeof schema>) => {
@@ -87,9 +108,8 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
         duration: 4500,
       });
       setOpen(false);
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["transactions", from, to] });
       form.reset();
+      router.refresh();
     },
     onError: (error) => {
       toast.error(`Failed to update ${type}`, {
@@ -98,16 +118,21 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
     },
   });
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
+  const onSubmit = async(data: z.infer<typeof schema>) => {
+    console.log(data);
+    const isDateEqual = new Date(data.transactionDate).toISOString() === new Date(transaction.date).toISOString();
+    //@ts-ignore
+    const isCategoryUnchanged = type === "Expense" ? data?.category === transaction.category : true;
+
     if (
       data.description === transaction.description &&
       data.amount === transaction.amount.toString() &&
-      //@ts-ignore
-      ((new Date(data.transactionDate).toISOString())===transaction.date)
+      isDateEqual &&
+      isCategoryUnchanged
     ) {
-      toast.info("No changes are Made!!");
+      toast.warning("No changes are Made!!");
     }else{
-      editMutation.mutate(data);
+      await editMutation.mutateAsync(data);
     }
   };
 

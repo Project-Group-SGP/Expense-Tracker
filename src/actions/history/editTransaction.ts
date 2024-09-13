@@ -9,12 +9,12 @@ export const editTransaction = async(values:z.infer<typeof editTransactionProps>
   const user = await currentUserServer();
 
   if(!user)
-    return {error:"unAuthorized!!"};
+    return {error:"unAuthorized!!",success:""};
 
   const validationeddFields = editTransactionProps.safeParse(values)
 
   if (validationeddFields.error)
-    return { error: "Invalid fields!"};
+    return { error: "Invalid fields!",success:""};
 
   const transaction = validationeddFields.data.transaction;
 
@@ -44,9 +44,9 @@ export const editTransaction = async(values:z.infer<typeof editTransactionProps>
         }
       });
     }
-    return {success:"Successfully updated!!"};
+    return {success:"Successfully updated!!",error:""};
   }catch(e){
     console.error("Error updating transaction:", e)
-    return { error:"Failed to updating transaction"};
+    return { error:"Failed to updating transaction",success:""};
   }
 }
