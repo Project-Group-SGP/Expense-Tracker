@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { editTransactionProps } from "@/lib/index";
 import { currentUserServer } from "@/lib/auth";
 import { validate } from "uuid";
+import { revalidateTag } from "next/cache";
 
 export const editTransaction = async(values:z.infer<typeof editTransactionProps>)=>{
   const user = await currentUserServer();
@@ -44,6 +45,7 @@ export const editTransaction = async(values:z.infer<typeof editTransactionProps>
         }
       });
     }
+    revalidateTag("getTransactions");
     return {success:"Successfully updated!!",error:""};
   }catch(e){
     console.error("Error updating transaction:", e)

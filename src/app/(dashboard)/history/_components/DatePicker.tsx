@@ -1,15 +1,13 @@
 "use client"
 
+import { format } from "date-fns"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { DateRange } from "react-day-picker"
-import { useEffect, useState } from "react"
-import { format, parseISO } from "date-fns"
 import { DatePickerWithRange } from "../../dashboard/_components/DatePickerWithRange"
-import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 const DatePicker = () => {
   const router = useRouter()
-  const user = useCurrentUserClient();
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
   // useEffect(() => {

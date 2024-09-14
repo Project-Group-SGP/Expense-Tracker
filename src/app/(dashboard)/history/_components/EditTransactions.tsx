@@ -1,25 +1,23 @@
-import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { CategoryTypes } from "@prisma/client";
-import { format } from "date-fns";
-import { CalendarIcon, Check, ChevronDown, Loader2, Edit } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { editTransaction } from "@/actions/history/editTransaction";
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"; 
-import { Description } from '@radix-ui/react-dialog';
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CategoryTypes } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { CalendarIcon, Check, ChevronDown, Edit, Loader2 } from "lucide-react";
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from "sonner";
+import * as z from 'zod';
 
 const defaultCategories = [
   "Other", "Bills", "Food", "Entertainment", "Transportation",
@@ -58,7 +56,7 @@ type EditTransactionProps = {
 
 export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, type }) => {
   const [open, setOpen] = React.useState(false);
-  const router = useRouter();
+  // const router = useRouter();
   const schema = type === 'Income' ? incomeSchema : expenseSchema;
 
   const form = useForm({
@@ -108,8 +106,8 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
         duration: 4500,
       });
       setOpen(false);
+      //  router.refresh();
       form.reset();
-      router.refresh();
     },
     onError: (error) => {
       toast.error(`Failed to update ${type}`, {

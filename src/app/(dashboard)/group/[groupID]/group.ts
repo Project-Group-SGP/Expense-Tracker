@@ -5,8 +5,6 @@ import { db } from "@/lib/db";
 import { CategoryTypes } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidateTag } from "next/cache";
-import { split } from "postcss/lib/list";
-import { Prisma } from "@prisma/client";
 
 export async function AddGroupExpense(params: { 
   groupID: string, 
@@ -43,8 +41,9 @@ export async function AddGroupExpense(params: {
         throw new Error("User is not a member of the group");
     }
 
+
     // Create the expense record
-    await db.groupExpense.create({
+    const responce = await db.groupExpense.create({
         data: {
             groupId: params.groupID,
             paidById: params.paidById,
@@ -58,8 +57,29 @@ export async function AddGroupExpense(params: {
         },
     });
 
+    const updatesplit = await db.expenseSplit.update({
+      where:{
+        expenseId_userId:{
+          expenseId:responce.id,
+          userId:params.paidById,
+        }
+      },
+      data:{
+        isPaid:"PAID",
+      },
+      select:{
+        id:true,
+        expenseId:true,
+        isPaid:true,
+      }
+    })
+
+    // console.log("\n\nupdate expance:",updatesplit);
+
     // Optionally revalidate cache if needed
     revalidateTag(`group:${params.groupID}`);
+    revalidateTag("getGroupTransactiondata");  
+    revalidateTag("getGroupdata"); 
 
     return { success: true };
 }
@@ -101,7 +121,7 @@ export async function settleUp(params: {
     throw new Error("Both users must be members of the group.");
   }
 
-  let promises: any[] = [];
+  // let promises: any[] = [];
   for (const expense of params.expenseIds) {
     let remainingAmountToSettle = new Decimal(expense.amount);
     if (remainingAmountToSettle.lte(0)) break;
@@ -127,35 +147,40 @@ export async function settleUp(params: {
       continue;
     }
 
-    const totalPaidForSplit = await db.payment.aggregate({
-      where: { expenseSplitId: expense.expenseid },
-      _sum: { amount: true },
-    });
+    // const totalPaidForSplit = await db.payment.aggregate({
+    //   where: { expenseSplitId: expense.expenseid },
+    //   _sum: { amount: true },
+    // });
 
-    const totalPaidAmount = totalPaidForSplit._sum?.amount ?? new Decimal(0);
-    const remainingAmount = payerSplit.amount.sub(totalPaidAmount);
-    const paymentAmount = Decimal.min(remainingAmountToSettle, remainingAmount);
+    // const totalPaidAmount = totalPaidForSplit._sum?.amount ?? new Decimal(0);
+    // const remainingAmount = payerSplit.amount.sub(totalPaidAmount);
+    // const paymentAmount = Decimal.min(remainingAmountToSettle, remainingAmount);
 
     const payment = await db.payment.create({
       data: {
         expenseSplitId: expense.expenseid,
-        amount: paymentAmount,
+        amount: expense.amount,
         paidAt: params.transactionDate,
       },
     });
 
-    const newTotalPaidAmount = totalPaidAmount.add(paymentAmount);
-    const newSplitStatus: SplitStatus = 
-      newTotalPaidAmount.gte(payerSplit.amount) ? "PAID" :
-      newTotalPaidAmount.gt(0) ? "PARTIALLY_PAID" : "UNPAID";
+    // const newTotalPaidAmount = totalPaidAmount.add(paymentAmount);
+    // const newSplitStatus: SplitStatus = 
+    //   newTotalPaidAmount.gte(payerSplit.amount) ? "PAID" :
+    //   newTotalPaidAmount.gt(0) ? "PARTIALLY_PAID" : "UNPAID";
 
-    const update = db.expenseSplit.update({
+    const update = await db.expenseSplit.update({
       where: { id: expense.expenseid },
-      data: { isPaid: newSplitStatus },
+      data: { isPaid: "PAID" },
+      // select: {
+      //   id:true,
+      //   expenseId:true,
+      //   isPaid:true
+      // }
     });
 
-    
-
+    // console.log("settleup expance split update ",update);
+  
     const unpaidSplits = await db.expenseSplit.findMany({
       where: { 
         expenseId: groupExpense.id, 
@@ -164,23 +189,20 @@ export async function settleUp(params: {
     });
 
     const newExpenseStatus: ExpenseStatus = 
-      unpaidSplits.length === 0 ? "SETTLED" : 
-      unpaidSplits.some(split => split.isPaid === "PARTIALLY_PAID") || 
-      (unpaidSplits.length < groupExpense.splits.length) ? "PARTIALLY_SETTLED" : 
-      "UNSETTLED";
+      unpaidSplits.length === 0 ? "SETTLED" : "PARTIALLY_SETTLED";
 
     const result = await db.groupExpense.update({
       where: { id: groupExpense.id },
       data: { status: newExpenseStatus },
     });
 
-    remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
+    // remainingAmountToSettle = remainingAmountToSettle.sub(paymentAmount);
   }
 
+  // await Promise.all(promises);
 
-  
-
-  await Promise.all(promises);
+  revalidateTag("getGroupTransactiondata");  
+  revalidateTag("getGroupdata"); 
 
   return { message: "Payment to group member completed successfully!" };
 }

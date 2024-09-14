@@ -1,7 +1,7 @@
 "use client"
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
 export function TransactionButtons() {
   const router = useRouter()

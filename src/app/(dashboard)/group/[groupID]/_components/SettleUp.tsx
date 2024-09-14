@@ -322,9 +322,9 @@
 // export default SettleUp
 
 "use client"
-import React, { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -340,24 +340,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import * as z from "zod"
+import React, { useEffect, useMemo, useState } from "react"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { UserAvatar } from "./UserAvatar"
+import * as z from "zod"
 import { settleUp } from "../group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useRouter } from "next/navigation"
-import { revalidateTag } from "next/cache"
+import { UserAvatar } from "./UserAvatar"
 
 interface GroupMember {
   userId: string
@@ -488,8 +485,6 @@ export function SettleUp({
   const [selectingFor, setSelectingFor] = useState<
     "fromUser" | "toUser" | null
   >(null)
-
-  const route = useRouter()
   const safeUsersYouNeedToPay = useMemo(() => usersYouNeedToPay || [], [usersYouNeedToPay]);
 
   const availableRecipients = useMemo(
@@ -585,10 +580,6 @@ export function SettleUp({
         icon: "🤝",
         duration: 4500,
       })
-
-      
-      // Reset the form
-      route.refresh()
       
       // revalidateTag("getGroupTransactionData");
       form.reset()

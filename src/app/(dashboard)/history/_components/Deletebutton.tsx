@@ -31,10 +31,9 @@
 
 
 // Delete Button Version-2
-import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Trash } from "lucide-react";
 const DeleteButton = ({ disabled, handleOnClick, selectedCount }) => {
   return (
     <Button

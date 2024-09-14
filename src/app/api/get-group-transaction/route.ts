@@ -35,61 +35,72 @@ export async function GET(req: NextRequest) {
         },
     });
 
-    console.log("groupMembers : ", groupMembers);
+    // console.log("groupMembers : ", groupMembers);
     
 
     // chek if current user is in group
-
     const groupMember = groupMembers.find((member) => member.userId === user.id);
 
     if (!groupMembers) {
         return new NextResponse("Group members not found", { status: 404 });
     }
 
+    console.log("GroupID",group.id);
     
     // get group transactions
     const groupTransations = await db.groupExpense.findMany({
-        where: { groupId: group.id },
-        include: {
-          paidBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
+      where: { groupId: group.id },
+      select: {
+        id: true,
+        status: true,
+        amount:true,
+        category:true,
+        description:true,
+        date:true,
+        paidBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
           },
-          splits: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
+        },
+        splits: {
+          select: {
+            id: true,
+            amount: true,
+            isPaid: true,
+            expenseId: true,
+            userId: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
               },
-              payments: true,
             },
+            payments: true,
           },
-          group: true,
         },
-        orderBy: {
-          date: 'desc',
-        },
-      });
-      
-     
-      
-      console.log("group : ", group);
+        group: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+      console.log("groupTransations : ", groupTransations);
+      // console.log("group : ", group);
       
 
       // format data According to required 
       const formattedData = groupTransations.map(expense => ({
-        groupId: expense.groupId,
+        groupId: expense.group.id,
         expenseId: expense.id,
         amount: expense.amount,
         category: expense.category,
-        paidById: expense.paidById,
+        paidById: expense.paidBy.id,
+        PaidByName: expense.paidBy.name,
         description: expense.description,
+        status:expense.status,
         date: expense.date,
         expenseSplits: expense.splits.map(split => {
           // Find the matching group member by userId
@@ -104,20 +115,6 @@ export async function GET(req: NextRequest) {
       }));
       
       console.log("formattedData: ",JSON.stringify(formattedData, null, 2));
-      console.log("group : ", );
-      
-
-
-
-    //   console.log("formattedData: ", formattedData[0]);
-    //   console.log("groupTransactions: ", JSON.stringify(groupTransations, null, 2));
-    
-    
-    // console.log("Inside get group transaction route: ");
-    // console.log(group);
-    // console.log("groupMember: ", groupMember);
-    
-
 
 
     return NextResponse.json(formattedData);

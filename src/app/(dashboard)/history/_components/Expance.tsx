@@ -550,6 +550,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   Form,
   FormControl,
   FormField,
@@ -563,24 +569,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { CalendarIcon, Check, ChevronDown } from "lucide-react"
 import { useState } from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { AddnewExpense } from "../action"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import * as z from "zod"
+import { AddnewExpense } from "../action"
 
 // Categories should align with CategoryTypes enum
 const defaultCategories = [
@@ -621,7 +620,7 @@ export function NewExpense() {
   const [open, setOpen] = useState<boolean>(false);
   const [isPending, setisPending] = useState<boolean>(false);
   
-  const router = useRouter();
+  // const router = useRouter();
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -643,7 +642,7 @@ export function NewExpense() {
         });
 
         setOpen(false);
-        router.refresh();
+        // router.refresh();
         form.reset();
       }else{
         throw new Error("Income not added")

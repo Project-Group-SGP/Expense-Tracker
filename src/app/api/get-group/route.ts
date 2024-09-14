@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       where: {
         userId: user.id,
         expense: { groupId: group.id },
-        isPaid: "UNPAID",
+        isPaid: {in:["UNPAID","PARTIALLY_PAID"]},
       },
       select: {
         id:true,

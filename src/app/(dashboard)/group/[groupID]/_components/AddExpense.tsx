@@ -1,12 +1,13 @@
 "use client"
-import React, { useState, useEffect } from "react"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -28,18 +29,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
-import { AddGroupExpense } from "../group"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
 import { revalidateTag } from "next/cache"
+import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
+import { AddGroupExpense } from "../group"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -166,7 +165,6 @@ export function AddExpense({
     },
   })
 
-  const router = useRouter()
   const watchAmount = form.watch("amount")
   const watchSplitType = form.watch("splitType")
 
@@ -232,8 +230,6 @@ export function AddExpense({
         category: data.category,
         splits: splits,
       })
-
-      router.refresh()
 
       if (response.success) {
         toast.success("Expense added successfully", {

@@ -71,8 +71,10 @@ export interface FormattedExpenseData {
   amount: number
   category: string
   paidById: string
+  PaidByName: string
   description: string
   date: string
+  status:  "UNSETTLED" | "PARTIALLY_SETTLED" | "SETTLED" | "CANCELLED";
   expenseSplits: ExpenseSplit[]
 }
 
@@ -83,7 +85,7 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
       {
         method: "GET",
         headers: { Cookie: cookie },
-        cache: 'no-store',
+        next: { tags: ["getGroupdata"] },
       }
     )
 
@@ -111,7 +113,8 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       {
         method: "GET",
         headers: { Cookie: cookie },
-        cache: 'no-store',
+        // cache: 'no-store',
+        next: { tags: ["getGroupTransactiondata"] },
       }
     )
 
@@ -119,10 +122,10 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       throw new Error("Network response was not ok")
     }
 
-    console.log("Data fetched successfully in getGroupTransactionData")
+    // console.log("Data fetched successfully in getGroupTransactionData")
 
     const data: FormattedExpenseData[] = await res.json()
-    console.log(data)
+    // console.log(data)
 
     return data
   } catch (error) {
@@ -151,11 +154,13 @@ export default async function GroupPage({
     redirect("/404")
   }
 
-  const transactionData = await getGroupTransactionData(params.groupID, cookie)
-  // console.log("Inside [groupID]/page.tsx")
-  // console.log("Group 1: ", JSON.stringify(transactionData, null, 2))
+  // const transactionData = await getGroupTransactionData(params.groupID, cookie)
+  // // console.log("Inside [groupID]/page.tsx")
+  // // console.log("Group 1: ", JSON.stringify(transactionData, null, 2))
 
-  const data = await getAllData(params.groupID, cookie)
+  // const data = await getAllData(params.groupID, cookie)
+
+  const [transactionData,data] = await Promise.all([getGroupTransactionData(params.groupID, cookie),getAllData(params.groupID, cookie)]);
 
   const groupMembers = data.groupMembers
   const usersYouNeedToPay = data.usersToPay

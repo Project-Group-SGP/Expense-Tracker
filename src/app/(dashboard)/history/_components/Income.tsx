@@ -221,16 +221,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { useState } from "react"
-import { AddnewIncome } from "../action"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import * as z from "zod"
+import { AddnewIncome } from "../action"
 
 // form validation schema
 const formSchema = z.object({
@@ -253,7 +252,7 @@ export function Newincome() {
   const [open, setOpen] = useState(false)
   const [isPending, setisPending] = useState<boolean>(false);
 
-  const router = useRouter();
+  // const router = useRouter();
 
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -275,7 +274,7 @@ export function Newincome() {
         });
 
         setOpen(false);
-        router.refresh();
+        // router.refresh();
         form.reset();
       }else{
         throw new Error("Income not added")
