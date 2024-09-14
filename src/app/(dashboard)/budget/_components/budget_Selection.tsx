@@ -38,7 +38,7 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData }) => {
     setSelectedMonth(parseInt(value, 10));
   };
 
-  console.log(data.monthlyData[selectedMonth].categoryExpenses);
+  // console.log(data.monthlyData[selectedMonth].categoryExpenses);
   
 
   return (
