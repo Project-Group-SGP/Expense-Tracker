@@ -24,7 +24,11 @@ export async function SetBudgetDb(budget:number){
         data:{
           budget: budget
         }
-      })
+      });
+
+      console.log(result);
+      
+
       revalidateTag("budget-data");
       return result ? "success" : "error";
   }catch(error){

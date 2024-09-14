@@ -69,6 +69,8 @@ export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) 
     setCurrentMonthData(monthlyData[monthIndex])
   }
 
+  console.log(totalBudget);
+  
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
@@ -124,10 +126,12 @@ export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) 
             />
           </div>
           <div className="max-w-[300px] flex-1">
+            
             <SetBudget
               currentBudget={totalBudget}
               expense={currentMonthData.totalExpense}
             />
+
           </div>
           <div className="max-w-[300px] flex-1">
             <Card_unclick

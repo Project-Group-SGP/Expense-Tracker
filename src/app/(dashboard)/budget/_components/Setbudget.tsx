@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import CategoryCard from "./Card_Category"
 import { SetBudgetDb } from "../actions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   amount: z
@@ -46,6 +47,8 @@ export function SetBudget({
 }) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
+
+  const router = useRouter();
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -89,7 +92,7 @@ export function SetBudget({
   const handleSubmit = async (data: BudgetFormData) => {
     try {
       const budget = Number(data.amount)
-      const result = await SetBudgetDb(budget)
+      const result = await SetBudgetDb(budget);
 
       if (result === "success") {
         toast.success("Budget updated successfully", {
@@ -97,6 +100,9 @@ export function SetBudget({
           icon: "💰",
           duration: 4500,
         })
+
+        router.refresh()
+
         form.reset()
       } else {
         toast.error("Budget update failed")
