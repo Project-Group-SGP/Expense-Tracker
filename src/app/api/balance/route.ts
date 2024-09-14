@@ -17,10 +17,10 @@ export async function GET(
       },
       include: {
         paidBy: { select: { id: true, name: true } },
-        splits: { 
-          where: { isPaid: { in: ['UNPAID', 'PARTIALLY_PAID'] } },
-          include: { user: { select: { id: true, name: true } } }
-        },
+        splits: {
+          where: { isPaid: { in: ['UNPAID', 'PAID'] } },
+          select: { isPaid:true,amount: true, user: { select: { id: true, name: true } } }
+        }
       },
     });
     console.log("Expance:",expenses);
@@ -33,21 +33,26 @@ export async function GET(
     console.log("GroupMember:",groupMembers);
 
     // Initialize balance for each member
-    const balances: { [userId: string]: number } = {};
+    const balances: { [userID: string]: number } = {};
     groupMembers.forEach((member) => {
       balances[member.user.id] = 0;
     });
-    console.log("Balance-1:",balances);
+
     expenses.forEach((expense) => {
       // Add the full amount to the payer's balance
       balances[expense.paidBy.id] += Number(expense.amount);
+      console.log("B1: ",balances);
 
       // Subtract each unsettled or partially settled split amount from the respective user's balance
       expense.splits.forEach((split) => {
-        balances[split.user.id] -= Number(split.amount);
+        if(split.isPaid==="UNPAID")
+          balances[split.user.id] -= Number(split.amount);
+        else if(split.isPaid==="PAID")
+          balances[expense.paidBy.id] -= Number(split.amount);
+
+        console.log("B2: ",balances);
       });
     });
-    console.log("Balance-2:",balances);
 
     // Prepare the result
     const result = groupMembers.map((member) => {
