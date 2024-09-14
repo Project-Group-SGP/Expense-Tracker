@@ -57,7 +57,7 @@ export async function GET(
         name: member.user.name,
         avatar:  member.user.image, 
         amount: Math.abs(balance).toFixed(2),
-        status: balance === 0 ? 'settled up' : balance > 0 ? 'gets back' : 'owes',
+        status: balance == 0 ? 'settled up' : balance > 0 ? 'gets back' : 'owes',
         amountColor: balance >= 0 ? 'text-green-500' : 'text-red-500',
       };
     });
