@@ -9,6 +9,7 @@ import { GroupMember } from "./_components/GroupMember"
 import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "../../dashboard/_components/PageTitle"
+import TransactionTableSkeleton from "./_components/TransactionSkeleton"
 
 interface Group {
   id: string
@@ -77,6 +78,7 @@ export interface FormattedExpenseData {
   status:  "UNSETTLED" | "PARTIALLY_SETTLED" | "SETTLED" | "CANCELLED";
   expenseSplits: ExpenseSplit[]
 }
+
 
 async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
   try {
@@ -200,10 +202,10 @@ export default async function GroupPage({
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
             <Cardcontent className="border-none p-0 md:col-span-2 lg:col-span-2">
-              <Transaction transactionsData={transactionData} />
+              <Transaction transactionsData={transactionData} loading={false}/>
             </Cardcontent>
             <Cardcontent className="border-none p-0">
-              <GroupMember groupMemberName={groupMembers} />
+              <GroupMember groupMemberName={groupMembers} loading={false}/>
             </Cardcontent>
           </section>
         </div>

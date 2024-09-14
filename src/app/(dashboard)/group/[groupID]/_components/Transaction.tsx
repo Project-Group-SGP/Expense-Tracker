@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import TransactionTableSkeleton from "./TransactionSkeleton"
 
 interface ExpenseSplit {
   userName: string
@@ -58,7 +59,12 @@ const columns = [
   { id: 'action', label: 'View split', sortable: false },
 ]
 
-export default function Transaction({ transactionsData }: { transactionsData: Transaction[] }) {
+export default function Transaction({ transactionsData,loading }: { transactionsData: Transaction[],loading:boolean }) {
+
+  if (loading) {
+    return <TransactionTableSkeleton />;
+  }
+
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null)
   const [showDetailed, setShowDetailed] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(columns.map(col => col.id))
@@ -213,7 +219,12 @@ export default function Transaction({ transactionsData }: { transactionsData: Tr
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedTransactions.map((transaction) => (
+            {paginatedTransactions.length===0 && (
+              <div className="h-24 text-center">
+                No results.
+              </div>
+            )}
+            {paginatedTransactions.length!==0 && paginatedTransactions.map((transaction) => (
               <React.Fragment key={transaction.expenseId}>
                 <TableRow className="hover:bg-muted/50 transition-colors">
                   {selectedColumns.includes('date') && (

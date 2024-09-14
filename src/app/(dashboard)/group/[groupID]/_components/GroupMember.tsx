@@ -34,6 +34,7 @@
 // export default GroupMember;
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Member } from "./Member";
+import { GroupMemberSkeleton } from "./GroupMemberSkeleton";
 
 type GroupMemberProps = {
   groupMemberName: {
@@ -41,16 +42,17 @@ type GroupMemberProps = {
     name: string;
     avatar: string;
   }[];
+  loading:boolean
 };
 
-export const GroupMember = ({ groupMemberName }: GroupMemberProps) => {
+export const GroupMember = ({ groupMemberName , loading }: GroupMemberProps) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Group Member</CardTitle>
       </CardHeader>
       <CardContent>
-        {groupMemberName.map((member, index) => (
+        {!loading && groupMemberName.map((member, index) => (
           <Member
             key={member.userId}
             name={member.name}
@@ -61,6 +63,13 @@ export const GroupMember = ({ groupMemberName }: GroupMemberProps) => {
             userId={member.userId}  // Pass userId for avatar generation fallback
           />
         ))}
+        {loading && (
+          <div className="flex flex-col">
+          {[...Array(4)].map((_, index) => (
+            <GroupMemberSkeleton key={index}/>
+          ))}
+         </div>
+        )}
       </CardContent>
     </Card>
  
