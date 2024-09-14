@@ -39,6 +39,7 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddGroupExpense } from "../group"
+import { useRouter } from "next/navigation"
 
 // Enum for Category Types
 enum CategoryTypes {
@@ -125,7 +126,8 @@ export function AddExpense({
   groupMemberName: { userId: string; name: string; avatar: string }[]
   user: string
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   // State for members
   const [members, setMembers] = useState<
@@ -239,6 +241,7 @@ export function AddExpense({
           id: loading,
         })
 
+        router.refresh();
         form.reset();
         revalidateTag("getGroupTransactionData");
       } else {

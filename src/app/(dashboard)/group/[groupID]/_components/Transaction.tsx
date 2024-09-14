@@ -59,12 +59,7 @@ const columns = [
   { id: 'action', label: 'View split', sortable: false },
 ]
 
-export default function Transaction({ transactionsData,loading }: { transactionsData: Transaction[],loading:boolean }) {
-
-  if (loading) {
-    return <TransactionTableSkeleton />;
-  }
-
+export default function Transaction({ transactionsData, loading }: { transactionsData: Transaction[], loading: boolean }) {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null)
   const [showDetailed, setShowDetailed] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(columns.map(col => col.id))
@@ -72,7 +67,7 @@ export default function Transaction({ transactionsData,loading }: { transactions
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'ascending' | 'descending' } | null>(null)
-  
+
   const handleSplitClick = (expenseId: string) => {
     setSelectedExpense(selectedExpense === expenseId ? null : expenseId)
   }
@@ -86,6 +81,7 @@ export default function Transaction({ transactionsData,loading }: { transactions
   }
 
   const filteredTransactions = useMemo(() => {
+    if (!transactionsData) return []
     let filtered = showDetailed 
       ? transactionsData 
       : transactionsData.filter(t => t.status !== "SETTLED")
@@ -126,6 +122,10 @@ export default function Transaction({ transactionsData,loading }: { transactions
       direction = 'descending'
     }
     setSortConfig({ key, direction })
+  }
+
+  if (loading) {
+    return <TransactionTableSkeleton />;
   }
 
   return (
@@ -220,9 +220,9 @@ export default function Transaction({ transactionsData,loading }: { transactions
           </TableHeader>
           <TableBody>
             {paginatedTransactions.length===0 && (
-              <div className="h-24 text-center">
+              <TableCell colSpan={7} className="h-24 mt-4 w-full text-center">
                 No results.
-              </div>
+              </TableCell>
             )}
             {paginatedTransactions.length!==0 && paginatedTransactions.map((transaction) => (
               <React.Fragment key={transaction.expenseId}>

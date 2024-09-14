@@ -580,6 +580,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddnewExpense } from "../action"
+import { useRouter } from "next/navigation"
 
 // Categories should align with CategoryTypes enum
 const defaultCategories = [
@@ -620,7 +621,7 @@ export function NewExpense() {
   const [open, setOpen] = useState<boolean>(false);
   const [isPending, setisPending] = useState<boolean>(false);
   
-  // const router = useRouter();
+  const router = useRouter();
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -642,7 +643,7 @@ export function NewExpense() {
         });
 
         setOpen(false);
-        // router.refresh();
+        router.refresh();
         form.reset();
       }else{
         throw new Error("Income not added")
