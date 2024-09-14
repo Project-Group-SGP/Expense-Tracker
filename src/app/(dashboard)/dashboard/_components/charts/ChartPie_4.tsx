@@ -25,53 +25,54 @@ const chartConfig = {
   },
   Other: {
     label: "Other",
-    color: "#888888",
+    color: "#A9A9A9", // Dark Gray
   },
   Bills: {
     label: "Bills",
-    color: "#0088FE",
+    color: "#4169E1", // Royal Blue
   },
   Food: {
     label: "Food",
-    color: "#FF8042",
+    color: "#FF6347", // Tomato Red
   },
   Entertainment: {
     label: "Entertainment",
-    color: "#FFBB28",
+    color: "#FFD700", // Gold
   },
   Transportation: {
     label: "Transportation",
-    color: "#00C49F",
+    color: "#4682B4", // Steel Blue
   },
   EMI: {
     label: "EMI",
-    color: "#FF0000",
+    color: "#DC143C", // Crimson
   },
   Healthcare: {
     label: "Healthcare",
-    color: "#800080",
+    color: "#20B2AA", // Light Sea Green
   },
   Education: {
     label: "Education",
-    color: "#00FFFF",
+    color: "#9370DB", // Medium Purple
   },
   Investment: {
     label: "Investment",
-    color: "#008000",
+    color: "#228B22", // Forest Green
   },
   Shopping: {
     label: "Shopping",
-    color: "#FFD700",
+    color: "#FF69B4", // Hot Pink
   },
   Fuel: {
     label: "Fuel",
-    color: "#FF6347",
+    color: "#FFA500", // Orange
   },
   Groceries: {
     label: "Groceries",
-    color: "#ADFF2F",
+    color: "#32CD32", // Lime Green
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
+
 
 // Catagory label
 const Catagory_label = ({ data }) => (

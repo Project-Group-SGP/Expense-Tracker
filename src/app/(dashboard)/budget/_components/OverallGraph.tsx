@@ -1,4 +1,6 @@
-import React from "react"
+"use client"
+
+import React, { useState, useEffect } from "react"
 import {
   Card,
   CardContent,
@@ -10,39 +12,47 @@ import {
 import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
-import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-type BudgetUsageGraphProps = {
-  totalIncome: number
-  budget: number
-  perDayBudget: number
-  totalExpense: number
-}
+type CategoryBudget = {
+  [key: string]: number; // Dynamic keys for categories
+};
 
-export function OverallGraph(props: BudgetUsageGraphProps) {
-  const month = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+type MonthlyData = {
+  month: string;
+  totalIncome: number;
+  totalExpense: number;
+  categoryExpenses: CategoryBudget;
+  categoryBudget: CategoryBudget;
+  remainingBudget: number;
+};
+
+type OverallGraphProps = {
+  monthlyData: MonthlyData[];
+  selectedMonth: number;
+};
+
+export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ]
 
-  const currentMonth = new Date().getMonth()
+  const [currentMonthData, setCurrentMonthData] = useState(monthlyData[selectedMonth])
 
-  const remainingBudget = props.budget - props.totalExpense
+  useEffect(() => {
+    setCurrentMonthData(monthlyData[selectedMonth])
+  }, [selectedMonth, monthlyData])
+
+  const remainingBudget = currentMonthData.remainingBudget
   const isOverBudget = remainingBudget < 0
   const budgetColor = isOverBudget ? "text-emi" : "text-blue-700"
 
+  // Calculate the total budget
+  const totalBudget = Object.values(currentMonthData.categoryBudget).reduce((sum, value) => sum + value, 0)
+
   // Calculate the percentage of the budget used
-  const percentUsed = Math.min((props.totalExpense / props.budget) * 100, 100)
+  const percentUsed = Math.min((currentMonthData.totalExpense / totalBudget) * 100, 100)
 
   // SVG parameters
   const size = 180
@@ -54,13 +64,16 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
   const circleColor = "#4A4A4A"
   const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"
 
+  const handleMonthChange = (value: string) => {
+    const monthIndex = parseInt(value, 10)
+    setCurrentMonthData(monthlyData[monthIndex])
+  }
+
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-lg font-semibold">Budget Usage</CardTitle>
-        <CardDescription className="text-sm text-gray-500">
-          {month[currentMonth]}
-        </CardDescription>
+        
       </CardHeader>
       <CardContent className="flex-1 pb-2">
         <div className="flex items-center justify-center">
@@ -93,9 +106,9 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
               fontSize="28"
               fontWeight="bold"
               fill="currentColor"
-              className="text-gray-900 dark:text-white" // Adjust text colors based on theme
+              className="text-gray-900 dark:text-white"
             >
-              {props.totalExpense} <br />
+              {currentMonthData.totalExpense} <br />
             </text>
           </svg>
         </div>
@@ -105,15 +118,15 @@ export function OverallGraph(props: BudgetUsageGraphProps) {
           <div className="max-w-[300px] flex-1">
             <Card_unclick
               title="Income"
-              amount={Number(props.totalIncome)}
+              amount={Number(currentMonthData.totalIncome)}
               color="text-green-600"
               icon={HandCoins}
             />
           </div>
           <div className="max-w-[300px] flex-1">
             <SetBudget
-              currentBudget={Number(props.budget)}
-              expense={props.totalExpense}
+              currentBudget={totalBudget}
+              expense={currentMonthData.totalExpense}
             />
           </div>
           <div className="max-w-[300px] flex-1">

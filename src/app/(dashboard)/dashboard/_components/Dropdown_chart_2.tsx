@@ -34,18 +34,18 @@ type Expense = {
 
 // Define colors for categories
 const categoryColors: { [key: string]: string } = {
-  Other: "#0033cc", // color for --chart-1
-  Bills: "#009999", // color for --chart-5
-  Food: "#ff9933", // color for --chart-3
-  Entertainment: "#6a0dad", // color for --chart-4
-  Transportation: "#cc3333", // color for --chart-2
-  EMI: "#4caf50", // color for --chart-6
-  Healthcare: "#ffeb3b", // color for --chart-7
-  Education: "#f44336", // color for --chart-8
-  Investment: "#009688", // color for --chart-9
-  Shopping: "#03a9f4", // color for --chart-10
-  Fuel: "#e91e63", // color for --chart-11
-  Groceries: "#888888", // additional color (unchanged)
+  Other: "#A9A9A9",         // Dark Gray
+  Bills: "#4169E1",         // Royal Blue (slightly darker than Dodger Blue)
+  Food: "#FF6347",          // Tomato Red
+  Entertainment: "#FFD700", // Gold
+  Transportation: "#4682B4",// Steel Blue
+  EMI: "#DC143C",           // Crimson
+  Healthcare: "#20B2AA",    // Light Sea Green
+  Education: "#9370DB",     // Medium Purple
+  Investment: "#228B22",    // Forest Green
+  Shopping: "#FF69B4",      // Hot Pink (slightly softer than Deep Pink)
+  Fuel: "#FFA500",          // Orange
+  Groceries: "#32CD32"      // Lime Green
 }
 
 // Define DropdownChartProps
@@ -126,13 +126,13 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
               onValueChange={setSelectedChart}
             >
               <DropdownMenuRadioItem value="Category Crustview">
-              Category Crustview
+                Category Crustview
               </DropdownMenuRadioItem>
               {/* <DropdownMenuRadioItem value="pie chart_2">
                 pie chart_2
               </DropdownMenuRadioItem> */}
               <DropdownMenuRadioItem value="Spending Circle">
-              Spending Circle
+                Spending Circle
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="Spend Spectrum">
                 Spend Spectrum

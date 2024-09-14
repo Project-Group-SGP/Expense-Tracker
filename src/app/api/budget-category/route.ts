@@ -1,154 +1,138 @@
-// take all requried Data
-// 1. total income of this month
-// 2. get remaining budget and calculate per day budget
-// 3. get all expense of this month
-// 4. seprate expense based on category
-
 import { currentUserServer } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { CategoryTypes } from "@prisma/client"
+
+type CategoryBudget = {
+  [key in CategoryTypes]: number;
+};
+
+type MonthlyData = {
+  month: string;
+  totalIncome: number;
+  totalExpense: number;
+  categoryExpenses: CategoryBudget;
+  categoryBudget: CategoryBudget;
+  remainingBudget: number;
+};
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await currentUserServer()
-    const userId = user?.id
+    const user = await currentUserServer();
+    if (!user?.id) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
+    const userId = user.id;
 
-    // console.log("userId:", userId)
+    const currentYear = new Date().getFullYear();
 
-    // set startDate and EndDate
-    const endDate = new Date()
-    const startDate = new Date(endDate.getFullYear(), endDate.getMonth())
+    const monthlyData: MonthlyData[] = [];
 
-    // console.log("userId:", userId, "startDate:", startDate, "endDate:", endDate)
+    for (let month = 0; month < 12; month++) {
+      const startDate = new Date(currentYear, month, 1);
+      const endDate = new Date(currentYear, month + 1, 0);
 
-    const income = await db.income.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        userId: userId,
-        date: {
-          gt: startDate,
-          lte: endDate,
+      const income = await db.income.aggregate({
+        _sum: {
+          amount: true,
         },
-      },
-    })
-
-    // total income
-    const totalIncome = income._sum.amount || 0
-
-    // get budget
-    const budget = await db.user.findUnique({
-      where: {
-        id: userId,
-      },
-    })
-
-    // total expense
-    const totalEx = await db.expense.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        userId: userId,
-        date: {
-          gt: startDate,
-          lte: endDate,
+        where: {
+          userId: userId,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
         },
-      },
-    })
+      });
 
-    const totalExpense = totalEx._sum.amount || 0;
+      const totalIncome = income._sum.amount?.toNumber() || 0;
 
-    // get all expense data
-    const expenses = await db.expense.findMany({
-      where: {
-        userId: userId,
-        date: {
-          gte: startDate,
-          lte: endDate,
+      const expenses = await db.expense.findMany({
+        where: {
+          userId: userId,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
         },
-      },
-    })
+        select: {
+          category: true,
+          amount: true,
+        },
+      });
 
-    //get category data
-    const categoryData = await db.category.findMany({
-      where: {
-        userId: userId,
-      },
-    });
+      const totalEx = await db.expense.aggregate({
+        _sum: {
+          amount: true,
+        },
+        where: {
+          userId: userId,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      });
 
-    // console.log("categoryData:", categoryData);
-    
-    // category budget
-    const categoryBudget = {
-      Other: 0,
-      Bills: 0,
-      Food: 0,
-      Entertainment: 0,
-      Transportation: 0,
-      EMI: 0,
-      Healthcare: 0,
-      Education: 0,
-      Investment: 0,
-      Shopping: 0,
-      Fuel: 0,
-      Groceries: 0,
+      const totalExpense = totalEx._sum.amount?.toNumber() || 0;
+
+      const budget = await db.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          budget: true,
+        },
+      });
+
+      const categoryData = await db.category.findMany({
+        where: {
+          userId: userId,
+        },
+        select: {
+          category: true,
+          budget: true,
+        },
+      });
+
+      const categoryBudget: CategoryBudget = Object.values(CategoryTypes).reduce((acc, category) => {
+        acc[category] = 0;
+        return acc;
+      }, {} as CategoryBudget);
+
+      const categoryExpenses: CategoryBudget = Object.values(CategoryTypes).reduce((acc, category) => {
+        acc[category] = 0;
+        return acc;
+      }, {} as CategoryBudget);
+
+      categoryData.forEach((category) => {
+        categoryBudget[category.category] = category.budget.toNumber();
+      });
+
+      expenses.forEach((expense) => {
+        categoryExpenses[expense.category] += expense.amount.toNumber();
+      });
+
+      const remainingBudget = (budget?.budget?.toNumber() || 0) - totalExpense;
+
+      monthlyData.push({
+        month: startDate.toLocaleString('default', { month: 'long' }),
+        totalIncome,
+        totalExpense,
+        categoryExpenses,
+        categoryBudget,
+        remainingBudget,
+      });
     }
 
-    categoryData.forEach((category) => {
-      categoryBudget[category.id] = category.budget;
-    });
-
-    // category
-    const category = {
-      Other: 0,
-      Bills: 0,
-      Food: 0,
-      Entertainment: 0,
-      Transportation: 0,
-      EMI: 0,
-      Healthcare: 0,
-      Education: 0,
-      Investment: 0,
-      Shopping: 0,
-      Fuel: 0,
-      Groceries: 0,
-    }
-
-    // TotalExpense
-    let TotalExpense = 0;
-
-    // get all category
-    expenses.forEach((expense) => {
-      category[expense.category] += Number(expense.amount)
-      TotalExpense += Number(expense.amount);
-    })
-
-    // calculate perday budget
-    const remainingBudget = budget?.budget||0 - TotalExpense;
-
-    // Calculate per day budget for the remaining days of the month
-    const daysInMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
-    const currentDay = endDate.getDate();
-    const daysLeft = daysInMonth - currentDay;
-    const perDayBudget = remainingBudget||0 / daysLeft ;
-
-    // console.log("perDayBudget : " + perDayBudget);
     
 
-    // remaining budget
-    // console.log("totalIncome:", totalIncome)
-    // console.log("budget:", budget?.budget)
-    // console.log("expenses:", expenses)
-    // console.log("category:", category)
-
-    return NextResponse.json({ totalIncome, categoryBudget ,budget, expenses, perDayBudget ,totalExpense ,category })
+    return NextResponse.json({ monthlyData });
   } catch (error) {
-    console.error("Error in GET function:", error)
+    console.error("Error in GET function:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
-    )
+    );
   }
 }

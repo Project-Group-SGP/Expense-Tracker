@@ -27,6 +27,8 @@ type CategoryListType = {
 const CategoryList = (props: CategoryListType) => {
   const router = useRouter()
 
+
+
   const categoryItems = [
     {
       title: "Food",
@@ -95,6 +97,9 @@ const CategoryList = (props: CategoryListType) => {
   const handleCategoryClick = (path) => {
     router.push(path)
   }
+
+  console.log(props.categories);
+  
 
   return (
     <section className="ml-6 mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
