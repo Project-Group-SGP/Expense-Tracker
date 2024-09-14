@@ -52,7 +52,6 @@ interface UserToPay {
 
 interface GetResponse {
   group: Group | null
-  groupMembers: GroupMemberDetails[]
   pendingPayments: ExpenseSplit[]
   usersToPay: UserToPay[]
 }
@@ -79,6 +78,14 @@ export interface FormattedExpenseData {
   expenseSplits: ExpenseSplit[]
 }
 
+export interface GetBalance {
+  userId: string
+  name: string
+  avatar: string
+  amount: number
+  status: 'settled up' | 'gets back' | 'owes',
+  amountColor:string,
+}
 
 async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
   try {
@@ -87,7 +94,8 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
       {
         method: "GET",
         headers: { Cookie: cookie },
-        next: { tags: ["getGroupdata"] },
+        // next: { tags: ["getGroupdata"] },
+        cache: 'no-store',
       }
     )
 
@@ -101,12 +109,35 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
     console.error("Error fetching data:", error)
     return {
       group: null,
-      groupMembers: [],
       pendingPayments: [],
       usersToPay: [],
     }
   }
 }
+
+const fetchGroupBalances = async (groupId: string,cookie: string):Promise<GetBalance[]> => {
+  try {
+    const res = await fetch(`${process.env.BASE_URL}/api/balance?groupId=${groupId}`,{
+        method: "GET",
+        headers: { Cookie: cookie },
+        // next: { tags: ["getGroupBalance"] },
+        cache: 'no-store',
+      });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch group balances")
+    }
+
+    const data: GetBalance[] = await res.json()
+
+    console.log("\n\n\n\n Balance",data);
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return [];
+  }
+};
+
 
 async function getGroupTransactionData(groupID: string, cookie: string): Promise<FormattedExpenseData[]> {
   try {
@@ -115,8 +146,8 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       {
         method: "GET",
         headers: { Cookie: cookie },
-        // cache: 'no-store',
-        next: { tags: ["getGroupTransactiondata"] },
+        cache: 'no-store',
+        // next: { tags: ["getGroupTransactiondata"] },
       }
     )
 
@@ -162,9 +193,12 @@ export default async function GroupPage({
 
   // const data = await getAllData(params.groupID, cookie)
 
-  const [transactionData,data] = await Promise.all([getGroupTransactionData(params.groupID, cookie),getAllData(params.groupID, cookie)]);
+  const [transactionData,data,balance] = await Promise.all([getGroupTransactionData(params.groupID, cookie),getAllData(params.groupID, cookie),fetchGroupBalances(params.groupID, cookie)]);
 
-  const groupMembers = data.groupMembers
+  const groupMembers:GroupMemberDetails[] = [];
+
+  balance.map((b)=>{groupMembers.push({userId:b.userId,avatar:b.avatar,name:b.name})})
+
   const usersYouNeedToPay = data.usersToPay
 
   return (
@@ -205,7 +239,7 @@ export default async function GroupPage({
               <Transaction transactionsData={transactionData} loading={false}/>
             </Cardcontent>
             <Cardcontent className="border-none p-0">
-              <GroupMember groupMemberName={groupMembers} loading={false}/>
+              <GroupMember loading={false} balance={balance}/>
             </Cardcontent>
           </section>
         </div>

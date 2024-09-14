@@ -108,7 +108,7 @@ export default function LoadingGroupPage(){
              <Transaction transactionsData={[]} loading={true}/>
           </Cardcontent>
            <Cardcontent className="border-none p-0">
-             <GroupMember groupMemberName={[]} loading={true} />
+             <GroupMember loading={true} balance={[]}/>
            </Cardcontent>
          </section>
         </div>

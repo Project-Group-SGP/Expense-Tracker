@@ -10,7 +10,7 @@ import { UserAvatar } from './UserAvatar'
 interface MemberProps {
   name: string;
   status: string;
-  amount: string;
+  amount: number;
   amountColor: string;
   avatar: string;
   userId: string;
@@ -22,6 +22,7 @@ export const Member = ({ name,
   amountColor,
   avatar,
   userId, }: MemberProps) => {
+    console.log(amount)
   return (
     <CardContent className="flex w-full m-2 flex-col gap-3 rounded-xl border p-5 shadow dark:bg-Neutral-100">
       <section className="flex justify-between gap-2">
@@ -34,11 +35,11 @@ export const Member = ({ name,
           {/* Name and Status */}
           <div className="flex flex-col">
             <span className="text-lg font-medium">{name}</span>
-            <span className="text-sm text-gray-500">{status}</span>
+            <span className={`text-sm ${amountColor}`}>{status}</span>
           </div>
         </div>
         {/* Amount Section */}
-        <div className="flex items-center text-lg font-semibold" style={{ color: amountColor }}>
+        <div className={`flex items-center text-lg font-semibold ${amountColor}`}>
           {status !== "settled up" && (
             <IndianRupee className="mr-1 text-xl" />
           )}
