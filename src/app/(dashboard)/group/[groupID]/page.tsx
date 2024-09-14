@@ -8,7 +8,7 @@ import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
 import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
-import PageTitle from "../../dashboard/_components/PageTitle"
+import PageTitle from "./_components/PageTitle"
 import TransactionTableSkeleton from "./_components/TransactionSkeleton"
 
 interface Group {
@@ -201,11 +201,25 @@ export default async function GroupPage({
 
   const usersYouNeedToPay = data.usersToPay
 
+  const findcurrentuser = balance.find((b) => b.userId === user.id) || null;
+
+  const leave : {
+    status: 'settled up' | 'gets back' | 'owes';
+    amount: number;
+    userId: string;
+    groupId: string;
+  } =  {
+    status: findcurrentuser?.status ?? "gets back",
+    amount: findcurrentuser?.amount ?? 0,
+    userId: findcurrentuser?.userId ?? "",
+    groupId: params.groupID
+  }  
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
-          <PageTitle title={group.name} />
+          <PageTitle title={group.name} leave={leave}/>
 
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
             <p className="mr-auto">
