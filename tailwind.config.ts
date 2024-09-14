@@ -20,19 +20,19 @@ const config = {
     },
     extend: {
       colors: {
-        // category color 
-        other: "#888888",
-        bills: "#0088FE",
-        food: "#FF8042",
-        entertainment: "#FFBB28",
-        transportation: "#00C49F",
-        emi: "#FF0000",
-        healthcare: "#800080",
-        education: "#00FFFF",
-        investment: "#008000",
-        shopping: "#FFD700",
-        fuel: "#FF6347",
-        groceries: "#ADFF2F",
+        // category color
+        other: "#A9A9A9", // Dark Gray
+        bills: "#4169E1", // Royal Blue (slightly darker than Dodger Blue)
+        food: "#FF6347", // Tomato Red
+        entertainment: "#FFD700", // Gold
+        transportation: "#4682B4", // Steel Blue
+        emi: "#DC143C", // Crimson
+        healthcare: "#20B2AA", // Light Sea Green
+        education: "#9370DB", // Medium Purple
+        investment: "#228B22", // Forest Green
+        shopping: "#FF69B4", // Hot Pink (slightly softer than Deep Pink)
+        fuel: "#FFA500", // Orange
+        groceries: "#32CD32", // Lime Green
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
