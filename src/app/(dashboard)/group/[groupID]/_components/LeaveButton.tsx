@@ -71,13 +71,13 @@ export default function LeaveButton({ status, amount, userId, groupId }: Props) 
       case 'gets back':
         return {
           title: 'Unable to leave group',
-          description: `You are owed $${amount}. You need to settle up before leaving the group.`,
+          description: `You are owed ₹${amount}. You need to settle up before leaving the group.`,
           action: 'OK'
         }
       case 'owes':
         return {
           title: 'Unable to leave group',
-          description: `You owe $${amount}. You need to settle up before leaving the group.`,
+          description: `You owe ₹${amount}. You need to settle up before leaving the group.`,
           action: 'OK'
         }
     }
