@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon } from 'lucide-react'
-import { OverallGraph } from './OverallGraph'
-import CategoryList from './CategoryList'
+import React, { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon } from 'lucide-react';
+import { OverallGraph } from './OverallGraph';
+import CategoryList from './CategoryList';
 
 type CategoryBudget = {
   [key: string]: number;
@@ -23,9 +23,10 @@ type BudgetSelectionProps = {
   initialData: {
     monthlyData: MonthlyData[];
   };
+  budget: number;
 };
 
-const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData }) => {
+const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }) => {
   const [data, setData] = useState(initialData);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
@@ -38,13 +39,19 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData }) => {
     setSelectedMonth(parseInt(value, 10));
   };
 
-  // console.log(data.monthlyData[selectedMonth].categoryExpenses);
-  
+  // Ensure selectedMonth is valid and prevent potential errors
+  const selectedData = data.monthlyData[selectedMonth] || {
+    totalIncome: 0,
+    totalExpense: 0,
+    categoryExpenses: {},
+    categoryBudget: {},
+    remainingBudget: 0
+  };
 
   return (
     <div className="space-y-6 p-4 sm:p-6 bg-background rounded-lg shadow-md">
       <div className="flex flex-col items-center space-y-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Budget Overview</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Budget Overview</h1>
         <div className="w-full sm:w-[200px]">
           <Select onValueChange={handleMonthChange} defaultValue={selectedMonth.toString()}>
             <SelectTrigger className="w-full bg-blue-600/5 border-blue-600/20 text-blue-600 hover:bg-blue-600/10 focus:ring-blue-600/30">
@@ -67,11 +74,11 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData }) => {
       </div>
 
       <div className="space-y-6">
-        <OverallGraph monthlyData={data.monthlyData} selectedMonth={selectedMonth} />
-        <CategoryList categories={data.monthlyData[selectedMonth].categoryExpenses} />
+        <OverallGraph monthlyData={data.monthlyData} budget={budget} selectedMonth={selectedMonth} />
+        <CategoryList categories={selectedData.categoryExpenses} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default BudgetSelection;

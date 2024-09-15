@@ -125,9 +125,19 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    const budget = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        budget: true,
+      },
+    });
+
+    // console.log("budget", budget);
     
 
-    return NextResponse.json({ monthlyData });
+    return NextResponse.json({ monthlyData, budget });
   } catch (error) {
     console.error("Error in GET function:", error);
     return NextResponse.json(

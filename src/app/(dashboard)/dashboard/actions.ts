@@ -39,5 +39,6 @@ export async function AddnewExpense(data: ExpenseFormData) {
 
   revalidateTag("totalExpense")
   revalidateTag("getAllData")
+  
   return newExpense ? "success" : "error"
 }

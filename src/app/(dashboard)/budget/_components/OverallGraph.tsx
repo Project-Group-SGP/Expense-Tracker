@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState, useEffect } from "react"
 import {
   Card,
@@ -30,9 +29,10 @@ type MonthlyData = {
 type OverallGraphProps = {
   monthlyData: MonthlyData[];
   selectedMonth: number;
+  budget: number;
 };
 
-export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) {
+export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGraphProps) {
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -52,7 +52,7 @@ export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) 
   const totalBudget = Object.values(currentMonthData.categoryBudget).reduce((sum, value) => sum + value, 0)
 
   // Calculate the percentage of the budget used
-  const percentUsed = Math.min((currentMonthData.totalExpense / totalBudget) * 100, 100)
+  const percentUsed = Math.min((currentMonthData.totalExpense / budget) * 100, 100)
 
   // SVG parameters
   const size = 180
@@ -69,7 +69,7 @@ export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) 
     setCurrentMonthData(monthlyData[monthIndex])
   }
 
-  console.log(totalBudget);
+  // console.log("totalBudget" ,totalBudget);
   
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
@@ -128,7 +128,7 @@ export function OverallGraph({ monthlyData, selectedMonth }: OverallGraphProps) 
           <div className="max-w-[300px] flex-1">
             
             <SetBudget
-              currentBudget={totalBudget}
+              currentBudget={budget}
               expense={currentMonthData.totalExpense}
             />
 

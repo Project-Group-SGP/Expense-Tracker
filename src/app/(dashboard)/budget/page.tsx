@@ -1,11 +1,27 @@
-// This is a server component
-import { fetchBudgetData } from "./actions"
-import { OverallGraph } from "./_components/OverallGraph"
-import CategoryList from "./_components/CategoryList"
-import BudgetSelection from "./_components/budget_Selection"
+import { headers } from "next/headers";
+import BudgetSelection from "./_components/budget_Selection";
+import { cache } from "react";
+
+// Define interfaces for returned data
+interface MonthlyData {
+  month: string;
+  totalIncome: number;
+  totalExpense: number;
+  categoryExpenses: Record<string, number>;
+  categoryBudget: Record<string, number>;
+  remainingBudget: number;
+}
+
+interface BudgetData {
+  monthlyData: MonthlyData[];
+}
+
+interface Budget {
+  budget: number;
+}
 
 // Ensure all categories are present with default values if missing
-const ensureCategories = (data: any) => {
+const ensureCategories = (data: BudgetData): BudgetData => {
   const allCategories = [
     "Other",
     "Bills",
@@ -19,31 +35,81 @@ const ensureCategories = (data: any) => {
     "Shopping",
     "Fuel",
     "Groceries",
-  ]
+  ];
 
-  data.monthlyData.forEach((monthData: any) => {
+  data.monthlyData.forEach((monthData) => {
     allCategories.forEach((category) => {
       if (!monthData.categoryExpenses.hasOwnProperty(category)) {
-        monthData.categoryExpenses[category] = 0 // Default to zero if missing
+        monthData.categoryExpenses[category] = 0; // Default to zero if missing
       }
-    })
-  })
+    });
+  });
 
-  return data
-}
+  return data;
+};
 
+// Cached fetch for budget category data
+const fetchBudgetData = cache(async (): Promise<BudgetData> => {
+  const headersList = headers();
+  const cookie = headersList.get('cookie') || '';
+
+  try {
+    const response = await fetch(
+      `${process.env.BASE_URL}/api/budget-category`,
+      {
+        method: 'GET',
+        headers: { Cookie: cookie },
+        next: { tags: ['budget-category'] },
+      }
+    );
+    
+    const data: BudgetData = await response.json();
+    return data; // Return the fetched and normalized data
+  } catch (error) {
+    console.error('Error fetching budget data:', error);
+    return {
+      monthlyData: [], // Return fallback empty data in case of an error
+    };
+  }
+});
+
+// Fetch budget data (not cached)
+const fetchBudget = async (): Promise<Budget> => {
+  const headersList = headers();
+  const cookie = headersList.get('cookie') || '';
+
+  try {
+    const response = await fetch(
+      `${process.env.BASE_URL}/api/get-budget`,
+      {
+        method: 'GET',
+        headers: { Cookie: cookie },
+        next: { tags: ['budget'] },
+      }
+    );
+    
+    const data: Budget = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching budget:', error);
+    return {
+      budget: 0, // Return fallback value in case of an error
+    };
+  }
+};
+
+// Server Component Page
 const Page = async () => {
-  let data = await fetchBudgetData()
-  data = ensureCategories(data) // Normalize the data here
+  let data = await fetchBudgetData();
+  data = ensureCategories(data); // Normalize the data
 
-  // console.log("Inside main Page.tsx");
-  // console.log(JSON.stringify(data, null, 2));
+  const { budget } = await fetchBudget(); // Fetch the budget
 
   return (
     <div className="mb-10 mr-10 mt-20">
-      <BudgetSelection initialData={data} />
+      <BudgetSelection initialData={data} budget={budget} />
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

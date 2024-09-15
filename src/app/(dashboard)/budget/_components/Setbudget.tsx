@@ -27,6 +27,7 @@ import CategoryCard from "./Card_Category"
 import { SetBudgetDb } from "../actions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useRouter } from "next/navigation"
+import { revalidateTag } from "next/cache"
 
 const formSchema = z.object({
   amount: z
@@ -47,8 +48,7 @@ export function SetBudget({
 }) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
-
-  const router = useRouter();
+  const router = useRouter()
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -62,7 +62,11 @@ export function SetBudget({
     if (!toastShown && expense && currentBudget && currentBudget < expense) {
       toast.custom(
         (t) => (
-          <Alert className="relative w-full max-w-md border-none border-red-800 bg-red-600 shadow-lg">
+          <Alert
+            aria-live="assertive"
+            role="alert"
+            className="relative w-full max-w-md border-none border-red-800 bg-red-600 shadow-lg"
+          >
             <AlertTitle className="flex items-center text-[13px] font-bold text-white">
               <AlertCircle className="mr-2 h-6 w-6 text-red-200" />
               Warning: Budget Exceeded!
@@ -73,6 +77,7 @@ export function SetBudget({
             <Button
               size="sm"
               variant="ghost"
+              aria-label="Close warning"
               className="absolute right-2 top-2 text-red-100 hover:bg-red-700 hover:text-white"
               onClick={() => toast.dismiss(t)}
             >
@@ -92,27 +97,33 @@ export function SetBudget({
   const handleSubmit = async (data: BudgetFormData) => {
     try {
       const budget = Number(data.amount)
-      const result = await SetBudgetDb(budget);
+      const result = await SetBudgetDb(budget)
 
       if (result === "success") {
+        
+        router.refresh();
+
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
         })
 
-        router.refresh()
-
+       
         form.reset()
       } else {
-        toast.error("Budget update failed")
+        toast.error("Budget update failed. Please try again later.", {
+          duration: 4500,
+        })
       }
 
       setOpen(false)
       form.reset({ amount: data.amount })
     } catch (error) {
       console.error("Error updating budget:", error)
-      toast.error("Failed to update budget")
+      toast.error(`Failed to update budget: ${error  || "Unknown error"}`, {
+        duration: 4500,
+      })
     }
   }
 
@@ -129,9 +140,15 @@ export function SetBudget({
         </div>
       </DialogTrigger>
 
-      <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
+      <DialogContent
+        aria-labelledby="dialog-title"
+        className="w-[95vw] max-w-[425px] p-4 sm:p-6"
+      >
         <DialogHeader>
-          <DialogTitle className="text-center sm:text-left">
+          <DialogTitle
+            id="dialog-title"
+            className="text-center sm:text-left"
+          >
             Set a new <span className="text-green-500">Budget</span>
           </DialogTitle>
         </DialogHeader>
@@ -149,6 +166,7 @@ export function SetBudget({
                   <FormLabel>Budget Amount</FormLabel>
                   <FormControl>
                     <Input
+                      aria-label="Budget amount"
                       placeholder="Enter amount"
                       type="number"
                       step="0.01"
@@ -161,7 +179,11 @@ export function SetBudget({
             />
 
             <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" className="w-full sm:w-auto">
+              <Button
+                type="submit"
+                className="w-full sm:w-auto"
+                aria-label="Update budget"
+              >
                 Update Budget
               </Button>
             </DialogFooter>
