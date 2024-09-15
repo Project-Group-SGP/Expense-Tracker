@@ -6,164 +6,6 @@ import { CategoryTypes } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidatePath, revalidateTag } from "next/cache";
 import webpush from "web-push"
-
-
-// export async function AddGroupExpense(params: { 
-//   groupID: string, 
-//   paidById: string, 
-//   title: string, 
-//   amount: number, 
-//   date: Date, 
-//   category: CategoryTypes, 
-//   splits: { userId: string, amount: number }[] 
-// }) {
-//     const user = await currentUserServer();
-    
-//     if (!user) {
-//         throw new Error("Login Please");
-//     }
-
-//     const groupMembers = await db.groupMember.findMany({
-//         where: {
-//           groupId: params.groupID
-//         }
-//     });
-
-//     // console.log(params.splits);
-    
-
-//     // console.log( "paidById : " + params.paidById);
-    
-
-//     // Check if the user is a member of the group
-//     if (groupMembers.some(member => member.id.toString() === params.paidById.toString())) {
-//         // console.log('Invalid ID:', params.paidById);
-//         // console.log("Group members:", groupMembers);
-        
-//         throw new Error("User is not a member of the group");
-//     }
-
-
-//     // Create the expense record
-//     const responce = await db.groupExpense.create({
-//         data: {
-//             groupId: params.groupID,
-//             paidById: params.paidById,
-//             category: params.category,
-//             amount: params.amount,
-//             description: params.title,
-//             date: params.date,
-//             splits: {
-//                 create: params.splits,
-//             },
-//         },
-//     });
-
-//     const updatesplit = await db.expenseSplit.update({
-//       where:{
-//         expenseId_userId:{
-//           expenseId:responce.id,
-//           userId:params.paidById,
-//         }
-//       },
-//       data:{
-//         isPaid:"PAID",
-//       },
-//       select:{
-//         id:true,
-//         expenseId:true,
-//         isPaid:true,
-//       }
-//     })
-
-//     // console.log("\n\nupdate expance:",updatesplit);
-
-//     // Optionally revalidate cache if needed
-//     revalidateTag(`group:${params.groupID}`);
-
-//     return { success: true };
-// }  // Assuming you're using Next.js
-
-// export async function settleUp(params: {
-//   groupID: string;
-//   payerId: string;
-//   recipientId: string;
-//   expenseIds: ExpenseDetails[];
-//   transactionDate: Date;
-// }) {
-//   const user = await currentUserServer();
-//   if (!user || user.id !== params.payerId) {
-//     throw new Error("Please log in with the correct account.");
-//   }
-
-//   // Fetch group members in a single query
-//   const groupMembers = await db.groupMember.findMany({
-//     where: { groupId: params.groupID },
-//     select: { userId: true },
-//   });
-
-//   const memberIds = new Set(groupMembers.map(member => member.userId));
-//   if (!memberIds.has(params.payerId) || !memberIds.has(params.recipientId)) {
-//     throw new Error("Both users must be members of the group.");
-//   }
-
-//   // Fetch all relevant group expenses in a single query
-//   const groupExpenses = await db.groupExpense.findMany({
-//     where: {
-//       id: { in: params.expenseIds.map(e => e.groupexpenceid) },
-//       groupId: params.groupID,
-//       paidById: params.recipientId,
-//       status: { not: "CANCELLED" },
-//     },
-//     include: {
-//       splits: {
-//         where: { userId: params.payerId },
-//       },
-//     },
-//   });
-
-//   const groupExpensesMap = new Map(groupExpenses.map(ge => [ge.id, ge]));
-
-//   const updates = params.expenseIds.map(async (expense) => {
-//     const groupExpense = groupExpensesMap.get(expense.groupexpenceid);
-//     if (!groupExpense || groupExpense.splits.length === 0) {
-//       console.warn(`Invalid group expense or split for ID: ${expense.groupexpenceid}`);
-//       return null;
-//     }
-
-//     const payerSplit = groupExpense.splits[0];
-
-//     const [payment, updatedSplit] = await Promise.all([
-//       db.payment.create({
-//         data: {
-//           expenseSplitId: expense.expenseid,
-//           amount: new Decimal(expense.amount),
-//           paidAt: params.transactionDate,
-//         },
-//       }),
-//       db.expenseSplit.update({
-//         where: { id: expense.expenseid },
-//         data: { isPaid: "PAID" },
-//       }),
-//     ]);
-
-//     return groupExpense.id;
-//   });
-
-//   const updatedExpenseIds = (await Promise.all(updates)).filter(Boolean) as string[];
-
-//   // Update group expense statuses in bulk
-//   await db.groupExpense.updateMany({
-//     where: { id: { in: updatedExpenseIds } },
-//     data: { status: "SETTLED" },
-//   });
-
-//   // Revalidate tags
-//   revalidateTag(`group:${params.groupID}`);
-
-//   return { message: "Payment to group member completed successfully!" };
-// }
-
 export async function removeUserFromGroup(
   groupId: string,
   userIdToRemove: string
@@ -527,6 +369,12 @@ export async function AddGroupExpense(params: {
     return { success: true };
 }
 
+interface ExpenseDetails {
+  expenseid: string;
+  amount: number;
+  groupexpenceid: string;
+}
+
 export async function settleUp(params: {
   groupID: string;
   payerId: string;
@@ -559,9 +407,7 @@ export async function settleUp(params: {
       status: { not: "CANCELLED" },
     },
     include: {
-      splits: {
-        where: { userId: params.payerId },
-      },
+      splits: true,
     },
   });
 
@@ -569,12 +415,16 @@ export async function settleUp(params: {
 
   const updates = params.expenseIds.map(async (expense) => {
     const groupExpense = groupExpensesMap.get(expense.groupexpenceid);
-    if (!groupExpense || groupExpense.splits.length === 0) {
-      console.warn(`Invalid group expense or split for ID: ${expense.groupexpenceid}`);
+    if (!groupExpense) {
+      console.warn(`Invalid group expense for ID: ${expense.groupexpenceid}`);
       return null;
     }
 
-    const payerSplit = groupExpense.splits[0];
+    const payerSplit = groupExpense.splits.find(split => split.userId === params.payerId);
+    if (!payerSplit) {
+      console.warn(`No split found for payer in expense: ${expense.groupexpenceid}`);
+      return null;
+    }
 
     const [payment, updatedSplit] = await Promise.all([
       db.payment.create({
@@ -590,16 +440,32 @@ export async function settleUp(params: {
       }),
     ]);
 
+    // Check the status of all splits for this expense
+    const allSplitsPaid = groupExpense.splits.every(split => 
+      split.id === expense.expenseid ? true : split.isPaid === "PAID"
+    );
+    const someSplitsPaid = groupExpense.splits.some(split => 
+      split.id === expense.expenseid || split.isPaid === "PAID"
+    );
+
+    let newStatus;
+    if (allSplitsPaid) {
+      newStatus = "SETTLED";
+    } else if (someSplitsPaid) {
+      newStatus = "PARTIALLY_SETTLED";
+    } else {
+      newStatus = "UNSETTLED";
+    }
+
+    await db.groupExpense.update({
+      where: { id: expense.groupexpenceid },
+      data: { status: newStatus },
+    });
+
     return groupExpense.id;
   });
 
-  const updatedExpenseIds = (await Promise.all(updates)).filter(Boolean) as string[];
-
-  // Update group expense statuses in bulk
-  await db.groupExpense.updateMany({
-    where: { id: { in: updatedExpenseIds } },
-    data: { status: "SETTLED" },
-  });
+  await Promise.all(updates);
 
   // Calculate total amount settled
   const totalAmount = params.expenseIds.reduce((sum, expense) => sum + expense.amount, 0);
@@ -607,8 +473,8 @@ export async function settleUp(params: {
   // Send settle up notification
   sendSettleUpNotification(params.groupID, params.payerId, params.recipientId, totalAmount);
 
-  // Revalidate tags
-  // revalidateTag(`group:${params.groupID}`);
+  // Revalidate the group page to reflect the changes
+  revalidatePath(`/groups/${params.groupID}`);
 
   return { message: "Payment to group member completed successfully!" };
 }

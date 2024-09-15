@@ -8,6 +8,8 @@ import { Cardcontent } from "../../dashboard/_components/Card"
 import { CardContent } from "@/components/ui/card"
 import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
+import { cn } from "@/lib/utils"
+import { LogOut } from "lucide-react"
 interface Group {
   id: string
   name: string
@@ -80,7 +82,19 @@ export default function LoadingGroupPage(){
   return (
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
-        <Skeleton className="h-10 w-[200px]" />
+          <div className="flex justify-between"> 
+            <Skeleton className="h-10 w-[200px]" />
+           <Button
+              variant="outline"
+              className={cn(
+                "w-full sm:w-auto transition-colors duration-300",
+                "border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black"
+              )}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Leave Group
+            </Button>
+          </div>
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
             <p className="flex w-fit">
               <p>Welcome Back,</p>
