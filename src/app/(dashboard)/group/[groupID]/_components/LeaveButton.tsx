@@ -364,15 +364,13 @@ export default function LeaveButton({ status, amount, userId, groupId }: LeaveBu
         return {
           title: 'Unable to leave group',
           description: `You are owed $${amount}. You need to settle up before leaving the group.`,
-          action: 'OK',
-          icon: <AlertTriangle className="h-6 w-6 text-yellow-500" />
+          action: 'OK'
         }
       case 'owes':
         return {
           title: 'Unable to leave group',
           description: `You owe $${amount}. You need to settle up before leaving the group.`,
-          action: 'OK',
-          icon: <AlertTriangle className="h-6 w-6 text-yellow-500" />
+          action: 'OK'
         }
     }
   }

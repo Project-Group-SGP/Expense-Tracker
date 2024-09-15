@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button"; // Corrected Button import
 import Card_budget from "./Card_budget";
 import { SetCategory_Budget } from "./SetCategory_Budget";
+import { getCategoryData } from "../action";
 
 type Expense = {
   id: string;
@@ -22,11 +23,22 @@ type Expense = {
 
 export type Expenses = Expense[];
 
+
+
+
 const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any } }) => {
   const pathname = usePathname();
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || "";
 
   const [toastShown, setToastShown] = useState(false);
+
+  
+
+  const data1 = getCategoryData(lastRouteName);
+  
+  console.log("getCategoryData:", data1);
+
+   
 
   // Filter data category-wise
   const filteredData = data.expenses?.filter(

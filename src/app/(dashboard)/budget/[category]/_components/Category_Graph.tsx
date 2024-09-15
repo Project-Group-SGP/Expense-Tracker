@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +28,8 @@ function getMonthName(dateStr: string): string {
   return date.toLocaleString('default', { month: 'long' });
 }
 
-export function Category_Graph({ data }: { data: { expenses: Expenses; categoryBudget: any } }) {
+// Typing the data prop with expenses as an array of Expense and categoryBudget as a number
+export function Category_Graph({ data }: { data: { expenses: Expenses; categoryBudget: number } }) {
   const pathname = usePathname();
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || '';
 
@@ -46,24 +47,29 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; categoryB
     November: 0,
     December: 0,
   };
-  
+
   // Filter and aggregate data for the specific category
   const targetCategory = lastRouteName;
-  data.expenses.filter(transaction => transaction.category.toUpperCase() === targetCategory).forEach(transaction => {
-    const month = getMonthName(transaction.date);
-    if (categoryWiseData[month] !== undefined) {
-      categoryWiseData[month] += parseFloat(transaction.amount);
-    }
-  });
+  data.expenses
+    .filter(transaction => transaction.category.toUpperCase() === targetCategory)
+    .forEach(transaction => {
+      const month = getMonthName(transaction.date);
+      if (categoryWiseData[month] !== undefined) {
+        categoryWiseData[month] += parseFloat(transaction.amount);
+      }
+    });
 
   // Convert the categoryWiseData object to an array for the BarChart
-  const chartData = Object.entries(categoryWiseData).map(([month, spend]) => ({ month, spend }));
+  const chartData = Object.entries(categoryWiseData).map(([month, spend]) => ({
+    month, 
+    spend: spend as number  // Explicit type for the 'spend' field
+  }));
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
-        <CardDescription>This month Data</CardDescription>
+        <CardDescription>This month's Data</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -74,12 +80,12 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; categoryB
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value.slice(0, 3)} // Format month names to 3 letters
             />
             <YAxis />
             <Tooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent hideLabel />} // Use custom tooltip content
             />
             <Legend />
             <Bar dataKey="spend" fill="var(--color-desktop)" radius={8} />
