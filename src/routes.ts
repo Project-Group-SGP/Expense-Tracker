@@ -54,6 +54,7 @@ export const apiRoutes = [
   "/api/history/singletransaction",
   "/api/get-group",
   "/api/get-group-transaction",
+  "/api/balance",
   "/api/get-budget",
 ]
 

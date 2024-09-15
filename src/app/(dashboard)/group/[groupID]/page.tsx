@@ -8,7 +8,8 @@ import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
 import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
-import PageTitle from "../../dashboard/_components/PageTitle"
+import PageTitle from "./_components/PageTitle"
+import TransactionTableSkeleton from "./_components/TransactionSkeleton"
 
 interface Group {
   id: string
@@ -51,7 +52,6 @@ interface UserToPay {
 
 interface GetResponse {
   group: Group | null
-  groupMembers: GroupMemberDetails[]
   pendingPayments: ExpenseSplit[]
   usersToPay: UserToPay[]
 }
@@ -78,6 +78,15 @@ export interface FormattedExpenseData {
   expenseSplits: ExpenseSplit[]
 }
 
+export interface GetBalance {
+  userId: string
+  name: string
+  avatar: string
+  amount: number
+  status: 'settled up' | 'gets back' | 'owes',
+  amountColor:string,
+}
+
 async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
   try {
     const res = await fetch(
@@ -85,7 +94,8 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
       {
         method: "GET",
         headers: { Cookie: cookie },
-        next: { tags: ["getGroupdata"] },
+        // next: { tags: ["getGroupdata"] },
+        cache: 'no-store',
       }
     )
 
@@ -99,12 +109,35 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
     console.error("Error fetching data:", error)
     return {
       group: null,
-      groupMembers: [],
       pendingPayments: [],
       usersToPay: [],
     }
   }
 }
+
+const fetchGroupBalances = async (groupId: string,cookie: string):Promise<GetBalance[]> => {
+  try {
+    const res = await fetch(`${process.env.BASE_URL}/api/balance?groupId=${groupId}`,{
+        method: "GET",
+        headers: { Cookie: cookie },
+        // next: { tags: ["getGroupBalance"] },
+        cache: 'no-store',
+      });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch group balances")
+    }
+
+    const data: GetBalance[] = await res.json()
+
+    console.log("\n\n\n\n Balance",data);
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return [];
+  }
+};
+
 
 async function getGroupTransactionData(groupID: string, cookie: string): Promise<FormattedExpenseData[]> {
   try {
@@ -113,8 +146,8 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       {
         method: "GET",
         headers: { Cookie: cookie },
-        // cache: 'no-store',
-        next: { tags: ["getGroupTransactiondata"] },
+        cache: 'no-store',
+        // next: { tags: ["getGroupTransactiondata"] },
       }
     )
 
@@ -160,16 +193,33 @@ export default async function GroupPage({
 
   // const data = await getAllData(params.groupID, cookie)
 
-  const [transactionData,data] = await Promise.all([getGroupTransactionData(params.groupID, cookie),getAllData(params.groupID, cookie)]);
+  const [transactionData,data,balance] = await Promise.all([getGroupTransactionData(params.groupID, cookie),getAllData(params.groupID, cookie),fetchGroupBalances(params.groupID, cookie)]);
 
-  const groupMembers = data.groupMembers
+  const groupMembers:GroupMemberDetails[] = [];
+
+  balance.map((b)=>{groupMembers.push({userId:b.userId,avatar:b.avatar,name:b.name})})
+
   const usersYouNeedToPay = data.usersToPay
+
+  const findcurrentuser = balance.find((b) => b.userId === user.id) || null;
+
+  const leave : {
+    status: 'settled up' | 'gets back' | 'owes';
+    amount: number;
+    userId: string;
+    groupId: string;
+  } =  {
+    status: findcurrentuser?.status ?? "gets back",
+    amount: findcurrentuser?.amount ?? 0,
+    userId: findcurrentuser?.userId ?? "",
+    groupId: params.groupID
+  }  
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
-          <PageTitle title={group.name} />
+          <PageTitle title={group.name} leave={leave}/>
 
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
             <p className="mr-auto">
@@ -200,10 +250,10 @@ export default async function GroupPage({
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
             <Cardcontent className="border-none p-0 md:col-span-2 lg:col-span-2">
-              <Transaction transactionsData={transactionData} />
+              <Transaction transactionsData={transactionData} loading={false}/>
             </Cardcontent>
             <Cardcontent className="border-none p-0">
-              <GroupMember groupMemberName={groupMembers} />
+              <GroupMember loading={false} balance={balance}/>
             </Cardcontent>
           </section>
         </div>

@@ -14,6 +14,7 @@ import { CategoryTypes } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronDown, Edit, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from "sonner";
@@ -56,7 +57,7 @@ type EditTransactionProps = {
 
 export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, type }) => {
   const [open, setOpen] = React.useState(false);
-  // const router = useRouter();
+  const router = useRouter();
   const schema = type === 'Income' ? incomeSchema : expenseSchema;
 
   const form = useForm({
@@ -106,7 +107,7 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
         duration: 4500,
       });
       setOpen(false);
-      //  router.refresh();
+       router.refresh();
       form.reset();
     },
     onError: (error) => {

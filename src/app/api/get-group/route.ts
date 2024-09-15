@@ -26,28 +26,12 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Group not found", { status: 404 });
     }
 
-    // Get group members
-    const groupMembers = await db.groupMember.findMany({
-      where: { groupId: group.id },
-      include: {
-        user: {
-          select: { id: true, name: true, image: true },
-        },
-      },
-    });
-
-    const groupMemberDetails = groupMembers.map((member) => ({
-      userId: member.user.id,
-      name: member.user.name || "Unknown",
-      avatar: member.user.image || "",
-    }));
-
     // Get pending payments
     const pendingPayments = await db.expenseSplit.findMany({
       where: {
         userId: user.id,
         expense: { groupId: group.id },
-        isPaid: {in:["UNPAID","PARTIALLY_PAID"]},
+        isPaid: {in:["UNPAID","PARTIALLY_PAID"] },
       },
       select: {
         id:true,
@@ -107,7 +91,6 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json({
       group,
-      groupMembers: groupMemberDetails,
       pendingPayments,
       usersToPay,
     });

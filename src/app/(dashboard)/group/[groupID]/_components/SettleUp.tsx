@@ -355,6 +355,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 import { settleUp } from "../group"
 import { UserAvatar } from "./UserAvatar"
+import { useRouter } from "next/navigation"
 
 interface GroupMember {
   userId: string
@@ -485,6 +486,7 @@ export function SettleUp({
   const [selectingFor, setSelectingFor] = useState<
     "fromUser" | "toUser" | null
   >(null)
+  const router = useRouter();
   const safeUsersYouNeedToPay = useMemo(() => usersYouNeedToPay || [], [usersYouNeedToPay]);
 
   const availableRecipients = useMemo(
@@ -582,6 +584,7 @@ export function SettleUp({
       })
       
       // revalidateTag("getGroupTransactionData");
+      router.refresh();
       form.reset()
     } catch (error) {
       console.error(error)

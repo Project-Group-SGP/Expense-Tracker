@@ -230,6 +230,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddnewIncome } from "../action"
+import { useRouter } from "next/navigation"
 
 // form validation schema
 const formSchema = z.object({
@@ -252,7 +253,7 @@ export function Newincome() {
   const [open, setOpen] = useState(false)
   const [isPending, setisPending] = useState<boolean>(false);
 
-  // const router = useRouter();
+  const router = useRouter();
 
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -274,7 +275,7 @@ export function Newincome() {
         });
 
         setOpen(false);
-        // router.refresh();
+        router.refresh();
         form.reset();
       }else{
         throw new Error("Income not added")

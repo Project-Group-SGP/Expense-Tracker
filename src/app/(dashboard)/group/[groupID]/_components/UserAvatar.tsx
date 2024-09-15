@@ -8,7 +8,7 @@ export const UserAvatar: React.FC<{ user: GroupMember; size?: number }> = ({
   user,
   size = 45, // Set a default size
 }) => {
-  if (user.avatar) {
+  if (user.avatar!=="") {
     return (
       <img
         src={user.avatar}
