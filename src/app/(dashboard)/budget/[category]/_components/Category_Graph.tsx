@@ -14,7 +14,7 @@ const chartConfig = {
 
 type Expense = {
   id: string;
-  userId: string;
+  userId?: string;
   category: string;
   amount: string;
   date: string;
@@ -29,7 +29,7 @@ function getMonthName(dateStr: string): string {
 }
 
 // Typing the data prop with expenses as an array of Expense and categoryBudget as a number
-export function Category_Graph({ data }: { data: { expenses: Expenses; categoryBudget: number } }) {
+export function Category_Graph({ data }: { data: { expenses: Expenses; } }) {
   const pathname = usePathname();
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || '';
 
@@ -66,7 +66,7 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; categoryB
   }));
 
   return (
-    <Card>
+    <Card className="border-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>This month's Data</CardDescription>

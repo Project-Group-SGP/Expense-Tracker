@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import { Cardcontent } from "@/app/(dashboard)/dashboard/_components/Card";
 import React, { useState, useEffect } from "react";
-import { Category_Graph } from "./Category_Graph";
-import Transaction from "@/app/(dashboard)/group/[groupID]/_components/Transaction";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Category_Graph } from "./Category_Graph";
+import Transaction from "./Transaction";
+import { CalendarIcon } from "lucide-react";
 
 interface Expense {
   id: string;
@@ -34,22 +35,18 @@ interface CategoryBudget {
   };
 }
 
-const MonthSelection = ({
-  data,
-  budget,
-}: {
+interface MonthSelectionProps {
   data: CategoryData;
   budget: CategoryBudget;
-}) => {
+}
+
+export default function MonthSelection({ data, budget }: MonthSelectionProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
 
   useEffect(() => {
-    // Get all available months from the data
     const months = Object.keys(data.filteredByMonth);
     setAvailableMonths(months);
-    
-    // Set the initial selected month to the most recent month
     if (months.length > 0) {
       setSelectedMonth(months[months.length - 1]);
     }
@@ -63,46 +60,56 @@ const MonthSelection = ({
   const selectedMonthTotal = budget.monthwiseTotal[selectedMonth] || 0;
 
   return (
-    <div className="ml-6 mr-6 mt-20 pb-10">
-      <div className="mb-6">
-        <Select value={selectedMonth} onValueChange={handleMonthChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a month" />
-          </SelectTrigger>
-          <SelectContent>
-            {availableMonths.map((month) => (
-              <SelectItem key={month} value={month}>
-                {month}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="container mx-auto px-4 py-8 mt-12">
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Monthly Expense Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-4">
+            <CalendarIcon className="h-6 w-6 text-gray-500" />
+            <Select value={selectedMonth} onValueChange={handleMonthChange}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select a month" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableMonths.map((month) => (
+                  <SelectItem key={month} value={month}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid gap-8 md:grid-cols-2">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Category Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Category_Graph
+              data={{
+                expenses: selectedExpenses,
+              }}
+            />
+          </CardContent>
+        </Card>
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Transaction Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Transaction
+              data={{
+                expenses: selectedExpenses,
+                categoryBudget: budget.monthwiseTotal,
+              }}
+            />
+          </CardContent>
+        </Card>
       </div>
-      <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-        <Cardcontent className="border-none p-0">
-          {/* Pass expenses and monthwiseTotal to Category_Graph */}
-          <Category_Graph 
-            data={{ 
-              expenses: selectedExpenses, 
-              categoryBudget: selectedMonthTotal 
-            }} 
-          />
-        </Cardcontent>
-        <Cardcontent className="border-none p-0">
-          {/* Pass filtered transactions to Transaction */}
-          <Transaction 
-            data={{ 
-              filteredByMonth: { [selectedMonth]: selectedExpenses },
-              categoryBudget: {
-                ...budget,
-                monthwiseTotal: { [selectedMonth]: selectedMonthTotal }
-              }
-            }} 
-          />
-        </Cardcontent>
-      </section>
     </div>
   );
-};
-
-export default MonthSelection;
+}

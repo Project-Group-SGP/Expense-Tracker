@@ -91,7 +91,9 @@ export async function SetCategoryBudgetDb(categoryId: string, budget: number) {
       });
     }
     
-    revalidateTag("budget");
+    
+
+    revalidateTag("get-category-budget");
     // refresh cache
     // revalidateTag("budget-category");
 
