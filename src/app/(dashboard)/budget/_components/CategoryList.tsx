@@ -98,7 +98,7 @@ const CategoryList = (props: CategoryListType) => {
     router.push(path)
   }
 
-  console.log(props.categories);
+  // console.log(props.categories);
   
 
   return (

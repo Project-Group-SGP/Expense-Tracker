@@ -41,6 +41,9 @@ interface MonthSelectionProps {
 }
 
 export default function MonthSelection({ data, budget }: MonthSelectionProps) {
+  
+
+  
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
 
