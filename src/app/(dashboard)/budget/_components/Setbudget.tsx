@@ -24,10 +24,12 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import CategoryCard from "./Card_Category"
-import { SetBudgetDb } from "../actions"
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useRouter } from "next/navigation"
 import { revalidateTag } from "next/cache"
+import { SetBudgetDb, SetCategoryBudgetDb } from "../actions"
+import { set } from "date-fns"
 
 const formSchema = z.object({
   amount: z
@@ -97,7 +99,7 @@ export function SetBudget({
   const handleSubmit = async (data: BudgetFormData) => {
     try {
       const budget = Number(data.amount)
-      const result = await SetBudgetDb(budget)
+      const result = await SetBudgetDb(budget);
 
       if (result === "success") {
         

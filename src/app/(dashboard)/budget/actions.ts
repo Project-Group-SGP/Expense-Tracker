@@ -67,3 +67,33 @@ export async function SetCategoryBudgetDb(categoryId: string, budget: number) {
     throw new Error("Error setting category budget.");
   }
 }
+
+
+// set budget USER
+export async function SetBudgetDb(budget: number) {
+  const headersList = headers();
+  const cookie = headersList.get('cookie') || '';
+
+  // Check login status
+  const user = await currentUserServer();
+  if (!user) {
+    throw new Error("Please log in.");
+  }
+
+  try {
+    await db.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        budget: budget
+      }
+    });
+    revalidateTag("get-category-budget");
+    revalidateTag("get-category-data");
+    return "success";
+  } catch (error) {
+    console.error("Error in SetBudget:", error);
+    throw new Error("Error setting budget.");
+  }
+}
