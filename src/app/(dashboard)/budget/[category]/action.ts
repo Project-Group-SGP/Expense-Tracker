@@ -41,7 +41,7 @@ export const getCategoryBudget = cache(async (category: string) => {
 
     const data = await response.json();
     
-    console.log(data);
+    // console.log(data);
 
     return data;
   } catch (error) {

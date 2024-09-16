@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,7 +12,7 @@ import { getCategoryData } from "../action";
 
 type Expense = {
   id: string;
-  userId: string;
+  userId?: string;
   category: string;
   amount: string;
   date: string;
@@ -25,20 +23,11 @@ export type Expenses = Expense[];
 
 
 
-
 const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any } }) => {
   const pathname = usePathname();
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || "";
 
   const [toastShown, setToastShown] = useState(false);
-
-  
-
-  const data1 = getCategoryData(lastRouteName);
-  
-  console.log("getCategoryData:", data1);
-
-   
 
   // Filter data category-wise
   const filteredData = data.expenses?.filter(
@@ -104,7 +93,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
   const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700";
 
   return (
-    <Card >
+    <Card className="border-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>
@@ -167,4 +156,4 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
   );
 };
 
-export default Transaction;
+export default Transaction; 

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        console.log("expenses : ", expenses);
+        // console.log("expenses : ", expenses);
      
         const monthNames = [
             'January', 'February', 'March', 'April', 'May', 'June',

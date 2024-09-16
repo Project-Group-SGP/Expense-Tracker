@@ -41,12 +41,16 @@ export type BudgetFormData = z.infer<typeof formSchema>
 type SetCategory_BudgetProps = {
   currentBudget: number,
   category: string,
-  expense?: number
+  expense: number
 }
 
 export function SetCategory_Budget(props: SetCategory_BudgetProps) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
+
+  console.log("Current budget:", props.currentBudget);
+  
+
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -91,30 +95,39 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
   }, [props.currentBudget, props.expense, toastShown, showWarningToast])
 
   const handleSubmit = async (data: BudgetFormData) => {
+    const budget = Number(data.amount);
+  
     try {
-      const budget = Number(data.amount);
-      const result = await SetCategoryBudgetDb(props.category, budget);
-
+      // Assuming you have a way to get the category (you might need to pass it in or get it from props)
+      const category = props.category;
+  
+      // Update the category budget
+      const result = await SetCategoryBudgetDb(category, budget);
+  
       if (result === "success") {
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
-        })
+        });
         form.reset();
       } else {
-        toast.error("Budget update failed")
+        toast.error("Budget update failed");
       }
-
-      setOpen(false)
-      form.reset({ amount: data.amount })
-      // Reset toastShown state when budget is updated
-      setToastShown(false)
+  
+      // Close modal or dialog if applicable
+      setOpen(false);
+  
+      // Reset form state
+      form.reset({ amount: data.amount });
+  
+      // Reset toastShown state if applicable
+      setToastShown(false);
     } catch (error) {
-      console.error("Error updating budget:", error)
-      toast.error("Failed to update budget")
+      console.error("Error updating budget:", error);
+      toast.error("Failed to update budget");
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

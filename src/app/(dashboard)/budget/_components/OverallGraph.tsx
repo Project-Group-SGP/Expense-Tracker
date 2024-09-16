@@ -12,6 +12,7 @@ import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { usePathname } from "next/navigation"
 
 type CategoryBudget = {
   [key: string]: number; // Dynamic keys for categories
@@ -53,6 +54,7 @@ export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGrap
 
   // Calculate the percentage of the budget used
   const percentUsed = Math.min((currentMonthData.totalExpense / budget) * 100, 100)
+
 
   // SVG parameters
   const size = 180
