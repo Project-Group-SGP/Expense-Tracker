@@ -1,38 +1,56 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { usePathname } from "next/navigation";
-import { AlertCircle, Wallet, X } from "lucide-react";
-import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button"; // Corrected Button import
-import Card_budget from "./Card_budget";
-import { SetCategory_Budget } from "./SetCategory_Budget";
-import { getCategoryData } from "../action";
+import React, { useCallback, useEffect, useState } from "react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { usePathname } from "next/navigation"
+import { AlertCircle, Wallet, X } from "lucide-react"
+import { toast } from "sonner"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button" // Corrected Button import
+import Card_budget from "./Card_budget"
+import { SetCategory_Budget } from "./SetCategory_Budget"
+import { getCategoryData } from "../action"
 
 type Expense = {
-  id: string;
-  userId?: string;
-  category: string;
-  amount: string;
-  date: string;
-  description: string;
-};
+  id: string
+  userId?: string
+  category: string
+  amount: string
+  date: string
+  description: string
+}
 
-export type Expenses = Expense[];
+export type Expenses = Expense[]
 
+const Transaction = ({
+  data,
+}: {
+  data: { expenses: Expenses; categoryBudget: any }
+}) => {
+  const pathname = usePathname()
+  const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || ""
 
-
-const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any } }) => {
-  const pathname = usePathname();
-  const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || "";
-
-  const [toastShown, setToastShown] = useState(false);
+  const [toastShown, setToastShown] = useState(false)
 
   // Filter data category-wise
-  const filteredData = data.expenses?.filter(
-    (transaction) => transaction.category.toUpperCase() === lastRouteName
-  ) || [];
+  const filteredData =
+    data.expenses?.filter(
+      (transaction) => transaction.category.toUpperCase() === lastRouteName
+    ) || []
 
   const categoryTransaction = filteredData.map((transaction) => ({
     id: transaction.id,
@@ -40,20 +58,18 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
     date: transaction.date,
     description: transaction.description || null,
     amount: transaction.amount,
-  }));
+  }))
 
   // Total amount calculation
   const totalAmount = categoryTransaction.reduce((total, transaction) => {
-    return total + parseFloat(transaction.amount);
-  }, 0);
+    return total + parseFloat(transaction.amount)
+  }, 0)
 
   // Function to show the warning toast
   const showWarningToast = useCallback(() => {
     toast.custom(
       (t) => (
-        <Alert className="relative w-full max-w-md  border-none border-red-800 bg-red-600 shadow-lg"
-       
-        >
+        <Alert className="relative w-full max-w-md border-none border-red-800 bg-red-600 shadow-lg">
           <AlertTitle className="flex items-center text-[13px] font-bold text-white">
             <AlertCircle className="mr-2 h-6 w-6 text-red-200" />
             Warning: {lastRouteName} Budget Exceeded!
@@ -75,29 +91,36 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
         duration: 5000,
         position: "top-right",
       }
-    );
-    setToastShown(true);
-  }, []);
+    )
+    setToastShown(true)
+  }, [])
 
   // Use effect to trigger the toast when the total amount exceeds the budget
   useEffect(() => {
-    const categoryBudget = data.categoryBudget?.[lastRouteName] || 0;
+    const categoryBudget = data.categoryBudget?.[lastRouteName] || 0
     if (!toastShown && categoryBudget && totalAmount > categoryBudget) {
-      showWarningToast();
+      showWarningToast()
     }
-  }, [data.categoryBudget, lastRouteName, totalAmount, toastShown, showWarningToast]);
+  }, [
+    data.categoryBudget,
+    lastRouteName,
+    totalAmount,
+    toastShown,
+    showWarningToast,
+  ])
 
   // Remaining budget calculation
-  const remainingBudget = (data.categoryBudget?.[lastRouteName] || 0) - totalAmount;
-  const isOverBudget = remainingBudget < 0;
-  const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700";
+  const remainingBudget =
+    (data.categoryBudget?.[lastRouteName] || 0) - totalAmount
+  const isOverBudget = remainingBudget < 0
+  const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700"
 
   return (
     <Card className="border-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>
-          <section className="pb-2 ml-2 pr-2 mt-4 grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <section className="ml-2 mt-4 grid w-full grid-cols-1 gap-2 pb-2 pr-2 sm:grid-cols-2 lg:grid-cols-3">
             <Card_budget
               title="Remaining"
               amount={remainingBudget}
@@ -110,7 +133,10 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
               color="text-emi"
               icon={Wallet}
             />
-            {/* <SetCategory_Budget category={lastRouteName} currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)} /> */}
+            {/* <SetCategory_Budget
+              category={lastRouteName}
+              currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)}
+            /> */}
           </section>
           All {lastRouteName} Transactions
         </CardDescription>
@@ -153,7 +179,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
         </Table>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default Transaction; 
+export default Transaction
