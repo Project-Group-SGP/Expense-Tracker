@@ -219,7 +219,7 @@ export default async function GroupPage({
     <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
-          <PageTitle title={group.name} leave={leave}/>
+          <PageTitle title={group.name} leave={leave} createrId={group.creatorId}/>
 
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
             <p className="mr-auto">

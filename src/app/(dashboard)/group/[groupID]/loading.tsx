@@ -1,11 +1,7 @@
-"use client"
-import { SettleUp } from "./_components/SettleUp"
-import AddExpense from "./_components/AddExpense"
 import React from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Cardcontent } from "../../dashboard/_components/Card"
-import { CardContent } from "@/components/ui/card"
 import Transaction from "./_components/Transaction"
 import { GroupMember } from "./_components/GroupMember"
 import { cn } from "@/lib/utils"
@@ -78,6 +74,7 @@ export interface FormattedExpenseData {
   expenseSplits: ExpenseSplit[]
 }
 export default function LoadingGroupPage(){
+  
 
   return (
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">

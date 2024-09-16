@@ -52,13 +52,13 @@ interface Transaction {
 const columns = [
   { id: 'date', label: 'Date', sortable: true },
   { id: 'description', label: 'Description', sortable: false },
-  { id: 'category', label: 'Category', sortable: true },
-  { id: 'paidBy', label: 'Paid By', sortable: true },
+  { id: 'category', label: 'Category', sortable: false },
+  { id: 'paidBy', label: 'Paid By', sortable: false },
   { id: 'amount', label: 'Amount', sortable: true },
   { id: 'status', label: 'Status', sortable: false },
   { id: 'action', label: 'View split', sortable: false },
 ]
-
+  
 export default function Transaction({ transactionsData, loading }: { transactionsData: Transaction[], loading: boolean }) {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null)
   const [showDetailed, setShowDetailed] = useState(false)

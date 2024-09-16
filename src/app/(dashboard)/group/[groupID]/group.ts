@@ -6,6 +6,7 @@ import { CategoryTypes } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidatePath, revalidateTag } from "next/cache";
 import webpush from "web-push"
+
 export async function removeUserFromGroup(
   groupId: string,
   userIdToRemove: string
@@ -34,15 +35,24 @@ export async function removeUserFromGroup(
       return { error: "Only the user can remove himself" };
     }
 
-    // Remove the user from the group
-    await db.groupMember.delete({
-      where: {
-        userId_groupId: {
-          userId: userIdToRemove,
-          groupId: groupId
+    if(userIdToRemove !== group.creatorId){
+      // Remove the user from the group
+      await db.groupMember.delete({
+        where: {
+          userId_groupId: {
+            userId: userIdToRemove,
+            groupId: groupId
+          }
         }
-      }
-    });
+      });
+    }else{
+      // delete the group
+      await db.group.delete({
+        where:{
+          id: groupId,
+        }
+      })
+    }
 
     // Revalidate the group page to reflect the changes
     sendLeaveNotification(groupId,userIdToRemove);
@@ -167,7 +177,7 @@ async function sendExpenseNotification(
 
     const notificationPayload = JSON.stringify({
       title: `New expense in "${group.name}"`,
-      body: `${payer.name} added an expense: ${title} ($${amount})`,
+      body: `${payer.name} added an expense: ${title} (${amount})`,
       type: "NewExpense",
       data: {
         url: `/group/${groupId}`,

@@ -35,9 +35,10 @@ interface PageTitleProps {
     userId: string
     groupId: string
   }
+  createrId:string
 }
 
-export default function PageTitle({ title, className, leave }: PageTitleProps) {
+export default function PageTitle({ title, className, leave, createrId }: PageTitleProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
       <h1 className={cn("text-3xl font-bold", className)}>
@@ -67,6 +68,7 @@ export default function PageTitle({ title, className, leave }: PageTitleProps) {
           amount={leave.amount}
           userId={leave.userId}
           groupId={leave.groupId}
+          createrId={createrId}
         />
       </div>
     </div>
