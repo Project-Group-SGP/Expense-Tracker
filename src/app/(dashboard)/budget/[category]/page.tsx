@@ -35,8 +35,7 @@ const Page = async ({ params: { category } } ) => {
   
 
   // Fetch data based on the last segment
-  const data = await getCategoryData(CategoryEnum);
-  const budget = await getCategoryBudget(CategoryEnum);
+  const [data,budget] = await Promise.all([getCategoryData(CategoryEnum),getCategoryBudget(CategoryEnum)]);
 
   return (
     <>

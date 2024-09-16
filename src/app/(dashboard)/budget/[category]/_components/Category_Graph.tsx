@@ -59,11 +59,14 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; } }) {
       }
     });
 
-  // Convert the categoryWiseData object to an array for the BarChart
+  
+    // Convert the categoryWiseData object to an array for the BarChart
+  
   const chartData = Object.entries(categoryWiseData).map(([month, spend]) => ({
     month, 
     spend: spend as number  // Explicit type for the 'spend' field
   }));
+
 
   return (
     <Card className="border-none">

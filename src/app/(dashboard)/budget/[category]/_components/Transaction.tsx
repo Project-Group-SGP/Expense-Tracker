@@ -110,7 +110,7 @@ const Transaction = ({ data }: { data: { expenses: Expenses; categoryBudget: any
               color="text-emi"
               icon={Wallet}
             />
-            <SetCategory_Budget category={lastRouteName} currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)} />
+            {/* <SetCategory_Budget category={lastRouteName} currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)} /> */}
           </section>
           All {lastRouteName} Transactions
         </CardDescription>

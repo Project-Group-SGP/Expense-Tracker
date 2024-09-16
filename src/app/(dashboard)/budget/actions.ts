@@ -81,7 +81,7 @@ export async function SetBudgetDb(budget: number) {
   }
 
   try {
-    await db.user.update({
+   await db.user.update({
       where: {
         id: user.id
       },
@@ -89,8 +89,12 @@ export async function SetBudgetDb(budget: number) {
         budget: budget
       }
     });
-    revalidateTag("get-category-budget");
-    revalidateTag("get-category-data");
+    
+    revalidateTag("budget");
+    
+    // revalidateTag("get-category-budget");
+    // revalidateTag("get-category-data");
+
     return "success";
   } catch (error) {
     console.error("Error in SetBudget:", error);

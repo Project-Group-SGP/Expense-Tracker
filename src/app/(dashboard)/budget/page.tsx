@@ -100,14 +100,16 @@ const fetchBudget = async (): Promise<Budget> => {
 
 // Server Component Page
 const Page = async () => {
-  let data = await fetchBudgetData();
-  data = ensureCategories(data); // Normalize the data
-
-  const { budget } = await fetchBudget(); // Fetch the budget
+  // let data = await fetchBudgetData();
+  
+  // const { budget } = await fetchBudget(); // Fetch the budget
+  
+  const [data, {budget}] = await Promise.all([fetchBudgetData(), fetchBudget()]);
+  const data1 = ensureCategories(data); // Normalize the data
 
   return (
     <div className="mb-10 mr-10 mt-20">
-      <BudgetSelection initialData={data} budget={budget} />
+      <BudgetSelection initialData={data1} budget={budget} />
     </div>
   );
 };

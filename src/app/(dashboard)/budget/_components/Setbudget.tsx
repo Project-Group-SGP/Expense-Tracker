@@ -103,16 +103,16 @@ export function SetBudget({
 
       if (result === "success") {
         
-        router.refresh();
-
+        
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
         })
-
-       
+        
+        
         form.reset()
+        // router.refresh();
       } else {
         toast.error("Budget update failed. Please try again later.", {
           duration: 4500,
