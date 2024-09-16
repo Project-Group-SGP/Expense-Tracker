@@ -9,14 +9,10 @@ import { NewExpense } from "./_components/Expance"
 import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
 import { format, parseISO } from "date-fns"
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation"
 
 const getTransactionData = cache(
-  async (
-    cookie: string,
-    from: string,
-    to: string
-  ) => {
+  async (cookie: string, from: string, to: string) => {
     try {
       const res = await fetch(
         `${process.env.BASE_URL}/api/history/bulkdata?from=${from}&to=${to}`,
@@ -24,36 +20,35 @@ const getTransactionData = cache(
           method: "GET",
           headers: { Cookie: cookie },
           next: { tags: ["getTransactions"] },
+          cache: "force-cache",
         }
       )
 
       if (!res.ok) throw new Error("Failed to fetch all transaction data")
 
-        const { transactions } = await res.json();
-        console.log("Fetched transactions count:", transactions.length);
-        return transactions;
+      const { transactions } = await res.json()
+      console.log("Fetched transactions count:", transactions.length)
+      return transactions
     } catch (error) {
       console.error("Error fetching transaction data:", error)
-      return [];
+      return []
     }
   }
 )
 
-
-const HistoryPage = async({
+const HistoryPage = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string }
 }) => {
+  const headersList = headers()
+  const cookie = headersList.get("cookie") || ""
+  const user = await currentUserServer()
 
-  const headersList = headers();
-  const cookie = headersList.get("cookie") || "";
-  const user = await currentUserServer();
+  const from = searchParams?.from || ""
+  const to = searchParams?.to || ""
 
-  const from = searchParams?.from || ""; 
-  const to =  searchParams?.to || "";
-
-  if(from==="" && to===""){
+  if (from === "" && to === "") {
     if (user && user.joininDate) {
       const joininDate = parseISO(user.joininDate)
       const formattedStartDate = format(joininDate, "yyyy-MM-dd")
@@ -61,45 +56,42 @@ const HistoryPage = async({
       // router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, {
       //   scroll: false,
       // })
-      redirect(`?from=${formattedStartDate}&to=${formattedEndDate}`);
-    }else{
+      redirect(`?from=${formattedStartDate}&to=${formattedEndDate}`)
+    } else {
       return <div>Please log in to view your Transaction History.</div>
     }
   }
 
-  const [Data] = await Promise.all([
-    getTransactionData(cookie, from, to),
-  ]);
+  const [Data] = await Promise.all([getTransactionData(cookie, from, to)])
 
   return (
     <>
-        <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
-          <div className="mt-20 flex w-full flex-col gap-5 px-4">
-            <PageTitle title="Transaction History" />
-            <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
-            <div className="flex justify-between">
-              <DatePicker/>
-              <div className="ml-auto flex gap-2">
-                <Newincome />
-                <NewExpense />
-              </div>
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="mt-20 flex w-full flex-col gap-5 px-4">
+          <PageTitle title="Transaction History" />
+          <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
+          <div className="flex justify-between">
+            <DatePicker />
+            <div className="ml-auto flex gap-2">
+              <Newincome />
+              <NewExpense />
             </div>
           </div>
-          <div className="container mx-auto py-10 px-4">
-            <DataTable 
-              columns={columns} 
-              data={Data} 
-              filterKey="description" 
-              disabled={false}
-            />
-          </div>      
         </div>
+        <div className="container mx-auto px-4 py-10">
+          <DataTable
+            columns={columns}
+            data={Data}
+            filterKey="description"
+            disabled={false}
+          />
+        </div>
+      </div>
     </>
   )
 }
 
-export default HistoryPage;
-
+export default HistoryPage
 
 // "use client"
 // import React from "react"
@@ -117,11 +109,11 @@ export default HistoryPage;
 // import dynamic from 'next/dynamic';
 
 // const NewExpense = dynamic(() => import('./_components/Expance').then((mod) => mod.NewExpense), {
-//   ssr: false, 
+//   ssr: false,
 // });
 
 // const Newincome = dynamic(() => import('./_components/Income').then((mod) => mod.Newincome), {
-//   ssr: false, 
+//   ssr: false,
 // });
 // const HistoryPage = () => {
 //   const params = useSearchParams();
@@ -181,15 +173,15 @@ export default HistoryPage;
 //           </div>
 //         </div>
 //         <div className="container mx-auto py-10 px-4">
-//           <DataTable 
-//             columns={columns} 
-//             data={transactions} 
-//             filterKey="description" 
-//             onDelete={handleDelete} 
+//           <DataTable
+//             columns={columns}
+//             data={transactions}
+//             filterKey="description"
+//             onDelete={handleDelete}
 //             // onEdit={handleEditTransaction}  {/* Handle editing transactions if applicable */}
 //             disabled={isDisabled}
 //           />
-//         </div>      
+//         </div>
 //       </div>
 //     </>
 //   )
