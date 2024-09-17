@@ -49,19 +49,24 @@ const ensureCategories = (data: BudgetData): BudgetData => {
 }
 
 export default async function Page() {
-  const data = await GetCategoryDataDb()
-  const budget = await GetBudgetDb()
-  const data1 = ensureCategories(data) // Normalize the data
+  try {
+    const data = await GetCategoryDataDb()
+    const budget = await GetBudgetDb()
+    
+    if (!data || !budget) {
+      console.error("No data or budget found")
+      return <div><h1>No data found</h1></div>
+    }
+    
+    const data1 = ensureCategories(data) // Normalize the data
 
-  if (!data || !budget) {
-    return <div>
-      <h1>No data found</h1>
-    </div>
+    return (
+      <div className="mb-10 mr-10 mt-20">
+        <BudgetSelection initialData={data1} budget={Number(budget.budget)} />
+      </div>
+    )
+  } catch (error) {
+    console.error("Error in budget page:", error)
+    return <div><h1>Error loading budget data. Please try again later.</h1></div>
   }
-
-  return (
-    <div className="mb-10 mr-10 mt-20">
-      <BudgetSelection initialData={data1} budget={Number(budget.budget)} />
-    </div>
-  )
 }
