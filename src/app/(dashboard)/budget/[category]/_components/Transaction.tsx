@@ -23,7 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button" // Corrected Button import
 import Card_budget from "./Card_budget"
 import { SetCategory_Budget } from "./SetCategory_Budget"
-import { getCategoryData } from "../action"
+
 
 type Expense = {
   id: string
@@ -39,7 +39,7 @@ export type Expenses = Expense[]
 const Transaction = ({
   data,
 }: {
-  data: { expenses: Expenses; categoryBudget: any }
+  data: { expenses: Expenses; categoryBudget: any; budget:number }
 }) => {
   const pathname = usePathname()
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || ""
@@ -111,7 +111,7 @@ const Transaction = ({
 
   // Remaining budget calculation
   const remainingBudget =
-    (data.categoryBudget?.[lastRouteName] || 0) - totalAmount
+    Number(data.budget) - totalAmount
   const isOverBudget = remainingBudget < 0
   const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700"
 
@@ -138,7 +138,7 @@ const Transaction = ({
             
             <SetCategory_Budget
               category={lastRouteName}
-              currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)}
+              currentBudget={Number(data.budget)}
               expense={Number(totalAmount.toFixed(2))}
             />
 

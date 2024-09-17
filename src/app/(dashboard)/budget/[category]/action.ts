@@ -1,3 +1,4 @@
+"use server"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { CategoryTypes, Prisma } from "@prisma/client"
@@ -84,6 +85,9 @@ export async function getCategoryBudget(category: string) {
           userId: user.id,
           category: category as CategoryTypes,
         },
+        select: {
+          budget: true,
+        },
       }),
       db.expense.findMany({
         where: {
@@ -115,6 +119,10 @@ export async function getCategoryBudget(category: string) {
 
     console.log("Getting budget and monthwise category data")
 
+    console.log("monthwiseTotal", monthwiseTotal);
+    console.log("finalBudget", finalBudget);
+    
+
     return { budget: finalBudget, monthwiseTotal }
   } catch (error) {
     console.error("Error fetching category budget data:", error)
@@ -123,27 +131,29 @@ export async function getCategoryBudget(category: string) {
   }
 }
 
-function toCategoryType(category: string): CategoryTypes {
-  if (Object.values(CategoryTypes).includes(category as CategoryTypes)) {
-    return category as CategoryTypes
-  }
-  return CategoryTypes.Other
-}
+
 
 // Set or Update Category Budget
 export async function SetCategoryBudgetDb(
   category: string,
   budget: number
 ): Promise<string> {
+  
   try {
     // Get the current user from the session
-    const user = await currentUserServer()
+    const user = await currentUserServer();
 
     if (!user || !user.id) {
       throw new Error("User Not Found")
     }
 
-    const categoryType = toCategoryType(category)
+    console.log("Setting budget for category ", category, " to ", budget, " for user ", user.id);
+    
+
+    const categoryType = category as CategoryTypes
+    console.log(`Setting budget for category ${categoryType} to ${budget} for user ${user.id}`);
+    
+    const Budget  = budget as number;
 
     // Try to find the existing category
     const existingCategory = await db.category.findFirst({
@@ -161,7 +171,7 @@ export async function SetCategoryBudgetDb(
           id: existingCategory.id,
         },
         data: {
-          budget: budget,
+          budget: Budget,
         },
       })
     } else {
@@ -170,7 +180,7 @@ export async function SetCategoryBudgetDb(
         data: {
           userId: user.id,
           category: categoryType,
-          budget: budget,
+          budget: Budget,
         },
       })
     }

@@ -117,6 +117,7 @@ export default function Component({ data, budget }: MonthSelectionProps) {
               data={{
                 expenses: selectedExpenses,
                 categoryBudget: budget.monthwiseTotal,
+                budget: budget.budget,
               }}
             />
           </CardContent>
