@@ -27,7 +27,6 @@ type BudgetSelectionProps = {
 };
 
 const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }) => {
-  const [data, setData] = useState(initialData);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
   const months = [
@@ -40,7 +39,7 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }
   };
 
   // Ensure selectedMonth is valid and prevent potential errors
-  const selectedData = data.monthlyData[selectedMonth] || {
+  const selectedData = initialData.monthlyData[selectedMonth] || {
     totalIncome: 0,
     totalExpense: 0,
     categoryExpenses: {},
@@ -70,11 +69,11 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </div>v 
       </div>
 
       <div className="space-y-6">
-        <OverallGraph monthlyData={data.monthlyData} budget={budget} selectedMonth={selectedMonth} />
+        <OverallGraph monthlyData={initialData.monthlyData} budget={budget} selectedMonth={selectedMonth} />
         <CategoryList categories={selectedData.categoryExpenses} />
       </div>
     </div>
