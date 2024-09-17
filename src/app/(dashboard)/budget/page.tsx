@@ -1,7 +1,11 @@
+import { currentUserServer } from "@/lib/auth"
 import { GetBudgetDb, GetCategoryDataDb } from "./actions"
-import dynamic from 'next/dynamic'
- 
-const BudgetSelection = dynamic(() => import('./_components/budget_Selection'), { ssr: false })
+import dynamic from "next/dynamic"
+
+const BudgetSelection = dynamic(
+  () => import("./_components/budget_Selection"),
+  { ssr: false }
+)
 // Define interfaces for returned data
 interface MonthlyData {
   month: string
@@ -49,14 +53,22 @@ const ensureCategories = (data: BudgetData): BudgetData => {
 }
 
 const Page = async () => {
+  const user = await currentUserServer()
+
+  if (!user) {
+    Response.redirect("/auth/sigin")
+  }
+
   const [data, budget] = await Promise.all([GetCategoryDataDb(), GetBudgetDb()])
   const data1 = ensureCategories(data) // Normalize the data
 
   if (!data || !budget) {
     // throw new Error("Data or budget not found")
-    return <div>
-      <h1>No data found</h1>
-    </div>
+    return (
+      <div>
+        <h1>No data found</h1>
+      </div>
+    )
   }
 
   return (

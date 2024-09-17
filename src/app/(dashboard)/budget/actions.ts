@@ -1,9 +1,7 @@
 "use server"
-
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { CategoryTypes, Prisma } from "@prisma/client"
-import { headers } from "next/headers"
 
 type CategoryBudget = {
   [key in CategoryTypes]?: number
@@ -18,16 +16,8 @@ type MonthlyData = {
   remainingBudget: number
 }
 
-
-
-
-
-
 // Set budget USER
 export async function SetBudgetDb(budget: number) {
-  const headersList = headers()
-  const cookie = headersList.get("cookie") || ""
-
   // Check login status
   const user = await currentUserServer()
   if (!user) {
@@ -53,7 +43,6 @@ export async function SetBudgetDb(budget: number) {
 
 // Get User Budget
 export async function GetBudgetDb() {
-  
   // Check login status
   const user = await currentUserServer()
   if (!user) {
