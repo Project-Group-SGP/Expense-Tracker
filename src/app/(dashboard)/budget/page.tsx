@@ -57,12 +57,9 @@ const Page = async () => {
   }
 
   return (
-    <Suspense>
-
     <div className="mb-10 mr-10 mt-20">
       <BudgetSelection initialData={data1} budget={Number(budget.budget)} />
     </div>
-    </Suspense>
   )
 }
 
