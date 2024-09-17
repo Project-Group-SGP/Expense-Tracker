@@ -121,22 +121,27 @@ const Transaction = ({
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>
           <section className="ml-2 mt-4 grid w-full grid-cols-1 gap-2 pb-2 pr-2 sm:grid-cols-2 lg:grid-cols-3">
+            
             <Card_budget
               title="Remaining"
               amount={remainingBudget}
               color={budgetColor}
               icon={Wallet}
             />
+            
             <Card_budget
               title="Expense"
               amount={Number(totalAmount.toFixed(2))}
               color="text-emi"
               icon={Wallet}
             />
-            {/* <SetCategory_Budget
+            
+            <SetCategory_Budget
               category={lastRouteName}
               currentBudget={Number(data.categoryBudget?.[lastRouteName] || 0)}
-            /> */}
+              expense={Number(totalAmount.toFixed(2))}
+            />
+
           </section>
           All {lastRouteName} Transactions
         </CardDescription>

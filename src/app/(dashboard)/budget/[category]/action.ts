@@ -1,51 +1,196 @@
-import { headers } from "next/headers";
-import { cache } from "react";
+import { currentUserServer } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { CategoryTypes, Prisma } from "@prisma/client"
 
-export const getCategoryData = cache(async (category: string) => {
+export async function getCategoryData(category: string) {
   try {
-    const headersList = headers();
-    const cookie = headersList.get('cookie') || '';
-    const response = await fetch(`${process.env.BASE_URL}/api/get-category-data?category=${(category)}`, {
-      method: 'GET',
-      headers: { Cookie: cookie },
-      next: { tags: ['get-category-data'] },
-    });
+    // Get the current user from the session
+    const user = await currentUserServer()
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.status}`);
+    if (!user || !user.id) {
+      throw new Error("User Not Found")
     }
 
-    const data = await response.json();
-    console.log(data);
+    // Fetch the expenses for the category from the database
+    const expenses = await db.expense.findMany({
+      where: {
+        userId: user.id,
+        category: category as CategoryTypes,
+      },
+      select: {
+        id: true,
+        category: true,
+        amount: true,
+        date: true,
+        description: true,
+      },
+      orderBy: {
+        date: "asc", // Orders the data by date
+      },
+    })
 
-    return data;
+    // Function to group expenses by month
+    const groupByMonth = (expenses) => {
+      return expenses.reduce((acc, expense) => {
+        const date = new Date(expense.date)
+        const month = monthNames[date.getMonth()] // Get month name
+
+        if (!acc[month]) {
+          acc[month] = []
+        }
+        acc[month].push(expense)
+
+        return acc
+      }, {})
+    }
+
+    const filteredByMonth = groupByMonth(expenses)
+
+    return { filteredByMonth } // Return the grouped expenses
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return null; // Return null or handle the error appropriately
+    console.error("Error fetching category data:", error)
+    return null // Return null or handle the error appropriately
   }
-});
+}
 
-export const getCategoryBudget = cache(async (category: string) => {
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+]
+
+export async function getCategoryBudget(category: string) {
   try {
-    const headersList = headers();
-    const cookie = headersList.get('cookie') || '';
-    const response = await fetch(`${process.env.BASE_URL}/api/get-category-budget?category=${(category)}`, {
-      method: 'GET',
-      headers: { Cookie: cookie },
-      next: { tags: ['get-category-budget'] },
-    });
+    // Fetch the current user from the server-side session
+    const user = await currentUserServer()
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.status}`);
+    if (!user || !user.id) {
+      throw new Error("User Not Found")
     }
 
-    const data = await response.json();
+    // Fetch budget and expenses from the database in parallel
+    const [budget, expenses] = await Promise.all([
+      db.category.findFirst({
+        where: {
+          userId: user.id,
+          category: category as CategoryTypes,
+        },
+      }),
+      db.expense.findMany({
+        where: {
+          userId: user.id,
+          category: category as CategoryTypes,
+        },
+      }),
+    ])
+
+    if (!budget && expenses.length === 0) {
+      throw new Error("No data found for the provided category")
+    }
+
+    // Convert budget to a number, defaulting to 0 if null or undefined
+    const finalBudget =
+      budget?.budget instanceof Prisma.Decimal
+        ? parseFloat(budget.budget.toString())
+        : (budget?.budget ?? 0)
+
+    // Group and sum expenses by month
+    const monthwiseTotal = expenses.reduce((acc, expense) => {
+      const date = new Date(expense.date)
+      const month = monthNames[date.getMonth()] // Get month name
+      const amount = Number(expense.amount) // Convert amount to number
+
+      if (!acc[month]) {
+        acc[month] = 0
+      }
+      acc[month] += amount
+
+      return acc
+    }, {})
+
+    console.log("getting budget and monthwise category data")
+
+    // console.log("finalBudget : " + finalBudget)
+    // console.log("monthwiseTotal : " + JSON.stringify(monthwiseTotal))
+
+    return { budget: finalBudget, monthwiseTotal } // Return the data
+  } catch (error) {
+    console.error("Error fetching category budget data:", error)
+    return null // Return null or handle the error appropriately
+  }
+}
+
+function toCategoryType(category: string): CategoryTypes {
+  if (Object.values(CategoryTypes).includes(category as CategoryTypes)) {
+    return category as CategoryTypes
+  }
+  return CategoryTypes.Other
+}
+
+// Set or Update Category Budget
+export async function SetCategoryBudgetDb(
+  category: string,
+  budget: number
+): Promise<string> {
+  try {
+    // Get the current user from the session
+    const user = await currentUserServer()
+
+    if (!user || !user.id) {
+      throw new Error("User Not Found")
+    }
+
+    const categoryType = toCategoryType(category)
+
+    // Try to find the existing category
+    const existingCategory = await db.category.findFirst({
+      where: {
+        userId: user.id,
+        category: categoryType,
+      },
+    })
     
-    // console.log(data);
+    let result;
+    if (existingCategory) {
+      // Update existing category
+      result = await db.category.update({
+        where: {
+          id: existingCategory.id,
+        },
+        data: {
+          budget: budget,
+        },
+      })
+    } else {
+      // Create new category
+      result = await db.category.create({
+        data: {
+          userId: user.id,
+          category: categoryType,
+          budget: budget,
+        },
+      })
+    }
 
-    return data;
+    if (result) {
+      console.log(`Category ${category} budget set to ${budget} for user ${user.id}`)
+      return "success"
+    } else {
+      console.error(`Failed to set budget for category ${category}`)
+      return "error"
+    }
+
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return null; // Return null or handle the error appropriately
+    console.error("Error updating budget:", error)
+    return "error"
   }
-})            
+}

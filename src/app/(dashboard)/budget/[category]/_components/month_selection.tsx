@@ -27,15 +27,9 @@ interface CategoryData {
   }
 }
 
-interface Budget {
-  id: string
-  userId: string
-  category: string
-  budget: string
-}
 
 interface CategoryBudget {
-  budget: Budget
+  budget: number ;
   monthwiseTotal: {
     [month: string]: number
   }
