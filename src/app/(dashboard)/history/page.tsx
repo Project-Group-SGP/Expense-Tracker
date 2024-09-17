@@ -10,6 +10,7 @@ import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
 import { format, parseISO } from "date-fns"
 import { redirect } from 'next/navigation';
+import HistoryPage from "./_components/History_page"
 
 const getTransactionData = cache(
   async (
@@ -40,7 +41,7 @@ const getTransactionData = cache(
 )
 
 
-const HistoryPage = async({
+const Page = async({
   searchParams,
 }: {
   searchParams: { [key: string]: string }
@@ -73,7 +74,7 @@ const HistoryPage = async({
 
   return (
     <>
-        <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+        {/* <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
           <div className="mt-20 flex w-full flex-col gap-5 px-4">
             <PageTitle title="Transaction History" />
             <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
@@ -93,12 +94,13 @@ const HistoryPage = async({
               disabled={false}
             />
           </div>      
-        </div>
+        </div> */}
+        <HistoryPage Data={Data} />
     </>
   )
 }
 
-export default HistoryPage;
+export default Page;
 
 
 // "use client"

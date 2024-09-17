@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { TransactionButtons } from './TransactionButtons';
 
 type Props = {
     title : string;
@@ -12,7 +11,6 @@ function PageTitle({title,clasName}: Props) {
       <h1 className={cn("text-2xl font-semibold",clasName)}>
           {title}
       </h1>
-      <TransactionButtons/>
     </div>
   )
 }

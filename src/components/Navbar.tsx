@@ -6,10 +6,10 @@ import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/spend", label: "Spend" },
-  { href: "/", label: "About" },
-  { href: "/", label: "Contact" },
+  // { href: "/", label: "Home" },
+  // { href: "/spend", label: "Spend" },
+  // { href: "/", label: "About" },
+  // { href: "/", label: "Contact" },
 ]
 
 const Navbar = () => {
