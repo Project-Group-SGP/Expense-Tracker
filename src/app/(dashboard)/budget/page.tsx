@@ -49,7 +49,8 @@ const ensureCategories = (data: BudgetData): BudgetData => {
 }
 
 export default async function Page() {
-  const [data, budget] = await Promise.all([GetCategoryDataDb(), GetBudgetDb()])
+  const data = await GetCategoryDataDb()
+  const budget = await GetBudgetDb()
   const data1 = ensureCategories(data) // Normalize the data
 
   if (!data || !budget) {
