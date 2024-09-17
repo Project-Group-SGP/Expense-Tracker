@@ -93,17 +93,13 @@ export async function getCategoryBudget(category: string) {
       }),
     ])
 
-    if (!budget && expenses.length === 0) {
-      throw new Error("No data found for the provided category")
-    }
-
-    // Convert budget to a number, defaulting to 0 if null or undefined
+    // If no budget is found, default to 0
     const finalBudget =
       budget?.budget instanceof Prisma.Decimal
         ? parseFloat(budget.budget.toString())
-        : (budget?.budget ?? 0)
+        : 0 // Default budget to 0 if not found
 
-    // Group and sum expenses by month
+    // Group and sum expenses by month, defaulting to empty object if no expenses
     const monthwiseTotal = expenses.reduce((acc, expense) => {
       const date = new Date(expense.date)
       const month = monthNames[date.getMonth()] // Get month name
@@ -115,17 +111,15 @@ export async function getCategoryBudget(category: string) {
       acc[month] += amount
 
       return acc
-    }, {})
+    }, {} as Record<string, number>) // Default to an empty object if no expenses
 
-    console.log("getting budget and monthwise category data")
+    console.log("Getting budget and monthwise category data")
 
-    // console.log("finalBudget : " + finalBudget)
-    // console.log("monthwiseTotal : " + JSON.stringify(monthwiseTotal))
-
-    return { budget: finalBudget, monthwiseTotal } // Return the data
+    return { budget: finalBudget, monthwiseTotal }
   } catch (error) {
     console.error("Error fetching category budget data:", error)
-    return null // Return null or handle the error appropriately
+    // Default to budget: 0 and empty monthwiseTotal object
+    return { budget: 0, monthwiseTotal: {} }
   }
 }
 
