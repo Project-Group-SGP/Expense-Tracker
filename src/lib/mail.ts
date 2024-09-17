@@ -60,7 +60,7 @@ export const sendPasswordResetEmail = async(email:string,token:string) => {
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
-    auth: {{process.env.BASE_URL
+    auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
