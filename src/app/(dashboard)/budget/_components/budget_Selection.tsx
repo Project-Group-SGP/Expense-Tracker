@@ -69,7 +69,7 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }
               ))}
             </SelectContent>
           </Select>
-        </div>v 
+        </div>
       </div>
 
       <div className="space-y-6">
