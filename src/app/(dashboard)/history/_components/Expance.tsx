@@ -663,7 +663,7 @@ export function NewExpense() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          className="w-full sm:w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
           variant="outline"
           onClick={() => setOpen(true)}
         >

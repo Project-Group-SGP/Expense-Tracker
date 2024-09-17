@@ -16,7 +16,7 @@ const LOADINGPAGE = () => {
             <div className="flex w-full flex-wrap items-center justify-between gap-4"></div>
             <div className="flex justify-between">
               <DatePicker/>
-              <div className="ml-auto flex gap-2">
+              <div className="hidden sm:flex ml-auto gap-2">
                 <Newincome />
                 <NewExpense />
               </div>

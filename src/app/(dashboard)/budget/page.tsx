@@ -48,7 +48,7 @@ const ensureCategories = (data: BudgetData): BudgetData => {
   return data
 }
 
-const Page = async () => {
+export default async function Page() {
   const [data, budget] = await Promise.all([GetCategoryDataDb(), GetBudgetDb()])
   const data1 = ensureCategories(data) // Normalize the data
 
@@ -64,5 +64,3 @@ const Page = async () => {
     </div>
   )
 }
-
-export default Page
