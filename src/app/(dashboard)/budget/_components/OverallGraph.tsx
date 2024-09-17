@@ -128,8 +128,8 @@ export function OverallGraph({
         </div>
       </CardContent>
       <CardFooter>
-        <div className="flex w-full justify-around gap-2">
-          <div className="max-w-[300px] flex-1">
+        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm">
             <Card_unclick
               title="Income"
               amount={Number(currentMonthData.totalIncome)}
@@ -137,13 +137,13 @@ export function OverallGraph({
               icon={HandCoins}
             />
           </div>
-          <div className="max-w-[300px] flex-1">
+          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm">
             <SetBudget
               currentBudget={budget}
               expense={currentMonthData.totalExpense}
             />
           </div>
-          <div className="max-w-[300px] flex-1">
+          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm sm:col-span-2 lg:col-span-1">
             <Card_unclick
               title="Remaining"
               amount={Number(remainingBudget)}

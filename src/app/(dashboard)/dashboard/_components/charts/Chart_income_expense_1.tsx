@@ -36,7 +36,7 @@ export type Chart_income_expense_Props = {
 
 export function Chart_income_expense_1({ chartData }: Chart_income_expense_Props) {
   return (
-    <Card>
+    <Card className="border-none shadow-none bg-none dark:bg-black">
       <CardHeader>
         <CardTitle>Income vs Expense</CardTitle>
         <CardDescription>Monthly comparison of income and expenses</CardDescription>

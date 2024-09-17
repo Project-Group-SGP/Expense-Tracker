@@ -25,7 +25,7 @@ export const ChartBar_1 = ({chartData}:chartDataBar1) => {
 
   return (
     <ChartContainer config={chartConfig} className="h-full">
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer  height={300}>
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
