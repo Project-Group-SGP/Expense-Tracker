@@ -13,11 +13,7 @@ import { redirect } from 'next/navigation';
 import HistoryPage from "./_components/History_page"
 
 const getTransactionData = cache(
-  async (
-    cookie: string,
-    from: string,
-    to: string
-  ) => {
+  async (cookie: string, from: string, to: string) => {
     try {
       const res = await fetch(
         `${process.env.BASE_URL}/api/history/bulkdata?from=${from}&to=${to}`,
@@ -25,17 +21,18 @@ const getTransactionData = cache(
           method: "GET",
           headers: { Cookie: cookie },
           next: { tags: ["getTransactions"] },
+          cache: "force-cache",
         }
       )
 
       if (!res.ok) throw new Error("Failed to fetch all transaction data")
 
-        const { transactions } = await res.json();
-        console.log("Fetched transactions count:", transactions.length);
-        return transactions;
+      const { transactions } = await res.json()
+      console.log("Fetched transactions count:", transactions.length)
+      return transactions
     } catch (error) {
       console.error("Error fetching transaction data:", error)
-      return [];
+      return []
     }
   }
 )
@@ -46,15 +43,14 @@ const Page = async({
 }: {
   searchParams: { [key: string]: string }
 }) => {
+  const headersList = headers()
+  const cookie = headersList.get("cookie") || ""
+  const user = await currentUserServer()
 
-  const headersList = headers();
-  const cookie = headersList.get("cookie") || "";
-  const user = await currentUserServer();
+  const from = searchParams?.from || ""
+  const to = searchParams?.to || ""
 
-  const from = searchParams?.from || ""; 
-  const to =  searchParams?.to || "";
-
-  if(from==="" && to===""){
+  if (from === "" && to === "") {
     if (user && user.joininDate) {
       const joininDate = parseISO(user.joininDate)
       const formattedStartDate = format(joininDate, "yyyy-MM-dd")
@@ -62,15 +58,13 @@ const Page = async({
       // router.push(`?from=${formattedStartDate}&to=${formattedEndDate}`, {
       //   scroll: false,
       // })
-      redirect(`?from=${formattedStartDate}&to=${formattedEndDate}`);
-    }else{
+      redirect(`?from=${formattedStartDate}&to=${formattedEndDate}`)
+    } else {
       return <div>Please log in to view your Transaction History.</div>
     }
   }
 
-  const [Data] = await Promise.all([
-    getTransactionData(cookie, from, to),
-  ]);
+  const [Data] = await Promise.all([getTransactionData(cookie, from, to)])
 
   return (
     <>
@@ -119,11 +113,11 @@ export default Page;
 // import dynamic from 'next/dynamic';
 
 // const NewExpense = dynamic(() => import('./_components/Expance').then((mod) => mod.NewExpense), {
-//   ssr: false, 
+//   ssr: false,
 // });
 
 // const Newincome = dynamic(() => import('./_components/Income').then((mod) => mod.Newincome), {
-//   ssr: false, 
+//   ssr: false,
 // });
 // const HistoryPage = () => {
 //   const params = useSearchParams();
@@ -183,15 +177,15 @@ export default Page;
 //           </div>
 //         </div>
 //         <div className="container mx-auto py-10 px-4">
-//           <DataTable 
-//             columns={columns} 
-//             data={transactions} 
-//             filterKey="description" 
-//             onDelete={handleDelete} 
+//           <DataTable
+//             columns={columns}
+//             data={transactions}
+//             filterKey="description"
+//             onDelete={handleDelete}
 //             // onEdit={handleEditTransaction}  {/* Handle editing transactions if applicable */}
 //             disabled={isDisabled}
 //           />
-//         </div>      
+//         </div>
 //       </div>
 //     </>
 //   )

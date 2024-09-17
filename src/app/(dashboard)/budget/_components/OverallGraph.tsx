@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -11,35 +10,49 @@ import {
 import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { usePathname } from "next/navigation"
 
 type CategoryBudget = {
-  [key: string]: number; // Dynamic keys for categories
-};
+  [key: string]: number // Dynamic keys for categories
+}
 
 type MonthlyData = {
-  month: string;
-  totalIncome: number;
-  totalExpense: number;
-  categoryExpenses: CategoryBudget;
-  categoryBudget: CategoryBudget;
-  remainingBudget: number;
-};
+  month: string
+  totalIncome: number
+  totalExpense: number
+  categoryExpenses: CategoryBudget
+  categoryBudget: CategoryBudget
+  remainingBudget: number
+}
 
 type OverallGraphProps = {
-  monthlyData: MonthlyData[];
-  selectedMonth: number;
-  budget: number;
-};
+  monthlyData: MonthlyData[]
+  selectedMonth: number
+  budget: number
+}
 
-export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGraphProps) {
+export function OverallGraph({
+  monthlyData,
+  selectedMonth,
+  budget,
+}: OverallGraphProps) {
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ]
 
-  const [currentMonthData, setCurrentMonthData] = useState(monthlyData[selectedMonth])
+  const [currentMonthData, setCurrentMonthData] = useState(
+    monthlyData[selectedMonth]
+  )
 
   useEffect(() => {
     setCurrentMonthData(monthlyData[selectedMonth])
@@ -50,11 +63,16 @@ export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGrap
   const budgetColor = isOverBudget ? "text-emi" : "text-blue-700"
 
   // Calculate the total budget
-  const totalBudget = Object.values(currentMonthData.categoryBudget).reduce((sum, value) => sum + value, 0)
+  const totalBudget = Object.values(currentMonthData.categoryBudget).reduce(
+    (sum, value) => sum + value,
+    0
+  )
 
   // Calculate the percentage of the budget used
-  const percentUsed = Math.min((currentMonthData.totalExpense / budget) * 100, 100)
-
+  const percentUsed = Math.min(
+    (currentMonthData.totalExpense / budget) * 100,
+    100
+  )
 
   // SVG parameters
   const size = 180
@@ -66,18 +84,10 @@ export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGrap
   const circleColor = "#4A4A4A"
   const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"
 
-  const handleMonthChange = (value: string) => {
-    const monthIndex = parseInt(value, 10)
-    setCurrentMonthData(monthlyData[monthIndex])
-  }
-
-  // console.log("totalBudget" ,totalBudget);
-  
   return (
     <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-lg font-semibold">Budget Usage</CardTitle>
-        
       </CardHeader>
       <CardContent className="flex-1 pb-2">
         <div className="flex items-center justify-center">
@@ -128,12 +138,10 @@ export function OverallGraph({ monthlyData, selectedMonth, budget }: OverallGrap
             />
           </div>
           <div className="max-w-[300px] flex-1">
-            
             <SetBudget
               currentBudget={budget}
               expense={currentMonthData.totalExpense}
             />
-
           </div>
           <div className="max-w-[300px] flex-1">
             <Card_unclick

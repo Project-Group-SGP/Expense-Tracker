@@ -25,8 +25,11 @@ import * as z from "zod"
 import { CircleGauge, AlertCircle, X } from "lucide-react"
 
 import Card_budget from "./Card_budget"
-import { SetCategoryBudgetDb } from "../../actions"
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { SetCategoryBudgetDb } from "../action"
+import { CategoryTypes } from "@prisma/client"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   amount: z
@@ -39,8 +42,8 @@ const formSchema = z.object({
 export type BudgetFormData = z.infer<typeof formSchema>
 
 type SetCategory_BudgetProps = {
-  currentBudget: number,
-  category: string,
+  currentBudget: number
+  category: string
   expense: number
 }
 
@@ -48,9 +51,9 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
 
-  console.log("Current budget:", props.currentBudget);
-  
+  const router = useRouter()
 
+  console.log("Current budget:", props.currentBudget)
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -89,45 +92,77 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
   }, [])
 
   useEffect(() => {
-    if (!toastShown && props.expense && props.currentBudget && props.currentBudget < props.expense) {
+    if (
+      !toastShown &&
+      props.expense &&
+      props.currentBudget &&
+      props.currentBudget < props.expense
+    ) {
       showWarningToast()
     }
   }, [props.currentBudget, props.expense, toastShown, showWarningToast])
 
   const handleSubmit = async (data: BudgetFormData) => {
-    const budget = Number(data.amount);
-  
+    const budget = Number(data.amount)
+
+    function toCategoryType(category: string): CategoryTypes {
+      // Convert both the input category and enum values to uppercase for comparison
+      const normalizedCategory = category.toUpperCase()
+
+      // Convert enum values to uppercase for comparison
+      const categoryEnumUppercaseMap = Object.values(CategoryTypes).reduce(
+        (acc, enumValue) => {
+          acc[enumValue.toString().toUpperCase()] = enumValue
+          return acc
+        },
+        {} as Record<string, CategoryTypes>
+      )
+
+      // Check if the normalized category exists in the enum map
+      if (categoryEnumUppercaseMap[normalizedCategory]) {
+        return categoryEnumUppercaseMap[normalizedCategory]
+      }
+
+      // Return 'Other' as a fallback if no match is found
+      return CategoryTypes.Other
+    }
+
     try {
       // Assuming you have a way to get the category (you might need to pass it in or get it from props)
-      const category = props.category;
-  
+      const category = toCategoryType(props.category)
+
+      console.log("category : " + category)
+      console.log("budget : " + budget)
+
       // Update the category budget
-      const result = await SetCategoryBudgetDb(category, budget);
-  
-      if (result === "success") {
+      const result = await SetCategoryBudgetDb(category, budget)
+
+      if (result == "success") {
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
-        });
-        form.reset();
+        })
+        form.reset()
+
+        // Close modal or dialog if applicable
+        setOpen(false)
+
+        // Reset form state
+        form.reset({ amount: data.amount })
+        router.refresh()
       } else {
-        toast.error("Budget update failed");
+        console.error("Error updating budget:", result)
+        toast.error("Budget update failed")
       }
-  
-      // Close modal or dialog if applicable
-      setOpen(false);
-  
-      // Reset form state
-      form.reset({ amount: data.amount });
-  
+
       // Reset toastShown state if applicable
-      setToastShown(false);
+      setToastShown(false)
     } catch (error) {
-      console.error("Error updating budget:", error);
-      toast.error("Failed to update budget");
+      console.error("Error updating budget:", error)
+      toast.error("Failed to update budget")
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

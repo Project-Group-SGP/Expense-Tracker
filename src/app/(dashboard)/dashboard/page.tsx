@@ -25,6 +25,7 @@ const getTotalIncome = cache(
           method: "GET",
           headers: { Cookie: cookie },
           next: { tags: ["totalIncome"] },
+          cache: "force-cache",
         }
       )
       if (!res.ok) throw new Error("Failed to fetch total income")
@@ -47,6 +48,7 @@ const getTotalExpense = cache(
           method: "GET",
           headers: { Cookie: cookie },
           next: { tags: ["totalExpense"] },
+          cache: "force-cache",
         }
       )
       if (!res.ok) throw new Error("Failed to fetch total expense")
@@ -97,7 +99,10 @@ const getAllData = cache(
         {
           method: "GET",
           headers: { Cookie: cookie },
-          next: { tags: ["getAllData"] },
+          next: {
+            tags: ["getAllData"],
+          },
+          cache: "no-store",
         }
       )
 

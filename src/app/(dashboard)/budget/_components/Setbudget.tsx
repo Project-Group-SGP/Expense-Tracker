@@ -27,9 +27,8 @@ import CategoryCard from "./Card_Category"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useRouter } from "next/navigation"
-import { revalidateTag } from "next/cache"
-import { SetBudgetDb, SetCategoryBudgetDb } from "../actions"
-import { set } from "date-fns"
+
+import { SetBudgetDb } from "../actions"
 
 const formSchema = z.object({
   amount: z
@@ -99,31 +98,30 @@ export function SetBudget({
   const handleSubmit = async (data: BudgetFormData) => {
     try {
       const budget = Number(data.amount)
-      const result = await SetBudgetDb(budget);
+      const result = await SetBudgetDb(budget)
 
       if (result === "success") {
-        
-        router.refresh();
-
         toast.success("Budget updated successfully", {
           closeButton: true,
           icon: "💰",
           duration: 4500,
         })
 
-       
         form.reset()
+
+        
       } else {
         toast.error("Budget update failed. Please try again later.", {
           duration: 4500,
         })
       }
-
+      
+      router.refresh();
       setOpen(false)
       form.reset({ amount: data.amount })
     } catch (error) {
       console.error("Error updating budget:", error)
-      toast.error(`Failed to update budget: ${error  || "Unknown error"}`, {
+      toast.error(`Failed to update budget: ${error || "Unknown error"}`, {
         duration: 4500,
       })
     }
@@ -147,10 +145,7 @@ export function SetBudget({
         className="w-[95vw] max-w-[425px] p-4 sm:p-6"
       >
         <DialogHeader>
-          <DialogTitle
-            id="dialog-title"
-            className="text-center sm:text-left"
-          >
+          <DialogTitle id="dialog-title" className="text-center sm:text-left">
             Set a new <span className="text-green-500">Budget</span>
           </DialogTitle>
         </DialogHeader>

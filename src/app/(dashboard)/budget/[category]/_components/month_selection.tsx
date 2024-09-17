@@ -27,15 +27,9 @@ interface CategoryData {
   }
 }
 
-interface Budget {
-  id: string
-  userId: string
-  category: string
-  budget: string
-}
 
 interface CategoryBudget {
-  budget: Budget
+  budget: number ;
   monthwiseTotal: {
     [month: string]: number
   }
@@ -123,6 +117,7 @@ export default function Component({ data, budget }: MonthSelectionProps) {
               data={{
                 expenses: selectedExpenses,
                 categoryBudget: budget.monthwiseTotal,
+                budget: budget.budget,
               }}
             />
           </CardContent>
