@@ -9,6 +9,7 @@
 ![Stargazers](https://img.shields.io/github/stars/Project-Group-SGP/Expense-Tracker?style=social)
 ![Issues](https://img.shields.io/github/issues/Project-Group-SGP/Expense-Tracker)
 ![License](https://img.shields.io/github/license/Project-Group-SGP/Expense-Tracker)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/db2afa49a29f4ab6901f9750292f4938)](https://app.codacy.com/gh/Project-Group-SGP/Expense-Tracker/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 </div>
 
