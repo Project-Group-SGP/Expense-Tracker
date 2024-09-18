@@ -16,11 +16,12 @@ interface ChartData {
   values: number[]
 }
 
+
 async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
   let browser: Browser | undefined
   try {
     const launchOptions: PuppeteerLaunchOptions = {
-      headless: "true",
+      headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     }
 
@@ -114,10 +115,10 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
     await page.setContent(html)
 
     // Wait for the chart to be fully rendered
-    await page.waitForFunction(() => window.chartRendered === true, { timeout: 5000 })
+    await page.waitForFunction(() => (window as any).chartRendered === true, { timeout: 5000 })
 
     // Add a small delay to ensure all animations are complete
-    await page.waitForTimeout(500)
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Take a screenshot of the entire chart container
     const element = await page.$('#chart-container')
@@ -136,6 +137,7 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
     }
   }
 }
+
 async function sendReportEmail(
   email: string,
   reportBuffer: Buffer,
