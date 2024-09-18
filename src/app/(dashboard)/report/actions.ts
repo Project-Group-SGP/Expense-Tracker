@@ -1,136 +1,116 @@
 "use server"
-import { startOfMonth, endOfMonth, subMonths, format } from "date-fns"
-import { db } from "@/lib/db"
 import { currentUserServer } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { logo } from "@/lib/logo"
+import { CategoryTypes, Prisma } from "@prisma/client"
+import { endOfMonth, format, startOfMonth, subMonths } from "date-fns"
 import jsPDF from "jspdf"
 import "jspdf-autotable"
 import autoTable from "jspdf-autotable"
-import { createCanvas, registerFont } from "canvas"
-import { Chart, registerables } from "chart.js"
-import ChartDataLabels from "chartjs-plugin-datalabels"
 import nodemailer from "nodemailer"
-import { CategoryTypes, Prisma } from "@prisma/client"
+import puppeteer, { Browser, PuppeteerLaunchOptions } from "puppeteer"
 import * as XLSX from "xlsx"
-import { logo } from "@/lib/logo"
-import PoppinsRegular from "@/public/fonts/Poppins-Regular.ttf"
-
-// Register fonts
-registerFont(PoppinsRegular, { family: "Poppins" })
-Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
   labels: string[]
   values: number[]
 }
 
-async function generatePieChart(data: ChartData): Promise<string> {
-  const width = 400
-  const height = 300
+async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
+  let browser: Browser | undefined
+  try {
+    const isDevelopment = process.env.NODE_ENV === "development"
 
-  const canvas = createCanvas(width, height)
-  const ctx = canvas.getContext("2d")
+    // Define launch options for Puppeteer
+    const launchOptions: PuppeteerLaunchOptions = {
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    }
 
-  if (!ctx) {
-    throw new Error("Failed to get 2D context from canvas")
+    // Launch Puppeteer
+    browser = await puppeteer.launch(launchOptions)
+
+    const page = await browser.newPage()
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <!-- Load Chart.js -->
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+        </head>
+        <body>
+          <canvas id="myChart" width="400" height="300"></canvas>
+          <script>
+            Chart.register(ChartDataLabels);
+            const ctx = document.getElementById('myChart').getContext('2d');
+            new Chart(ctx, {
+              type: 'pie',
+              data: {
+                labels: ${JSON.stringify(data.labels)},
+                datasets: [{
+                  data: ${JSON.stringify(data.values)},
+                  backgroundColor: [
+                    '#4CAF50', '#2196F3', '#FFC107', '#F44336', '#9C27B0',
+                    '#00BCD4', '#FF9800', '#795548', '#607D8B', '#E91E63'
+                  ],
+                }]
+              },
+              options: {
+                responsive: false,
+                plugins: {
+                  legend: {
+                    position: 'right',
+                  },
+                  title: {
+                    display: true,
+                    text: 'Expense Distribution',
+                    font: {
+                      size: 16,
+                      weight: 'bold'
+                    }
+                  },
+                  datalabels: {
+                    formatter: (value, ctx) => {
+                      const dataset = ctx.chart.data.datasets[0];
+                      const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                      const percentage = ((value / total) * 100).toFixed(1);
+                      return percentage + '%';
+                    },
+                    color: '#fff',
+                    font: {
+                      weight: 'bold',
+                      size: 10
+                    }
+                  }
+                }
+              }
+            });
+          </script>
+        </body>
+      </html>
+    `
+
+    await page.setContent(html)
+    await page.waitForSelector("canvas")
+
+    // Take a screenshot of the canvas
+    const element = await page.$("canvas")
+    const screenshot = await element!.screenshot({ encoding: "base64" })
+
+    return screenshot
+  } catch (error) {
+    console.error("Error generating pie chart:", error)
+    throw error
+  } finally {
+    if (browser) {
+      await browser.close()
+    }
   }
-
-  ctx.font = "12px 'Poppins', Arial, sans-serif"
-  const fontLoaded = ctx.measureText("Test").width !== 0
-  console.log("Poppins font loaded:", fontLoaded)
-
-  if (!fontLoaded) {
-    throw new Error("Poppins font not loaded correctly")
-  }
-
-  const configuration = {
-    type: "pie",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          data: data.values,
-          backgroundColor: [
-            "#4CAF50",
-            "#2196F3",
-            "#FFC107",
-            "#F44336",
-            "#9C27B0",
-            "#00BCD4",
-            "#FF9800",
-            "#795548",
-            "#607D8B",
-            "#E91E63",
-          ],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "right",
-          labels: {
-            boxWidth: 12,
-            padding: 10,
-          },
-        },
-        title: {
-          display: true,
-          text: "Expense Distribution",
-          font: {
-            size: 16,
-            weight: "bold",
-            family: "Poppins",
-          },
-        },
-        shadow: {
-          enabled: true,
-          color: "rgba(0, 0, 0, 0.1)",
-          blur: 10,
-          offsetX: 5,
-          offsetY: 5,
-        },
-        tooltip: {
-          callbacks: {
-            label: (tooltipItem) => {
-              const dataset = tooltipItem.dataset
-              const total = dataset.data.reduce(
-                (acc, data) => acc + Number(data),
-                0
-              )
-              const value = Number(dataset.data[tooltipItem.dataIndex])
-              const percentage = ((value / total) * 100).toFixed(1)
-              return `${tooltipItem.label}: ${value.toFixed(2)} (${percentage}%)`
-            },
-          },
-        },
-        datalabels: {
-          formatter: (value, ctx) => {
-            const dataset = ctx.chart.data.datasets[0]
-            const total = dataset.data.reduce(
-              (acc, data) => acc + Number(data),
-              0
-            )
-            const percentage = ((Number(value) / total) * 100).toFixed(1)
-            return percentage + "%"
-          },
-          color: "#fff",
-          font: {
-            weight: "bold",
-            size: 10,
-            family: "Poppins",
-          },
-        },
-      },
-    },
-  }
-
-  //@ts-ignore
-  const chart = new Chart(ctx, configuration)
-  const imageBuffer = canvas.toBuffer("image/png")
-  return imageBuffer.toString("base64")
 }
-
 async function sendReportEmail(
   email: string,
   reportBuffer: Buffer,
@@ -436,16 +416,21 @@ export async function generateReport(
     } else {
       let yPos = 0
       if (includeCharts) {
-        const pieChartBase64 = await generatePieChart(pieChartData)
-        doc.addImage(
-          `data:image/png;base64,${pieChartBase64}`,
-          "PNG",
-          50,
-          70,
-          110,
-          100
-        )
-
+        try {
+          const pieChartBase64 =
+            await generatePieChartWithPuppeteer(pieChartData)
+          doc.addImage(
+            `data:image/png;base64,${pieChartBase64}`,
+            "PNG",
+            50,
+            70,
+            110,
+            100
+          )
+        } catch (error) {
+          console.error("Error generating pie chart:", error)
+          // Handle the error as needed (e.g., add a text note in the PDF)
+        }
         doc.setFontSize(16)
         doc.setTextColor("#2E7D32")
         doc.setFont("helvetica", "bold")
