@@ -1,6 +1,10 @@
 import withPWA from "next-pwa"
 import CopyPlugin from "copy-webpack-plugin"
-import path from "path"
+import { fileURLToPath } from "url"
+import { dirname, join } from "path"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,8 +19,8 @@ const nextConfig = {
         new CopyPlugin({
           patterns: [
             {
-              from: path.join(__dirname, "public", "fonts"),
-              to: path.join(__dirname, ".next", "server", "fonts"),
+              from: join(__dirname, "public", "fonts"),
+              to: join(__dirname, ".next", "server", "fonts"),
             },
           ],
         })
