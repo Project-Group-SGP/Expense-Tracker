@@ -1,25 +1,25 @@
-const fs = require("fs")
-const path = require("path")
-
 module.exports = function fonttrick() {
-  const tempFontPath = path.join("/tmp", "Roboto-Regular.ttf")
-  const sourceFontPath = require.resolve("./fonts/Poppins-Regular.ttf")
+  const fs = require("fs")
+  const path = require("path")
+  const RobotoR = require.resolve("./fonts/Poppins-Regular.ttf")
+  const { COPYFILE_EXCL } = fs.constants
+  const { COPYFILE_FICLONE } = fs.constants
+
+  //const pathToRoboto = path.join(process.cwd(), 'node_modules/fonttrick/Roboto-Regular.ttf')
 
   try {
-    if (!fs.existsSync(tempFontPath)) {
-      console.log("Copying font to /tmp directory...")
-      fs.copyFileSync(
-        sourceFontPath,
-        tempFontPath,
-        fs.constants.COPYFILE_FICLONE | fs.constants.COPYFILE_EXCL
-      )
-      console.log("Font copied successfully!")
+    if (fs.existsSync("/tmp/Roboto-Regular.ttf")) {
+      console.log("Roboto lives in tmp!!!!")
     } else {
-      console.log("Font already exists in /tmp directory.")
+      fs.copyFileSync(
+        RobotoR,
+        "/tmp/Roboto-Regular.ttf",
+        COPYFILE_FICLONE | COPYFILE_EXCL
+      )
     }
   } catch (err) {
-    console.error("Error while handling the font file:", err)
+    console.error(err)
   }
 
-  return tempFontPath
+  return "/tmp/Roboto-Regular.ttf"
 }
