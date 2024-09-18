@@ -1,4 +1,5 @@
 import withPWA from "next-pwa"
+import path from "path"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,14 +17,44 @@ const nextConfig = {
           loader: "file-loader",
           options: {
             name: "[name].[ext]",
-            outputPath: "static/fonts/", // Specify the output directory for fonts
-            publicPath: "/_next/static/fonts/", // Specify the public URL path for fonts
-            esModule: false, // Ensure compatibility with CommonJS
+            outputPath: "static/fonts/",
+            publicPath: "/_next/static/fonts/",
+            esModule: false,
           },
         },
       ],
     })
+
+    // Ensure the fonts directory is copied to the build output
+    if (isServer) {
+      const fontsDir = path.join(process.cwd(), "public", "fonts")
+      config.plugins.push(
+        new CopyPlugin({
+          patterns: [
+            {
+              from: fontsDir,
+              to: path.join(config.output.path, "static", "fonts"),
+            },
+          ],
+        })
+      )
+    }
+
     return config
+  },
+  // Add custom headers for font files
+  async headers() {
+    return [
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ]
   },
 }
 
