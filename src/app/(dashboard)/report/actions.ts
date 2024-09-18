@@ -12,18 +12,22 @@ import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
-import fonttrick from "fonttrick"
-
-let theFontPath
-
-if (process.env.NODE_ENV === "production") {
-  theFontPath = fonttrick()
-  registerFont(fonttrick(), { family: "Poppins" })
-}
+import path from "path"
+import fs from "fs"
 
 // Register fonts
-// registerFont(theFontPath, { family: "Roboto" })
-
+const fontPath = path.join(
+  process.cwd(),
+  ".next",
+  "server",
+  "fonts",
+  "Roboto-Regular.ttf"
+)
+if (fs.existsSync(fontPath)) {
+  registerFont(fontPath, { family: "Roboto" })
+} else {
+  console.error("Font file not found:", fontPath)
+}
 Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
