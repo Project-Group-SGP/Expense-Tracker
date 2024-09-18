@@ -12,21 +12,16 @@ import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
-import path from "node:path"
+import path from "path"
 
-const fontPath = path.join(
-  process.cwd(),
-  "public",
-  "fonts",
-  "Poppins-Regular.ttf"
-)
+const fontPath = path.join(process.cwd(), "public", "Poppins-Regular.ttf")
 
 try {
   registerFont(fontPath, { family: "Poppins" })
-  console.log("Font registered successfully:", fontPath)
+  console.log("Poppins font registered successfully")
 } catch (error) {
-  console.error("Error registering font:", error)
-  throw new Error("Font registration failed: " + (error as any).message)
+  console.error("Error registering Poppins font:", error)
+  throw new Error("Poppins font registration failed: " + (error as any).message)
 }
 
 Chart.register(...registerables, ChartDataLabels)
