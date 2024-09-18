@@ -41,35 +41,32 @@ type GroupMemberProps = {
   loading:boolean,
   balance:GetBalance[]
 };
-
-export const GroupMember = ({ loading, balance}: GroupMemberProps) => {
-  console.log("\n\n\nBalance",balance);
+export const GroupMember = ({ loading, balance }: { loading: boolean; balance: GetBalance[] }) => {
   return (
-    <Card>
+    <Card className="w-screen sm:w-auto ">
       <CardHeader>
-        <CardTitle>Group Member</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl">Group Members</CardTitle>
       </CardHeader>
       <CardContent>
-        {!loading && balance.map((member, index) => (
+        {!loading && balance.map((member) => (
           <Member
             key={member.userId}
             name={member.name}
-            status={member.status || ""} // Example logic
-            amount={member.amount}  // Example amount
-            amountColor={member.amountColor} // Example colors
-            avatar={member.avatar || ""}  // Pass avatar to Member component
-            userId={member.userId}  // Pass userId for avatar generation fallback
+            status={member.status || ""}
+            amount={member.amount}
+            amountColor={member.amountColor}
+            avatar={member.avatar || ""}
+            userId={member.userId}
           />
         ))}
         {loading && (
-          <div className="flex flex-col">
-          {[...Array(4)].map((_, index) => (
-            <GroupMemberSkeleton key={index}/>
-          ))}
-         </div>
+          <div className="flex flex-col gap-4">
+            {[...Array(4)].map((_, index) => (
+              <GroupMemberSkeleton key={index} />
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>
- 
-      );
+  );
 };

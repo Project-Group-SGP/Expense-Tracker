@@ -40,37 +40,18 @@ interface PageTitleProps {
 
 export default function PageTitle({ title, className, leave, createrId }: PageTitleProps) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+    
+<div className="flex justify-between space-y-4 flex-row items-center">
       <h1 className={cn("text-3xl font-bold", className)}>
         {title}
       </h1>
-      <div className="flex items-center space-x-2">
-        {/* {leave.status !== 'settled up' && (
-          <div className={cn(
-            "text-sm font-medium px-3 py-1 rounded-full",
-            leave.status === 'gets back' ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          )}>
-            {leave.status === 'gets back' ? (
-              <span className="flex items-center">
-                <CheckCircle className="w-4 h-4 mr-1" />
-                You get back ${leave.amount}
-              </span>
-            ) : (
-              <span className="flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                You owe ${leave.amount}
-              </span>
-            )}
-          </div>
-        )} */}
-        <LeaveButton
-          status={leave.status}
-          amount={leave.amount}
-          userId={leave.userId}
-          groupId={leave.groupId}
-          createrId={createrId}
-        />
-      </div>
+      <LeaveButton
+        status={leave.status}
+        amount={leave.amount}
+        userId={leave.userId}
+        groupId={leave.groupId}
+        createrId={createrId}
+      />
     </div>
   )
 }
