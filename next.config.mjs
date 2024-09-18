@@ -1,10 +1,4 @@
 import withPWA from "next-pwa"
-import CopyPlugin from "copy-webpack-plugin"
-import { fileURLToPath } from "url"
-import { dirname, join } from "path"
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -14,18 +8,13 @@ const nextConfig = {
     },
   },
   webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.plugins.push(
-        new CopyPlugin({
-          patterns: [
-            {
-              from: join(__dirname, "public", "fonts"),
-              to: join(__dirname, ".next", "server", "fonts"),
-            },
-          ],
-        })
-      )
-    }
+    config.module.rules.push({
+      test: /\.(woff|woff2|eot|ttf|otf)$/i,
+      type: "asset/resource",
+      generator: {
+        filename: "static/fonts/[name][ext]",
+      },
+    })
     return config
   },
 }
