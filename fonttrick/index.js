@@ -2,28 +2,15 @@ const fs = require("fs")
 const path = require("path")
 
 module.exports = function fonttrick() {
+  // Path to the /tmp directory
   const tempFontPath = path.join("/tmp", "Roboto-Regular.ttf")
-  const sourceFontPath = require.resolve("./fonts/Poppins-Regular.ttf")
 
-  console.log(`Source font path: ${sourceFontPath}`)
-  console.log(`Temporary font path: ${tempFontPath}`)
+  // Construct the path to the font file relative to index.js
+  const sourceFontPath = path.resolve(__dirname, "fonts/Poppins-Regular.ttf")
 
   try {
     if (!fs.existsSync(tempFontPath)) {
       console.log("Copying font to /tmp directory...")
-
-      // Check if sourceFontPath is a string
-      if (typeof sourceFontPath !== "string") {
-        throw new TypeError(
-          `Expected sourceFontPath to be a string, got ${typeof sourceFontPath}`
-        )
-      }
-
-      // Ensure the source file exists
-      if (!fs.existsSync(sourceFontPath)) {
-        throw new Error(`Source font file does not exist: ${sourceFontPath}`)
-      }
-
       fs.copyFileSync(
         sourceFontPath,
         tempFontPath,
