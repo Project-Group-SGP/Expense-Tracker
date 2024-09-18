@@ -1,5 +1,6 @@
 import withPWA from "next-pwa"
 import CopyPlugin from "copy-webpack-plugin"
+import path from "path"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
