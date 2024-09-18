@@ -96,7 +96,10 @@ export function NewExpense() {
   })
 
   // handle submit
-  const handleSubmit = async (data: ExpenseFormData) => {
+  const handleSubmit1 = async (data: ExpenseFormData) => {
+
+  
+
     // console.log(data)
     try {
       const result = await AddnewExpense(data)
@@ -117,7 +120,14 @@ export function NewExpense() {
     }
   }
 
+  const handleSubmit = async(data:  ExpenseFormData) => {
+    setisPending(true);
+    await handleSubmit1(data);
+    setisPending(false);
+  }
+
   const [open, setOpen] = useState(false)
+  const [isPending, setisPending] = useState<boolean>(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -270,8 +280,8 @@ export function NewExpense() {
               />
 
               <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className="w-full sm:w-auto">
-                  Add Expense
+                <Button type="submit" variant='outline' className="w-fullsm:w-auto border-red-500 text-red-500 hover:bg-red-700" disabled={isPending}>
+                {isPending ? "Adding..." : "Add new Expense"}
                 </Button>
               </DialogFooter>
             </form>
