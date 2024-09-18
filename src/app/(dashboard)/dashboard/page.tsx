@@ -196,12 +196,12 @@ export default async function Dashboard({
 
           <DateSelect />
 
-          <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-            <Cardcontent className="w-max-[400px] w-min-[300px] p-0">
+          <section className="w-full  space-y-4 md:space-y-0 md:space-x-4 md:flex">
+            <Cardcontent className="w-full md:w-1/2 p-4">
               <Dropdown_chart_1 data={Data} />
             </Cardcontent>
 
-            <Cardcontent className="p-0">
+            <Cardcontent className="w-full md:w-1/2 p-4">
               <Dropdown_chart_2 data={Data} />
             </Cardcontent>
           </section>

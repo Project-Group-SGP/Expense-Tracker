@@ -22,17 +22,16 @@ export default function MemberGroupsList({ groups }: MemberGroupsListProps) {
             key={group.id}
             className="transform transition-transform hover:scale-105 hover:shadow-lg"
           >
+                <Link href={`/group/${group.id}`} key={group.id}>
             <CardHeader className="bg-gradient-to-r p-4">
               <section className="flex items-center justify-between">
-                <Link href={`/group/${group.id}`} key={group.id}>
                   <CardTitle className="text-xl font-bold">
                     {group.name}
                   </CardTitle>
-                </Link>
-                <Trash
+                {/* <Trash
                   className="cursor-pointer transition-colors duration-200 hover:text-red-600"
                   size={20}
-                />
+                  /> */}
               </section>
             </CardHeader>
             <CardContent className="p-4">
@@ -40,6 +39,7 @@ export default function MemberGroupsList({ groups }: MemberGroupsListProps) {
                 {group.description}
               </p>
             </CardContent>
+                  </Link>
           </Card>
         ))}
       </div>

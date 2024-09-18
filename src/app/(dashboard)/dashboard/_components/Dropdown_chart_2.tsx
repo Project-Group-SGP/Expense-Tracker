@@ -112,11 +112,12 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
 
   return (
     <>
-      <div className="w-max-[400px] flex items-center justify-between p-4">
-        <p className="font-semibold">Expenses</p>
+      <div className="w-full max-w-[400px] mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between p-4 space-y-2 sm:space-y-0">
+        <p className="font-semibold text-lg">Expenses</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-29">
+            <Button variant="outline" className="w-full sm:w-auto">
               {selectedChart}
             </Button>
           </DropdownMenuTrigger>
@@ -128,9 +129,6 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
               <DropdownMenuRadioItem value="Category Crustview">
                 Category Crustview
               </DropdownMenuRadioItem>
-              {/* <DropdownMenuRadioItem value="pie chart_2">
-                pie chart_2
-              </DropdownMenuRadioItem> */}
               <DropdownMenuRadioItem value="Spending Circle">
                 Spending Circle
               </DropdownMenuRadioItem>
@@ -142,6 +140,7 @@ export function Dropdown_chart_2({ data }: DropdownChartProps) {
         </DropdownMenu>
       </div>
       <div className="p-4">{renderChart()}</div>
+    </div>
     </>
   )
 }

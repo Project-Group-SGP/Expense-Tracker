@@ -638,7 +638,7 @@ export function NewExpense() {
       if(responce==="success"){
         toast.success("Expense added successfully", {
           closeButton: true,
-          icon: "💸",
+          icon: "😤",
           duration: 4500,
         });
 
@@ -797,8 +797,8 @@ export function NewExpense() {
               )}
             />
             <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" className="w-full sm:w-auto" disabled={isPending}>
-                {isPending ? "Adding..." : "Add Expense"}
+              <Button type="submit" variant='outline' className="w-full sm:w-auto border-red-500 text-red-500 hover:bg-red-700" disabled={isPending}>
+                {isPending ? "Adding..." : "Add New Expense"}
               </Button>
             </DialogFooter>
           </form>

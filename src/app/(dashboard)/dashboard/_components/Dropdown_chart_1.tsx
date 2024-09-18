@@ -175,12 +175,12 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
   }
 
   return (
-    <>
-      <div className="w-max-[400px] flex items-center justify-between p-4">
-        <p className="font-semibold">Transactions</p>
+      <div className="w-full max-w-[400px] mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between p-4 space-y-2 sm:space-y-0">
+        <p className="font-semibold text-lg">Transactions</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-29">
+            <Button variant="outline" className="w-full sm:w-auto">
               {selectedChart}
             </Button>
           </DropdownMenuTrigger>
@@ -192,10 +192,6 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
               <DropdownMenuRadioItem value="Monthly Money Meters">
                 Monthly Money Meters
               </DropdownMenuRadioItem>
-              {/* <DropdownMenuRadioItem value="Bar chart_2">
-                Bar chart_2
-              </DropdownMenuRadioItem> */}
-
               <DropdownMenuRadioItem value="Daily Money Meters">
                 Daily Money Meters
               </DropdownMenuRadioItem>
@@ -210,6 +206,6 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
         </DropdownMenu>
       </div>
       <div className="p-4">{renderChart()}</div>
-    </>
+    </div>
   )
 }

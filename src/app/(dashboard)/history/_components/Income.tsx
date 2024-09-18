@@ -386,7 +386,7 @@ export function Newincome() {
                 )}
               />
             <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" className="w-full sm:w-auto" disabled={isPending}>
+              <Button type="submit" variant='outline' className="w-full sm:w-auto border-green-500 text-green-500 hover:bg-green-700" disabled={isPending}>
                 {isPending ? "Adding..." : "Add new income"}
               </Button>
             </DialogFooter>
