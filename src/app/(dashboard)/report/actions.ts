@@ -5,14 +5,18 @@ import { currentUserServer } from "@/lib/auth"
 import jsPDF from "jspdf"
 import "jspdf-autotable"
 import autoTable from "jspdf-autotable"
-import { createCanvas } from "canvas"
+import { createCanvas, registerFont } from "canvas"
 import { Chart, registerables } from "chart.js"
 import ChartDataLabels from "chartjs-plugin-datalabels"
 import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
+import path from "path"
 
+registerFont(path.join(process.cwd(), "fonts", "Poppins-Regular.ttf"), {
+  family: "Poppins",
+})
 Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
@@ -69,7 +73,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             size: 16,
             weight: "bold",
-            family: "'Poppins', sans-serif",
+            family: "Poppins, sans-serif",
           },
         },
         shadow: {
@@ -107,7 +111,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             weight: "bold",
             size: 10,
-            family: "'Poppins', sans-serif",
+            family: "Poppins, sans-serif",
           },
         },
       },
