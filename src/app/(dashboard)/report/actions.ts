@@ -12,7 +12,7 @@ import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
-import path from "path"
+import path from "node:path"
 
 const fontPath = path.join(
   process.cwd(),
@@ -47,7 +47,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
     throw new Error("Failed to get 2D context from canvas")
   }
 
-  ctx.font = "12px Poppins"
+  ctx.font = "Poppins"
   const fontLoaded = ctx.measureText("Test").width !== 0
   console.log("Poppins font loaded:", fontLoaded)
 
