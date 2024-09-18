@@ -5,24 +5,13 @@ import { currentUserServer } from "@/lib/auth"
 import jsPDF from "jspdf"
 import "jspdf-autotable"
 import autoTable from "jspdf-autotable"
-import { createCanvas, registerFont } from "canvas"
+import { createCanvas } from "canvas"
 import { Chart, registerables } from "chart.js"
 import ChartDataLabels from "chartjs-plugin-datalabels"
 import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
-import path from "path"
-
-const fontPath = path.join(process.cwd(), "public", "Poppins-Regular.ttf")
-
-try {
-  registerFont(fontPath, { family: "Poppins" })
-  console.log("Poppins font registered successfully")
-} catch (error) {
-  console.error("Error registering Poppins font:", error)
-  throw new Error("Poppins font registration failed: " + (error as any).message)
-}
 
 Chart.register(...registerables, ChartDataLabels)
 
@@ -42,9 +31,9 @@ async function generatePieChart(data: ChartData): Promise<string> {
     throw new Error("Failed to get 2D context from canvas")
   }
 
-  ctx.font = "Poppins"
+  ctx.font = "Arial"
   const fontLoaded = ctx.measureText("Test").width !== 0
-  console.log("Poppins font loaded:", fontLoaded)
+  console.log("Arial font loaded:", fontLoaded)
 
   if (!fontLoaded) {
     throw new Error("Poppins font not loaded correctly")
@@ -88,7 +77,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             size: 16,
             weight: "bold",
-            family: "Poppins, sans-serif",
+            family: "Arial",
           },
         },
         shadow: {
@@ -126,7 +115,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             weight: "bold",
             size: 10,
-            family: "Poppins, sans-serif",
+            family: "Arial",
           },
         },
       },
