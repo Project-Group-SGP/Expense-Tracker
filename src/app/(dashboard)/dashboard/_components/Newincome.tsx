@@ -72,8 +72,9 @@ export function Newincome() {
   })
 
   const [open, setOpen] = useState(false)
+  const [isPending, setisPending] = useState<boolean>(false);
   // handle submit
-  const handleSubmit = async (data: IncomeFormData) => {
+  const handleSubmit1 = async (data: IncomeFormData) => {
     try {
       const result = await AddnewIncome(data)
 
@@ -85,6 +86,7 @@ export function Newincome() {
         })
 
         setOpen(false)
+     
         form.reset()
       } else {
         throw new Error("Income not added")
@@ -95,6 +97,13 @@ export function Newincome() {
       toast.error("Failed to add income")
     }
   }
+
+  const handleSubmit = async(data: IncomeFormData) => {
+    setisPending(true);
+    await handleSubmit1(data);
+    setisPending(false);
+  }
+
 
   const [categories, setCategories] = useState(defaultCategories)
   // const [newCategory, setNewCategory] = useState("")
@@ -246,8 +255,8 @@ export function Newincome() {
               />
 
               <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" className="w-full sm:w-auto">
-                  Add new income
+                <Button type="submit" variant='outline' className="w-full sm:w-auto border-green-500 text-green-500 hover:bg-green-700" disabled={isPending}>
+                {isPending ? "Adding..." : "Add new income"}
                 </Button>
               </DialogFooter>
             </form>
