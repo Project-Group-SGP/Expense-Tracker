@@ -23,10 +23,15 @@ const fontPath = path.join(
   "fonts",
   "Poppins-Regular.ttf"
 )
-if (fs.existsSync(fontPath)) {
-  registerFont(fontPath, { family: "Poppins" })
-} else {
-  console.error("Font file not found:", fontPath)
+try {
+  if (fs.existsSync(fontPath)) {
+    registerFont(fontPath, { family: "Poppins" })
+    console.log("Poppins font registered successfully")
+  } else {
+    throw new Error("Font file not found")
+  }
+} catch (error) {
+  console.error("Error registering font:", error)
 }
 Chart.register(...registerables, ChartDataLabels)
 
@@ -46,7 +51,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
     throw new Error("Failed to get 2D context from canvas")
   }
 
-  ctx.font = "30px Poppins"
+  ctx.font = "12px 'Poppins', Arial, sans-serif"
   const fontLoaded = ctx.measureText("Test").width !== 0
   console.log("Poppins font loaded:", fontLoaded)
 
