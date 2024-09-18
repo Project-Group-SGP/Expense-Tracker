@@ -35,17 +35,15 @@ const Page = async ({ params: { category } }) => {
   // console.log("lastRouteName : " + CategoryEnum)
 
   // console.log(data)
-  console.log("Inside [category]/page.tsx : " + budget.budget);
-  
+  console.log("Inside [category]/page.tsx : " + budget.budget)
+
   console.log(budget.budget)
 
   if (!data || !budget) {
     throw new Error("No data found for the provided category")
   }
 
-  return (
-    <Month_selection data={data} budget={budget} />
-  )
+  return <Month_selection data={data} budget={budget} />
 }
 
 export default Page

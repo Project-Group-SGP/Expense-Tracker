@@ -104,24 +104,26 @@ export async function getCategoryBudget(category: string) {
         : 0 // Default budget to 0 if not found
 
     // Group and sum expenses by month, defaulting to empty object if no expenses
-    const monthwiseTotal = expenses.reduce((acc, expense) => {
-      const date = new Date(expense.date)
-      const month = monthNames[date.getMonth()] // Get month name
-      const amount = Number(expense.amount) // Convert amount to number
+    const monthwiseTotal = expenses.reduce(
+      (acc, expense) => {
+        const date = new Date(expense.date)
+        const month = monthNames[date.getMonth()] // Get month name
+        const amount = Number(expense.amount) // Convert amount to number
 
-      if (!acc[month]) {
-        acc[month] = 0
-      }
-      acc[month] += amount
+        if (!acc[month]) {
+          acc[month] = 0
+        }
+        acc[month] += amount
 
-      return acc
-    }, {} as Record<string, number>) // Default to an empty object if no expenses
+        return acc
+      },
+      {} as Record<string, number>
+    ) // Default to an empty object if no expenses
 
     console.log("Getting budget and monthwise category data")
 
-    console.log("monthwiseTotal", monthwiseTotal);
-    console.log("finalBudget", finalBudget);
-    
+    console.log("monthwiseTotal", monthwiseTotal)
+    console.log("finalBudget", finalBudget)
 
     return { budget: finalBudget, monthwiseTotal }
   } catch (error) {
@@ -131,29 +133,34 @@ export async function getCategoryBudget(category: string) {
   }
 }
 
-
-
 // Set or Update Category Budget
 export async function SetCategoryBudgetDb(
   category: string,
   budget: number
 ): Promise<string> {
-  
   try {
     // Get the current user from the session
-    const user = await currentUserServer();
+    const user = await currentUserServer()
 
     if (!user || !user.id) {
       throw new Error("User Not Found")
     }
 
-    console.log("Setting budget for category ", category, " to ", budget, " for user ", user.id);
-    
+    console.log(
+      "Setting budget for category ",
+      category,
+      " to ",
+      budget,
+      " for user ",
+      user.id
+    )
 
     const categoryType = category as CategoryTypes
-    console.log(`Setting budget for category ${categoryType} to ${budget} for user ${user.id}`);
-    
-    const Budget  = budget as number;
+    console.log(
+      `Setting budget for category ${categoryType} to ${budget} for user ${user.id}`
+    )
+
+    const Budget = budget as number
 
     // Try to find the existing category
     const existingCategory = await db.category.findFirst({
@@ -162,8 +169,8 @@ export async function SetCategoryBudgetDb(
         category: categoryType,
       },
     })
-    
-    let result;
+
+    let result
     if (existingCategory) {
       // Update existing category
       result = await db.category.update({
@@ -186,13 +193,14 @@ export async function SetCategoryBudgetDb(
     }
 
     if (result) {
-      console.log(`Category ${category} budget set to ${budget} for user ${user.id}`)
+      console.log(
+        `Category ${category} budget set to ${budget} for user ${user.id}`
+      )
       return "success"
     } else {
       console.error(`Failed to set budget for category ${category}`)
       return "error"
     }
-
   } catch (error) {
     console.error("Error updating budget:", error)
     return "error"

@@ -1,7 +1,11 @@
+import { currentUserServer } from "@/lib/auth"
 import { GetBudgetDb, GetCategoryDataDb } from "./actions"
-import dynamic from 'next/dynamic'
- 
-const BudgetSelection = dynamic(() => import('./_components/budget_Selection'), { ssr: false })
+import dynamic from "next/dynamic"
+
+const BudgetSelection = dynamic(
+  () => import("./_components/budget_Selection"),
+  { ssr: false }
+)
 // Define interfaces for returned data
 interface MonthlyData {
   month: string
@@ -48,25 +52,30 @@ const ensureCategories = (data: BudgetData): BudgetData => {
   return data
 }
 
-export default async function Page() {
-  try {
-    const data = await GetCategoryDataDb()
-    const budget = await GetBudgetDb()
-    
-    if (!data || !budget) {
-      console.error("No data or budget found")
-      return <div><h1>No data found</h1></div>
-    }
-    
-    const data1 = ensureCategories(data) // Normalize the data
+const Page = async () => {
+  const user = await currentUserServer()
 
+  if (!user) {
+    Response.redirect("/auth/sigin")
+  }
+
+  const [data, budget] = await Promise.all([GetCategoryDataDb(), GetBudgetDb()])
+  const data1 = ensureCategories(data) // Normalize the data
+
+  if (!data || !budget) {
+    // throw new Error("Data or budget not found")
     return (
-      <div className="mb-10 mr-10 mt-20">
-        <BudgetSelection initialData={data1} budget={Number(budget.budget)} />
+      <div>
+        <h1>No data found</h1>
       </div>
     )
-  } catch (error) {
-    console.error("Error in budget page:", error)
-    return <div><h1>Error loading budget data. Please try again later.</h1></div>
   }
+
+  return (
+    <div className="mb-10 mr-10 mt-20">
+      <BudgetSelection initialData={data1} budget={Number(budget.budget)} />
+    </div>
+  )
 }
+
+export default Page
