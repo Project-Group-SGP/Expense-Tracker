@@ -14,9 +14,21 @@ import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
 import path from "path"
 
-registerFont(path.join(process.cwd(), "fonts", "Poppins-Regular.ttf"), {
-  family: "Poppins",
-})
+const fontPath = path.join(
+  process.cwd(),
+  "public",
+  "fonts",
+  "Poppins-Regular.ttf"
+)
+
+try {
+  registerFont(fontPath, { family: "Poppins" })
+  console.log("Font registered successfully:", fontPath)
+} catch (error) {
+  console.error("Error registering font:", error)
+  throw new Error("Font registration failed: " + (error as any).message)
+}
+
 Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
@@ -33,6 +45,14 @@ async function generatePieChart(data: ChartData): Promise<string> {
 
   if (!ctx) {
     throw new Error("Failed to get 2D context from canvas")
+  }
+
+  ctx.font = "12px Poppins"
+  const fontLoaded = ctx.measureText("Test").width !== 0
+  console.log("Poppins font loaded:", fontLoaded)
+
+  if (!fontLoaded) {
+    throw new Error("Poppins font not loaded correctly")
   }
 
   const configuration = {
