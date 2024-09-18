@@ -111,7 +111,7 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
         </body>
       </html>
     `
-
+ 
     await page.setContent(html)
 
     // Wait for the chart to be fully rendered
