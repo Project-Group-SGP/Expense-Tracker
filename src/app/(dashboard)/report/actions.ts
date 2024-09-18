@@ -69,6 +69,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             size: 16,
             weight: "bold",
+            family: "'Poppins', sans-serif",
           },
         },
         shadow: {
@@ -106,6 +107,7 @@ async function generatePieChart(data: ChartData): Promise<string> {
           font: {
             weight: "bold",
             size: 10,
+            family: "'Poppins', sans-serif",
           },
         },
       },
