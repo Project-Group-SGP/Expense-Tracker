@@ -21,10 +21,10 @@ const fontPath = path.join(
   ".next",
   "server",
   "fonts",
-  "Roboto-Regular.ttf"
+  "Poppins-Regular.ttf"
 )
 if (fs.existsSync(fontPath)) {
-  registerFont(fontPath, { family: "Roboto" })
+  registerFont(fontPath, { family: "Poppins" })
 } else {
   console.error("Font file not found:", fontPath)
 }
