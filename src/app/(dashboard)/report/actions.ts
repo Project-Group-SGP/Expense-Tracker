@@ -19,17 +19,12 @@ interface ChartData {
 async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
   let browser: Browser | undefined
   try {
-    const isDevelopment = process.env.NODE_ENV === "development"
-
-    // Define launch options for Puppeteer
     const launchOptions: PuppeteerLaunchOptions = {
-      headless: true,
+      headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     }
 
-    // Launch Puppeteer
     browser = await puppeteer.launch(launchOptions)
-
     const page = await browser.newPage()
 
     const html = `
@@ -38,16 +33,21 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <!-- Load Chart.js -->
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+          <style>
+            body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
+            #chart-container { width: 600px; height: 400px; margin: 20px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+          </style>
         </head>
         <body>
-          <canvas id="myChart" width="400" height="300"></canvas>
+          <div id="chart-container">
+            <canvas id="myChart"></canvas>
+          </div>
           <script>
             Chart.register(ChartDataLabels);
             const ctx = document.getElementById('myChart').getContext('2d');
-            new Chart(ctx, {
+            const chart = new Chart(ctx, {
               type: 'pie',
               data: {
                 labels: ${JSON.stringify(data.labels)},
@@ -60,17 +60,27 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
                 }]
               },
               options: {
-                responsive: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                   legend: {
                     position: 'right',
+                    labels: {
+                      font: {
+                        size: 12
+                      }
+                    }
                   },
                   title: {
                     display: true,
                     text: 'Expense Distribution',
                     font: {
-                      size: 16,
+                      size: 18,
                       weight: 'bold'
+                    },
+                    padding: {
+                      top: 10,
+                      bottom: 30
                     }
                   },
                   datalabels: {
@@ -83,23 +93,38 @@ async function generatePieChartWithPuppeteer(data: ChartData): Promise<string> {
                     color: '#fff',
                     font: {
                       weight: 'bold',
-                      size: 10
+                      size: 12
                     }
                   }
                 }
               }
             });
+
+            // Signal when the chart is fully rendered
+            chart.options.animation = {
+              onComplete: () => {
+                window.chartRendered = true;
+              }
+            };
           </script>
         </body>
       </html>
     `
 
     await page.setContent(html)
-    await page.waitForSelector("canvas")
 
-    // Take a screenshot of the canvas
-    const element = await page.$("canvas")
-    const screenshot = await element!.screenshot({ encoding: "base64" })
+    // Wait for the chart to be fully rendered
+    await page.waitForFunction(() => window.chartRendered === true, { timeout: 5000 })
+
+    // Add a small delay to ensure all animations are complete
+    await page.waitForTimeout(500)
+
+    // Take a screenshot of the entire chart container
+    const element = await page.$('#chart-container')
+    const screenshot = await element!.screenshot({ 
+      encoding: "base64",
+      omitBackground: true // This removes the default white background
+    })
 
     return screenshot
   } catch (error) {
