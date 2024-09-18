@@ -12,11 +12,18 @@ import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
+import fonttrick from "fonttrick"
 
-registerFont(
-  "https://fonts.gstatic.com/s/poppins/v15/pxiDyp8kv8JHgFVrJJfedw.ttf",
-  { family: "Poppins" }
-)
+let theFontPath
+
+if (process.env.NODE_ENV === "production") {
+  theFontPath = fonttrick()
+  registerFont(fonttrick(), { family: "Poppins" })
+}
+
+// Register fonts
+// registerFont(theFontPath, { family: "Roboto" })
+
 Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {

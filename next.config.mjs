@@ -7,6 +7,24 @@ const nextConfig = {
       fullUrl: true,
     },
   },
+  webpack: (config, { isServer }) => {
+    // Add custom font handling rules
+    config.module.rules.push({
+      test: /\.(ttf|eot|woff|woff2)$/,
+      use: [
+        {
+          loader: "file-loader",
+          options: {
+            name: "[name].[ext]",
+            outputPath: "static/fonts/", // Specify the output directory for fonts
+            publicPath: "/_next/static/fonts/", // Specify the public URL path for fonts
+            esModule: false, // Ensure compatibility with CommonJS
+          },
+        },
+      ],
+    })
+    return config
+  },
 }
 
 const pwaConfig = {
