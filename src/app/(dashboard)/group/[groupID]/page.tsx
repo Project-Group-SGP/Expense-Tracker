@@ -10,6 +10,7 @@ import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "./_components/PageTitle"
 import TransactionTableSkeleton from "./_components/TransactionSkeleton"
+import { Compatable } from "./_components/compatable"
 
 interface Group {
   id: string
@@ -86,7 +87,6 @@ export interface GetBalance {
   status: 'settled up' | 'gets back' | 'owes',
   amountColor:string,
 }
-
 async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
   try {
     const res = await fetch(
@@ -216,13 +216,11 @@ export default async function GroupPage({
   }  
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title={group.name} leave={leave} createrId={group.creatorId}/>
-
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
-            <p className="mr-auto">
+            <p>
               Welcome Back,
               <span className="text font-semibold text-orange-500 dark:text-sky-500">
                 {" "}
@@ -230,8 +228,8 @@ export default async function GroupPage({
               </span>
               👋
             </p>
-            <div className="ml-auto flex gap-2">
-              <AddExpense
+            <div className="w-full sm:ml-auto flex gap-2 sm:w-auto">
+            <AddExpense
                 params={{ groupID: params.groupID }}
                 groupMemberName={groupMembers}
                 user={user.id}
@@ -249,16 +247,15 @@ export default async function GroupPage({
           </div>
 
           <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
-            <Cardcontent className="border-none p-0 md:col-span-2 lg:col-span-2">
+            <Cardcontent className="border-none p-0  md:col-span-2 lg:col-span-2">
               <Transaction transactionsData={transactionData} loading={false}/>
             </Cardcontent>
-            <Cardcontent className="border-none p-0">
+            <Cardcontent className="border-none p-0 w-full">
               <GroupMember loading={false} balance={balance}/>
             </Cardcontent>
           </section>
         </div>
       </div>
-    </Suspense>
   )
 }
 

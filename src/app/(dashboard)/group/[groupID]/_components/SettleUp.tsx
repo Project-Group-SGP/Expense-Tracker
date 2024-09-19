@@ -620,7 +620,7 @@ export function SettleUp({
   if (safeUsersYouNeedToPay.length === 0) {
     return (
       <Button
-        className="w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
+        className="w-full sm:w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
         variant="outline"
         disabled
       >

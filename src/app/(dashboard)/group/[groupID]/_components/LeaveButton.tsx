@@ -553,7 +553,7 @@ export default function LeaveButton({ status, amount, userId, groupId, createrId
             <Button
               variant="outline"
               className={cn(
-                "w-full sm:w-auto transition-colors duration-300",
+                "w-auto transition-colors duration-300 mt-0",
                 isCreator
                   ? "border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                   : status === 'settled up'
@@ -573,7 +573,7 @@ export default function LeaveButton({ status, amount, userId, groupId, createrId
       </TooltipProvider>
 
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className='my-2 sm:my-0'>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center">
               {alertContent.icon}

@@ -154,7 +154,7 @@ export default function Transaction({ transactionsData, loading }: { transaction
             </PopoverTrigger>
             <PopoverContent className="w-56 p-2">
               <div className="space-y-2">
-                <h4 className="text-sm font-messsssss*dium mb-1">Select columns</h4>
+                <h4 className="text-sm font-medium mb-1">Select columns</h4>
                 {columns.map(column => (
                   <div
                     key={column.id}

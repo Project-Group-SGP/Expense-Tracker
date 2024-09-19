@@ -80,8 +80,8 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
 
   const handleClose = () => {
     setOpen(false)
-    router.refresh()
     form.reset()
+    router.refresh()
   }
 
   const validateJoinRequest = (code: string) => {

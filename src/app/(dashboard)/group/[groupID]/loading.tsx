@@ -94,12 +94,14 @@ export default function LoadingGroupPage(){
           </div>
           <div className="flex w-full flex-wrap items-center justify-between gap-4">
             <p className="flex w-fit">
-              <p>Welcome Back,</p>
-              <Skeleton className="ml-2 h-8 w-[80px]" />
-              <p>👋</p>
+              Welcome Back,
+              <span className="text font-semibold text-orange-500 dark:text-sky-500">
+                <Skeleton className="ml-2 h-8 w-[80px]" />
+              </span>
+              👋
             </p>
-            <div className="ml-auto flex gap-2">
-              <Button
+            <div className="w-full sm:ml-auto flex gap-2 sm:w-auto">
+            <Button
                 className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-[150px]"
                 variant="outline"
               >

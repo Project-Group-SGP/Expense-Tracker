@@ -16,32 +16,27 @@ interface MemberProps {
   userId: string;
 }
 
-export const Member = ({ name,
-  status,
-  amount,
-  amountColor,
-  avatar,
-  userId, }: MemberProps) => {
-    console.log(amount)
+export const Member = ({ name, status, amount, amountColor, avatar, userId }: MemberProps) => {
   return (
-    <CardContent className="flex w-full m-2 flex-col gap-3 rounded-xl border p-5 shadow dark:bg-Neutral-100">
-      <section className="flex justify-between gap-2">
+    <CardContent className="flex w-full m-2 flex-col sm:flex-row gap-3 rounded-xl border p-4 shadow dark:bg-Neutral-100">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
         {/* Avatar and Name Section */}
         <div className="flex items-center gap-3">
-          {/* Avatar */}
-          {/* <UserAvatar  */}
           <UserAvatar user={{ userId, name, avatar }} size={40} />
           
           {/* Name and Status */}
           <div className="flex flex-col">
-            <span className="text-lg font-medium">{name}</span>
-            <span className={`text-sm ${status==="settled up"? "text-gray-500" :amountColor}`}>{status}</span>
+            <span className="text-base sm:text-lg font-medium">{name}</span>
+            <span className={`text-xs sm:text-sm ${status === "settled up" ? "text-gray-500" : amountColor}`}>
+              {status}
+            </span>
           </div>
         </div>
+        
         {/* Amount Section */}
-        <div className={`flex items-center text-lg font-semibold ${status==="settled up"? "text-gray-500" :amountColor}`}>
+        <div className={`flex items-center text-base sm:text-lg font-semibold mt-2 sm:mt-0 ${status === "settled up" ? "text-gray-500" : amountColor}`}>
           {status !== "settled up" && (
-            <IndianRupee className="mr-1 text-xl" />
+            <IndianRupee className="mr-1 text-lg sm:text-xl" />
           )}
           {amount}
         </div>
@@ -49,6 +44,3 @@ export const Member = ({ name,
     </CardContent>
   );
 };
-
-
-
