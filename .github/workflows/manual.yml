@@ -11,5 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Call API
+      env:
+        API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
       run: |
-        curl -X GET 'https://your-api-endpoint.com'
+        curl -X GET $API_ENDPOINT
