@@ -44,7 +44,7 @@ export default function Page() {
         formData.append("password", values.password || "")
 
         const response = await axios.post(
-          "http://localhost:5000/extract-tables",
+          `${process.env.NEXT_PUBLIC_PYTHON_API}/extract-tables`,
           formData,
           {
             headers: {
