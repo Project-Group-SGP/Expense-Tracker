@@ -34,7 +34,6 @@ async function generatePieChart(data: ChartData): Promise<string> {
   const configuration = {
     type: "pie",
     data: {
-      labels: data.labels,
       datasets: [
         {
           data: data.values,
@@ -49,6 +48,8 @@ async function generatePieChart(data: ChartData): Promise<string> {
             "#795548",
             "#607D8B",
             "#E91E63",
+            "#9E9E9E",
+            "#FF5722",
           ],
         },
       ],
@@ -57,56 +58,16 @@ async function generatePieChart(data: ChartData): Promise<string> {
       responsive: true,
       plugins: {
         legend: {
-          position: "right",
-          labels: {
-            boxWidth: 12,
-            padding: 10,
-          },
-        },
-        title: {
-          display: true,
-          text: "Expense Distribution",
-          font: {
-            size: 16,
-            weight: "bold",
-          },
-        },
-        shadow: {
-          enabled: true,
-          color: "rgba(0, 0, 0, 0.1)",
-          blur: 10,
-          offsetX: 5,
-          offsetY: 5,
+          display: false,
         },
         tooltip: {
-          callbacks: {
-            label: (tooltipItem) => {
-              const dataset = tooltipItem.dataset
-              const total = dataset.data.reduce(
-                (acc, data) => acc + Number(data),
-                0
-              )
-              const value = Number(dataset.data[tooltipItem.dataIndex])
-              const percentage = ((value / total) * 100).toFixed(1)
-              return `${tooltipItem.label}: ${value.toFixed(2)} (${percentage}%)`
-            },
-          },
+          enabled: false,
+        },
+        title: {
+          display: false,
         },
         datalabels: {
-          formatter: (value, ctx) => {
-            const dataset = ctx.chart.data.datasets[0]
-            const total = dataset.data.reduce(
-              (acc, data) => acc + Number(data),
-              0
-            )
-            const percentage = ((Number(value) / total) * 100).toFixed(1)
-            return percentage + "%"
-          },
-          color: "#fff",
-          font: {
-            weight: "bold",
-            size: 10,
-          },
+          display: false,
         },
       },
     },
@@ -421,6 +382,10 @@ export async function generateReport(
         )
       }
     } else {
+      const totalExpenses = expenses.reduce(
+        (sum, e) => sum + Number(e.amount),
+        0
+      )
       let yPos = 0
       if (includeCharts) {
         const pieChartBase64 = await generatePieChart(pieChartData)
@@ -428,7 +393,7 @@ export async function generateReport(
           `data:image/png;base64,${pieChartBase64}`,
           "PNG",
           50,
-          70,
+          65,
           110,
           100
         )
@@ -447,17 +412,42 @@ export async function generateReport(
           doc.setFont("helvetica", "normal")
           doc.setTextColor(60, 60, 60)
           const text = `${category.category}: -${Number(category._sum.amount || 0).toFixed(2)}`
-          doc.text(text, index % 2 === 0 ? leftCol : rightCol, yPos)
+          // Define the size of the rectangle
+          const rectWidth = 3
+          const rectHeight = 3
+          const rectX = index % 2 === 0 ? leftCol - 5 : rightCol - 5 // Adjust the X position to appear before the text
+          const rectY = yPos - 3 // Adjust Y position to align with the text
+          const colors: { [key: string]: string } = {
+            Other: "#4CAF50",
+            Bills: "#2196F3",
+            Food: "#FFC107",
+            Entertainment: "#F44336",
+            Transportation: "#9C27B0",
+            EMI: "#00BCD4",
+            Healthcare: "#FF9800",
+            Education: "#795548",
+            Investment: "#607D8B",
+            Shopping: "#E91E63",
+            Fuel: "#9E9E9E",
+            Groceries: "#FF5722",
+          }
+          doc.setFillColor(colors[category.category])
+          // Draw the rectangle (no fill color yet, just a placeholder)
+          doc.rect(rectX, rectY, rectWidth, rectHeight, "F")
+
+          doc.text(
+            `${text}  (${(((category._sum.amount as any) * 100) / totalExpenses).toFixed(2)})%`,
+            index % 2 === 0 ? leftCol : rightCol,
+            yPos
+          )
+
           if (index % 2 !== 0) yPos += 10
         })
         yPos = Math.max(yPos + 20, 250)
       } else {
         yPos = 90
       }
-      const totalExpenses = expenses.reduce(
-        (sum, e) => sum + Number(e.amount),
-        0
-      )
+
       const totalIncome = incomes.reduce((sum, i) => sum + Number(i.amount), 0)
 
       doc.setFontSize(14)
