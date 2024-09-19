@@ -1,5 +1,4 @@
 "use client"
-
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMutation } from "@tanstack/react-query"
@@ -24,7 +23,7 @@ export type Transaction = {
   Description: string
 }
 
-export default function Component() {
+export default function Page() {
   const [data, setData] = useState<Transaction[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false)
@@ -38,10 +37,75 @@ export default function Component() {
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["Extract-table"],
     mutationFn: async (values: TransactionPDF) => {
-      // ... (mutation logic remains the same)
+      try {
+        const formData = new FormData()
+        formData.append("file", values.file, values.file.name)
+        formData.append("bank", values.bank)
+        formData.append("password", values.password || "")
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_PYTHON_API}/extract-tables`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+
+        if (!response || !response.data) {
+          throw new Error("Failed to extract transactions: No data received")
+        }
+
+        const dataWithCategory = response.data.transactions.map(
+          (transaction: Transaction) => ({
+            ...transaction,
+            Category: transaction.Amount > 0 ? "Income" : "Other",
+            Description: "",
+          })
+        )
+        toast.success("Transactions extracted successfully")
+        setData(dataWithCategory)
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (!error.response) {
+            toast.error(
+              "Network error. Please check your connection and try again."
+            )
+          } else if (error.response.status === 400) {
+            toast.error(
+              `Bad Request: ${error.response.data.error.split(":")[1]}`
+            )
+          } else if (error.response.status === 500) {
+            toast.error(`Server Error: ${error.response.data.error}`)
+          } else {
+            toast.error(`Error: ${error.response.data.error}`)
+          }
+        } else {
+          toast.error(`An unexpected error occurred, please try again.`)
+        }
+      }
     },
     onError: (error: any) => {
-      // ... (error handling remains the same)
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          if (error.response.status === 400) {
+            toast.error(`Bad Request: ${error.response.data.error}`)
+          } else if (error.response.status === 500) {
+            toast.error(`Server Error: ${error.response.data.error}`)
+          } else {
+            toast.error(`Error: ${error.response.data.error}`)
+          }
+        } else if (error.request) {
+          toast.error(
+            "No response received from server. Please ensure that the PDF and password are correct."
+          )
+        } else {
+          toast.error(`Error: ${error.message}`)
+        }
+      } else {
+        toast.error(`An unexpected error occurred: ${error.message}`)
+      }
     },
   })
 
