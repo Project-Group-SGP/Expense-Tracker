@@ -80,7 +80,7 @@ export default function CategoryDropdown({
                 className={cn(
                   "flex cursor-default items-center gap-1 p-2.5 text-sm hover:bg-zinc-100",
                   {
-                    "bg-zinc-100 dark:bg-slate-500": key === selectedStatus,
+                    "bg-zinc-100 dark:bg-zinc-700": key === selectedStatus,
                   }
                 )}
                 onClick={() => {
