@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import TransactionTableSkeleton from "./TransactionSkeleton"
+import { number } from "zod"
 
 interface ExpenseSplit {
   userName: string
@@ -240,7 +241,7 @@ export default function Transaction({ transactionsData, loading }: { transaction
                     <TableCell>{transaction.PaidByName}</TableCell>
                   )}
                   {selectedColumns.includes('amount') && (
-                    <TableCell className="text-right font-semibold">₹ {transaction.amount}</TableCell>
+                    <TableCell className="text-right font-semibold">₹ {Number(transaction.amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                   )}
                   {selectedColumns.includes('status') && (
                     <TableCell>
@@ -307,7 +308,7 @@ export default function Transaction({ transactionsData, loading }: { transaction
                                     {split.isPaid}
                                   </span>
                                 </TableCell>
-                                <TableCell className="text-right font-semibold">₹ {split.amount}</TableCell>
+                                <TableCell className="text-right font-semibold">₹ {Number(split.amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>

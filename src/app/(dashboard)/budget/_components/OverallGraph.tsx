@@ -122,7 +122,8 @@ export function OverallGraph({
               fill="currentColor"
               className="text-gray-900 dark:text-white"
             >
-              {currentMonthData.totalExpense} <br />
+              {currentMonthData.totalExpense.toLocaleString('en-IN')} <br />
+              
             </text>
           </svg>
         </div>

@@ -49,6 +49,7 @@ export function SetBudget({
 }) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
+  const [isPending, setisPending] = useState<boolean>(false);
   const router = useRouter()
 
   const form = useForm<BudgetFormData>({
@@ -95,7 +96,7 @@ export function SetBudget({
     }
   }, [currentBudget, expense, toastShown])
 
-  const handleSubmit = async (data: BudgetFormData) => {
+  const handleSubmit1 = async (data: BudgetFormData) => {
     try {
       const budget = Number(data.amount)
       const result = await SetBudgetDb(budget)
@@ -116,8 +117,8 @@ export function SetBudget({
         })
       }
       
-      router.refresh();
       setOpen(false)
+      router.refresh();
       form.reset({ amount: data.amount })
     } catch (error) {
       console.error("Error updating budget:", error)
@@ -126,6 +127,14 @@ export function SetBudget({
       })
     }
   }
+
+  const handleSubmit = async(data: BudgetFormData) => {
+    setisPending(true);
+    await handleSubmit1(data);
+    setisPending(false);
+  }
+
+  
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -178,10 +187,12 @@ export function SetBudget({
             <DialogFooter className="mt-6 sm:mt-8">
               <Button
                 type="submit"
-                className="w-full sm:w-auto"
-                aria-label="Update budget"
+                variant='outline'
+                className="w-full sm:w-auto border-green-500 text-green-500 hover:bg-green-700"
+                aria-label="Update budget" 
+                disabled={isPending}
               >
-                Update Budget
+               {isPending ? "Updating..." : "Update Budget"}
               </Button>
             </DialogFooter>
           </form>

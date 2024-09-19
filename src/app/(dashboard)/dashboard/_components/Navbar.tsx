@@ -23,7 +23,7 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           <MobileNav />
           <Link
-            href="/"
+            href="/dashboard"
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
             <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />

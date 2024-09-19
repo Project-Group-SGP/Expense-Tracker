@@ -38,7 +38,8 @@ export const Member = ({ name, status, amount, amountColor, avatar, userId }: Me
           {status !== "settled up" && (
             <IndianRupee className="mr-1 text-lg sm:text-xl" />
           )}
-          {amount}
+          
+          {Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
       </section>
     </CardContent>
