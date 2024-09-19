@@ -33,14 +33,14 @@ const chartConfig = {
 export function Chart_income_expense_2({ chartData }: Chart_income_expense_Props) {
   return (
     <Card className="w-full max-w-3xl mx-auto dark:bg-black shadow-none border-none">
-      <CardHeader>
+      <CardHeader className="hidden sm:block sm:min-w-[400px]:hidden">
         <CardTitle className="text-2xl font-bold text-center">Income vs. Expense Radar</CardTitle>
         <CardDescription className="text-center text-gray-500">Monthly comparison of income and expenses</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[500px]"
+          className="mx-auto  aspect-square max-h-[500px]"
         >
           <RadarChart
             data={chartData}
