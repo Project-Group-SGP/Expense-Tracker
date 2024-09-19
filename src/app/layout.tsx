@@ -80,23 +80,22 @@ export default function RootLayout({
         </Providers>
       </body>
       <Script type="application/ld+json" id="schema">
-        {`
-    {
-      "@context": "http://schema.org",
-      "@type": "WebSite",
-      "name": "Spendwise - Expense Tracker",
-      "url": "${process.env.BASE_URL}",
-      "description": "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
-      "creator": {
-        "@type": "Person",
-        "name": "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani"
-      },
-      "publisher": {
-        "@type": "Person",
-        "name": "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani"
-      },
-    }
-  `}
+        {JSON.stringify({
+          "@context": "http://schema.org",
+          "@type": "WebSite",
+          name: "Spendwise - Expense Tracker",
+          url: process.env.BASE_URL,
+          description:
+            "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
+          creator: {
+            "@type": "Person",
+            name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
+          },
+          publisher: {
+            "@type": "Person",
+            name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
+          },
+        })}
       </Script>
     </html>
   )
