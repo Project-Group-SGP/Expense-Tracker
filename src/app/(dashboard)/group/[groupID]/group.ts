@@ -376,7 +376,10 @@ export async function AddGroupExpense(params: {
     // Send notification
     sendExpenseNotification(params.groupID, response.id, params.paidById, params.amount, params.title);
 
-    revalidatePath(`/groups/${params.groupID}`);
+    // revalidatePath(`/groups/${params.groupID}`);
+    revalidateTag("getGroupTransactiondata")
+    revalidateTag("getGroupBalance")
+    revalidateTag("getGroupdata")
 
     return { success: true };
 }
@@ -485,7 +488,11 @@ export async function settleUp(params: {
   // Send settle up notification
   sendSettleUpNotification(params.groupID, params.payerId, params.recipientId, totalAmount);
 
-  revalidatePath(`/groups/${params.groupID}`);
+  // revalidatePath(`/groups/${params.groupID}`);
+  revalidateTag("getGroupTransactiondata")
+  revalidateTag("getGroupBalance")
+  revalidateTag("getGroupdata")
+
 
   return { message: "Payment to group member completed successfully!" };
 }
