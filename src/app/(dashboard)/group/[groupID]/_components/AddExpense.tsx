@@ -243,7 +243,7 @@ export function AddExpense({
 
         router.refresh();
         form.reset();
-        revalidateTag("getGroupTransactionData");
+        // revalidateTag("getGroupTransactionData");
       } else {
         console.error("Failed to Add Expense")
 

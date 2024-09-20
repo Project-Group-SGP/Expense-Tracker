@@ -94,8 +94,8 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
       {
         method: "GET",
         headers: { Cookie: cookie },
-        // next: { tags: ["getGroupdata"] },
-        cache: 'no-store',
+        next: { tags: ["getGroupdata"] },
+        cache: "force-cache",
       }
     )
 
@@ -120,8 +120,8 @@ const fetchGroupBalances = async (groupId: string,cookie: string):Promise<GetBal
     const res = await fetch(`${process.env.BASE_URL}/api/balance?groupId=${groupId}`,{
         method: "GET",
         headers: { Cookie: cookie },
-        // next: { tags: ["getGroupBalance"] },
-        cache: 'no-store',
+        next: { tags: ["getGroupBalance"] },
+        cache: "force-cache",
       });
 
     if (!res.ok) {
@@ -146,8 +146,8 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       {
         method: "GET",
         headers: { Cookie: cookie },
-        cache: 'no-store',
-        // next: { tags: ["getGroupTransactiondata"] },
+        cache: "force-cache",
+        next: { tags: ["getGroupTransactiondata"] },
       }
     )
 
@@ -245,15 +245,6 @@ export default async function GroupPage({
               />
             </div>
           </div>
-
-          {/* <section className="text-bl grid w-full gap-4 transition-all sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
-            <Cardcontent className="border-none p-0  md:col-span-2 lg:col-span-2">
-              <Transaction transactionsData={transactionData} loading={false}/>
-            </Cardcontent>
-            <Cardcontent className="border-none p-0 w-full">
-              <GroupMember loading={false} balance={balance}/>
-            </Cardcontent>
-          </section> */}
           <section className="text-bl grid w-full gap-4 transition-all grid-cols-1 lg:grid-cols-3">
             <Cardcontent className="border-none p-0 col-span-1 md:col-span-2 ">
               <Transaction transactionsData={transactionData} loading={false}/>
