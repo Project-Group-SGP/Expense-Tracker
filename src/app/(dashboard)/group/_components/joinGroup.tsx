@@ -1,4 +1,11 @@
 "use client"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { toast } from "sonner"
+import { UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,18 +24,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Group } from "@prisma/client"
-import { UserPlus } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
 import { joinGroup } from "../actions"
 
-// Client-side validation
-// Only allow letters and numbers with the length 6
 const formSchema = z.object({
   code: z
     .string()
@@ -39,9 +36,8 @@ const formSchema = z.object({
 
 type JoinGroupFormData = z.infer<typeof formSchema>
 
-export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
+export function JoinGroupModal() {
   const [open, setOpen] = useState(false)
-  // const router = useRouter()
 
   const form = useForm<JoinGroupFormData>({
     resolver: zodResolver(formSchema),
@@ -53,12 +49,6 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   const handleSubmit = async (data: JoinGroupFormData) => {
     const loadingToast = toast.loading("Sending join request...")
     try {
-      // Client-side validation
-      const validationResult = validateJoinRequest(data.code)
-      if (!validationResult.canJoin) {
-        toast.error(validationResult.message, { id: loadingToast })
-        return
-      }
       const result = await joinGroup(data.code)
       if (result.success) {
         toast.success(result.message, {
@@ -81,18 +71,6 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   const handleClose = () => {
     setOpen(false)
     form.reset()
-    // router.refresh()
-  }
-
-  const validateJoinRequest = (code: string) => {
-    if (memberGroups.some((group) => group.code === code)) {
-      return {
-        canJoin: false,
-        message: "You are already a member of this group",
-      }
-    } else {
-      return { canJoin: true }
-    }
   }
 
   return (
