@@ -17,8 +17,12 @@ export const Resetpass = async({email}:z.infer<typeof ResetSchema>) => {
   if(!existinguser || !existinguser.emailVerified) 
     return {error : "Email not found!"};
 
+  if(!existinguser.image){
+    return {error: "You are registered with google"}
+  }
 
-  const passwordResettoken =await  generatePasswordResetToken(validatedFields.data.email);
+
+  const passwordResettoken = await generatePasswordResetToken(validatedFields.data.email);
 
 
   await sendPasswordResetEmail(
