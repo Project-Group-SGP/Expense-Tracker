@@ -50,6 +50,7 @@ type SetCategory_BudgetProps = {
 export function SetCategory_Budget(props: SetCategory_BudgetProps) {
   const [open, setOpen] = useState(false)
   const [toastShown, setToastShown] = useState(false)
+  const [isPending, setisPending] = useState<boolean>(false)
 
   const router = useRouter()
 
@@ -102,7 +103,7 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
     }
   }, [props.currentBudget, props.expense, toastShown, showWarningToast])
 
-  const handleSubmit = async (data: BudgetFormData) => {
+  const handleSubmit1 = async (data: BudgetFormData) => {
     const budget = Number(data.amount)
 
     function toCategoryType(category: string): CategoryTypes {
@@ -164,6 +165,12 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
     }
   }
 
+  const handleSubmit = async (data: BudgetFormData) => {
+    setisPending(true)
+    await handleSubmit1(data)
+    setisPending(false)
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -210,8 +217,12 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
             />
 
             <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" className="w-full sm:w-auto">
-                Update Budget
+              <Button
+                type="submit"
+                className="w-full sm:w-auto"
+                disabled={isPending}
+              >
+                {isPending ? "Updating..." : "Update Budget"}
               </Button>
             </DialogFooter>
           </form>
