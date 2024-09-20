@@ -241,7 +241,7 @@ export function AddExpense({
           id: loading,
         })
 
-        // router.refresh();
+        router.refresh();
         form.reset();
         // revalidateTag("getGroupTransactionData");
       } else {
