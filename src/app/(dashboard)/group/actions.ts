@@ -242,6 +242,7 @@ export async function cancelPendingRequest(requestId: string) {
     }
 
     await db.joinRequest.delete({ where: { id: requestId } })
+    revalidatePath("/group")
     return { success: true, message: "Request canceled successfully" }
   } catch (error) {
     return {

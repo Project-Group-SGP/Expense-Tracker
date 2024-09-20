@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
@@ -13,9 +13,10 @@ type PendingRequestsListProps = {
 }
 
 export default function PendingRequestsList({
-  requests,
+  requests: initialRequests,
 }: PendingRequestsListProps) {
   const router = useRouter()
+  const [requests, setRequests] = useState(initialRequests)
 
   async function cancelRequest(id: string) {
     const loadingToast = toast.loading("Cancelling request...")
@@ -23,6 +24,9 @@ export default function PendingRequestsList({
       const response = await cancelPendingRequest(id)
       if (response.success) {
         toast.success(response.message, { id: loadingToast })
+        setRequests((prevRequests) =>
+          prevRequests.filter((req) => req.id !== id)
+        )
         router.refresh()
       } else {
         toast.error(response.message, { id: loadingToast })
