@@ -73,7 +73,9 @@ export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:s
     } else {
       const twoFactorToken = await generateTwoFactorToken(existingUser.email)
 
-      await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
+      console.log("2FA: ",twoFactorToken);
+
+      sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
 
       return { twoFactor: true }
     }
