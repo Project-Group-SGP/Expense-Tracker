@@ -17,7 +17,7 @@ export const Resetpass = async({email}:z.infer<typeof ResetSchema>) => {
   if(!existinguser || !existinguser.emailVerified) 
     return {error : "Email not found!"};
 
-  if(!existinguser.image){
+  if(existinguser.image!==null){
     return {error: "You are registered with google"}
   }
 
