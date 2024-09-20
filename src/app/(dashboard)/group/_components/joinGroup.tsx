@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { joinGroup } from "../actions"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   code: z
@@ -38,6 +39,7 @@ type JoinGroupFormData = z.infer<typeof formSchema>
 
 export function JoinGroupModal() {
   const [open, setOpen] = useState(false)
+  const router = useRouter()
 
   const form = useForm<JoinGroupFormData>({
     resolver: zodResolver(formSchema),
@@ -57,6 +59,7 @@ export function JoinGroupModal() {
           id: loadingToast,
         })
         handleClose()
+        router.refresh()
       } else {
         throw new Error(result.message)
       }
