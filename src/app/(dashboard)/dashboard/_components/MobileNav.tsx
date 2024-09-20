@@ -71,22 +71,6 @@ export default function MobileNav() {
                     </Link>
                   </motion.div>
                 ))}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <form action={logout}>
-                    <Button
-                      variant="link"
-                      className="flex items-center gap-2 p-0 h-auto text-black dark:text-white  hover:text-primary text-base"
-                    >
-                      <FiLogOut className="text-xl" />
-                      <span className="border-b-2 border-transparent ">
-                        Logout
-                      </span>
-                    </Button>
-                  </form>
-                </motion.div>
               </nav>
             </motion.section>
           </motion.div>
