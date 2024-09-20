@@ -6,6 +6,7 @@ import { acceptJoinRequest, declineJoinRequest } from "./actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { FaUser } from "react-icons/fa"
+import { set } from "date-fns"
 
 type JoinRequest = {
   id: string
@@ -39,7 +40,16 @@ export function PendingJoinRequests({
           prevRequests.filter((req) => req.id !== requestId)
         )
       } else {
-        toast.error(response.message, { id: loadingToast })
+        if (response.message === "Join request not found.") {
+          toast.error("Join request not found", {
+            id: loadingToast,
+          })
+          setRequests((prevRequests) =>
+            prevRequests.filter((req) => req.id !== requestId)
+          )
+        } else {
+          toast.error(response.message, { id: loadingToast })
+        }
       }
     } catch (error) {
       toast.error("An error occurred", { id: loadingToast })
