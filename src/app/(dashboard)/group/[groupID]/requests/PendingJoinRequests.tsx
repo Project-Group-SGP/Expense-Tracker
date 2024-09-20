@@ -1,6 +1,5 @@
 "use client"
-
-import React, { useState, useEffect, useTransition } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { acceptJoinRequest, declineJoinRequest } from "./actions"
@@ -29,43 +28,40 @@ export function PendingJoinRequests({
 }: PendingJoinRequestsProps) {
   const router = useRouter()
   const [requests, setRequests] = useState(initialRequests)
-  const [isPending, startTransition] = useTransition()
 
-  useEffect(() => {
-    setRequests(initialRequests)
-  }, [initialRequests])
-
-  const handleAction = async (
-    requestId: string,
-    action: typeof acceptJoinRequest | typeof declineJoinRequest,
-    actionName: string
-  ) => {
-    const loadingToast = toast.loading(`${actionName} join request...`)
+  const handleAccept = async (requestId: string) => {
+    const loadingToast = toast.loading("Accepting join request...")
     try {
-      const response = await action(groupID, requestId)
+      const response = await acceptJoinRequest(groupID, requestId)
       if (response.success) {
         toast.success(response.message, { id: loadingToast })
         setRequests((prevRequests) =>
-          prevRequests.filter((request) => request.id !== requestId)
+          prevRequests.filter((req) => req.id !== requestId)
         )
-        startTransition(() => {
-          router.refresh()
-        })
       } else {
         toast.error(response.message, { id: loadingToast })
       }
     } catch (error) {
-      console.error(`Error ${actionName.toLowerCase()} join request:`, error)
-      toast.error(`Failed to ${actionName.toLowerCase()} join request`, {
-        id: loadingToast,
-      })
+      toast.error("An error occurred", { id: loadingToast })
     }
   }
 
-  const handleAccept = (requestId: string) =>
-    handleAction(requestId, acceptJoinRequest, "Accepting")
-  const handleDecline = (requestId: string) =>
-    handleAction(requestId, declineJoinRequest, "Declining")
+  const handleDecline = async (requestId: string) => {
+    const loadingToast = toast.loading("Declining join request...")
+    try {
+      const response = await declineJoinRequest(groupID, requestId)
+      if (response.success) {
+        toast.success(response.message, { id: loadingToast })
+        setRequests((prevRequests) =>
+          prevRequests.filter((req) => req.id !== requestId)
+        )
+      } else {
+        toast.error(response.message, { id: loadingToast })
+      }
+    } catch (error) {
+      toast.error("An error occurred", { id: loadingToast })
+    }
+  }
 
   if (requests.length === 0) {
     return (
@@ -104,14 +100,12 @@ export function PendingJoinRequests({
           <div className="flex w-full space-x-2 sm:w-auto">
             <Button
               onClick={() => handleAccept(request.id)}
-              disabled={isPending}
               className="w-full bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
             >
               Accept
             </Button>
             <Button
               onClick={() => handleDecline(request.id)}
-              disabled={isPending}
               variant="outline"
               className="w-full border-red-500 text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950"
             >
