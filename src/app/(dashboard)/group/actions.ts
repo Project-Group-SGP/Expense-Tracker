@@ -158,12 +158,12 @@ export async function joinGroup(code: string) {
   try {
     const user = await currentUserServer()
 
-    //Check For Login
+    // Check For Login
     if (!user || !user.id) {
       return { success: false, message: "User not authenticated" }
     }
 
-    //Check for validity of the code
+    // Check for validity of the code
     if (code.length !== 6 || !code.match(/^[a-zA-Z0-9]+$/)) {
       return { success: false, message: "Invalid group code" }
     }
@@ -173,12 +173,12 @@ export async function joinGroup(code: string) {
       include: { members: true, joinRequests: true },
     })
 
-    //If no such group is found
+    // If no such group is found
     if (!group) {
       return { success: false, message: "Group not found" }
     }
 
-    //Check if user is already a member
+    // Check if user is already a member
     const isMember = group.members.some((member) => member.userId === user.id)
     if (isMember) {
       return {
@@ -187,7 +187,7 @@ export async function joinGroup(code: string) {
       }
     }
 
-    //Check if user has a pending request to thais group
+    // Check if user has a pending request to this group
     const hasPendingRequest = group.joinRequests.some(
       (request) => request.userId === user.id && request.status === "PENDING"
     )
@@ -198,7 +198,7 @@ export async function joinGroup(code: string) {
       }
     }
 
-    await db.joinRequest.create({
+    const newJoinRequest = await db.joinRequest.create({
       data: {
         userId: user.id,
         groupId: group.id,
@@ -207,9 +207,19 @@ export async function joinGroup(code: string) {
     })
 
     sendJoinRequestNotification(group.id, user.id)
-    // revalidatePath("/group")
 
-    return { success: true, message: "Join request sent successfully" }
+    return {
+      success: true,
+      message: "Join request sent successfully",
+      requestId: newJoinRequest.id,
+      userId: user.id,
+      groupId: group.id,
+      groupName: group.name,
+      groupCode: group.code,
+      groupDescription: group.description,
+      groupImage: group.photo,
+      groupCreator: group.creatorId,
+    }
   } catch (error) {
     return {
       success: false,
@@ -242,7 +252,6 @@ export async function cancelPendingRequest(requestId: string) {
     }
 
     await db.joinRequest.delete({ where: { id: requestId } })
-    revalidatePath("/group")
     return { success: true, message: "Request canceled successfully" }
   } catch (error) {
     return {

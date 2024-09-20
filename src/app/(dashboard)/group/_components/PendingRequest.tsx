@@ -1,5 +1,4 @@
-"use client"
-import React, { useState } from "react"
+import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
@@ -8,15 +7,18 @@ import { cancelPendingRequest } from "../actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
+type PendingRequest = JoinRequest & { group: Group }
+
 type PendingRequestsListProps = {
-  requests: (JoinRequest & { group: Group })[]
+  requests: PendingRequest[]
+  onRequestCancel: (id: string) => void
 }
 
 export default function PendingRequestsList({
-  requests: initialRequests,
+  requests,
+  onRequestCancel,
 }: PendingRequestsListProps) {
   const router = useRouter()
-  const [requests, setRequests] = useState(initialRequests)
 
   async function cancelRequest(id: string) {
     const loadingToast = toast.loading("Cancelling request...")
@@ -24,9 +26,7 @@ export default function PendingRequestsList({
       const response = await cancelPendingRequest(id)
       if (response.success) {
         toast.success(response.message, { id: loadingToast })
-        setRequests((prevRequests) =>
-          prevRequests.filter((req) => req.id !== id)
-        )
+        onRequestCancel(id)
       } else {
         toast.error(response.message, { id: loadingToast })
       }
@@ -36,6 +36,11 @@ export default function PendingRequestsList({
       })
     }
   }
+
+  if (requests.length === 0) {
+    return null
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">

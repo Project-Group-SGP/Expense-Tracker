@@ -1,6 +1,5 @@
 "use client"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -26,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { joinGroup } from "../actions"
 import { useRouter } from "next/navigation"
+import { MemberGroup, PendingRequest } from "../page"
 
 const formSchema = z.object({
   code: z
@@ -37,7 +37,13 @@ const formSchema = z.object({
 
 type JoinGroupFormData = z.infer<typeof formSchema>
 
-export function JoinGroupModal() {
+export function JoinGroupModal({
+  memberGroups,
+  onJoinRequest,
+}: {
+  memberGroups: MemberGroup[]
+  onJoinRequest: (newRequest: PendingRequest) => void
+}) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -50,6 +56,13 @@ export function JoinGroupModal() {
 
   const handleSubmit = async (data: JoinGroupFormData) => {
     const loadingToast = toast.loading("Sending join request...")
+
+    if (memberGroups.find((group) => group.code === data.code)) {
+      toast.error("You are already a member of this group", {
+        id: loadingToast,
+      })
+      return
+    }
     try {
       const result = await joinGroup(data.code)
       if (result.success) {
@@ -58,8 +71,24 @@ export function JoinGroupModal() {
           duration: 4500,
           id: loadingToast,
         })
+        // Create a new PendingRequest object
+        const newRequest: PendingRequest = {
+          id: result.requestId!,
+          userId: result.userId!,
+          groupId: result.groupId!,
+          status: "PENDING",
+          createdAt: new Date(),
+          group: {
+            id: result.groupId!,
+            name: result.groupName!,
+            description: result.groupDescription!,
+            code: result.groupCode!,
+            photo: result.groupImage!,
+            creatorId: result.groupCreator!,
+          },
+        }
+        onJoinRequest(newRequest)
         handleClose()
-        router.refresh()
       } else {
         throw new Error(result.message)
       }
