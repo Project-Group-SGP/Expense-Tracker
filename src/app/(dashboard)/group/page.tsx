@@ -98,6 +98,7 @@ export default async function GroupManagementPage() {
             <div className="mt-3 flex w-full flex-row gap-2 sm:mt-0 sm:w-auto">
               <AddGroupModal />
               {/* <JoinGroupModal memberGroups={memberGroups} /> */}
+              <JoinGroupModal />
             </div>
           </div>
 
