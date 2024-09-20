@@ -1,61 +1,38 @@
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Member } from "./Member";
+'use client'
 
-// type GroupMemberProps = {
-//   groupMemberName: {
-//     userId: string;
-//     name: string;
-//     avatar?: string;
-//   }[];
-// };
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Member } from "./Member"
+import { GroupMemberSkeleton } from "./GroupMemberSkeleton"
 
-// const GroupMember = ({ groupMemberName }: GroupMemberProps) => {
-//   return (
-//     <Card>
-//       <CardHeader>
-//         <CardTitle>Group Member</CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         {groupMemberName.map((member, index) => (
-//           <Member
-//             key={member.userId}
-//             name={member.name}
-//             status={index === 0 ? "owes" : "gets back"} // Example logic
-//             amount="₹66.66"  // Example amount, you can modify it as needed
-//             amountColor={index === 0 ? "red" : "green"} // Example colors
-            
-//           />
-//         ))}
-//       </CardContent>
-//     </Card>
-//   );
-// };
+export interface GetBalance {
+  userId: string
+  name: string
+  status: 'settled up' | 'gets back' | 'owes'
+  amount: number
+  amountColor: string
+  avatar: string
+}
 
-// export default GroupMember;
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Member } from "./Member";
-import { GroupMemberSkeleton } from "./GroupMemberSkeleton";
-import {GetBalance} from "../page"
+interface GroupMemberProps {
+  loading: boolean
+  balance: GetBalance[]
+}
 
-type GroupMemberProps = {
-  loading:boolean,
-  balance:GetBalance[]
-};
-export const GroupMember = ({ loading, balance }: { loading: boolean; balance: GetBalance[] }) => {
+export const GroupMember = ({ loading, balance }: GroupMemberProps) => {
   return (
-    <Card className="w-screen sm:w-auto ">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl sm:text-2xl">Group Members</CardTitle>
+        <CardTitle className="text-xl md:text-2xl">Group Members</CardTitle>
       </CardHeader>
       <CardContent>
         {!loading && balance.map((member) => (
           <Member
             key={member.userId}
             name={member.name}
-            status={member.status || ""}
+            status={member.status}
             amount={member.amount}
             amountColor={member.amountColor}
-            avatar={member.avatar || ""}
+            avatar={member.avatar}
             userId={member.userId}
           />
         ))}
@@ -68,5 +45,5 @@ export const GroupMember = ({ loading, balance }: { loading: boolean; balance: G
         )}
       </CardContent>
     </Card>
-  );
-};
+  )
+}
