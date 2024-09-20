@@ -28,7 +28,7 @@ export const Member = ({ name, status, amount, amountColor, avatar, userId }: Me
         </div>
         <div className={`flex items-center text-base md:text-lg font-semibold mt-2 md:mt-0 ${status === "settled up" ? "text-gray-500" : amountColor}`}>
           {status !== "settled up" && (
-            <IndianRupee className="mr-1 text-lg md:text-xl" />
+            "₹"
           )}
           {Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
