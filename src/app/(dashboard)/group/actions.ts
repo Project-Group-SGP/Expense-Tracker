@@ -1,6 +1,7 @@
 "use server"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { revalidatePath } from "next/cache"
 import webpush from "web-push"
 
 interface AddGroupData {
@@ -206,6 +207,7 @@ export async function joinGroup(code: string) {
     })
 
     sendJoinRequestNotification(group.id, user.id)
+    revalidatePath("/group")
 
     return { success: true, message: "Join request sent successfully" }
   } catch (error) {

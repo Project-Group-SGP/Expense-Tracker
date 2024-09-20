@@ -41,7 +41,7 @@ type JoinGroupFormData = z.infer<typeof formSchema>
 
 export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
+  // const router = useRouter()
 
   const form = useForm<JoinGroupFormData>({
     resolver: zodResolver(formSchema),
@@ -81,7 +81,7 @@ export function JoinGroupModal({ memberGroups }: { memberGroups: Group[] }) {
   const handleClose = () => {
     setOpen(false)
     form.reset()
-    router.refresh()
+    // router.refresh()
   }
 
   const validateJoinRequest = (code: string) => {
