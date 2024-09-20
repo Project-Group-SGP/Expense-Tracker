@@ -31,6 +31,10 @@ export const newPassword = async(values:z.infer<typeof NewPasswordSchema>,token?
   if(!existingUser)
     return {error:"Email does not exist"}
 
+  if(existingUser.image!==null){
+    return {error:"You are registered with google"}
+  }
+
   const hashedPassword = await bcrypt.hash(password,10);
 
   await db.user.update({

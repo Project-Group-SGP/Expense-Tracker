@@ -39,10 +39,10 @@ export const ResetpasswordForm = () => {
     startTransition(()=>{
       Resetpass(values)
         .then((data)=>{
-            setError(data?.error);
-            //TODO 2 factor authentation 
-            setSuccess(data?.success);
-            
+          if(data.success === undefined)
+            setError(data.error);
+          else 
+            setSuccess(data.success);    
         })
     });
   }

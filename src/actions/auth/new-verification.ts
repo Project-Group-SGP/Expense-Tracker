@@ -24,24 +24,36 @@ export const newVerification = async(token:string)=>{
     return {error : "User does not exist!"}
   }
 
-  await db.user.update({
-    where:{
-      id: existingUser.id
-    },
-    data:{
-      emailVerified:new Date(),
+  if(existingUser.emailVerified){
+    return {error:"Email already verified!"}
+  }
 
-      // Reuse this when user wants to change there email
-      email:existingToken.email
-    }
-  });
+  if(existingUser.image!==null){
+    return {error:"You are registered with google"}
+  }
 
-  await db.tokens.delete({
-    where:{
-      id:existingToken.id,
-      type:"EmailVerification"
-    }
-  });
+  try{
+      await db.user.update({
+      where:{
+        id: existingUser.id
+      },
+      data:{
+        emailVerified:new Date(),
+
+        // Reuse this when user wants to change there email
+        email:existingToken.email
+      }
+    });
+
+    await db.tokens.delete({
+      where:{
+        id:existingToken.id,
+        type:"EmailVerification"
+      }
+    });
+  }catch(e){
+    return {error:"Error in EmailVerification"};
+  }
 
   return {success: "Email verified!" };
 } 
