@@ -667,7 +667,7 @@ export async function generateReport(
   }
 
   if (emailReport && emailAddress) {
-    await sendReportEmail(emailAddress, reportBuffer, reportFormat, name)
+    sendReportEmail(emailAddress, reportBuffer, reportFormat, name)
     return {
       buffer: "Report sent to your email successfully!",
       mimeType: "",
