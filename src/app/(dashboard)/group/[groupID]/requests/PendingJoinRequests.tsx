@@ -26,17 +26,17 @@ export function PendingJoinRequests({
   requests,
   groupID,
 }: PendingJoinRequestsProps) {
-  const router = useRouter()
+  // const router = useRouter()
 
   const handleAccept = async (requestId: string) => {
     const loadingToast = toast.loading("Accepting join request...")
     const response = await acceptJoinRequest(groupID, requestId)
     if (response.success) {
       toast.success(response.message, { id: loadingToast })
-      router.refresh()
+      // router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
-      router.refresh()
+      // router.refresh()
     }
   }
 
@@ -45,10 +45,10 @@ export function PendingJoinRequests({
     const response = await declineJoinRequest(groupID, requestId)
     if (response.success) {
       toast.success(response.message, { id: loadingToast })
-      router.refresh()
+      // router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
-      router.refresh()
+      // router.refresh()
     }
   }
 
