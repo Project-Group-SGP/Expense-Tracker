@@ -23,7 +23,7 @@ export default function PendingRequestsList({
       const response = await cancelPendingRequest(id)
       if (response.success) {
         toast.success(response.message, { id: loadingToast })
-        router.refresh()
+        // router.refresh()
       } else {
         toast.error(response.message, { id: loadingToast })
       }

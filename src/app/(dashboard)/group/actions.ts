@@ -207,7 +207,7 @@ export async function joinGroup(code: string) {
     })
 
     sendJoinRequestNotification(group.id, user.id)
-    // revalidatePath("/group")
+    revalidatePath("/group")
 
     return { success: true, message: "Join request sent successfully" }
   } catch (error) {
@@ -242,6 +242,7 @@ export async function cancelPendingRequest(requestId: string) {
     }
 
     await db.joinRequest.delete({ where: { id: requestId } })
+    revalidatePath("/group")
     return { success: true, message: "Request canceled successfully" }
   } catch (error) {
     return {
