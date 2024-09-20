@@ -252,7 +252,7 @@ async function sendSettleUpNotification(
 
     const notificationPayload = JSON.stringify({
       title: `Settlement in "${group.name}"`,
-      body: `${payer.name} paid ${recipient.name} $${totalAmount}`,
+      body: `${payer.name} paid ${recipient.name} ₹${totalAmount}`,
       type: "SettleUp",
       data: {
         url: `/group/${groupId}`,
