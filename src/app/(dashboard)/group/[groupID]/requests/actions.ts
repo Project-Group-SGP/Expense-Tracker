@@ -58,9 +58,6 @@ export async function acceptJoinRequest(groupId: string, requestId: string) {
       groupId,
       joinRequest.user.name!
     )
-
-    revalidatePath(`/group/${groupId}/requests`)
-
     return { success: true, message: "Join request accepted." }
   } catch (error) {
     console.error("Error accepting join request:", error)
