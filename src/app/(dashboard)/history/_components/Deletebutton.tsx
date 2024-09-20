@@ -1,35 +1,3 @@
-// Delete Button Version-1
-
-// import { Button } from "@/components/ui/button";
-// import { Trash } from "lucide-react";
-// import { cn } from "@/lib/utils"; // Assuming you have this utility for conditional classes
-// const DeleteButton = ({ disabled, HandleOnclick, table }) => {
-//   return (
-//     <Button
-//       size={"sm"}
-//       variant={"outline"}
-//       className={cn(
-//         "ml-auto font-normal text-xs flex items-center justify-center space-x-2 transition-all duration-300 ease-in-out",
-//         "hover:bg-red-100 hover:text-red-600 hover:scale-105", // Hover effect
-//         "active:scale-95 active:shadow-lg", // Active press effect
-//         disabled && "opacity-50 pointer-events-none" // Disabled styling
-//       )}
-//       disabled={disabled}
-//       onClick={HandleOnclick}
-//     >
-//       <Trash
-//         className={cn(
-//           "mr-2 h-4 w-4 transition-transform duration-300", // Animate the icon
-//           !disabled && "hover:rotate-12 hover:text-red-500" // Rotate slightly and change color on hover
-//         )}
-//       />
-//       <span>Delete ({table.getFilteredSelectedRowModel().rows.length})</span>
-//     </Button>
-//   );
-// };
-// export default DeleteButton;
-
-
 // Delete Button Version-2
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

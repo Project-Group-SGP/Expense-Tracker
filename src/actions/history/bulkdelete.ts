@@ -47,7 +47,8 @@ export const bulkdelete = async(values:z.infer<typeof bulkdeleteProps>)=>{
       }),
     ]);
     revalidateTag("getTransactions");
-    return {success:"Successfully Deleted!!"};
+    console.log("\n\n\n\n YAA")
+    return { success:"Successfully Deleted!!" };
   }catch(e){
     console.error("Error deleting transactions:", e);
     return { error:"Failed to delete transactions" };
