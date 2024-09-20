@@ -207,7 +207,7 @@ export async function joinGroup(code: string) {
     })
 
     sendJoinRequestNotification(group.id, user.id)
-    revalidatePath("/group")
+    // revalidatePath("/group")
 
     return { success: true, message: "Join request sent successfully" }
   } catch (error) {

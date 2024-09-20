@@ -1,9 +1,8 @@
 "use server"
 
-import { db } from "@/lib/db"
 import { currentUserServer } from "@/lib/auth"
+import { db } from "@/lib/db"
 import webpush from "web-push"
-import { revalidatePath } from "next/cache"
 
 // Accept Join Request
 export async function acceptJoinRequest(groupId: string, requestId: string) {
@@ -58,6 +57,7 @@ export async function acceptJoinRequest(groupId: string, requestId: string) {
       groupId,
       joinRequest.user.name!
     )
+
     return { success: true, message: "Join request accepted." }
   } catch (error) {
     console.error("Error accepting join request:", error)
@@ -102,8 +102,6 @@ export async function declineJoinRequest(groupId: string, requestId: string) {
     })
 
     sendRejectNotification(group.name, userId.userId)
-    // revalidatePath(`/group/${groupId}/requests`)
-
     return { success: true, message: "Join request declined." }
   } catch (error) {
     console.error("Error declining join request:", error)

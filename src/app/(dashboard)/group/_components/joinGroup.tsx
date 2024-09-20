@@ -1,6 +1,5 @@
 "use client"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { joinGroup } from "../actions"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   code: z
@@ -38,6 +38,8 @@ type JoinGroupFormData = z.infer<typeof formSchema>
 
 export function JoinGroupModal() {
   const [open, setOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
   const form = useForm<JoinGroupFormData>({
     resolver: zodResolver(formSchema),
@@ -47,24 +49,24 @@ export function JoinGroupModal() {
   })
 
   const handleSubmit = async (data: JoinGroupFormData) => {
-    const loadingToast = toast.loading("Sending join request...")
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
     try {
       const result = await joinGroup(data.code)
       if (result.success) {
-        toast.success(result.message, {
-          closeButton: true,
-          duration: 4500,
-          id: loadingToast,
-        })
+        toast.success(result.message)
         handleClose()
+        router.refresh()
       } else {
-        throw new Error(result.message)
+        toast.error(result.message)
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to join group",
-        { id: loadingToast }
+        error instanceof Error ? error.message : "Failed to join group"
       )
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -114,8 +116,9 @@ export function JoinGroupModal() {
               <Button
                 type="submit"
                 className="w-full bg-primary text-white hover:bg-primary/90 sm:w-auto"
+                disabled={isSubmitting}
               >
-                Join Group
+                {isSubmitting ? "Joining..." : "Join Group"}
               </Button>
             </DialogFooter>
           </form>
