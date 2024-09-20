@@ -255,5 +255,3 @@ export default async function GroupPage({
       </div>
   )
 }
-
-export const dynamic = 'force-dynamic'
