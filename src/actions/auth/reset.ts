@@ -21,11 +21,9 @@ export const Resetpass = async({email}:z.infer<typeof ResetSchema>) => {
     return {error: "You are registered with google"}
   }
 
-
   const passwordResettoken = await generatePasswordResetToken(validatedFields.data.email);
 
-
-  await sendPasswordResetEmail(
+  sendPasswordResetEmail(
     passwordResettoken.email,
     passwordResettoken.token,
   );
