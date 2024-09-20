@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -27,63 +28,38 @@ export function PendingJoinRequests({
 }: PendingJoinRequestsProps) {
   const router = useRouter()
   const [requests, setRequests] = useState(initialRequests)
-  const [pendingActions, setPendingActions] = useState<Set<string>>(new Set())
 
   const handleAccept = async (requestId: string) => {
-    // Optimistic update
-    setRequests((prevRequests) =>
-      prevRequests.filter((req) => req.id !== requestId)
-    )
-    setPendingActions((prev) => new Set(prev).add(requestId))
-
+    const loadingToast = toast.loading("Accepting join request...")
     try {
       const response = await acceptJoinRequest(groupID, requestId)
       if (response.success) {
-        toast.success(response.message)
+        toast.success(response.message, { id: loadingToast })
+        setRequests((prevRequests) =>
+          prevRequests.filter((req) => req.id !== requestId)
+        )
       } else {
-        // Revert optimistic update on failure
-        setRequests(initialRequests)
-        toast.error(response.message)
+        toast.error(response.message, { id: loadingToast })
       }
     } catch (error) {
-      // Revert optimistic update on error
-      setRequests(initialRequests)
-      toast.error("An error occurred while accepting the request")
-    } finally {
-      setPendingActions((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(requestId)
-        return newSet
-      })
+      toast.error("An error occurred", { id: loadingToast })
     }
   }
 
   const handleDecline = async (requestId: string) => {
-    // Optimistic update
-    setRequests((prevRequests) =>
-      prevRequests.filter((req) => req.id !== requestId)
-    )
-    setPendingActions((prev) => new Set(prev).add(requestId))
-
+    const loadingToast = toast.loading("Declining join request...")
     try {
       const response = await declineJoinRequest(groupID, requestId)
       if (response.success) {
-        toast.success(response.message)
+        toast.success(response.message, { id: loadingToast })
+        setRequests((prevRequests) =>
+          prevRequests.filter((req) => req.id !== requestId)
+        )
       } else {
-        // Revert optimistic update on failure
-        setRequests(initialRequests)
-        toast.error(response.message)
+        toast.error(response.message, { id: loadingToast })
       }
     } catch (error) {
-      // Revert optimistic update on error
-      setRequests(initialRequests)
-      toast.error("An error occurred while declining the request")
-    } finally {
-      setPendingActions((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(requestId)
-        return newSet
-      })
+      toast.error("An error occurred", { id: loadingToast })
     }
   }
 
@@ -125,17 +101,15 @@ export function PendingJoinRequests({
             <Button
               onClick={() => handleAccept(request.id)}
               className="w-full bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
-              disabled={pendingActions.has(request.id)}
             >
-              {pendingActions.has(request.id) ? "Processing..." : "Accept"}
+              Accept
             </Button>
             <Button
               onClick={() => handleDecline(request.id)}
               variant="outline"
               className="w-full border-red-500 text-red-500 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950"
-              disabled={pendingActions.has(request.id)}
             >
-              {pendingActions.has(request.id) ? "Processing..." : "Decline"}
+              Decline
             </Button>
           </div>
         </div>
