@@ -216,5 +216,3 @@ export default async function GroupPage({
     <GroupID group={group} balance={balance} groupMembers={groupMembers} leave={leave} transactionData={transactionData} name={user?.name} usersYouNeedToPay={usersYouNeedToPay} user={user.id}/>
   )
 }
-
-export const dynamic = 'force-dynamic'

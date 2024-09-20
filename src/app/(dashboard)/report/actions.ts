@@ -401,12 +401,12 @@ export async function generateReport(
         doc.setFontSize(16)
         doc.setTextColor("#2E7D32")
         doc.setFont("helvetica", "bold")
-        doc.text("Expense Distribution", 14, 175)
+        doc.text("Expense Distribution", 14, 173)
 
         // Improve layout of category totals
         let leftCol = 20
         let rightCol = pageWidth / 2 + 10
-        yPos = 190
+        yPos = 183
         expensesByCategory.forEach((category, index) => {
           doc.setFontSize(10)
           doc.setFont("helvetica", "normal")
@@ -441,7 +441,7 @@ export async function generateReport(
             yPos
           )
 
-          if (index % 2 !== 0) yPos += 10
+          if (index % 2 !== 0) yPos += 8
         })
         yPos = Math.max(yPos + 20, 250)
       } else {
@@ -453,24 +453,24 @@ export async function generateReport(
       doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
       doc.setTextColor("#F44336")
-      doc.text(`Total Expense:`, 14, yPos - 5)
-      doc.text(`-${totalExpenses.toFixed(2)}`, pageWidth - 14, yPos - 5, {
+      doc.text(`Total Expense:`, 14, yPos - 12)
+      doc.text(`-${totalExpenses.toFixed(2)}`, pageWidth - 14, yPos - 11, {
         align: "right",
       })
       yPos += 15
       if (includeIncome) {
         doc.setTextColor("#2E7D32")
-        doc.text(`Total Income:`, 14, yPos - 5)
-        doc.text(`+${totalIncome.toFixed(2)}`, pageWidth - 14, yPos - 5, {
+        doc.text(`Total Income:`, 14, yPos - 12)
+        doc.text(`+${totalIncome.toFixed(2)}`, pageWidth - 14, yPos - 11, {
           align: "right",
         })
         yPos += 15
         doc.setTextColor("#1976D2")
-        doc.text(`Net:`, 14, yPos - 5)
+        doc.text(`Net:`, 14, yPos - 12)
         doc.text(
           `${(totalIncome - totalExpenses).toFixed(2)}`,
           pageWidth - 14,
-          yPos - 5,
+          yPos - 11,
           { align: "right" }
         )
       }

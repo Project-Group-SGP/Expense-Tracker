@@ -376,6 +376,11 @@ export async function AddGroupExpense(params: {
     // Send notification
     sendExpenseNotification(params.groupID, response.id, params.paidById, params.amount, params.title);
 
+    // revalidatePath(`/groups/${params.groupID}`);
+    // revalidateTag("getGroupTransactiondata")
+    // revalidateTag("getGroupBalance")
+    // revalidateTag("getGroupdata")
+
     return { success: true };
 }
 
