@@ -27,7 +27,6 @@ export default function PendingRequestsList({
         setRequests((prevRequests) =>
           prevRequests.filter((req) => req.id !== id)
         )
-        router.refresh()
       } else {
         toast.error(response.message, { id: loadingToast })
       }
