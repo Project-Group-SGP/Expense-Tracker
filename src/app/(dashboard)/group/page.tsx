@@ -10,6 +10,7 @@ import { JoinGroupModal } from "./_components/joinGroup"
 import MemberGroupsList from "./_components/MemberGroup"
 import PendingRequestsList from "./_components/PendingRequest"
 import { Suspense } from "react"
+import Loading from "./loading"
 
 export type CreatedGroup = {
   id: string
@@ -102,7 +103,7 @@ export default async function GroupManagementPage() {
             </div>
           </div>
 
-          <Suspense>
+          <Suspense fallback={<Loading />}>
             {createdGroupsData.length > 0 && (
               <CreatedGroupsList groups={createdGroupsData} />
             )}

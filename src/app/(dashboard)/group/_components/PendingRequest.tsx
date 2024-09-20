@@ -6,7 +6,7 @@ import { X } from "lucide-react"
 import { JoinRequest, Group } from "@prisma/client"
 import { cancelPendingRequest } from "../actions"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 
 type PendingRequestsListProps = {
   requests: (JoinRequest & { group: Group })[]
@@ -15,7 +15,7 @@ type PendingRequestsListProps = {
 export default function PendingRequestsList({
   requests,
 }: PendingRequestsListProps) {
-  const router = useRouter()
+  // const router = useRouter()
 
   async function cancelRequest(id: string) {
     const loadingToast = toast.loading("Cancelling request...")
