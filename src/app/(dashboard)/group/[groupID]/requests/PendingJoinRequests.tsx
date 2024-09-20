@@ -1,5 +1,6 @@
 "use client"
-import React from "react"
+
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { acceptJoinRequest, declineJoinRequest } from "./actions"
@@ -23,20 +24,21 @@ type PendingJoinRequestsProps = {
 }
 
 export function PendingJoinRequests({
-  requests,
+  requests: initialRequests,
   groupID,
 }: PendingJoinRequestsProps) {
-  // const router = useRouter()
+  const router = useRouter()
+  const [requests, setRequests] = useState(initialRequests)
 
   const handleAccept = async (requestId: string) => {
     const loadingToast = toast.loading("Accepting join request...")
     const response = await acceptJoinRequest(groupID, requestId)
     if (response.success) {
       toast.success(response.message, { id: loadingToast })
-      // router.refresh()
+      setRequests(requests.filter((request) => request.id !== requestId))
+      router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
-      // router.refresh()
     }
   }
 
@@ -45,10 +47,10 @@ export function PendingJoinRequests({
     const response = await declineJoinRequest(groupID, requestId)
     if (response.success) {
       toast.success(response.message, { id: loadingToast })
-      // router.refresh()
+      setRequests(requests.filter((request) => request.id !== requestId))
+      router.refresh()
     } else {
       toast.error(response.message, { id: loadingToast })
-      // router.refresh()
     }
   }
 

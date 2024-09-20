@@ -105,7 +105,7 @@ export async function declineJoinRequest(groupId: string, requestId: string) {
     })
 
     sendRejectNotification(group.name, userId.userId)
-    revalidatePath(`/group/${groupId}/requests`)
+    // revalidatePath(`/group/${groupId}/requests`)
 
     return { success: true, message: "Join request declined." }
   } catch (error) {
