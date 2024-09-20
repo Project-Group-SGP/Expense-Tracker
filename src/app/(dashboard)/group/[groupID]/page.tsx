@@ -9,12 +9,13 @@ import { GroupMember } from "./_components/GroupMember"
 import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "./_components/PageTitle"
-
+import TransactionTableSkeleton from "./_components/TransactionSkeleton"
+import { Compatable } from "./_components/compatable"
+import {GroupID} from "./GroupID"
 interface Group {
   id: string
   name: string
 }
-
 interface GroupMemberDetails {
   userId: string
   name: string
@@ -51,7 +52,6 @@ interface UserToPay {
 
 interface GetResponse {
   group: Group | null
-  pendingPayments: ExpenseSplit[]
   usersToPay: UserToPay[]
 }
 
@@ -93,7 +93,7 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["getGroupdata"] },
-        cache: "force-cache",
+        cache: "no-cache",
       }
     )
 
@@ -107,7 +107,6 @@ async function getAllData(groupID: string, cookie: string): Promise<GetResponse>
     console.error("Error fetching data:", error)
     return {
       group: null,
-      pendingPayments: [],
       usersToPay: [],
     }
   }
@@ -119,7 +118,7 @@ const fetchGroupBalances = async (groupId: string,cookie: string):Promise<GetBal
         method: "GET",
         headers: { Cookie: cookie },
         next: { tags: ["getGroupBalance"] },
-        cache: "force-cache",
+        cache: "no-cache",
       });
 
     if (!res.ok) {
@@ -144,7 +143,7 @@ async function getGroupTransactionData(groupID: string, cookie: string): Promise
       {
         method: "GET",
         headers: { Cookie: cookie },
-        cache: "force-cache",
+        cache: "no-cache",
         next: { tags: ["getGroupTransactiondata"] },
       }
     )
@@ -211,48 +210,10 @@ export default async function GroupPage({
     amount: findcurrentuser?.amount ?? 0,
     userId: findcurrentuser?.userId ?? "",
     groupId: params.groupID
-  }  
+  }
 
   return (
-      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
-        <div className="mt-20 flex w-full flex-col gap-5 px-4">
-          <PageTitle title={group.name} leave={leave} createrId={group.creatorId}/>
-          <div className="flex w-full flex-wrap items-center justify-between gap-4">
-            <p>
-              Welcome Back,
-              <span className="text font-semibold text-orange-500 dark:text-sky-500">
-                {" "}
-                {user?.name.split(" ")[0]}{" "}
-              </span>
-              👋
-            </p>
-            <div className="w-full sm:ml-auto flex gap-2 sm:w-auto">
-            <AddExpense
-                params={{ groupID: params.groupID }}
-                groupMemberName={groupMembers}
-                user={user.id}
-              />
-              <SettleUp
-                params={{ groupID: params.groupID }}
-                groupMemberName={groupMembers}
-                usersYouNeedToPay={usersYouNeedToPay.map((user) => ({
-                  ...user,
-                  expenses: [],
-                }))}
-                user={user.id}
-              />
-            </div>
-          </div>
-          <section className="text-bl grid w-full gap-4 transition-all grid-cols-1 lg:grid-cols-3">
-            <Cardcontent className="border-none p-0 col-span-1 md:col-span-2 ">
-              <Transaction transactionsData={transactionData} loading={false}/>
-            </Cardcontent>
-            <Cardcontent className="border-none p-0 w-full col-span-1 md:col-span-1">
-              <GroupMember loading={false} balance={balance} />
-            </Cardcontent>
-          </section>
-        </div>
-      </div>
+    <GroupID group={group} balance={balance} groupMembers={groupMembers} leave={leave} transactionData={transactionData} name={user?.name} usersYouNeedToPay={usersYouNeedToPay} user={user.id}/>
   )
 }
 

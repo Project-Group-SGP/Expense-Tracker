@@ -25,26 +25,7 @@ export async function GET(req: NextRequest) {
     if (!group) {
       return new NextResponse("Group not found", { status: 404 });
     }
-
-    // Get pending payments
-    const pendingPayments = await db.expenseSplit.findMany({
-      where: {
-        userId: user.id,
-        expense: { groupId: group.id },
-        isPaid: {in:["UNPAID","PARTIALLY_PAID"] },
-      },
-      select: {
-        id:true,
-        amount: true,
-        expense: {
-          select: {
-            paidBy: { select: { id: true, name: true, image: true } },
-          },
-        },
-        payments: { select: { amount: true } },
-      },
-    });
-
+    
     // Get users the current user needs to pay
     const expenseSplits = await db.expenseSplit.findMany({
       where: {
@@ -91,7 +72,6 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json({
       group,
-      pendingPayments,
       usersToPay,
     });
     
