@@ -3,7 +3,7 @@ name: Keep API Alive
 on:
   schedule:
     # This will run every 3 hours
-    - cron: '0 */3 * * *'
+    - cron: '0 */1 * * *'
   workflow_dispatch:  # This allows manual triggering of the workflow
 
 jobs:
