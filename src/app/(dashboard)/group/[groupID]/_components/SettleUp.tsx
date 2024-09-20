@@ -260,7 +260,7 @@ export function SettleUp({
         duration: 4500,
       })
  
-      router.refresh();
+      // router.refresh();
       form.reset()
     } catch (error) {
       console.error(error)

@@ -10,7 +10,6 @@ import { GroupMember } from "./GroupMember"
 import Transaction from "./Transaction"
 
 
-
 interface GroupClientProps {
   groupName: string
   creatorId: string
