@@ -9,6 +9,7 @@ import CreatedGroupsList from "./_components/CreatedGroups"
 import { JoinGroupModal } from "./_components/joinGroup"
 import MemberGroupsList from "./_components/MemberGroup"
 import PendingRequestsList from "./_components/PendingRequest"
+import { Suspense } from "react"
 
 export type CreatedGroup = {
   id: string
@@ -100,36 +101,38 @@ export default async function GroupManagementPage() {
             </div>
           </div>
 
-          {createdGroupsData.length > 0 && (
-            <CreatedGroupsList groups={createdGroupsData} />
-          )}
-
-          {memberGroups.length > 0 && (
-            <MemberGroupsList groups={memberGroups} />
-          )}
-
-          {pendingRequests.length > 0 && (
-            <PendingRequestsList requests={pendingRequests} />
-          )}
-
-          {createdGroupsData.length === 0 &&
-            memberGroups.length === 0 &&
-            pendingRequests.length === 0 && (
-              <Card className="bg-white dark:bg-zinc-900">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
-                    <Users size={24} />
-                    No Groups Yet
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    You haven't joined any groups yet. Create a new group or
-                    join an existing one to get started!
-                  </p>
-                </CardContent>
-              </Card>
+          <Suspense>
+            {createdGroupsData.length > 0 && (
+              <CreatedGroupsList groups={createdGroupsData} />
             )}
+
+            {memberGroups.length > 0 && (
+              <MemberGroupsList groups={memberGroups} />
+            )}
+
+            {pendingRequests.length > 0 && (
+              <PendingRequestsList requests={pendingRequests} />
+            )}
+
+            {createdGroupsData.length === 0 &&
+              memberGroups.length === 0 &&
+              pendingRequests.length === 0 && (
+                <Card className="bg-white dark:bg-zinc-900">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                      <Users size={24} />
+                      No Groups Yet
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      You haven't joined any groups yet. Create a new group or
+                      join an existing one to get started!
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+          </Suspense>
         </div>
       </div>
     </>
