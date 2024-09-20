@@ -31,7 +31,7 @@ export default async function GroupManagementPage() {
   const user = await currentUserServer()
 
   if (!user) {
-    redirect("/auth/signin")
+    return <h1>You are not authenticated</h1>
   }
 
   const [createdGroups, memberGroups, pendingRequests] = await Promise.all([
