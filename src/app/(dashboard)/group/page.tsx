@@ -10,8 +10,6 @@ import { JoinGroupModal } from "./_components/joinGroup"
 import MemberGroupsList from "./_components/MemberGroup"
 import PendingRequestsList from "./_components/PendingRequest"
 
-export const dynamic = "force-static"
-
 export type CreatedGroup = {
   id: string
   name: string
