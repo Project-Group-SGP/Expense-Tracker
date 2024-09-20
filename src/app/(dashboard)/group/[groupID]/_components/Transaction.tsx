@@ -435,7 +435,7 @@ const columns = [
   { id: 'action', label: 'View split', sortable: false },
 ]
 
-export default function Component({ transactionsData, loading }: { transactionsData: Transaction[], loading: boolean }) {
+export default function Transaction({ transactionsData, loading }: { transactionsData: Transaction[], loading: boolean }) {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null)
   const [showDetailed, setShowDetailed] = useState(false)
   const [selectedColumns, setSelectedColumns] = useState(columns.map(col => col.id))
