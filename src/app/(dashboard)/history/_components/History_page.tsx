@@ -130,11 +130,10 @@
 //     </div>
 //   )
 // }
-
 // export default HistoryPage
 
-'use client'
 
+'use client'
 import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import PageTitle from "./PageTitle"
@@ -234,7 +233,7 @@ export default function HistoryPage({ Data }: HistoryPageProps) {
           filterKey="description" 
           disabled={false}
         />
-      </div>      
+      </div>
     </div>
   )
 }

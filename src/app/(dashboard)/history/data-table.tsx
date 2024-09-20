@@ -40,6 +40,7 @@ import { useRouter } from "next/navigation";
 import { bulkdelete } from "@/actions/history/bulkdelete";
 import { toast } from "sonner";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -61,14 +62,16 @@ const bulkdeleteProps = z.object({
 const deleteTransactions = async(json:z.infer<typeof bulkdeleteProps>) => {
   try{
     const responce = await bulkdelete({props:json.props});
-    if(responce.error)
+    
+    if(responce.error!==undefined){
       toast.error(responce.error,{
         id:json.id
       });
-    else  
+    }else{  
       toast.success(responce.success,{
         id:json.id
       });
+    }
     return responce;
   }catch(e){
     toast.error("Failed to delete transaction's");
@@ -115,7 +118,7 @@ export function DataTable<TData, TValue>({
     setdisabled(false);
   },[data])
   
-  const router = useRouter();
+  // const router = useRouter();
 
   const onDelete = async (value: {
     ids: string,
@@ -129,7 +132,7 @@ export function DataTable<TData, TValue>({
     
     await deleteTransactions({ props: value , id:loading});
     setRowSelection({});
-    router.refresh();
+    // router.refresh();
   }
 
   const HandleOnclick = async () => {

@@ -57,7 +57,6 @@ type EditTransactionProps = {
 
 export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, type }) => {
   const [open, setOpen] = React.useState(false);
-  const router = useRouter();
   const schema = type === 'Income' ? incomeSchema : expenseSchema;
 
   const form = useForm({
@@ -107,7 +106,6 @@ export const EditTransaction: React.FC<EditTransactionProps> = ({ transaction, t
         duration: 4500,
       });
       setOpen(false);
-       router.refresh();
       form.reset();
     },
     onError: (error) => {
