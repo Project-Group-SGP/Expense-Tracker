@@ -21,8 +21,8 @@ export default function NotFound() {
           "Saving money is wise, but finding a missing page is a valuable
           lesson."
         </blockquote>
-        <div className="flex space-x-4">
-          <BackButton />
+        <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+          <BackButton className="w-full" />
           <Link href="/" className="w-full">
             <Button className="dark:bg-primary-400 dark:hover:bg-primary-400/90 w-full bg-primary text-white hover:bg-primary/90 dark:text-zinc-950">
               <Home className="mr-2 h-4 w-4" /> Back to SpendWise
