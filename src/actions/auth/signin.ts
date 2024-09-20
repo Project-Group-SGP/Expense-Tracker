@@ -30,7 +30,7 @@ export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:s
       existingUser.email
     )
 
-    await sendVerificationEmail(
+    sendVerificationEmail(
       verificationToken.email,
       verificationToken.token
     )
