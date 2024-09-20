@@ -45,10 +45,10 @@ export const NewResetPasswordForm = () => {
     startTransition(()=>{
       newPassword(values,token)
         .then((data)=>{
-          if(!data.error)
-            setSuccess(data?.success);
+          if(data.error===undefined)
+            setSuccess(data.success);
           else
-            setError(data?.error);
+            setError(data.error);
         })
     });
   }

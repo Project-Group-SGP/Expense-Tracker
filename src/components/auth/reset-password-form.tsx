@@ -39,11 +39,10 @@ export const ResetpasswordForm = () => {
     startTransition(()=>{
       Resetpass(values)
         .then((data)=>{
-          if(!data.success)
-            setError(data?.error);
-          else if(!data.error) 
-            setSuccess(data?.success);
-            
+          if(data.success === undefined)
+            setError(data.error);
+          else 
+            setSuccess(data.success);    
         })
     });
   }
