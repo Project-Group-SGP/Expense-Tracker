@@ -80,7 +80,7 @@ export default async function Home() {
       <Navbar />
 
       <MaxWidthWrapper>
-        <section className="px-3 pt-28 md:px-0 lg:px-0">
+        <section className="px-3 pt-24 sm:pt-28 md:px-0 lg:px-0">
           <div className="flex flex-col items-center justify-between gap-12 sm:pt-10 md:flex-row">
             <div className="w-full max-w-xl md:max-w-none md:flex-1 md:text-left">
               <h1 className="text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-6xl">
@@ -97,7 +97,7 @@ export default async function Home() {
                 realistic budgets, and achieve your financial goals with ease.
               </div>
               <Link
-                href="/auth/signup"
+                href="/auth/signin"
                 className="hover:bg-primary-dark mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-colors"
               >
                 Start Your Journey
