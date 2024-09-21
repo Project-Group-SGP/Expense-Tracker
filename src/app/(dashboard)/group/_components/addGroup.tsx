@@ -77,9 +77,11 @@ export function AddGroupModal() {
   }
 
   const handleClose = () => {
+    if (groupCode) {
+      router.refresh()
+    }
     setOpen(false)
     setGroupCode(null)
-    router.refresh()
     form.reset()
   }
 
@@ -89,8 +91,9 @@ export function AddGroupModal() {
       onOpenChange={(newOpen) => {
         if (!newOpen) {
           handleClose()
+        } else {
+          setOpen(true)
         }
-        setOpen(newOpen)
       }}
     >
       <DialogTrigger asChild>
