@@ -110,7 +110,7 @@ export const settings = async (
     
     const verificationtoken = await generateVerificationToken(values.email);
 
-    await sendVerificationEmail(
+    sendVerificationEmail(
       verificationtoken.email,
       verificationtoken.token
     );

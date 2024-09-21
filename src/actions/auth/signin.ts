@@ -136,7 +136,7 @@ export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:s
       existingUser.email
     )
 
-    await sendVerificationEmail(
+    sendVerificationEmail(
       verificationToken.email,
       verificationToken.token
     )
@@ -181,7 +181,7 @@ export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:s
 
       console.log("2FA: ",twoFactorToken);
 
-      await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
+      sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
 
       return { twoFactor: true }
     }
