@@ -53,7 +53,7 @@ const sendPasswordResetEmail = async(email:string,token:string) => {
   };
 
 
-  transporter.sendMail(mailOptions, function (error, info) {
+  await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
       throw error;
