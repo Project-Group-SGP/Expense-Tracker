@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
     setdisabled(false);
   },[data])
   
-  // const router = useRouter();
+  const router = useRouter();
 
   const onDelete = async (value: {
     ids: string,
@@ -132,7 +132,7 @@ export function DataTable<TData, TValue>({
     
     await deleteTransactions({ props: value , id:loading});
     setRowSelection({});
-    // router.refresh();
+    router.refresh();
   }
 
   const HandleOnclick = async () => {

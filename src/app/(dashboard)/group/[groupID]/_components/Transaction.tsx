@@ -404,6 +404,7 @@ import {
 } from "@/components/ui/select"
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import TransactionTableSkeleton from "./TransactionSkeleton"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface ExpenseSplit {
   userName: string
@@ -525,8 +526,11 @@ export default function Transaction({ transactionsData, loading }: { transaction
               onCheckedChange={setShowDetailed}
               className="items-center"
             />
-            <label htmlFor="detailed-view" className="text-sm font-medium text-muted-foreground items-center">
+            <label htmlFor="detailed-view" className="hidden sm:block text-sm font-medium text-muted-foreground items-center">
               Show Cleared Transactions
+            </label>
+            <label htmlFor="detailed-view" className="text-sm block sm:hidden font-medium text-muted-foreground items-center">
+              Show
             </label>
           </div>
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -578,6 +582,30 @@ export default function Transaction({ transactionsData, loading }: { transaction
               </div>
             </PopoverContent>
           </Popover>
+          {/* <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {columns
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={selectedColumns.filter(col=> col.id===column.id)}
+                    onCheckedChange={(value) =>
+                      toggleColumn(column.id)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu> */}
         </div>
       </CardHeader>
       <CardContent>
