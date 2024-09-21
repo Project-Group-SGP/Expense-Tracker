@@ -376,7 +376,7 @@ export async function AddGroupExpense(params: {
     // Send notification
     sendExpenseNotification(params.groupID, response.id, params.paidById, params.amount, params.title);
 
-    // revalidatePath(`/groups/${params.groupID}`);
+    revalidatePath(`/group/${params.groupID}`);
     // revalidateTag("getGroupTransactiondata")
     // revalidateTag("getGroupBalance")
     // revalidateTag("getGroupdata")
@@ -488,6 +488,160 @@ export async function settleUp(params: {
   // Send settle up notification
   sendSettleUpNotification(params.groupID, params.payerId, params.recipientId, totalAmount);
 
+  revalidatePath(`/group/${params.groupID}`);
 
   return { message: "Payment to group member completed successfully!" };
+}
+
+
+// _services/groupServices.ts
+
+interface Group {
+  id: string
+  name: string
+}
+
+interface GroupMemberDetails {
+  userId: string
+  name: string
+  avatar: string
+}
+
+interface User {
+  id: string
+  name: string
+  image: string
+}
+
+interface Payment {
+  amount: number
+}
+
+interface Expense {
+  paidBy: User[]
+}
+
+interface ExpenseSplit {
+  amount: number
+  expense: Expense
+  payments: Payment[]
+}
+
+interface UserToPay {
+  id: string
+  memberName: string
+  memberId: string
+  amountToPay: number
+  groupexpanceid: string
+}
+
+interface GetResponse {
+  group: Group | null
+  pendingPayments: ExpenseSplit[]
+  usersToPay: UserToPay[]
+}
+
+type ExpenseSplitStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID"
+
+interface ExpenseSplit {
+  userName: string
+  expenseId: string
+  amount: number
+  isPaid: ExpenseSplitStatus
+}
+
+export interface FormattedExpenseData {
+  groupId: string
+  expenseId: string
+  amount: number
+  category: string
+  paidById: string
+  PaidByName: string
+  description: string
+  date: string
+  status: "UNSETTLED" | "PARTIALLY_SETTLED" | "SETTLED" | "CANCELLED"
+  expenseSplits: ExpenseSplit[]
+}
+
+export interface GetBalance {
+  userId: string
+  name: string
+  avatar: string
+  amount: number
+  status: 'settled up' | 'gets back' | 'owes'
+  amountColor: string
+}
+
+export async function getAllData(groupID: string, cookie: string): Promise<GetResponse> {
+  try {
+    const res = await fetch(
+      `${process.env.BASE_URL}/api/get-group?groupID=${groupID}`,
+      {
+        method: "GET",
+        headers: { Cookie: cookie },
+        next: { tags: ["getGroupdata"] },
+        cache: "force-cache",
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok")
+    }
+
+    const data: GetResponse = await res.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return {
+      group: null,
+      pendingPayments: [],
+      usersToPay: [],
+    }
+  }
+}
+
+export async function fetchGroupBalances(groupId: string, cookie: string): Promise<GetBalance[]> {
+  try {
+    const res = await fetch(`${process.env.BASE_URL}/api/balance?groupId=${groupId}`, {
+      method: "GET",
+      headers: { Cookie: cookie },
+      next: { tags: ["getGroupBalance"] },
+      cache: "force-cache",
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch group balances")
+    }
+
+    const data: GetBalance[] = await res.json()
+    console.log("\n\n\n\n Balance", data)
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return []
+  }
+}
+
+export async function getGroupTransactionData(groupID: string, cookie: string): Promise<FormattedExpenseData[]> {
+  try {
+    const res = await fetch(
+      `${process.env.BASE_URL}/api/get-group-transaction?groupID=${groupID}`,
+      {
+        method: "GET",
+        headers: { Cookie: cookie },
+        cache: "force-cache",
+        next: { tags: ["getGroupTransactiondata"] },
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok")
+    }
+
+    const data: FormattedExpenseData[] = await res.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching data:", error)
+    return []
+  }
 }

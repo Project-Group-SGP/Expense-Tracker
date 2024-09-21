@@ -1,4 +1,5 @@
 "use client"
+
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -33,7 +34,6 @@ import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { revalidateTag } from "next/cache"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -178,26 +178,41 @@ export function AddExpense({
     let updatedMembers = [...members]
 
     if (splitType === "Equally") {
-      const splitAmount = totalAmount / includedMembers.length
+      const splitAmount = totalAmount / includedMembers.length || 0
       updatedMembers = updatedMembers.map((member) => ({
         ...member,
         amount: member.included ? splitAmount : 0,
       }))
+    } else if (splitType === "As Amounts") {
+      const totalAssigned = updatedMembers.reduce((sum, member) => sum + (member.included ? member.amount : 0), 0)
+      const remaining = totalAmount - totalAssigned
+      if (remaining > 0) {
+        const splitRemaining = remaining / includedMembers.length
+        updatedMembers = updatedMembers.map((member) => ({
+          ...member,
+          amount: member.included ? member.amount + splitRemaining : 0,
+        }))
+      }
     }
 
-    const hasChanged =
-      JSON.stringify(members) !== JSON.stringify(updatedMembers)
+    const hasChanged = JSON.stringify(members) !== JSON.stringify(updatedMembers)
     if (hasChanged) {
       setMembers(updatedMembers)
       form.setValue("splitWith", updatedMembers)
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchAmount, watchSplitType])
+  }, [watchAmount, watchSplitType, members, form])
 
   const handleMemberToggle = (id: string, included: boolean) => {
     const updatedMembers = members.map((m) =>
-      m.id === id ? { ...m, included } : m
+      m.id === id ? { ...m, included, amount: included ? m.amount : 0 } : m
+    )
+    setMembers(updatedMembers)
+    form.setValue("splitWith", updatedMembers)
+  }
+
+  const handleAmountChange = (id: string, amount: number) => {
+    const updatedMembers = members.map((m) =>
+      m.id === id ? { ...m, amount } : m
     )
     setMembers(updatedMembers)
     form.setValue("splitWith", updatedMembers)
@@ -205,7 +220,13 @@ export function AddExpense({
 
   // Form submission
   const onSubmit = async (data) => {
-    // console.log(data)
+    const totalAmount = parseFloat(data.amount)
+    const totalSplitAmount = data.splitWith.reduce((sum, member) => sum + (member.included ? member.amount : 0), 0)
+
+    if (Math.abs(totalSplitAmount - totalAmount) > 0.01) {
+      toast.error("The split amounts do not add up to the total expense amount.")
+      return
+    }
 
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
@@ -227,7 +248,7 @@ export function AddExpense({
         groupID: groupId,
         paidById: String(paidById),
         title: data.title,
-        amount: parseFloat(data.amount),
+        amount: totalAmount,
         date: data.date,
         category: data.category,
         splits: splits,
@@ -241,9 +262,7 @@ export function AddExpense({
           id: loading,
         })
 
-        router.refresh();
         form.reset();
-        // revalidateTag("getGroupTransactionData");
       } else {
         console.error("Failed to Add Expense")
 
@@ -455,19 +474,9 @@ export function AddExpense({
                             <Input
                               type="number"
                               value={member.amount}
-                              onChange={(e) => {
-                                const updatedMembers = members.map((m) =>
-                                  m.id === member.id
-                                    ? {
-                                        ...m,
-                                        amount: parseFloat(e.target.value),
-                                      }
-                                    : m
-                                )
-                                setMembers(updatedMembers)
-                                form.setValue("splitWith", updatedMembers)
-                              }}
+                              onChange={(e) => handleAmountChange(member.id, parseFloat(e.target.value) || 0)}
                               className="w-20"
+                              disabled={!member.included}
                             />
                           ) : (
                             `₹${member.amount.toFixed(2)}`
