@@ -7,7 +7,7 @@ import { getUserByEmail } from "@/data/user"
 import { generateVerificationToken } from "@/lib/tokens"
 import nodemailer from "nodemailer"
 
-async function sendVerificationEmail(email: string, token: string) {
+function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",

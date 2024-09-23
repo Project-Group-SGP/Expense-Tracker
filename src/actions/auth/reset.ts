@@ -5,7 +5,7 @@ import { ResetSchema } from "@/lib/index"
 import nodemailer from "nodemailer"
 import { z } from "zod"
 
-const sendPasswordResetEmail = async (email: string, token: string) => {
+const sendPasswordResetEmail = (email: string, token: string) => {
   const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`
 
   const transporter = nodemailer.createTransport({

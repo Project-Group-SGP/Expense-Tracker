@@ -2,7 +2,6 @@
 import { getUserByEmail } from "@/data/user"
 import {  getVerifationTokenByToken } from "@/data/verification-token"
 import { db } from "@/lib/db"
-import identityServer4 from "next-auth/providers/identity-server4"
 
 export const newVerification = async(token:string)=>{
   const existingToken = await getVerifationTokenByToken(token);

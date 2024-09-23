@@ -12,7 +12,7 @@ import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation
 import { AuthError } from "next-auth"
 import nodemailer from "nodemailer"
 
-async function sendVerificationEmail(email: string, token: string) {
+function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -68,7 +68,7 @@ async function sendVerificationEmail(email: string, token: string) {
   console.log("\n\nVerification Mail send\n\n");
 }
 
-export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
+export const sendTwoFactorTokenEmail = (email: string, token: string) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

@@ -8,7 +8,7 @@ import nodemailer from "nodemailer"
 import * as z from "zod"
 import bcrypt from "bcryptjs"
 
-async function sendVerificationEmail(email: string, token: string) {
+ function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
