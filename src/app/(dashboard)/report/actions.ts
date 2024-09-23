@@ -120,23 +120,7 @@ async function sendReportEmail(
   await transporter.sendMail(mailOptions)
 }
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Generates an expense report based on the provided parameters.
- *
- * @param {string} reportType - The type of report to generate, one of "last_month", "last_3_months", "last_6_months" or "custom"
- * @param {Date} [startDate] - The start date of the custom period
- * @param {Date} [endDate] - The end date of the custom period
- * @param {string} [reportFormat="pdf"] - The format of the generated report, one of "pdf", "csv" or "excel"
- * @param {boolean} [includeCharts=true] - Whether to include charts in the report
- * @param {boolean} [isDetailed=false] - Whether to include detailed expense information in the report
- * @param {CategoryTypes[]} [selectedCategories=[]] - The selected categories to include in the report
- * @param {boolean} [includeIncome=false] - Whether to include income in the report
- * @param {boolean} [emailReport=false] - Whether to email the report to the user
- * @param {string} [emailAddress] - The email address to send the report to
- * @returns {Promise<{buffer: string, mimeType: string, fileExtension: string, name?: string}>} A promise that resolves to an object containing the report buffer, mime type, file extension and name
- */
-/******  828517b4-ad17-48cc-b0df-3582c2a7894b  *******/
+
 export async function generateReport(
   reportType: string,
   startDate?: Date,

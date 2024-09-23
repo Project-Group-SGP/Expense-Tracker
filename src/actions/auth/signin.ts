@@ -69,6 +69,8 @@ function sendVerificationEmail(email: string, token: string) {
 }
 
 const sendTwoFactorTokenEmail = async (email: string, token: string) => {
+
+  console.log(`Attempting to send 2FA email to: ${email} , token:${token}`);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -110,14 +112,17 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
 </body>
 </html>`,
   }
-  console.log("\n\n2FA Mail about to send\n\n");
+  
   try {
-    await transporter.sendMail(mailOptions)
-    console.log("2FA Mail sent")
+    console.log('Transporter created, attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('2FA Mail sent successfully:', info.response);
+    return info;
   } catch (error) {
-    console.error("Error sending 2FA email:", error)
-    throw error
+    console.error('Error sending 2FA email:', error);
+    throw error;
   }
+
 }
 
 export const Signin = async (
@@ -183,7 +188,13 @@ export const Signin = async (
 
       console.log("2FA: ", twoFactorToken)
 
-      sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token)
+
+      try {
+        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
+        console.log('Test email sent successfully');
+      } catch (error) {
+        console.error('Test email failed:', error);
+      }
 
       return { twoFactor: true }
     }
