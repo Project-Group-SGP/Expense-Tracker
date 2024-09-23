@@ -13,7 +13,8 @@ import { AuthError } from "next-auth"
 import nodemailer from "nodemailer"
 
 async function sendVerificationEmail(email: string, token: string) {
-  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
+  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
+  console.log("Varification Link",VerificationLink);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
