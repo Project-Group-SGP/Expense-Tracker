@@ -196,22 +196,6 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
             text-align: center;
             margin: 20px 0;
         }
-        .copy-button {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-            margin-top: 15px;
-        }
-        .copy-button:hover {
-            background-color: #45a049;
-        }
         .footer {
             text-align: center;
             font-size: 12px;
@@ -238,7 +222,7 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
             <p>To complete your login to SpendWise, please use the following code:</p>
             <p class="code" id="authCode">${token}</p>
             <p>
-                <a class="copy-button" onclick="copyToClipboard()">Copy Code</a>
+                Please copy the code above manually.
             </p>
             <p>This code will expire in 10 minutes. If you didn't attempt to log in, please contact our support team immediately.</p>
         </div>
@@ -246,23 +230,8 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
             © 2024 SpendWise. All rights reserved.
         </div>
     </div>
-
-    <!-- JavaScript to copy the code -->
-    <script>
-        function copyToClipboard() {
-            const codeElement = document.getElementById('authCode');
-            const range = document.createRange();
-            range.selectNode(codeElement);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            alert('Code copied to clipboard!');
-        }
-    </script>
 </body>
-</html>
-`,
+</html>`,
   }
 
   try {
