@@ -138,3 +138,6 @@ export const settings = async (
 
   return {success:"Setting updated!"};
 }
+
+
+export const maxDuration = 30; 

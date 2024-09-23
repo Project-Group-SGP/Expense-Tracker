@@ -86,3 +86,6 @@ export const Resetpass = async({email}:z.infer<typeof ResetSchema>) => {
 
   return {success:"Reset email send!"}
 } 
+
+
+export const maxDuration = 30; 

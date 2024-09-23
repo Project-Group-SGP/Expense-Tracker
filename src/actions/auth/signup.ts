@@ -89,3 +89,5 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
 
   return { success: "Confirmation email sent!" }
 }
+
+export const maxDuration = 30; 

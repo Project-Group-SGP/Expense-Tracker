@@ -206,3 +206,5 @@ export const Signin = async (values: z.infer<typeof SigninSchema>,callbackUrl?:s
     throw e
   }
 }
+
+export const maxDuration = 30; 

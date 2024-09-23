@@ -1,5 +1,4 @@
 "use server"
-
 import { getUserByEmail } from "@/data/user"
 import {  getVerifationTokenByToken } from "@/data/verification-token"
 import { db } from "@/lib/db"
