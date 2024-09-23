@@ -34,25 +34,86 @@ async function sendVerificationEmail(email: string, token: string) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Your SpendWise Account</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; }
-        .button { display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 3px; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 5px;
+        }
+        h2 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWise-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
-            <h2 style="color: #4CAF50;">Verify Your Email Address</h2>
+            <h2>Verify Your Email Address</h2>
             <p>Welcome to SpendWise! To get started, please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
-                <a href=${VerificationLink} class="button">Verify Email</a>
+                <a href="${VerificationLink}" class="button">Verify Email</a>
             </p>
             <p>If you didn't create an account with SpendWise, please ignore this email.</p>
+        </div>
+        <div class="footer">
+            © 2024 SpendWise. All rights reserved.
         </div>
     </div>
 </body>
@@ -67,7 +128,7 @@ async function sendVerificationEmail(email: string, token: string) {
   } catch (error) {
     console.error('Error sending Verification email:', error);
     throw error;
-  };
+  }
 }
 
 const sendTwoFactorTokenEmail = async (email: string, token: string) => {
@@ -92,27 +153,116 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your SpendWise Two-Factor Authentication Code</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; }
-        .code { font-size: 24px; font-weight: bold; text-align: center; color: #4CAF50; letter-spacing: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 5px;
+        }
+        h2 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .code {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4CAF50;
+            letter-spacing: 5px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .copy-button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        .copy-button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWise-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
-            <h2 style="color: #4CAF50;">Your Two-Factor Authentication Code</h2>
+            <h2>Your Two-Factor Authentication Code</h2>
             <p>To complete your login to SpendWise, please use the following code:</p>
-            <p class="code">${token}</p>
+            <p class="code" id="authCode">${token}</p>
+            <p>
+                <a class="copy-button" onclick="copyToClipboard()">Copy Code</a>
+            </p>
             <p>This code will expire in 10 minutes. If you didn't attempt to log in, please contact our support team immediately.</p>
         </div>
+        <div class="footer">
+            © 2024 SpendWise. All rights reserved.
+        </div>
     </div>
+
+    <!-- JavaScript to copy the code -->
+    <script>
+        function copyToClipboard() {
+            const codeElement = document.getElementById('authCode');
+            const range = document.createRange();
+            range.selectNode(codeElement);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('Code copied to clipboard!');
+        }
+    </script>
 </body>
-</html>`,
+</html>
+`,
   }
 
   try {

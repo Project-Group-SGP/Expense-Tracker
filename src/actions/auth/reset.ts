@@ -27,25 +27,86 @@ const sendPasswordResetEmail = async(email: string, token: string) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Your SpendWise Password</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .logo { text-align: center; margin-bottom: 20px; }
-        .content { background-color: #f9f9f9; padding: 30px; border-radius: 5px; }
-        .button { display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 3px; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 5px;
+        }
+        h2 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWise-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
-            <h2 style="color: #4CAF50;">Reset Your Password</h2>
+            <h2>Reset Your Password</h2>
             <p>We received a request to reset your SpendWise password. Click the button below to create a new password:</p>
             <p style="text-align: center;">
-                <a href=${resetLink} class="button">Reset Password</a>
+                <a href="${resetLink}" class="button">Reset Password</a>
             </p>
             <p>If you didn't request a password reset, please ignore this email or contact our support team.</p>
+        </div>
+        <div class="footer">
+            © 2024 SpendWise. All rights reserved.
         </div>
     </div>
 </body>
@@ -87,6 +148,6 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
   }catch(error){
     console.error("Error while sending resetpass mail",error);
   }
-  
+
   return { success: "Reset email send!" }
 }
