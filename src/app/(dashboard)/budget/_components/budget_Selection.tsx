@@ -48,7 +48,7 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }
   };
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 bg-background rounded-lg shadow-md">
+    <div className="space-y-6 p-4 sm:p-6 bg-background rounded-lg shadow-none">
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Budget Overview</h1>
         <div className="w-full sm:w-[200px]">

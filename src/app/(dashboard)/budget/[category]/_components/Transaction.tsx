@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useCallback, useEffect, useState } from "react"
 import {
   Card,
@@ -17,13 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { usePathname } from "next/navigation"
-import { AlertCircle, Wallet, X } from "lucide-react"
+import { AlertCircle, ChevronLeft, ChevronRight, Wallet, X } from "lucide-react"
 import { toast } from "sonner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button" // Corrected Button import
+import { Button } from "@/components/ui/button"
 import Card_budget from "./Card_budget"
 import { SetCategory_Budget } from "./SetCategory_Budget"
-
 
 type Expense = {
   id: string
@@ -39,12 +40,14 @@ export type Expenses = Expense[]
 const Transaction = ({
   data,
 }: {
-  data: { expenses: Expenses; categoryBudget: any; budget:number }
+  data: { expenses: Expenses; categoryBudget: any; budget: number }
 }) => {
   const pathname = usePathname()
   const lastRouteName = pathname?.split("/").pop()?.toUpperCase() || ""
 
   const [toastShown, setToastShown] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(5)
 
   // Filter data category-wise
   const filteredData =
@@ -59,6 +62,12 @@ const Transaction = ({
     description: transaction.description || null,
     amount: transaction.amount,
   }))
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = categoryTransaction.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(categoryTransaction.length / itemsPerPage)
 
   // Total amount calculation
   const totalAmount = categoryTransaction.reduce((total, transaction) => {
@@ -93,7 +102,7 @@ const Transaction = ({
       }
     )
     setToastShown(true)
-  }, [])
+  }, [lastRouteName])
 
   // Use effect to trigger the toast when the total amount exceeds the budget
   useEffect(() => {
@@ -110,38 +119,33 @@ const Transaction = ({
   ])
 
   // Remaining budget calculation
-  const remainingBudget =
-    Number(data.budget) - totalAmount
+  const remainingBudget = Number(data.budget) - totalAmount
   const isOverBudget = remainingBudget < 0
   const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700"
 
   return (
-    <Card className="border-none">
+    <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>
           <section className="ml-2 mt-4 grid w-full grid-cols-1 gap-2 pb-2 pr-2 sm:grid-cols-2 lg:grid-cols-3">
-            
             <Card_budget
               title="Remaining"
               amount={remainingBudget}
               color={budgetColor}
               icon={Wallet}
             />
-            
             <Card_budget
               title="Expense"
               amount={Number(totalAmount.toFixed(2))}
               color="text-emi"
               icon={Wallet}
             />
-            
             <SetCategory_Budget
               category={lastRouteName}
               currentBudget={Number(data.budget)}
               expense={Number(totalAmount.toFixed(2))}
             />
-
           </section>
           All {lastRouteName} Transactions
         </CardDescription>
@@ -160,9 +164,9 @@ const Transaction = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categoryTransaction.map((transaction, index) => (
+            {currentItems.map((transaction, index) => (
               <TableRow key={transaction.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{indexOfFirstItem + index + 1}</TableCell>
                 <TableCell>
                   {new Date(transaction.date).toLocaleDateString()}
                 </TableCell>
@@ -175,13 +179,36 @@ const Transaction = ({
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell colSpan={3}>Total Expense</TableCell>
               <TableCell className="text-right">
                 {`₹${totalAmount.toFixed(2)}`}
               </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
+        <div className="mt-4 flex items-center justify-between">
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            variant="outline"
+            size="sm"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Previous
+          </Button>
+          <span className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            variant="outline"
+            size="sm"
+          >
+            Next
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
