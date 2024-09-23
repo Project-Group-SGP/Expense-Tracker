@@ -5,17 +5,17 @@ import bcrypt from "bcryptjs"
 import { db } from "@/lib/db"
 import { getUserByEmail } from "@/data/user"
 import { generateVerificationToken } from "@/lib/tokens"
-import nodemailer from "nodemailer";
+import nodemailer from "nodemailer"
 
 async function sendVerificationEmail(email: string, token: string) {
-  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
+  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -38,7 +38,7 @@ async function sendVerificationEmail(email: string, token: string) {
 <body>
     <div class="container">
         <div class="logo">
-            <img src="/public/SpendWise-3.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
             <h2 style="color: #4CAF50;">Verify Your Email Address</h2>
@@ -51,16 +51,15 @@ async function sendVerificationEmail(email: string, token: string) {
     </div>
 </body>
 </html>`,
-  };
+  }
 
-  await transporter.sendMail(mailOptions, function (error, info) {
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  });
+  })
 }
-
 
 export const Register = async (values: z.infer<typeof RegisterSchema>) => {
   const validation = RegisterSchema.safeParse(values)

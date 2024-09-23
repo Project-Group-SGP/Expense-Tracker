@@ -1,22 +1,22 @@
-"use server";
-import { getUserByEmail, getUserById } from "@/data/user";
-import { currentUserServer } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { generateVerificationToken } from "@/lib/tokens";
-import { SettingsSchema } from "@/lib/index";
-import nodemailer from "nodemailer";
-import * as z from "zod";
-import bcrypt from "bcryptjs";
+"use server"
+import { getUserByEmail, getUserById } from "@/data/user"
+import { currentUserServer } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { generateVerificationToken } from "@/lib/tokens"
+import { SettingsSchema } from "@/lib/index"
+import nodemailer from "nodemailer"
+import * as z from "zod"
+import bcrypt from "bcryptjs"
 
 async function sendVerificationEmail(email: string, token: string) {
-  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
+  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -39,7 +39,7 @@ async function sendVerificationEmail(email: string, token: string) {
 <body>
     <div class="container">
         <div class="logo">
-            <img src="/public/SpendWise-3.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
             <h2 style="color: #4CAF50;">Verify Your Email Address</h2>
@@ -52,89 +52,89 @@ async function sendVerificationEmail(email: string, token: string) {
     </div>
 </body>
 </html>`,
-  };
+  }
 
-  await transporter.sendMail(mailOptions, function (error, info) {
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  });
+  })
 }
 
-
-export const settings = async (
-  values:z.infer<typeof SettingsSchema>
-)=>{
+export const settings = async (values: z.infer<typeof SettingsSchema>) => {
   // console.log("values: ",values);
-  if(!values.email && !values.isTwoFactorEnable && !values.name && !values.newPassword && !values.password) 
-    return {error:"No Changes are made"};
-  if(!values.password && values.newPassword)
-    return {error:"New Password is required"};
-  if(values.password && !values.newPassword)
-    return {error:"Old Password is required"};
-  if(values.password==""){
-    values.password = undefined;
-    values.newPassword = undefined;
+  if (
+    !values.email &&
+    !values.isTwoFactorEnable &&
+    !values.name &&
+    !values.newPassword &&
+    !values.password
+  )
+    return { error: "No Changes are made" }
+  if (!values.password && values.newPassword)
+    return { error: "New Password is required" }
+  if (values.password && !values.newPassword)
+    return { error: "Old Password is required" }
+  if (values.password == "") {
+    values.password = undefined
+    values.newPassword = undefined
   }
-  if(values.email && values.password){
-    return {error:"Change one section at a time!!"};
+  if (values.email && values.password) {
+    return { error: "Change one section at a time!!" }
   }
 
-  const user = await currentUserServer();
-  console.log("User:" ,user);
-  
-  if(!user)
-     return {error:"unauthorized"};
+  const user = await currentUserServer()
+  console.log("User:", user)
+
+  if (!user) return { error: "unauthorized" }
 
   // if(user.email==values.email && user.name==values.name && user.isTwoFactorEnable==values.isTwoFactorEnable && !values.password && !values.newPassword)
   //   return {error:"No Changes are made"};
 
-  const dbuser = await getUserById(user?.id as string);
+  const dbuser = await getUserById(user?.id as string)
 
-  if(!dbuser) return {error:"unauthorized"};
+  if (!dbuser) return { error: "unauthorized" }
 
-  if(user.isOAuth){
-    values.email = undefined;
-    values.password=undefined;
-    values.newPassword=undefined;
-    values.isTwoFactorEnable=undefined;
+  if (user.isOAuth) {
+    values.email = undefined
+    values.password = undefined
+    values.newPassword = undefined
+    values.isTwoFactorEnable = undefined
   }
-  console.log(values);
+  console.log(values)
 
-  if(values.email && values.email!==user.email){
-    const existingUser = await getUserByEmail(values.email);
+  if (values.email && values.email !== user.email) {
+    const existingUser = await getUserByEmail(values.email)
 
-    if(existingUser)
-        return {error:"Email already exist!!"}
-    
-    const verificationtoken = await generateVerificationToken(values.email);
+    if (existingUser) return { error: "Email already exist!!" }
 
-    sendVerificationEmail(
-      verificationtoken.email,
-      verificationtoken.token
-    );
+    const verificationtoken = await generateVerificationToken(values.email)
 
-    return {success:"verification email send"};
+    sendVerificationEmail(verificationtoken.email, verificationtoken.token)
+
+    return { success: "verification email send" }
   }
 
-  if(values.password && values.newPassword && dbuser.password){
-    const passwordsMatch = await bcrypt.compare(values.password,dbuser.password);
+  if (values.password && values.newPassword && dbuser.password) {
+    const passwordsMatch = await bcrypt.compare(
+      values.password,
+      dbuser.password
+    )
 
-    if(!passwordsMatch)
-      return {error:"Incorrect Oldpassword"}
+    if (!passwordsMatch) return { error: "Incorrect Oldpassword" }
 
-    const hashedPassword = await bcrypt.hash(values.newPassword,10);
-    values.password = hashedPassword;
-    values.newPassword = undefined;
+    const hashedPassword = await bcrypt.hash(values.newPassword, 10)
+    values.password = hashedPassword
+    values.newPassword = undefined
   }
 
   await db.user.update({
-    where:{id:dbuser?.id},
-    data:{
+    where: { id: dbuser?.id },
+    data: {
       ...values,
-    }
-  });
+    },
+  })
 
   return {success:"Setting updated!"};
 }

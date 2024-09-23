@@ -2,11 +2,11 @@
 import { getUserByEmail } from "@/data/user"
 import { generatePasswordResetToken } from "@/lib/tokens"
 import { ResetSchema } from "@/lib/index"
-import nodemailer from "nodemailer";
+import nodemailer from "nodemailer"
 import { z } from "zod"
 
-const sendPasswordResetEmail = async(email:string,token:string) => {
-  const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`;
+const sendPasswordResetEmail = async (email: string, token: string) => {
+  const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -14,7 +14,7 @@ const sendPasswordResetEmail = async(email:string,token:string) => {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -37,7 +37,7 @@ const sendPasswordResetEmail = async(email:string,token:string) => {
 <body>
     <div class="container">
         <div class="logo">
-            <img src="/public/SpendWise-3.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
             <h2 style="color: #4CAF50;">Reset Your Password</h2>
@@ -50,42 +50,38 @@ const sendPasswordResetEmail = async(email:string,token:string) => {
     </div>
 </body>
 </html>`,
-  };
-
-
-  await transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-      throw error;
-    }
-  });
-}
-
-export const Resetpass = async({email}:z.infer<typeof ResetSchema>) => {
-
-  const validatedFields = ResetSchema.safeParse({email});
-
-  if(validatedFields.error)
-      return {error:"Invalid email!"};
-
-  const existinguser = await getUserByEmail(validatedFields.data.email);
-
-  if(!existinguser || !existinguser.emailVerified) 
-    return {error : "Email not found!"};
-
-  if(existinguser.image!==null){
-    return {error: "You are registered with google"}
   }
 
-  const passwordResettoken = await generatePasswordResetToken(validatedFields.data.email);
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error)
+      throw error
+    }
+  })
+}
 
-  sendPasswordResetEmail(
-    passwordResettoken.email,
-    passwordResettoken.token,
-  );
+export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
+  const validatedFields = ResetSchema.safeParse({ email })
 
-  return {success:"Reset email send!"}
-} 
+  if (validatedFields.error) return { error: "Invalid email!" }
+
+  const existinguser = await getUserByEmail(validatedFields.data.email)
+
+  if (!existinguser || !existinguser.emailVerified)
+    return { error: "Email not found!" }
+
+  if (existinguser.image !== null) {
+    return { error: "You are registered with google" }
+  }
+
+  const passwordResettoken = await generatePasswordResetToken(
+    validatedFields.data.email
+  )
+
+  sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
+
+  return { success: "Reset email send!" }
+}
 
 
 export const maxDuration = 30; 

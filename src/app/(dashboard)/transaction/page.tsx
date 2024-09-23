@@ -74,12 +74,14 @@ export default function Page() {
             )
           } else if (error.response.status === 400) {
             toast.error(
-              `Bad Request: ${error.response.data.error.split(":")[1]}`
+              `Bad Request: Please check your PDF file and password, and try again.`
             )
           } else if (error.response.status === 500) {
-            toast.error(`Server Error: ${error.response.data.error}`)
+            toast.error(
+              `Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request.`
+            )
           } else {
-            toast.error(`Error: ${error.response.data.error}`)
+            toast.error(`An unexpected error occurred, please try again.`)
           }
         } else {
           toast.error(`An unexpected error occurred, please try again.`)
@@ -90,21 +92,25 @@ export default function Page() {
       if (axios.isAxiosError(error)) {
         if (error.response) {
           if (error.response.status === 400) {
-            toast.error(`Bad Request: ${error.response.data.error}`)
+            toast.error(
+              `Bad Request: Please check your PDF file and password, and try again.`
+            )
           } else if (error.response.status === 500) {
-            toast.error(`Server Error: ${error.response.data.error}`)
+            toast.error(
+              `Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request.`
+            )
           } else {
-            toast.error(`Error: ${error.response.data.error}`)
+            toast.error(`An unexpected error occurred, please try again.`)
           }
         } else if (error.request) {
           toast.error(
             "No response received from server. Please ensure that the PDF and password are correct."
           )
         } else {
-          toast.error(`Error: ${error.message}`)
+          toast.error(`An unexpected error occurred, please try again.`)
         }
       } else {
-        toast.error(`An unexpected error occurred: ${error.message}`)
+        toast.error(`An unexpected error occurred, please try again.`)
       }
     },
   })
