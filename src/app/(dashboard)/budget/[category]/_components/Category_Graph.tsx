@@ -69,7 +69,7 @@ export function Category_Graph({ data }: { data: { expenses: Expenses; } }) {
 
 
   return (
-    <Card className="border-none">
+    <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>This month's Data</CardDescription>

@@ -124,7 +124,7 @@ const Transaction = ({
   const budgetColor = isOverBudget ? "text-red-500" : "text-blue-700"
 
   return (
-    <Card className="border-none">
+    <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle>{lastRouteName}</CardTitle>
         <CardDescription>
@@ -179,7 +179,7 @@ const Transaction = ({
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell colSpan={3}>Total Expense</TableCell>
               <TableCell className="text-right">
                 {`₹${totalAmount.toFixed(2)}`}
               </TableCell>

@@ -10,6 +10,7 @@ import {
 import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
+import { useTheme } from "next-themes"
 
 type CategoryBudget = {
   [key: string]: number // Dynamic keys for categories
@@ -81,11 +82,13 @@ export function OverallGraph({
   const circumference = 2 * Math.PI * radius
   const fillPercentage = (percentUsed / 100) * circumference
 
-  const circleColor = "#4A4A4A"
+  const theme = useTheme();
+ const currentTheme = theme.theme;
+  const circleColor = currentTheme === "dark" ? "#4A4A4A" : "#D1D5DB"
   const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"
 
   return (
-    <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow-lg">
+    <Card className="ml-6 mr-6 flex w-full flex-col rounded-lg border-none shadow">
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-lg font-semibold">Budget Usage</CardTitle>
       </CardHeader>
@@ -122,15 +125,14 @@ export function OverallGraph({
               fill="currentColor"
               className="text-gray-900 dark:text-white"
             >
-              {currentMonthData.totalExpense.toLocaleString('en-IN')} <br />
-              
+              {currentMonthData.totalExpense.toLocaleString("en-IN")} <br />
             </text>
           </svg>
         </div>
       </CardContent>
       <CardFooter>
         <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm">
+          <div className="rounded-lg bg-card p-4 text-card-foreground">
             <Card_unclick
               title="Income"
               amount={Number(currentMonthData.totalIncome)}
@@ -138,13 +140,13 @@ export function OverallGraph({
               icon={HandCoins}
             />
           </div>
-          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm">
+          <div className="rounded-lg bg-card p-4 text-card-foreground">
             <SetBudget
               currentBudget={budget}
               expense={currentMonthData.totalExpense}
             />
           </div>
-          <div className="rounded-lg bg-card p-4 text-card-foreground shadow-sm sm:col-span-2 lg:col-span-1">
+          <div className="rounded-lg bg-card p-4 text-card-foreground sm:col-span-2 lg:col-span-1">
             <Card_unclick
               title="Remaining"
               amount={Number(remainingBudget)}
