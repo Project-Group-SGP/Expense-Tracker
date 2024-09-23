@@ -12,7 +12,7 @@ import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation
 import { AuthError } from "next-auth"
 import nodemailer from "nodemailer"
 
-function sendVerificationEmail(email: string, token: string) {
+async function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -57,15 +57,16 @@ function sendVerificationEmail(email: string, token: string) {
 </body>
 </html>`,
   }
-  console.log("\n\nVerification Mail about to send\n\n");
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error)
-      throw error
-    }
-  })
-  console.log("\n\nVerification Mail send\n\n");
+  try {
+    console.log('Transporter created, attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Verification Mail sent successfully:', info.response);
+    return info;
+  } catch (error) {
+    console.error('Error sending Verification email:', error);
+    throw error;
+  };
 }
 
 const sendTwoFactorTokenEmail = async (email: string, token: string) => {
@@ -112,7 +113,7 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
 </body>
 </html>`,
   }
-  
+
   try {
     console.log('Transporter created, attempting to send email...');
     const info = await transporter.sendMail(mailOptions);
@@ -146,8 +147,11 @@ export const Signin = async (
       existingUser.email
     )
 
-    sendVerificationEmail(verificationToken.email, verificationToken.token)
-
+    try{
+      await sendVerificationEmail(verificationToken.email, verificationToken.token)
+    }catch(error){
+      console.error('Test email failed:', error);
+    }
     return { success: "Confirmation email sent!!" }
   }
 

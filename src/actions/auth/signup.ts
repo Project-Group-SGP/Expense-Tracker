@@ -7,7 +7,8 @@ import { getUserByEmail } from "@/data/user"
 import { generateVerificationToken } from "@/lib/tokens"
 import nodemailer from "nodemailer"
 
-function sendVerificationEmail(email: string, token: string) {
+
+async function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -53,16 +54,15 @@ function sendVerificationEmail(email: string, token: string) {
 </html>`,
   }
 
-  console.log("\n\nVerification about to send\n\n");
-
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error)
-      throw error
-    }
-  })
-
-  console.log("\n\nVerification send\n\n");
+  try {
+    console.log('Transporter created, attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Verification Mail sent successfully:', info.response);
+    return info;
+  } catch (error) {
+    console.error('Error sending Verification email:', error);
+    throw error;
+  };
 }
 
 export const Register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -88,7 +88,10 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
 
   const verificationToken = await generateVerificationToken(email)
 
-  sendVerificationEmail(verificationToken.email, verificationToken.token)
-
+  try{
+    await sendVerificationEmail(verificationToken.email, verificationToken.token)
+  }catch(error){
+    console.error("Error while sending Verification Mail:",error);
+  }
   return { success: "Confirmation email sent!" }
 }

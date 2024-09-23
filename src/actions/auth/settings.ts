@@ -8,7 +8,8 @@ import nodemailer from "nodemailer"
 import * as z from "zod"
 import bcrypt from "bcryptjs"
 
- function sendVerificationEmail(email: string, token: string) {
+ 
+async function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -53,17 +54,18 @@ import bcrypt from "bcryptjs"
 </body>
 </html>`,
   }
-  console.log("\n\nVerification Mail about to send\n\n");
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error)
-      throw error
-    }
-  })
-
-  console.log("\n\nVerification Mail send\n\n");
+  try {
+    console.log('Transporter created, attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Verification Mail sent successfully:', info.response);
+    return info;
+  } catch (error) {
+    console.error('Error sending Verification email:', error);
+    throw error;
+  };
 }
+
 
 export const settings = async (values: z.infer<typeof SettingsSchema>) => {
   // console.log("values: ",values);
@@ -114,8 +116,11 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
 
     const verificationtoken = await generateVerificationToken(values.email)
 
-    sendVerificationEmail(verificationtoken.email, verificationtoken.token)
-
+    try{
+      await sendVerificationEmail(verificationtoken.email, verificationtoken.token);
+    }catch(error){
+      console.error("Error while sending mail:",error);
+    }
     return { success: "verification email send" }
   }
 

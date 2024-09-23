@@ -5,7 +5,7 @@ import { ResetSchema } from "@/lib/index"
 import nodemailer from "nodemailer"
 import { z } from "zod"
 
-const sendPasswordResetEmail = (email: string, token: string) => {
+const sendPasswordResetEmail = async(email: string, token: string) => {
   const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`
 
   const transporter = nodemailer.createTransport({
@@ -52,16 +52,17 @@ const sendPasswordResetEmail = (email: string, token: string) => {
 </html>`,
   }
 
-  console.log("\n\nReset mail about to send\n\n");
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error)
-      throw error
-    }
-  })
+  try {
+    console.log('Transporter created, attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('resetpass Mail sent successfully:', info.response);
+    return info;
+  } catch (error) {
+    console.error('Error sending resetpass email:', error);
+    throw error;
+  }
 
-  console.log("\n\nReset mail send!!\n\n");
 }
 
 export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
@@ -81,8 +82,11 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
   const passwordResettoken = await generatePasswordResetToken(
     validatedFields.data.email
   )
-
-  sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
-
+  try{
+    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
+  }catch(error){
+    console.error("Error while sending resetpass mail",error);
+  }
+  
   return { success: "Reset email send!" }
 }
