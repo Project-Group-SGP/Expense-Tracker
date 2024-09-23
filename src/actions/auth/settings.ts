@@ -53,6 +53,7 @@ async function sendVerificationEmail(email: string, token: string) {
 </body>
 </html>`,
   }
+  console.log("\n\nVerification Mail about to send\n\n");
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
@@ -60,6 +61,8 @@ async function sendVerificationEmail(email: string, token: string) {
       throw error
     }
   })
+
+  console.log("\n\nVerification Mail send\n\n");
 }
 
 export const settings = async (values: z.infer<typeof SettingsSchema>) => {
@@ -138,6 +141,3 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
 
   return {success:"Setting updated!"};
 }
-
-
-export const maxDuration = 30; 

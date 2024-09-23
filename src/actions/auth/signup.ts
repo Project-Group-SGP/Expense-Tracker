@@ -53,12 +53,16 @@ async function sendVerificationEmail(email: string, token: string) {
 </html>`,
   }
 
+  console.log("\n\nVerification about to send\n\n");
+
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error)
       throw error
     }
   })
+
+  console.log("\n\nVerification send\n\n");
 }
 
 export const Register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -88,5 +92,3 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
 
   return { success: "Confirmation email sent!" }
 }
-
-export const maxDuration = 30; 

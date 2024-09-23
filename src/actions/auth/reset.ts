@@ -52,12 +52,16 @@ const sendPasswordResetEmail = async (email: string, token: string) => {
 </html>`,
   }
 
+  console.log("\n\nReset mail about to send\n\n");
+
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error)
       throw error
     }
   })
+
+  console.log("\n\nReset mail send!!\n\n");
 }
 
 export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
@@ -82,6 +86,3 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
 
   return { success: "Reset email send!" }
 }
-
-
-export const maxDuration = 30; 

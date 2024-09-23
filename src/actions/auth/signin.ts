@@ -57,6 +57,7 @@ async function sendVerificationEmail(email: string, token: string) {
 </body>
 </html>`,
   }
+  console.log("\n\nVerification Mail about to send\n\n");
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
@@ -64,6 +65,7 @@ async function sendVerificationEmail(email: string, token: string) {
       throw error
     }
   })
+  console.log("\n\nVerification Mail send\n\n");
 }
 
 export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
@@ -108,6 +110,7 @@ export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
 </body>
 </html>`,
   }
+  console.log("\n\n2FA Mail about to send\n\n");
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
@@ -115,6 +118,8 @@ export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
       throw error
     }
   })
+
+  console.log("\n\n2FA Mail send\n\n");
 }
 
 export const Signin = async (
@@ -205,5 +210,3 @@ export const Signin = async (
     throw e
   }
 }
-
-export const maxDuration = 30; 
