@@ -39,6 +39,7 @@ type UserExpense = {
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
+  console.log("authHeader", authHeader)
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response("Unauthorized", {
       status: 401,
