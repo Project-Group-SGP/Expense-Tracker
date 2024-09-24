@@ -20,7 +20,7 @@ import { CardWrapper } from "./card-wrapper";
 import { toast } from 'sonner'
 import { Passwordcmp } from "../Passwordcmp";
 import { RegisterSchema } from "@/lib/index";
-import { Register } from "@/actions/auth/signup";
+import { Register } from "../../actions/auth/signup";
 
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -51,18 +51,18 @@ export const RegisterForm = () => {
       Register(values)
         .then((data: { success?: string, error?: string }) => {
           if (data.error) {
-          toast.error(data.error, {
-            closeButton: true,
-            id: loading
-          })
-          console.error(data.error)
-        } else {
-          toast.success(data.success, {
-            closeButton: true,
-            id: loading
-          });
-          form.reset();
-        }
+            toast.error(data.error, {
+              closeButton: true,
+              id: loading
+            })
+            console.error(data.error)
+          } else {
+            toast.success(data.success, {
+              closeButton: true,
+              id: loading
+            });
+            form.reset();
+          }
         });
     });
   };
