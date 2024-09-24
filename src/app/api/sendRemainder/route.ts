@@ -126,8 +126,7 @@ async function sendReminderEmails(userExpenses: Record<string, UserExpense>) {
     },
   })
 
-  for (const userId in userExpenses) {
-    const user = userExpenses[userId]
+  const emailPromises = Object.values(userExpenses).map((user) => {
     const mailOptions = {
       from: process.env.EMAIL,
       to: user.email,
@@ -135,9 +134,12 @@ async function sendReminderEmails(userExpenses: Record<string, UserExpense>) {
       html: createEmailContent(user),
     }
 
-    transporter.sendMail(mailOptions)
-    console.log(`Reminder email sent to ${user.email}`)
-  }
+    return transporter.sendMail(mailOptions).then(() => {
+      console.log(`Reminder email sent to ${user.email}`)
+    })
+  })
+
+  await Promise.all(emailPromises)
 }
 
 function createEmailContent(user: UserExpense): string {
