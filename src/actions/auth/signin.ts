@@ -112,9 +112,6 @@ async function sendVerificationEmail(email: string, token: string) {
             </p>
             <p>If you didn't create an account with SpendWise, please ignore this email.</p>
         </div>
-        <div class="footer">
-            © 2024 SpendWise. All rights reserved.
-        </div>
     </div>
 </body>
 </html>`,
@@ -225,9 +222,6 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
                 Please copy the code above manually.
             </p>
             <p>This code will expire in 10 minutes. If you didn't attempt to log in, please contact our support team immediately.</p>
-        </div>
-        <div class="footer">
-            © 2024 SpendWise. All rights reserved.
         </div>
     </div>
 </body>

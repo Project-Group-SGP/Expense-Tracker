@@ -140,8 +140,8 @@ export async function generateFinancialAdvice() {
 
     const result = await model.generateContent(prompt)
     const response = await result.response
-    const text = response.text()
-
+    const text = response.text();
+    
     return { result: text }
   } catch (error: any) {
     console.error("Error generating content:", error)
