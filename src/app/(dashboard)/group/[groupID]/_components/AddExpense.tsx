@@ -236,11 +236,17 @@ export function AddExpense({
       return
     }
 
-    const splits = data.splitWith.map((member) => ({
+    const splitsall = data.splitWith.map((member) => ({
       userId: member.id,
       amount: member.amount || 0,
     }))
 
+    const splits = splitsall.filter((split) => split.amount!==0);
+
+    if(splits.length < 2){
+      toast.error("Please select at least two members");
+    }
+    
     const loading = toast.loading("Adding Expense...")
     setOpen(false)
     try {

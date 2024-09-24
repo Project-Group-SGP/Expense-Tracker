@@ -50,7 +50,7 @@ export const LoginForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof SigninSchema>) => {
-    const loading = toast.loading("login user...")
+    // const loading = toast.loading("login user...")
     startTransition(() => {
       setDisabled(true);
       Signin(values,callbackUrl)
@@ -58,14 +58,12 @@ export const LoginForm = () => {
           if (data?.error!==undefined){
             toast.error(data.error, {
               closeButton: true,
-              id: loading
             })
             console.error(data.error)
           }
           if(data?.success!==undefined){
             toast.success(data.success, {
               closeButton: true,
-              id: loading
             });
             form.reset();
           }
