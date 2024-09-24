@@ -51,8 +51,6 @@ const sendPasswordResetEmail = async(email: string, token: string) => {
 </body>
 </html>`,
   }
-
-
   try {
     console.log('Transporter created, attempting to send email...');
     const info = await transporter.sendMail(mailOptions);
@@ -62,7 +60,6 @@ const sendPasswordResetEmail = async(email: string, token: string) => {
     console.error('Error sending resetpass email:', error);
     throw error;
   }
-
 }
 
 export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
@@ -83,7 +80,7 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
     validatedFields.data.email
   )
   try{
-    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
+    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token);
   }catch(error){
     console.error("Error while sending resetpass mail",error);
   }

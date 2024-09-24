@@ -34,7 +34,7 @@ export const NewResetPasswordForm = () => {
   });
 
   const onSubmit = (values:z.infer<typeof NewPasswordSchema>) =>{
-    const loading = toast.loading("Changing password...")
+    const loading = toast.loading("Changing password...");
     startTransition(()=>{
       newPassword(values,token)
         .then((data)=>{
