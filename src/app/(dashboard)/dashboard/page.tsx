@@ -10,6 +10,7 @@ import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
 import { format, subMonths } from "date-fns"
+import { generateFinancialAdvice } from "./actions"
 
 type FinancialData = {
   amount: number
@@ -145,6 +146,10 @@ export default async function Dashboard({
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
+
+  const suggestion  = await generateFinancialAdvice();
+  console.log(suggestion);
+  
 
   return (
     <Suspense>
