@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/sendRemainder",
+      "schedule": "0 20 * * *"
+    }
+  ]
+}
