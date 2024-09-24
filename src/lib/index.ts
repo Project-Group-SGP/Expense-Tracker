@@ -37,12 +37,7 @@ export const ResetSchema = z.object({
 export const NewPasswordSchema = z
   .object({
     password: z
-      .string()
-      .min(6, { message: "Minimum of 6 characters required" })
-      .regex(passwordValidation, {
-        message:
-          "Password should include digits(0-9),special symbols(@,#,&...),Uppercase (A-Z),lowercase(a-z) letters",
-      }),
+      .string(),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
