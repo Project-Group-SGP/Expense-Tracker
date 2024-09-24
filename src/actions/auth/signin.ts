@@ -274,10 +274,6 @@ export const Signin = async (
     }
     return { success: "Confirmation email sent!!" }
   }
-
-  console.log("Password during login",password,"Hashed pass:",existingUser.password)
-
-  const hashedPassord = await bcrypt.hash(password, 10)
   
   const check = await bcrypt.compare(password, existingUser.password)
 
