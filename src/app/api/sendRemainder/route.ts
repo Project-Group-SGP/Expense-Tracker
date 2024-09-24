@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   try {
     const expenses = await fetchExpenses()
     const userExpenses = organizeExpenses(expenses)
-    sendReminderEmails(userExpenses)
+    await sendReminderEmails(userExpenses)
 
     return Response.json({
       success: true,
