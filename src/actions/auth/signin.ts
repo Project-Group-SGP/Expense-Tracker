@@ -276,12 +276,14 @@ export const Signin = async (
   }
 
   console.log("Password during login",password,"Hashed pass:",existingUser.password)
+
+  const hashedPassord = await bcrypt.hash(password, 10)
   
   const check = await bcrypt.compare(password, existingUser.password)
 
   console.log("login check password",check);
   
-  console.log("check",check);
+  console.log("cmp pass",hashedPassord==existingUser.password);
 
   if (!check) return { error: "Invalid Password" }
 
