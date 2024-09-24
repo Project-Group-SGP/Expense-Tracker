@@ -90,8 +90,8 @@ export const RegisterForm = () => {
         .then((data:{success?:string,error?:string})=>{
             setError(data.error);
             setSuccess(data.success);
+            setPassword("");
         })
-        setPassword("");
     });
   }
   return (

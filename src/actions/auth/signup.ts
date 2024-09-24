@@ -132,7 +132,7 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
 
   if (validation.error) return { error: "Error!", success: "" }
 
-  const { email, password, name } = validation.data
+  const { email, password, name } = validation.data;
 
   const existinguser = await getUserByEmail(email)
 

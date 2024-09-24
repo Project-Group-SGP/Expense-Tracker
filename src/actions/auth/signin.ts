@@ -282,8 +282,6 @@ export const Signin = async (
   const check = await bcrypt.compare(password, existingUser.password)
 
   console.log("login check password",check);
-  
-  console.log("cmp pass",hashedPassord==existingUser.password);
 
   if (!check) return { error: "Invalid Password" }
 
