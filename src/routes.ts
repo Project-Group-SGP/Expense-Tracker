@@ -8,6 +8,7 @@ export const publicRoutes = [
   "/",
   "/auth/new-verification",
   "/api/sendMonthlyMail",
+  "/api/sendRemainder",
 ]
 
 /**
