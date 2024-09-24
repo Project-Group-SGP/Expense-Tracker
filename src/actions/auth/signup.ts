@@ -6,7 +6,7 @@ import { db } from "@/lib/db"
 import { getUserByEmail } from "@/data/user"
 import { generateVerificationToken } from "@/lib/tokens"
 import nodemailer from "nodemailer"
-import { logo } from "@/lib/logo"
+
 
 async function sendVerificationEmail(email: string, token: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
@@ -49,15 +49,6 @@ async function sendVerificationEmail(email: string, token: string) {
         .logo {
             text-align: center;
             margin-bottom: 20px;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-            height: 150px; /* Set the desired height for the logo */
-            background-image: url(${logo});
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
         }
         .content {
             background-color: #f9f9f9;
