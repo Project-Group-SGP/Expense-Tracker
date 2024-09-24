@@ -10,7 +10,7 @@ import {
 import { HandCoins, Wallet } from "lucide-react"
 import Card_unclick from "./Card_unclick"
 import { SetBudget } from "./Setbudget"
-import { useTheme } from "next-themes"
+
 
 type CategoryBudget = {
   [key: string]: number // Dynamic keys for categories
@@ -82,9 +82,8 @@ export function OverallGraph({
   const circumference = 2 * Math.PI * radius
   const fillPercentage = (percentUsed / 100) * circumference
 
-  const theme = useTheme();
- const currentTheme = theme.theme;
-  const circleColor = currentTheme === "dark" ? "#4A4A4A" : "#D1D5DB"
+//  const currentTheme = theme.theme;
+  // const circleColor = currentTheme === "dark" ? "#4A4A4A" : "#D1D5DB"
   const filledColor = isOverBudget ? "#dc2626" : "#2EB88A"
 
   return (
@@ -100,7 +99,8 @@ export function OverallGraph({
               cy={size / 2}
               r={radius}
               fill="none"
-              stroke={circleColor}
+              // stroke={circleColor}
+              className="stroke-gray-300 dark:stroke-zinc-700"
               strokeWidth={strokeWidth}
             />
             <circle

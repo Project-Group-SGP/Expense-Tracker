@@ -51,7 +51,7 @@ const BudgetSelection: React.FC<BudgetSelectionProps> = ({ initialData, budget }
     <div className="space-y-6 p-4 sm:p-6 bg-background rounded-lg shadow-none">
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Budget Overview</h1>
-        <div className="w-full sm:w-[200px]">
+        <div className="w-full ml-10 sm:w-[200px]">
           <Select onValueChange={handleMonthChange} defaultValue={selectedMonth.toString()}>
             <SelectTrigger className="w-full bg-blue-600/5 border-blue-600/20 text-blue-600 hover:bg-blue-600/10 focus:ring-blue-600/30">
               <CalendarIcon className="mr-2 h-4 w-4 text-blue-600/70" />
