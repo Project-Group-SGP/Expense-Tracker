@@ -98,7 +98,7 @@ async function sendVerificationEmail(email: string, token: string) {
 <body>
     <div class="container">
         <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWise-5.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
             <h2>Verify Your Email Address</h2>
