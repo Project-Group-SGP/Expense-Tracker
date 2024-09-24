@@ -56,11 +56,15 @@ export const columns: ColumnDef<ResponceType>[] = [
     },
     cell:({row}) => {
       const date = row.getValue("date") as Date;
-
       return (
-        <span>
-          {format(date,"dd MMMM, yyyy")}
-        </span>
+        <div>
+          <span className="hidden sm:block">  
+            {format(date,"dd MMMM, yyyy")}
+          </span>
+          <span className="sm:hidden block">  
+            {date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          </span>
+        </div>
       )
     }
   },
