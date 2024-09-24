@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useMemo, useState, useTransition } from "react";
+import React, { useCallback, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from 'zod';
@@ -17,15 +17,12 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CardWrapper } from "./card-wrapper";
-import { FormError } from "./form-error";
-import { FromSuccess } from "./form-success";
+import { toast } from 'sonner'
 import { Passwordcmp } from "../Passwordcmp";
 import { RegisterSchema } from "@/lib/index";
 import { Register } from "@/actions/auth/signup";
 
 export const RegisterForm = () => {
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [passwordStrength, setPasswordStrength] = useState({
@@ -43,29 +40,37 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
-    setError("");
-    setSuccess("");
-    
     if (passwordStrength.score < 3) {
-      setError("Please set a stronger password");
+      toast.warning("Please set a stronger password");
       return;
     }
+
+    const loading = toast.loading("Registering user...", {
+      description: 'Please wait while we process your request.'
+    })
 
     startTransition(() => {
       Register(values)
         .then((data: { success?: string, error?: string }) => {
-          setError(data.error);
-          setSuccess(data.success);
-          if (data.success) {
-            form.reset();
-          }
+          if (data.error) {
+          toast.error(data.error, {
+            closeButton: true,
+            id: loading
+          })
+          console.error(data.error)
+        } else {
+          toast.success(data.success, {
+            closeButton: true,
+            id: loading
+          });
+          form.reset();
+        }
         });
     });
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const password = e.target.value;
-    form.setValue("password", password);
     const result = zxcvbn(password);
     setPasswordStrength({
       score: result.score,
@@ -138,7 +143,10 @@ export const RegisterForm = () => {
                       {...field}
                       placeholder="Enter your Password"
                       type={isPasswordVisible ? "text" : "password"}
-                      onChange={handlePasswordChange}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handlePasswordChange(e);
+                      }}
                       disabled={isPending}
                       className="pr-10"
                     />
@@ -163,9 +171,6 @@ export const RegisterForm = () => {
               </FormItem>
             )}
           />
-
-          {error && <FormError message={error} />}
-          {success && <FromSuccess message={success} />}
 
           <Button
             disabled={isPending}

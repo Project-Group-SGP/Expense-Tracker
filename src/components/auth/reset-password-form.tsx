@@ -13,15 +13,12 @@ import {
   FormMessage
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { FormError } from "./form-error";
-import { FromSuccess } from "./form-success";
 import { Resetpass } from "@/actions/auth/reset";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { toast } from 'sonner'
 import { ResetSchema } from "@/lib/index";
 
 export const ResetpasswordForm = () => {
-  const [error,setError]=useState<string|undefined>("");
-  const [success,setSuccess] = useState<string|undefined>("");
   const [isPending, startTransition] =useTransition();
 
 
@@ -34,15 +31,27 @@ export const ResetpasswordForm = () => {
 
   const onSubmit = (values:z.infer<typeof ResetSchema>) =>{
     // Wrap startTransaction around the api call/ server actions
-    setError("");
-    setSuccess("");
+
+    const loading = toast.loading("changing Password...", {
+      description: 'Please wait while we process your request.'
+    })
+    
     startTransition(()=>{
       Resetpass(values)
         .then((data)=>{
-          if(data.success === undefined)
-            setError(data.error);
-          else 
-            setSuccess(data.success);    
+          if (data.error!==undefined) {
+            toast.error(data.error, {
+              closeButton: true,
+              id: loading
+            })
+            console.error(data.error)
+          } else {
+            toast.success(data.success, {
+              closeButton: true,
+              id: loading
+            });
+            form.reset();
+          }    
         })
     });
   }
@@ -77,9 +86,6 @@ export const ResetpasswordForm = () => {
                 </FormItem>
   )}
             />
-            {!success && <FormError message={error} key={error}/>}
-            
-            {!error && <FromSuccess message={success} key={success} />}
           <Button
             disabled={isPending}
             type='submit'

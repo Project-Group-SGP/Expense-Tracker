@@ -253,7 +253,7 @@ export const Signin = async (
   const validationeddFields = SigninSchema.safeParse(values)
 
   if (validationeddFields.error)
-    return { error: "Invalid fields!", success: "" }
+    return { error: "Invalid fields!"}
 
   const { email, password, code } = validationeddFields.data
 
@@ -268,7 +268,7 @@ export const Signin = async (
     )
 
     try{
-      await sendVerificationEmail(verificationToken.email, verificationToken.token)
+      sendVerificationEmail(verificationToken.email, verificationToken.token)
     }catch(error){
       console.error('Test email failed:', error);
     }
@@ -316,7 +316,7 @@ export const Signin = async (
 
 
       try {
-        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
+        sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
         console.log('Test email sent successfully');
       } catch (error) {
         console.error('Test email failed:', error);

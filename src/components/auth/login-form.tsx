@@ -1,5 +1,4 @@
 "use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -13,9 +12,6 @@ import {
   FormMessage,
 } from "../ui/form"
 import { Input } from "../ui/input"
-import { CardWrapper } from "./card-wrapper"
-import { FormError } from "./form-error"
-import { FromSuccess } from "./form-success"
 import { useState, useTransition } from "react"
 import { SigninSchema } from "@/lib/index"
 import { useSearchParams } from "next/navigation"
@@ -29,12 +25,12 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { Signin } from "@/actions/auth/signin"
+import { toast } from 'sonner'
+import { CardWrapper } from "./card-wrapper"
 
 export const LoginForm = () => {
   const [showTwoFactor, setShowTwoFactor] = useState<boolean | undefined>()
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>("")
-  const [success, setSuccess] = useState<string | undefined>("")
   const [isPending, startTransition] = useTransition()
   const [isDisabled,setDisabled] = useState<boolean>(false);
   const searchparams = useSearchParams()
@@ -54,26 +50,33 @@ export const LoginForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof SigninSchema>) => {
-    setError("")
-    setSuccess("")
+    const loading = toast.loading("login user...", {
+      description: 'Please wait while we process your request.'
+    })
     startTransition(() => {
       setDisabled(true);
       Signin(values,callbackUrl)
         .then((data) => {
-          if (data?.error) {
-            form.reset()
-            setError(data?.error || urlError)
+          if (data?.error!==undefined){
+            toast.error(data.error, {
+              closeButton: true,
+              id: loading
+            })
+            console.error(data.error)
           }
-          if (data?.success) {
-            form.reset()
-            setSuccess(data?.success)
+          if(data?.success!==undefined){
+            toast.success(data.success, {
+              closeButton: true,
+              id: loading
+            });
+            form.reset();
           }
-          if (data?.twoFactor) {
+          if (data?.twoFactor!==undefined) {
             setShowTwoFactor(true)
           }
         })
         .catch(() => {
-          setError("Something went wrong")
+          toast.error("Something went wrong");
         })
         setDisabled(false);
     })
@@ -176,8 +179,6 @@ export const LoginForm = () => {
               />
             </>
           )}
-          {!success && <FormError message={error} />}
-          {!error && <FromSuccess message={success} />}
           <Button
             disabled={isDisabled}
             type="submit"

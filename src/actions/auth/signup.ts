@@ -127,6 +127,7 @@ async function sendVerificationEmail(email: string, token: string) {
   }
 }
 
+
 export const Register = async (values: z.infer<typeof RegisterSchema>) => {
   const validation = RegisterSchema.safeParse(values)
 
@@ -153,7 +154,7 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
   const verificationToken = await generateVerificationToken(email)
 
   try{
-    await sendVerificationEmail(verificationToken.email, verificationToken.token)
+    sendVerificationEmail(verificationToken.email, verificationToken.token)
   }catch(error){
     console.error("Error while sending Verification Mail:",error);
   }
