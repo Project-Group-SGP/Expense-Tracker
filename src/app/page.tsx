@@ -97,7 +97,7 @@ export default async function Home() {
                 realistic budgets, and achieve your financial goals with ease.
               </div>
               <Link
-                href="/auth/signin"
+                href="/auth/signup"
                 className="hover:bg-primary-dark mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-colors"
               >
                 Start Your Journey

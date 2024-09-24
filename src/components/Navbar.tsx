@@ -48,7 +48,7 @@ const Navbar = () => {
             <div className="hidden md:block lg:block">
               <ModeToggle />
             </div>
-            <Link href="/auth/signin">
+            <Link href="/auth/signup">
               <Button
                 variant="default"
                 className={cn(

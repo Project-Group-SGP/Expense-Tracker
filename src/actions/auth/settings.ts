@@ -179,7 +179,7 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     const verificationtoken = await generateVerificationToken(values.email)
 
     try{
-      sendVerificationEmail(verificationtoken.email, verificationtoken.token);
+      await sendVerificationEmail(verificationtoken.email, verificationtoken.token);
     }catch(error){
       console.error("Error while sending mail:",error);
     }

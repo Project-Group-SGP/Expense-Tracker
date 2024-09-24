@@ -45,9 +45,7 @@ export const RegisterForm = () => {
       return;
     }
 
-    const loading = toast.loading("Registering user...", {
-      description: 'Please wait while we process your request.'
-    })
+    const loading = toast.loading("Registering user...")
 
     startTransition(() => {
       Register(values)

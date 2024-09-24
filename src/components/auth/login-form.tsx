@@ -50,9 +50,7 @@ export const LoginForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof SigninSchema>) => {
-    const loading = toast.loading("login user...", {
-      description: 'Please wait while we process your request.'
-    })
+    const loading = toast.loading("login user...")
     startTransition(() => {
       setDisabled(true);
       Signin(values,callbackUrl)

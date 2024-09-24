@@ -1,9 +1,6 @@
 "use client"
 import { useSearchParams } from "next/navigation"
 import { CardWrapper } from "./card-wrapper"
-import { FormError } from "./form-error"
-import { FromSuccess } from "./form-success"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from 'zod'
@@ -17,13 +14,11 @@ import {
   FormMessage
 } from "../ui/form"
 import { Input } from "../ui/input"
-
+import { toast } from 'sonner'
 import { newPassword } from "@/actions/auth/new-password"
 import { NewPasswordSchema } from "@/lib/index"
-import { useState, useTransition } from "react"
+import { useTransition } from "react"
 export const NewResetPasswordForm = () => {
-  const [Error ,setError] = useState<string|undefined>("");
-  const [Success ,setSuccess] = useState<string|undefined>("");
   const [isPending, startTransition] =useTransition();
 
   const searchparams = useSearchParams();
@@ -39,16 +34,23 @@ export const NewResetPasswordForm = () => {
   });
 
   const onSubmit = (values:z.infer<typeof NewPasswordSchema>) =>{
-    // Wrap startTransaction around the api call/ server actions
-    setError("");
-    setSuccess("");
+    const loading = toast.loading("Changing password...")
     startTransition(()=>{
       newPassword(values,token)
         .then((data)=>{
-          if(data.error===undefined)
-            setSuccess(data.success);
-          else
-            setError(data.error);
+            if (data.error!==undefined) {
+              toast.error(data.error, {
+                closeButton: true,
+                id: loading
+              })
+              console.error(data.error)
+            } else {
+              toast.success(data.success, {
+                closeButton: true,
+                id: loading
+              });
+              form.reset();
+            }
         })
     });
   }
@@ -102,9 +104,6 @@ export const NewResetPasswordForm = () => {
                 </FormItem>
   )}
             />
-            {!Success && <FormError message={Error} key={Error}/>}
-            
-            {!Error && <FromSuccess message={Success} key={Success} />}
           <Button
             disabled={isPending}
             type='submit'

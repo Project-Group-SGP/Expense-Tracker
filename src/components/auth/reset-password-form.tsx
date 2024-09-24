@@ -32,9 +32,7 @@ export const ResetpasswordForm = () => {
   const onSubmit = (values:z.infer<typeof ResetSchema>) =>{
     // Wrap startTransaction around the api call/ server actions
 
-    const loading = toast.loading("changing Password...", {
-      description: 'Please wait while we process your request.'
-    })
+    const loading = toast.loading("changing Password...")
     
     startTransition(()=>{
       Resetpass(values)

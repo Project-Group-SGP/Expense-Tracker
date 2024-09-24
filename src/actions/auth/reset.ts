@@ -83,7 +83,7 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
     validatedFields.data.email
   )
   try{
-    sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
+    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token)
   }catch(error){
     console.error("Error while sending resetpass mail",error);
   }

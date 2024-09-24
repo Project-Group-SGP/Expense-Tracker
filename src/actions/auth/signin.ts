@@ -215,7 +215,7 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
 <body>
     <div class="container">
         <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWise-5.png" alt="SpendWise Logo" width="150">
+            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
         </div>
         <div class="content">
             <h2>Your Two-Factor Authentication Code</h2>
@@ -268,7 +268,7 @@ export const Signin = async (
     )
 
     try{
-      sendVerificationEmail(verificationToken.email, verificationToken.token)
+      await sendVerificationEmail(verificationToken.email, verificationToken.token)
     }catch(error){
       console.error('Test email failed:', error);
     }
@@ -316,7 +316,7 @@ export const Signin = async (
 
 
       try {
-        sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
+        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
         console.log('Test email sent successfully');
       } catch (error) {
         console.error('Test email failed:', error);
