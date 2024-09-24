@@ -275,7 +275,13 @@ export const Signin = async (
     return { success: "Confirmation email sent!!" }
   }
 
+  console.log("Password during login",password,"Hashed pass:",existingUser.password)
+  
   const check = await bcrypt.compare(password, existingUser.password)
+
+  console.log("login check password",check);
+  
+  console.log("check",check);
 
   if (!check) return { error: "Invalid Password" }
 

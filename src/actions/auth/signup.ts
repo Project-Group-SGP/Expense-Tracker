@@ -138,7 +138,11 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
 
   if (existinguser) return { error: "User already exist!", success: "" }
 
+  console.log("Password during register",password)
+
   const hashedPassord = await bcrypt.hash(password, 10)
+
+  console.log("hashedPassword during register",hashedPassord)
 
   const user = await db.user.create({
     data: {
