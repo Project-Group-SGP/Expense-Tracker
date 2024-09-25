@@ -10,6 +10,8 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
+import { generateFinancialAdvice } from "./actions"
+import AIInsight from "./_components/AIInsight"
 
 type FinancialData = {
   amount: number
@@ -19,7 +21,6 @@ const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
       const res = await fetch(
-        // `${process.env.BASE_URL}/api/totalIncome?userId=${id}`,
         `${process.env.BASE_URL}/api/totalIncome`,
         {
           method: "GET",
@@ -32,7 +33,6 @@ const getTotalIncome = cache(
       const data = await res.json()
       return { amount: Number(data) || 0 }
     } catch (error) {
-      // console.error("Error fetching total income:", error)
       return { amount: 0 }
     }
   }
@@ -42,7 +42,6 @@ const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
       const res = await fetch(
-        // `${process.env.BASE_URL}/api/totalExpense?userId=${id}`,
         `${process.env.BASE_URL}/api/totalExpense`,
         {
           method: "GET",
@@ -55,7 +54,6 @@ const getTotalExpense = cache(
       const data = await res.json()
       return { amount: Number(data) || 0 }
     } catch (error) {
-      // console.error("Error fetching total expense:", error)
       return { amount: 0 }
     }
   }
@@ -93,9 +91,7 @@ const getAllData = cache(
   ): Promise<FinancialData_> => {
     try {
       const res = await fetch(
-        // `${process.env.BASE_URL}/api/allData?userId=${id}&startDate=${startDate}&endDate=${endDate}`,
         `${process.env.BASE_URL}/api/allData?&startDate=${startDate}&endDate=${endDate}`,
-
         {
           method: "GET",
           headers: { Cookie: cookie },
@@ -111,7 +107,6 @@ const getAllData = cache(
       const data: FinancialData_ = await res.json()
       return data
     } catch (error) {
-      // console.error("Error fetching data:", error)
       return { expense: [], income: [] }
     }
   }
@@ -145,11 +140,10 @@ export default async function Dashboard({
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
-  // console.log(suggestion);
 
   return (
     <Suspense>
-      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
+      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4 relative">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title="Dashboard" />
 
@@ -197,8 +191,8 @@ export default async function Dashboard({
 
           <DateSelect />
 
-          <section className="w-full space-y-4 md:flex md:space-x-4 md:space-y-0">
-            <Cardcontent className="w-full p-4 md:w-1/2">
+          <section className="w-full space-y-4 md:space-y-0 md:space-x-4 md:flex">
+            <Cardcontent className="w-full md:w-1/2 p-4">
               <Dropdown_chart_1 data={Data} />
             </Cardcontent>
 
@@ -207,6 +201,8 @@ export default async function Dashboard({
             </Cardcontent>
           </section>
         </div>
+        
+        <AIInsight />
       </div>
     </Suspense>
   )
