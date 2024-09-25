@@ -48,10 +48,6 @@ type MonthlyFinancialData = {
   budgetVarianceByCategory: Record<CategoryTypes, number>
 }
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_MAIL_API_KEY,
-})
-
 // add new income
 export async function AddnewIncome(data: IncomeFormData) {
   const user = await currentUserServer()
@@ -126,6 +122,10 @@ export async function generateFinancialAdvice(
         },
       },
     })
+
+    if (incomes.length === 0 && expenses.length === 0) {
+      throw new Error("No data found for the selected period.")
+    }
 
     const budgets = await db.category.findMany({
       where: {
@@ -312,8 +312,6 @@ export async function generateFinancialAdvice(
 
       stream.done()
     })()
-
-    console.log(stream.value)
 
     return { output: stream.value }
   } catch (error: any) {
