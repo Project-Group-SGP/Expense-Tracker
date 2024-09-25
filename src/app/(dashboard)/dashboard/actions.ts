@@ -5,7 +5,48 @@ import { ExpenseFormData } from "./_components/NewExpense"
 import { IncomeFormData } from "./_components/Newincome"
 import { revalidateTag } from "next/cache"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { generateText } from "ai"
+import { streamText } from "ai"
+import { createStreamableValue } from "ai/rsc"
+import { CategoryTypes } from "@prisma/client"
+
+type Month =
+  | "January"
+  | "February"
+  | "March"
+  | "April"
+  | "May"
+  | "June"
+  | "July"
+  | "August"
+  | "September"
+  | "October"
+  | "November"
+  | "December"
+
+const monthNames: Month[] = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+]
+
+type MonthlyFinancialData = {
+  month: string
+  totalIncome: number
+  totalExpenses: number
+  netSavings: number
+  expensesByCategory: Record<CategoryTypes, number>
+  budgetByCategory: Record<CategoryTypes, number>
+  budgetVarianceByCategory: Record<CategoryTypes, number>
+}
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_MAIL_API_KEY,
@@ -26,108 +67,172 @@ export async function AddnewIncome(data: IncomeFormData) {
   return newIncome ? "success" : "error"
 }
 
-// add new expense
-export async function AddnewExpense(data: ExpenseFormData) {
-  const user = await currentUserServer()
-  const { transactionDate, amount, description, category } = data
-  if (!user) {
-    throw new Error("Login Please")
-  }
-  const newExpense = await db.expense.create({
-    data: {
-      userId: user.id,
-      amount,
-      date: transactionDate,
-      description,
-      category,
-    },
-  })
-
-  revalidateTag("totalExpense")
-  revalidateTag("getAllData")
-
-  return newExpense ? "success" : "error"
-}
-
-
-// generate financial advice
-export async function generateFinancialAdvice() {
+export async function generateFinancialAdvice(
+  startMonth: Month,
+  endMonth: Month
+) {
   try {
-    // Check login status
     const user = await currentUserServer()
     if (!user) {
       throw new Error("Please log in.")
     }
 
-    //get the budget
-    const budget = await db.user.findUnique({
-      where: { id: user.id },
-      select: { budget: true },
-    })
-    if (!budget) {
-      throw new Error("Budget not found.")
+    if (monthNames.indexOf(startMonth) > monthNames.indexOf(endMonth)) {
+      throw new Error("Start month cannot be greater than end month.")
     }
 
-    const now = new Date()
-    const startmonthdate = new Date(now.getFullYear(), now.getMonth(), 1)
-    console.log("startmonthdate", startmonthdate)
-    const todayDate = new Date()
-    console.log("todayDate", todayDate)
+    const currentYear = new Date().getFullYear()
+    const startDate = new Date(currentYear, monthNames.indexOf(startMonth), 1)
+    const endDate = new Date(currentYear, monthNames.indexOf(endMonth) + 1, 0)
 
-    //get this month total income
-    const totalIncome = await db.income.aggregate({
-      _sum: { amount: true },
-      where: { userId: user.id, date: { gte: startmonthdate, lte: todayDate } },
-    })
-    if (!totalIncome) {
-      throw new Error("Total income not found.")
-    }
-
-    // get this month total expense
-    const totalExpense = await db.expense.aggregate({
-      _sum: { amount: true },
-      where: { userId: user.id, date: { gte: startmonthdate, lte: todayDate } },
+    const expenses = await db.expense.findMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
     })
 
-    if (!totalExpense) {
-      throw new Error("Total expense not found.")
-    }
-
-    //get category wise expense
-    const categoryData = await db.category.findMany({
-      where: { userId: user.id },
-      select: { category: true, budget: true },
+    const incomes = await db.income.findMany({
+      where: {
+        userId: user.id,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
     })
-    if (!categoryData) {
-      throw new Error("Category data not found.")
-    }
 
-    // get category wise expense
-    const categoryExpense = await Promise.all(
-      categoryData.map(async (category) => {
-        const expense = await db.expense.aggregate({
-          _sum: { amount: true },
-          where: {
-            userId: user.id,
-            category: category.category,
-            date: { gte: startmonthdate, lte: todayDate },
-          },
-        })
-        if (!expense) {
-          throw new Error("Category expense not found.")
-        }
-        return {
-          category: category.category,
-          budget: category.budget,
-          expense: expense._sum.amount,
-        }
+    const budgets = await db.category.findMany({
+      where: {
+        userId: user.id,
+      },
+    })
+
+    const monthlyData: MonthlyFinancialData[] = []
+
+    for (
+      let i = monthNames.indexOf(startMonth);
+      i <= monthNames.indexOf(endMonth);
+      i++
+    ) {
+      const monthStart = new Date(currentYear, i, 1)
+      const monthEnd = new Date(currentYear, i + 1, 0)
+
+      const monthExpenses = expenses.filter(
+        (e) => e.date >= monthStart && e.date <= monthEnd
+      )
+      const monthIncomes = incomes.filter(
+        (i) => i.date >= monthStart && i.date <= monthEnd
+      )
+
+      const totalExpenses = monthExpenses.reduce(
+        (sum, expense) => sum + Number(expense.amount),
+        0
+      )
+      const totalIncome = monthIncomes.reduce(
+        (sum, income) => sum + Number(income.amount),
+        0
+      )
+      const netSavings = totalIncome - totalExpenses
+
+      const expensesByCategory = monthExpenses.reduce(
+        (acc, expense) => {
+          acc[expense.category] =
+            (acc[expense.category] || 0) + Number(expense.amount)
+          return acc
+        },
+        {} as Record<CategoryTypes, number>
+      )
+
+      const budgetByCategory = budgets.reduce(
+        (acc, budget) => {
+          acc[budget.category] = Number(budget.budget)
+          return acc
+        },
+        {} as Record<CategoryTypes, number>
+      )
+
+      const budgetVarianceByCategory = Object.entries(budgetByCategory).reduce(
+        (acc, [category, budget]) => {
+          acc[category as CategoryTypes] =
+            budget - (expensesByCategory[category as CategoryTypes] || 0)
+          return acc
+        },
+        {} as Record<CategoryTypes, number>
+      )
+
+      monthlyData.push({
+        month: monthNames[i],
+        totalIncome,
+        totalExpenses,
+        netSavings,
+        expensesByCategory,
+        budgetByCategory,
+        budgetVarianceByCategory,
       })
+    }
+
+    const overallTotalExpenses = monthlyData.reduce(
+      (sum, month) => sum + month.totalExpenses,
+      0
+    )
+    const overallTotalIncome = monthlyData.reduce(
+      (sum, month) => sum + month.totalIncome,
+      0
+    )
+    const overallNetSavings = overallTotalIncome - overallTotalExpenses
+
+    const overallExpensesByCategory = monthlyData.reduce(
+      (acc, month) => {
+        Object.entries(month.expensesByCategory).forEach(
+          ([category, amount]) => {
+            acc[category as CategoryTypes] =
+              (acc[category as CategoryTypes] || 0) + amount
+          }
+        )
+        return acc
+      },
+      {} as Record<CategoryTypes, number>
     )
 
-    console.log(categoryExpense)
-    console.log(totalIncome._sum.amount)
-    console.log(totalExpense._sum.amount)
-    console.log(budget.budget)
+    const overallBudgetByCategory = budgets.reduce(
+      (acc, budget) => {
+        acc[budget.category] = Number(budget.budget) * monthlyData.length
+        return acc
+      },
+      {} as Record<CategoryTypes, number>
+    )
+
+    const overallBudgetVarianceByCategory = Object.entries(
+      overallBudgetByCategory
+    ).reduce(
+      (acc, [category, budget]) => {
+        acc[category as CategoryTypes] =
+          budget - (overallExpensesByCategory[category as CategoryTypes] || 0)
+        return acc
+      },
+      {} as Record<CategoryTypes, number>
+    )
+
+    const financialSummary = {
+      period: `${startMonth} to ${endMonth} ${currentYear}`,
+      monthlyData,
+      overall: {
+        totalIncome: overallTotalIncome,
+        totalExpenses: overallTotalExpenses,
+        netSavings: overallNetSavings,
+        expensesByCategory: overallExpensesByCategory,
+        budgetByCategory: overallBudgetByCategory,
+        budgetVarianceByCategory: overallBudgetVarianceByCategory,
+      },
+    }
+
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GEMINI_MAIL_API_KEY,
+    })
 
     const model = google("gemini-1.5-flash", {
       safetySettings: [
@@ -138,16 +243,54 @@ export async function generateFinancialAdvice() {
       ],
     })
 
-    const prompt = `Generate unique financial advice for a user with a budget of ₹${budget.budget} " 
-      expenses of ₹ ${totalExpense._sum.amount} , and income of ₹+ ${totalIncome._sum.amount} categroy wise expense data are ${categoryExpense}.  
-      Provide personalized tips for managing deficits, focusing on cutting expenses, boosting income, and practicing mindful spending, using engaging language and emojis for clarity. and make it in two-three line.`
+    const prompt = `
+    As a financial advisor, analyze the following detailed financial data, including budget information, and provide a comprehensive summary and actionable advice:
 
-    // For this example, we'll use the gemini-pro model
-    const text = await generateText({ model: model, prompt: prompt })
+    ${JSON.stringify(financialSummary, null, 2)}
 
-    console.log("text", text)
+    Please provide:
+    1. A brief summary of the user's overall financial situation for the entire period
+    2. Month-by-month analysis of income and expenses trends 
+    3. Insights on spending patterns across different categories, comparing actual expenses to budgeted amounts
+    4. Identification of categories where the user is consistently over or under budget
+    5. Analysis of the user's budgeting accuracy and suggestions for improvement
+    6. Recommendations for improving financial health, including:
+       - Suggestions for adjusting budgets in specific categories
+       - Ideas for reducing expenses in over-budget categories
+       - Advice on reallocating funds from under-budget categories
+       - Strategies for increasing savings
+    7. Specific, actionable steps the user can take in the coming month to better align with their budget and financial goals
 
-    return { result: text }
+    Format your response in markdown, using headers, subheaders, and bullet points for clarity.
+    Use tables where appropriate to present numerical data, especially for budget vs. actual comparisons.
+
+     To make the response more engaging and relatable:
+    - Use a friendly, conversational tone throughout your analysis and advice
+    - Include relevant emojis in your headers, key points, and recommendations to add visual interest and emphasize important information
+    - Make the financial advice feel personal and actionable, as if you're having a one-on-one conversation with the user
+    - Use encouraging language to motivate the user and make them feel positive about taking control of their finances
+
+    Remember, the goal is to provide clear, actionable financial advice while keeping the tone upbeat and engaging!
+    `
+
+    const stream = createStreamableValue("")
+
+    ;(async () => {
+      const { textStream } = await streamText({
+        model: model,
+        prompt: prompt,
+      })
+
+      for await (const delta of textStream) {
+        stream.update(delta)
+      }
+
+      stream.done()
+    })()
+
+    console.log(stream.value)
+
+    return { output: stream.value }
   } catch (error: any) {
     console.error("Error generating content:", error)
     return { error: "Failed to generate content", details: error.message }

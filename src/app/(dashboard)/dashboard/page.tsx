@@ -1,4 +1,5 @@
 import { currentUserServer } from "@/lib/auth"
+import { format, subMonths } from "date-fns"
 import { MoveDownIcon, MoveUpIcon, PiggyBankIcon } from "lucide-react"
 import { headers } from "next/headers"
 import { cache, Suspense } from "react"
@@ -9,8 +10,6 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
-import { format, subMonths } from "date-fns"
-import { generateFinancialAdvice } from "./actions"
 
 type FinancialData = {
   amount: number
@@ -146,10 +145,7 @@ export default async function Dashboard({
 
   const incomeAmount = totalIncome?.amount ?? 0
   const expenseAmount = totalExpense?.amount ?? 0
-
-  const suggestion  = await generateFinancialAdvice();
   // console.log(suggestion);
-  
 
   return (
     <Suspense>
@@ -201,12 +197,12 @@ export default async function Dashboard({
 
           <DateSelect />
 
-          <section className="w-full  space-y-4 md:space-y-0 md:space-x-4 md:flex">
-            <Cardcontent className="w-full md:w-1/2 p-4">
+          <section className="w-full space-y-4 md:flex md:space-x-4 md:space-y-0">
+            <Cardcontent className="w-full p-4 md:w-1/2">
               <Dropdown_chart_1 data={Data} />
             </Cardcontent>
 
-            <Cardcontent className="w-full md:w-1/2 p-4">
+            <Cardcontent className="w-full p-4 md:w-1/2">
               <Dropdown_chart_2 data={Data} />
             </Cardcontent>
           </section>
