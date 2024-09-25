@@ -5,22 +5,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import { useCompletion } from 'ai/react'
 import ReactMarkdown from 'react-markdown'
 import { generateFinancialAdvice } from '../actions'
+import { readStreamableValue } from 'ai/rsc'
+import { Month } from "../actions"
 
-const months = [
+const months= [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ]
 
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30
+
 export default function AIInsight() {
   const [fromMonth, setFromMonth] = useState("")
   const [toMonth, setToMonth] = useState("")
-
-  const { complete, completion, isLoading, error } = useCompletion({
-    api: generateFinancialAdvice,
-  })
+  const [generation, setGeneration] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (fromMonth && toMonth) {
@@ -34,7 +37,21 @@ export default function AIInsight() {
 
   const handleSubmit = async () => {
     if (fromMonth && toMonth) {
-      await complete(`${fromMonth},${toMonth}`)
+      setIsLoading(true)
+      setError(null)
+      setGeneration("")
+      try {
+        const { output } = await generateFinancialAdvice(fromMonth as Month, toMonth as Month)
+
+        for await (const delta of readStreamableValue(output as any)) {
+          setGeneration(currentGeneration => `${currentGeneration}${delta}`)
+        }
+      } catch (err) {
+        console.error("Error generating financial advice:", err)
+        setError("An error occurred while generating financial insights.")
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -62,7 +79,7 @@ export default function AIInsight() {
               <label htmlFor="fromMonth" className="block text-sm font-medium mb-1">
                 From
               </label>
-              <Select onValueChange={setFromMonth} value={fromMonth}>
+              <Select value={fromMonth} onValueChange={setFromMonth}>
                 <SelectTrigger id="fromMonth" className="bg-background text-foreground">
                   <SelectValue placeholder="From Month" />
                 </SelectTrigger>
@@ -77,7 +94,7 @@ export default function AIInsight() {
               <label htmlFor="toMonth" className="block text-sm font-medium mb-1">
                 To
               </label>
-              <Select onValueChange={setToMonth} value={toMonth}>
+              <Select value={toMonth as Month} onValueChange={setToMonth}>
                 <SelectTrigger id="toMonth" className="bg-background text-foreground">
                   <SelectValue placeholder="To Month" />
                 </SelectTrigger>
@@ -86,7 +103,7 @@ export default function AIInsight() {
                     <SelectItem 
                       key={month} 
                       value={month}
-                      disabled={Boolean(fromMonth && index < months.indexOf(fromMonth))}
+                      disabled={Boolean(fromMonth && index < months.indexOf(fromMonth as Month))}
                     >
                       {month}
                     </SelectItem>
@@ -109,16 +126,16 @@ export default function AIInsight() {
               "Generate Financial Insights"
             )}
           </Button>
-          {completion && (
+          {generation && (
             <div className="mt-4 p-4 bg-muted rounded-md">
               <ReactMarkdown className="prose dark:prose-invert max-w-none">
-                {completion}
+                {generation}
               </ReactMarkdown>
             </div>
           )}
           {error && (
             <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">
-              <p className="text-sm">An error occurred while generating the financial insights.</p>
+              <p className="text-sm">{error}</p>
             </div>
           )}
         </div>
