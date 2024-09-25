@@ -9,7 +9,7 @@ import { streamText } from "ai"
 import { createStreamableValue } from "ai/rsc"
 import { CategoryTypes } from "@prisma/client"
 
-type Month =
+export type Month =
   | "January"
   | "February"
   | "March"
@@ -65,6 +65,28 @@ export async function AddnewIncome(data: IncomeFormData) {
   revalidateTag("totalIncome")
   revalidateTag("getAllData")
   return newIncome ? "success" : "error"
+}
+
+export async function AddnewExpense(data: ExpenseFormData) {
+  const user = await currentUserServer()
+  const { transactionDate, amount, description, category } = data
+  if (!user) {
+    throw new Error("Login Please")
+  }
+  const newExpense = await db.expense.create({
+    data: {
+      userId: user.id,
+      amount,
+      date: transactionDate,
+      description,
+      category,
+    },
+  })
+
+  revalidateTag("totalExpense")
+  revalidateTag("getAllData")
+
+  return newExpense ? "success" : "error"
 }
 
 export async function generateFinancialAdvice(
