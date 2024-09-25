@@ -4,8 +4,12 @@ import { db } from "@/lib/db"
 import { ExpenseFormData } from "./_components/NewExpense"
 import { IncomeFormData } from "./_components/Newincome"
 import { revalidateTag } from "next/cache"
-import { GoogleGenerativeAI } from "@google/generative-ai"
-import { get } from "http"
+import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import { generateText } from "ai"
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_MAIL_API_KEY,
+})
 
 // add new income
 export async function AddnewIncome(data: IncomeFormData) {
@@ -44,6 +48,7 @@ export async function AddnewExpense(data: ExpenseFormData) {
 
   return newExpense ? "success" : "error"
 }
+
 
 // generate financial advice
 export async function generateFinancialAdvice() {
@@ -124,22 +129,24 @@ export async function generateFinancialAdvice() {
     console.log(totalExpense._sum.amount)
     console.log(budget.budget)
 
-    // Initialize the Google Generative AI client
-    if (!process.env.NEXT_PUBLIC_GEMINI_AI) {
-      throw new Error("Missing NEXT_PUBLIC_GEMINI_AI environment variable")
-    }
-    const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_AI)
+    const model = google("gemini-1.5-flash", {
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_LOW_AND_ABOVE",
+        },
+      ],
+    })
+
     const prompt = `Generate unique financial advice for a user with a budget of ₹${budget.budget} " 
       expenses of ₹ ${totalExpense._sum.amount} , and income of ₹+ ${totalIncome._sum.amount} categroy wise expense data are ${categoryExpense}.  
       Provide personalized tips for managing deficits, focusing on cutting expenses, boosting income, and practicing mindful spending, using engaging language and emojis for clarity. and make it in two-three line.`
 
     // For this example, we'll use the gemini-pro model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+    const text = await generateText({ model: model, prompt: prompt })
 
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text();
-    
+    console.log("text", text)
+
     return { result: text }
   } catch (error: any) {
     console.error("Error generating content:", error)

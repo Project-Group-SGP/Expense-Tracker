@@ -148,7 +148,7 @@ export default async function Dashboard({
   const expenseAmount = totalExpense?.amount ?? 0
 
   const suggestion  = await generateFinancialAdvice();
-  console.log(suggestion);
+  // console.log(suggestion);
   
 
   return (
