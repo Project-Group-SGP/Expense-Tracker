@@ -191,6 +191,9 @@ function createEmailContent(user: UserExpense): string {
                 margin-bottom: 20px;
                 font-size: 18px;
             }
+            .table-container {
+                overflow-x: auto;
+            }
             table {
                 width: 100%;
                 border-collapse: separate;
@@ -237,13 +240,16 @@ function createEmailContent(user: UserExpense): string {
                     padding: 10px;
                 }
                 .container {
-                    padding: 20px;
+                    padding: 15px;
                 }
                 table {
                     font-size: 14px;
                 }
                 th, td {
                     padding: 8px 10px;
+                }
+                .description-column {
+                    display: none;
                 }
             }
         </style>
@@ -256,40 +262,49 @@ function createEmailContent(user: UserExpense): string {
             <h1>Your Spendwise Expense Reminder</h1>
             <p class="greeting">Hello ${user.name},</p>
             <p>This is a friendly reminder about your unpaid expenses:</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Group</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Paid By</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${nonZeroExpenses
-                      .map(
-                        (expense) => `
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td>${expense.group}</td>
-                            <td>${expense.description}</td>
-                            <td>₹${expense.amount.toFixed(2)}</td>
-                            <td>${expense.paidBy}</td>
-                            <td>${expense.date.toLocaleDateString()}</td>
+                            <th>Group</th>
+                            <th class="description-column">Description</th>
+                            <th>Amount</th>
+                            <th>Paid By</th>
+                            <th>Date</th>
                         </tr>
-                    `
-                      )
-                      .join("")}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        ${nonZeroExpenses
+                          .map(
+                            (expense) => `
+                            <tr>
+                                <td>${expense.group}</td>
+                                <td class="description-column">${expense.description}</td>
+                                <td>₹${expense.amount.toFixed(2)}</td>
+                                <td>${expense.paidBy}</td>
+                                <td>${formatDate(expense.date)}</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            </div>
             <p class="total">Total: ₹${total.toFixed(2)}</p>
             <p>We kindly request you to settle these expenses at your earliest convenience. If you have any questions or concerns, please don't hesitate to reach out to us.</p>
             <p>Thank you for your prompt attention to this matter.</p>
             <div class="footer">
-                <p style="font-size: 14px;">Spendwise - Helping you manage your expenses wisely</p>
+                <p>Spendwise - Helping you manage your expenses wisely</p>
             </div>
         </div>
     </body>
     </html>
   `
+}
+
+function formatDate(date: Date): string {
+  const day = date.getDate().toString().padStart(2, "0")
+  const month = (date.getMonth() + 1).toString().padStart(2, "0")
+  const year = date.getFullYear()
+  return `${day}/${month}/${year % 100}`
 }
