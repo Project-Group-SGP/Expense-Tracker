@@ -22,6 +22,7 @@ import { readStreamableValue } from "ai/rsc"
 import { Month } from "../actions"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 const months = [
   "January",
@@ -52,6 +53,8 @@ export default function AIInsight() {
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  const user = useCurrentUserClient()
+
   useEffect(() => {
     if (fromMonth && toMonth) {
       const fromIndex = months.indexOf(fromMonth)
@@ -75,7 +78,10 @@ export default function AIInsight() {
       setMessages((prev) => [...prev, { role: "user", content: userMessage }])
 
       try {
-        const { output } = await generateFinancialAdvice(fromMonth as Month, toMonth)
+        const { output } = await generateFinancialAdvice(
+          fromMonth as Month,
+          toMonth
+        )
         let assistantMessage = ""
 
         for await (const delta of readStreamableValue(output as any)) {
@@ -110,7 +116,7 @@ export default function AIInsight() {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full p-0 sm:h-14 sm:w-14 md:h-16 md:w-16 border border-dotted border-zinc-700 shadow-lg hover:shadow-xl transition-shadow duration-300"
+          className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full border border-dotted border-zinc-700 p-0 shadow-lg transition-shadow duration-300 hover:shadow-xl sm:h-14 sm:w-14 md:h-16 md:w-16"
           variant="outline"
           aria-label="Open Financial AI Insight"
         >
@@ -119,7 +125,7 @@ export default function AIInsight() {
             xmlns="http://www.w3.org/2000/svg"
             strokeWidth="3"
             fill="none"
-            className="dark:stroke-gray-300 stroke-zinc-500 h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12"
+            className="h-8 w-8 stroke-zinc-500 dark:stroke-gray-300 sm:h-10 sm:w-10 md:h-12 md:w-12"
           >
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
@@ -159,7 +165,9 @@ export default function AIInsight() {
       </DialogTrigger>
       <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw] md:w-[80vw] lg:w-[80vw] xl:w-[80vw]">
         <DialogHeader className="p-4 sm:p-6">
-          <DialogTitle className="text-lg sm:text-xl md:text-2xl">Financial AI Insight</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl md:text-2xl">
+            Financial AI Insight
+          </DialogTitle>
         </DialogHeader>
         <ScrollArea className="flex-grow px-4 pb-4 sm:px-6">
           <div className="space-y-4">
@@ -174,14 +182,14 @@ export default function AIInsight() {
                   <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
                     {message.role === "user" ? (
                       <>
-                        <AvatarImage src="/user-avatar.png" alt="User" />
+                        <AvatarImage src={user?.image || ""} alt="User" />
                         <AvatarFallback>
                           <User className="h-4 w-4 sm:h-5 sm:w-5" />
                         </AvatarFallback>
                       </>
                     ) : (
                       <>
-                        <AvatarImage src="/ai-avatar.png" alt="AI Assistant" />
+                        {/* <AvatarImage src="/ai-avatar.png" alt="AI Assistant" /> */}
                         <AvatarFallback>
                           <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
                         </AvatarFallback>
