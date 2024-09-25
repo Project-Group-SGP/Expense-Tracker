@@ -7,7 +7,7 @@ import DatePicker from "./DatePicker";
 import { Newincome } from "./Income";
 import { NewExpense } from "./Expance";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export const Showoptions = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
