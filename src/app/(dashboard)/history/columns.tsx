@@ -62,11 +62,7 @@ export const columns: ColumnDef<ResponceType>[] = [
             {format(date, "dd MMMM, yyyy")}
           </span>
           <span className="sm:hidden block">  
-            {date.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            })}
+            {format(date, "dd/MM/yyyy")}
           </span>
         </div>
       )
