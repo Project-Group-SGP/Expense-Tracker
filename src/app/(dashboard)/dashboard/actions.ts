@@ -46,7 +46,6 @@ export async function AddnewExpense(data: ExpenseFormData) {
 }
 
 // generate financial advice
-
 export async function generateFinancialAdvice() {
   try {
     // Check login status
@@ -130,8 +129,7 @@ export async function generateFinancialAdvice() {
       throw new Error("Missing NEXT_PUBLIC_GEMINI_AI environment variable")
     }
     const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_AI)
-    const prompt =
-      `Generate unique financial advice for a user with a budget of ₹ ${budget.budget} " 
+    const prompt = `Generate unique financial advice for a user with a budget of ₹${budget.budget} " 
       expenses of ₹ ${totalExpense._sum.amount} , and income of ₹+ ${totalIncome._sum.amount} categroy wise expense data are ${categoryExpense}.  
       Provide personalized tips for managing deficits, focusing on cutting expenses, boosting income, and practicing mindful spending, using engaging language and emojis for clarity. and make it in two-three line.`
 
