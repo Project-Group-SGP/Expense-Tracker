@@ -109,9 +109,6 @@ async function sendVerificationEmail(email: string, token: string) {
             </p>
             <p>If you didn't create an account with SpendWise, please ignore this email.</p>
         </div>
-        <div class="footer">
-            © 2024 SpendWise. All rights reserved.
-        </div>
     </div>
 </body>
 </html>`,
