@@ -1,50 +1,94 @@
 "use client"
-
-import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useState, useEffect, useRef } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
-import ReactMarkdown from 'react-markdown'
-import { generateFinancialAdvice } from '../actions'
-import { readStreamableValue } from 'ai/rsc'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Loader2, User, Bot } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import { generateFinancialAdvice } from "../actions"
+import { readStreamableValue } from "ai/rsc"
 import { Month } from "../actions"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const months= [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30
+interface Message {
+  role: "user" | "assistant"
+  content: string
+}
 
 export default function AIInsight() {
-  const [fromMonth, setFromMonth] = useState("")
-  const [toMonth, setToMonth] = useState("")
-  const [generation, setGeneration] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [fromMonth, setFromMonth] = useState<Month | "">("")
+  const [toMonth, setToMonth] = useState<Month | "">("")
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (fromMonth && toMonth) {
       const fromIndex = months.indexOf(fromMonth)
       const toIndex = months.indexOf(toMonth)
       if (fromIndex > toIndex) {
-        setToMonth(fromMonth)
+        setToMonth("")
       }
     }
   }, [fromMonth, toMonth])
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
   const handleSubmit = async () => {
     if (fromMonth && toMonth) {
       setIsLoading(true)
+      setOpen(true)
       setError(null)
-      setGeneration("")
+      let userMessage = `Generate financial insights for the period from ${fromMonth} to ${toMonth}.`
+      setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+
       try {
-        const { output } = await generateFinancialAdvice(fromMonth as Month, toMonth as Month)
+        const { output } = await generateFinancialAdvice(fromMonth as Month, toMonth)
+        let assistantMessage = ""
 
         for await (const delta of readStreamableValue(output as any)) {
-          setGeneration(currentGeneration => `${currentGeneration}${delta}`)
+          assistantMessage += delta
+          setMessages((prev) => {
+            const newMessages = [...prev]
+            if (newMessages[newMessages.length - 1].role === "assistant") {
+              newMessages[newMessages.length - 1].content = assistantMessage
+            } else {
+              newMessages.push({ role: "assistant", content: assistantMessage })
+            }
+            return newMessages
+          })
         }
       } catch (err) {
         console.error("Error generating financial advice:", err)
@@ -55,86 +99,205 @@ export default function AIInsight() {
     }
   }
 
+  // Custom renderer for paragraphs
+  const renderers = {
+    p: ({ children }: { children: React.ReactNode }) => (
+      <p className="mb-4">{children}</p>
+    ),
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="fixed bottom-4 right-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 p-0 z-50"
+          className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full p-0 sm:h-14 sm:w-14 md:h-16 md:w-16 border border-dotted border-zinc-700 shadow-lg hover:shadow-xl transition-shadow duration-300"
           variant="outline"
+          aria-label="Open Financial AI Insight"
         >
-          <img
-            src="/ai-insight-icon.png"
-            alt="AI Insight"
-            className="w-8 h-8 sm:w-10 sm:h-10"
-          />
+          <svg
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            strokeWidth="3"
+            fill="none"
+            className="dark:stroke-gray-300 stroke-zinc-500 h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12"
+          >
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+              <line x1="50.4" y1="24.38" x2="58.3" y2="23.14"></line>
+              <line x1="47.93" y1="17.11" x2="52.87" y2="14.2"></line>
+              <line x1="42.89" y1="11.73" x2="46.21" y2="4.51"></line>
+              <line x1="33.45" y1="10.69" x2="33.41" y2="4.96"></line>
+              <line x1="24.29" y1="12.09" x2="21.62" y2="4.51"></line>
+              <line x1="17.99" y1="17.03" x2="12.96" y2="14.29"></line>
+              <line x1="15.78" y1="23.97" x2="8.03" y2="22.66"></line>
+              <path d="M26.22,45.47c0-5.16-3.19-9.49-4.91-12.69A12.24,12.24,0,0,1,19.85,27c0-6.79,6.21-12.3,13-12.3"></path>
+              <path d="M39.48,45.47c0-5.16,3.19-9.49,4.91-12.69A12.24,12.24,0,0,0,45.85,27c0-6.79-6.21-12.3-13-12.3"></path>
+              <rect
+                x="23.63"
+                y="45.19"
+                width="18.93"
+                height="4.25"
+                rx="2.12"
+              ></rect>
+              <rect
+                x="24.79"
+                y="49.43"
+                width="16.61"
+                height="4.25"
+                rx="2.12"
+              ></rect>
+              <path d="M36.32,53.68v.84a3.23,3.23,0,1,1-6.44,0v-.84"></path>
+              <path d="M24.57,26.25a7.5,7.5,0,0,1,7.88-7.11"></path>
+            </g>
+          </svg>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto bg-background text-foreground">
-        <DialogHeader>
-          <DialogTitle>Financial AI Insight</DialogTitle>
+      <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw] md:w-[80vw] lg:w-[80vw] xl:w-[80vw]">
+        <DialogHeader className="p-4 sm:p-6">
+          <DialogTitle className="text-lg sm:text-xl md:text-2xl">Financial AI Insight</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <label htmlFor="fromMonth" className="block text-sm font-medium mb-1">
-                From
-              </label>
-              <Select value={fromMonth} onValueChange={setFromMonth}>
-                <SelectTrigger id="fromMonth" className="bg-background text-foreground">
-                  <SelectValue placeholder="From Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((month) => (
-                    <SelectItem key={month} value={month}>{month}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex-1">
-              <label htmlFor="toMonth" className="block text-sm font-medium mb-1">
-                To
-              </label>
-              <Select value={toMonth as Month} onValueChange={setToMonth}>
-                <SelectTrigger id="toMonth" className="bg-background text-foreground">
-                  <SelectValue placeholder="To Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((month, index) => (
-                    <SelectItem 
-                      key={month} 
-                      value={month}
-                      disabled={Boolean(fromMonth && index < months.indexOf(fromMonth as Month))}
-                    >
-                      {month}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <ScrollArea className="flex-grow px-4 pb-4 sm:px-6">
+          <div className="space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[80%]`}
+                >
+                  <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
+                    {message.role === "user" ? (
+                      <>
+                        <AvatarImage src="/user-avatar.png" alt="User" />
+                        <AvatarFallback>
+                          <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                        </AvatarFallback>
+                      </>
+                    ) : (
+                      <>
+                        <AvatarImage src="/ai-avatar.png" alt="AI Assistant" />
+                        <AvatarFallback>
+                          <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
+                        </AvatarFallback>
+                      </>
+                    )}
+                  </Avatar>
+                  <div
+                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                  >
+                    {message.role === "assistant" ? (
+                      <ReactMarkdown
+                        className="prose dark:prose-invert max-w-none text-sm sm:text-base"
+                        //@ts-ignore
+                        components={renderers}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      <p className="text-sm sm:text-base">{message.content}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-          <Button 
-            onClick={handleSubmit} 
-            disabled={isLoading || !fromMonth || !toMonth}
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating Insights...
-              </>
-            ) : (
-              "Generate Financial Insights"
-            )}
-          </Button>
-          {generation && (
-            <div className="mt-4 p-4 bg-muted rounded-md">
-              <ReactMarkdown className="prose dark:prose-invert max-w-none">
-                {generation}
-              </ReactMarkdown>
+        </ScrollArea>
+        <div className="border-t p-4 sm:p-6">
+          {!open && (
+            <div className="flex flex-col space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex-1">
+                  <label
+                    htmlFor="fromMonth"
+                    className="mb-1 block text-sm font-medium"
+                  >
+                    From
+                  </label>
+                  <Select
+                    value={fromMonth}
+                    onValueChange={(value) => {
+                      setFromMonth(value as Month)
+                      if (
+                        toMonth &&
+                        months.indexOf(value) > months.indexOf(toMonth)
+                      ) {
+                        setToMonth("")
+                      }
+                    }}
+                  >
+                    <SelectTrigger
+                      id="fromMonth"
+                      className="bg-background text-foreground"
+                    >
+                      <SelectValue placeholder="From Month" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[40vh] overflow-y-auto">
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1">
+                  <label
+                    htmlFor="toMonth"
+                    className="mb-1 block text-sm font-medium"
+                  >
+                    To
+                  </label>
+                  <Select
+                    value={toMonth}
+                    onValueChange={(value) => setToMonth(value as Month)}
+                    disabled={!fromMonth}
+                  >
+                    <SelectTrigger
+                      id="toMonth"
+                      className="bg-background text-foreground"
+                    >
+                      <SelectValue placeholder="To Month" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[40vh] overflow-y-auto">
+                      {months.map((month, index) => (
+                        <SelectItem
+                          key={month}
+                          value={month}
+                          disabled={
+                            !fromMonth || index < months.indexOf(fromMonth)
+                          }
+                        >
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button
+                onClick={handleSubmit}
+                disabled={!fromMonth || !toMonth}
+                className="w-full"
+              >
+                Generate Financial Insights
+              </Button>
+            </div>
+          )}
+          {isLoading && (
+            <div className="flex items-center justify-center">
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              <span>Generating Insights...</span>
             </div>
           )}
           {error && (
-            <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">
+            <div className="mt-4 rounded-md bg-destructive/10 p-4 text-destructive">
               <p className="text-sm">{error}</p>
             </div>
           )}

@@ -284,14 +284,17 @@ export async function generateFinancialAdvice(
     7. Specific, actionable steps the user can take in the coming month to better align with their budget and financial goals
 
     Format your response in markdown, using headers, subheaders, and bullet points for clarity.
-    Use tables where appropriate to present numerical data, especially for budget vs. actual comparisons.
 
      To make the response more engaging and relatable:
     - Use a friendly, conversational tone throughout your analysis and advice
     - Include relevant emojis in your headers, key points, and recommendations to add visual interest and emphasize important information
     - Make the financial advice feel personal and actionable, as if you're having a one-on-one conversation with the user
     - Use encouraging language to motivate the user and make them feel positive about taking control of their finances
-
+    - Make the response short and concise
+    - Ensure there is spacing between in the response to make it easier to read
+    - Also dont use tables instead do something else
+    - give answer in rupees not in dollars
+    - Don't tell user to use any other apps tell them to user our website
     Remember, the goal is to provide clear, actionable financial advice while keeping the tone upbeat and engaging!
     `
 
