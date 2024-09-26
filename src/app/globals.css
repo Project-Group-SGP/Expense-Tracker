@@ -90,3 +90,34 @@ html {
     --chart-5: 340 75% 55%;
   }
 }
+
+
+#avatar {
+  position: relative;
+}
+
+.eye {
+  background-color: black;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.curtain {
+  background-color: rgba(0, 0, 0, 0.7);
+  transition: transform 0.5s ease-in-out;
+  transform: translateY(-100%);
+}
+
+.eye::before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background-color: black;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
