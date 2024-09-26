@@ -1,4 +1,5 @@
-"use client"
+'use client'
+
 import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
@@ -48,6 +49,7 @@ const months = [
 interface Message {
   role: "user" | "assistant"
   content: string
+  displayContent?: string // New field for typewriter effect
 }
 
 export default function AIInsight() {
@@ -58,8 +60,9 @@ export default function AIInsight() {
   const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [typingSpeed, setTypingSpeed] = useState<number>(20)
 
-  const user = useCurrentUserClient()
+  const user = useCurrentUserClient();
 
   useEffect(() => {
     if (fromMonth && toMonth) {
@@ -96,8 +99,9 @@ export default function AIInsight() {
             const newMessages = [...prev]
             if (newMessages[newMessages.length - 1].role === "assistant") {
               newMessages[newMessages.length - 1].content = assistantMessage
+              newMessages[newMessages.length - 1].displayContent = assistantMessage
             } else {
-              newMessages.push({ role: "assistant", content: assistantMessage })
+              newMessages.push({ role: "assistant", content: assistantMessage, displayContent: "" })
             }
             return newMessages
           })
@@ -110,6 +114,25 @@ export default function AIInsight() {
       }
     }
   }
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && lastMessage.role === "assistant" && lastMessage.content !== lastMessage.displayContent) {
+      const timer = setTimeout(() => {
+        setMessages((prev) => {
+          const newMessages = [...prev]
+          const lastMsg = newMessages[newMessages.length - 1]
+          if (lastMsg.role === "assistant") {
+            const nextChar = lastMsg.content[lastMsg.displayContent?.length || 0]
+            lastMsg.displayContent = (lastMsg.displayContent || "") + nextChar
+          }
+          return newMessages
+        })
+      }, typingSpeed)
+
+      return () => clearTimeout(timer)
+    }
+  }, [messages, typingSpeed])
 
   // Custom renderer for paragraphs
   const renderers = {
@@ -193,19 +216,19 @@ export default function AIInsight() {
           </DialogTitle>
         </DialogHeader>
         <ScrollArea className="flex-grow px-4 pb-4 sm:px-6">
-          <div className="space-y-4">
-            {messages.map((message, index) => (
+        <div className="space-y-4">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            >
               <div
-                key={index}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[80%]`}
               >
-                <div
-                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[80%]`}
-                >
-                  <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
-                    {message.role === "user" ? (
+                <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
+                {message.role === "user" ? (
                       <>
-                        <AvatarImage src={user?.image || ""} alt="User" />
+                        <AvatarImage src={user?.image||""} alt="User" />
                         <AvatarFallback>
                           <User className="h-4 w-4 sm:h-5 sm:w-5" />
                         </AvatarFallback>
@@ -218,28 +241,27 @@ export default function AIInsight() {
                         </AvatarFallback>
                       </>
                     )}
-                  </Avatar>
-                  <div
-                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-                  >
-                    {message.role === "assistant" ? (
-                      <ReactMarkdown
-                        className="prose dark:prose-invert max-w-none text-sm sm:text-base"
-                        //@ts-ignore
-                        components={renderers}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    ) : (
-                      <p className="text-sm sm:text-base">{message.content}</p>
-                    )}
-                  </div>
+                </Avatar>
+                <div
+                  className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                >
+                  {message.role === "assistant" ? (
+                    <ReactMarkdown
+                      className="prose dark:prose-invert max-w-none text-sm sm:text-base"
+                      components={renderers}
+                    >
+                      {message.displayContent || ""}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-sm sm:text-base">{message.content}</p>
+                  )}
                 </div>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
         <div className="border-t p-4 sm:p-6">
           {!open && (
             <div className="flex flex-col space-y-4">
