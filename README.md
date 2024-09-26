@@ -44,6 +44,7 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - Web Push Notifications
 - Group Expense Splitting
 - Progressive Web App
+- AI Generated Financial Advice
 
 ### Tech Stack
 
@@ -61,6 +62,8 @@ The website is designed to be fast, secure, and scalable, making it a great choi
 - next-themes (Theme management): Provides support for dark mode and theme switching, enhancing the user experience.
 - web-push (Web Push Notifications): Enables sending push notifications to users' devices for important updates and reminders.
 - next-pwa (Progressive Web App): Adds support for progressive web apps, enabling offline functionality and improved user experience.
+- zod (Zod): Used for data validation and type-safe validation.
+- Vercel AI SDK (AI): Used for generating financial advice from the application using Gemini AI.
 
 ### Development
 
@@ -104,9 +107,10 @@ OR
 - Deploy to AWS
 - Deploy to Google Cloud
 - Deploy to Microsoft Azure
-  
+
 ### Demo Link
-https://trackwithspendwise.vercel.app/ 
+
+https://trackwithspendwise.vercel.app/
 
 ### Contributors
 
