@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
@@ -49,7 +48,6 @@ const months = [
 interface Message {
   role: "user" | "assistant"
   content: string
-  displayContent?: string // New field for typewriter effect
 }
 
 export default function AIInsight() {
@@ -60,7 +58,6 @@ export default function AIInsight() {
   const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [typingSpeed, setTypingSpeed] = useState<number>(20)
 
   const user = useCurrentUserClient()
 
@@ -99,14 +96,8 @@ export default function AIInsight() {
             const newMessages = [...prev]
             if (newMessages[newMessages.length - 1].role === "assistant") {
               newMessages[newMessages.length - 1].content = assistantMessage
-              newMessages[newMessages.length - 1].displayContent =
-                assistantMessage
             } else {
-              newMessages.push({
-                role: "assistant",
-                content: assistantMessage,
-                displayContent: "",
-              })
+              newMessages.push({ role: "assistant", content: assistantMessage })
             }
             return newMessages
           })
@@ -119,30 +110,6 @@ export default function AIInsight() {
       }
     }
   }
-
-  useEffect(() => {
-    const lastMessage = messages[messages.length - 1]
-    if (
-      lastMessage &&
-      lastMessage.role === "assistant" &&
-      lastMessage.content !== lastMessage.displayContent
-    ) {
-      const timer = setTimeout(() => {
-        setMessages((prev) => {
-          const newMessages = [...prev]
-          const lastMsg = newMessages[newMessages.length - 1]
-          if (lastMsg.role === "assistant") {
-            const nextChar =
-              lastMsg.content[lastMsg.displayContent?.length || 0]
-            lastMsg.displayContent = (lastMsg.displayContent || "") + nextChar
-          }
-          return newMessages
-        })
-      }, typingSpeed)
-
-      return () => clearTimeout(timer)
-    }
-  }, [messages, typingSpeed])
 
   // Custom renderer for paragraphs
   const renderers = {
@@ -261,7 +228,7 @@ export default function AIInsight() {
                         //@ts-ignore
                         components={renderers}
                       >
-                        {message.displayContent || ""}
+                        {message.content}
                       </ReactMarkdown>
                     ) : (
                       <p className="text-sm sm:text-base">{message.content}</p>
