@@ -283,7 +283,7 @@ export async function generateFinancialAdvice(
        - Strategies for increasing savings
     7. Specific, actionable steps the user can take in the coming month to better align with their budget and financial goals
 
-    Format your response in markdown, using headers, subheaders, and bullet points for clarity.
+    Format your response for react-markdown, using headers, subheaders, title etc for clarity.
 
      To make the response more engaging and relatable:
     - Use a friendly, conversational tone throughout your analysis and advice
