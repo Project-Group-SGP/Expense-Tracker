@@ -29,6 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import remarkGfm from "remark-gfm"
 
 const months = [
   "January",
@@ -227,6 +228,7 @@ export default function AIInsight() {
                         className="prose dark:prose-invert max-w-none text-sm sm:text-base"
                         //@ts-ignore
                         components={renderers}
+                        remarkPlugins={[remarkGfm]}
                       >
                         {message.content}
                       </ReactMarkdown>
