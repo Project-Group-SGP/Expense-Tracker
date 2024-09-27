@@ -9,7 +9,6 @@ import SettleUp from "./SettleUp"
 import { GroupMember } from "./GroupMember"
 import Transaction from "./Transaction"
 
-
 interface GroupClientProps {
   groupName: string
   creatorId: string
@@ -51,7 +50,7 @@ export default function GroupClientComponent({
             </span>
             👋
           </p>
-          <div className="w-full sm:ml-auto flex gap-2 sm:w-auto">
+          <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
             <AddExpense
               params={{ groupID: leave.groupId }}
               groupMemberName={groupMembers}
@@ -68,11 +67,11 @@ export default function GroupClientComponent({
             />
           </div>
         </div>
-        <section className="text-bl grid w-full gap-4 transition-all grid-cols-1 lg:grid-cols-3">
-          <Cardcontent className="border-none p-0 col-span-1 md:col-span-2 ">
+        <section className="text-bl grid w-full grid-cols-1 gap-4 transition-all lg:grid-cols-3">
+          <Cardcontent className="col-span-1 border-none p-0 md:col-span-2">
             <Transaction transactionsData={transactionData} loading={false} />
           </Cardcontent>
-          <Cardcontent className="border-none p-0 w-full col-span-1 md:col-span-1">
+          <Cardcontent className="col-span-1 w-full border-none p-0 shadow-none md:col-span-1">
             <GroupMember loading={false} balance={balance} />
           </Cardcontent>
         </section>

@@ -1,3 +1,6 @@
+import React from "react"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+
 interface GroupMember {
   userId: string
   name: string
@@ -8,32 +11,8 @@ export const UserAvatar: React.FC<{ user: GroupMember; size?: number }> = ({
   user,
   size = 45, // Set a default size
 }) => {
-  console.log("User: ", user)
-
-  if (user.avatar) {
-    return (
-      <img
-        src={user.avatar}
-        alt={user.name}
-        className="rounded-full"
-        style={{
-          width: size,
-          height: size,
-          objectFit: "cover", // Ensures the image scales properly
-        }}
-      />
-    )
-  }
-
-  // Fallback to initials
-  const initials = user.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-
   // Hash function to generate a numeric value from a string
-  const hashStringToNumber = (str) => {
+  const hashStringToNumber = (str: string) => {
     if (!str) return 0
     let hash = 0
     for (let i = 0; i < str.length; i++) {
@@ -47,20 +26,38 @@ export const UserAvatar: React.FC<{ user: GroupMember; size?: number }> = ({
   // Use the hash function to compute the color
   const color = `hsl(${((hashStringToNumber(user.userId) * 100) % 360) + 30}, 70%, 50%)`
 
+  // Fallback to initials
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
+
   return (
-    <div
-      className="flex items-center justify-center rounded-full text-white"
+    <Avatar
       style={{
         width: size,
         height: size,
-        backgroundColor: color,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: size / 2, // Adjust font size based on the avatar size
       }}
     >
-      {initials.slice(0, 2)}
-    </div>
+      <AvatarImage
+        src={user.avatar}
+        alt={user.name}
+        style={{
+          objectFit: "cover",
+        }}
+      />
+      <AvatarFallback
+        style={{
+          backgroundColor: color,
+          color: "#fff",
+          fontSize: `${size / 2.3}px`,
+          lineHeight: `${size}px`,
+        }}
+      >
+        {initials}
+      </AvatarFallback>
+    </Avatar>
   )
 }
