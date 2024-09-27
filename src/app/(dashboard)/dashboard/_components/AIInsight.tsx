@@ -112,12 +112,12 @@ export default function AIInsight() {
     }
   }
 
-  // Custom renderer for paragraphs
-  const renderers = {
-    p: ({ children }: { children: React.ReactNode }) => (
-      <p className="mb-4">{children}</p>
-    ),
-  }
+  // // Custom renderer for paragraphs
+  // const renderers = {
+  //   p: ({ children }: { children: React.ReactNode }) => (
+  //     <p className="mb-4">{children}</p>
+  //   ),
+  // }
 
   return (
     <Dialog>
@@ -226,8 +226,8 @@ export default function AIInsight() {
                     {message.role === "assistant" ? (
                       <ReactMarkdown
                         className="prose dark:prose-invert max-w-none text-sm sm:text-base"
-                        //@ts-ignore
-                        components={renderers}
+                        // //@ts-ignore
+                        // components={renderers}
                         remarkPlugins={[remarkGfm]}
                       >
                         {message.content}
