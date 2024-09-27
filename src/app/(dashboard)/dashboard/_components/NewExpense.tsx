@@ -42,8 +42,9 @@ import {
 
 import { cn } from "@/lib/utils"
 import { AddnewExpense } from "../actions"
+import { CategoryTypes } from "@prisma/client"
 
-const categories = [
+const categories: { name: CategoryTypes; keywords: string[] }[] = [
   { name: "Other", keywords: [] },
   {
     name: "Bills",
@@ -214,10 +215,6 @@ const categories = [
   },
 ]
 
-const CategoryTypes = z.enum(
-  categories.map((c) => c.name) as [string, ...string[]]
-)
-
 // form validation schema
 const formSchema = z.object({
   description: z.string().optional(),
@@ -227,25 +224,27 @@ const formSchema = z.object({
       message: "Amount must be a valid number greater than 0",
     }),
   transactionDate: z.date(),
-  category: CategoryTypes,
+  category: z.nativeEnum(CategoryTypes),
 })
 
 export type ExpenseFormData = z.infer<typeof formSchema>
 
-const suggestCategory = (description: string): string => {
+const suggestCategory = (description: string): CategoryTypes => {
   const lowerDesc = description.toLowerCase()
   for (const category of categories) {
     if (category.keywords.some((keyword) => lowerDesc.includes(keyword))) {
       return category.name
     }
   }
-  return "Other"
+  return CategoryTypes.Other
 }
 
 export function NewExpense() {
   const [open, setOpen] = useState(false)
   const [isPending, setIsPending] = useState<boolean>(false)
-  const [suggestedCategory, setSuggestedCategory] = useState<string>("Other")
+  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(
+    CategoryTypes.Other
+  )
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -253,7 +252,7 @@ export function NewExpense() {
       description: "",
       amount: "",
       transactionDate: new Date(),
-      category: "Other",
+      category: CategoryTypes.Other,
     },
   })
 
