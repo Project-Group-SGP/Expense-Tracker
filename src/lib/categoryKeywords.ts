@@ -606,7 +606,7 @@ export const suggestCategory = (description: string): CategoryTypes => {
     }
   }
 
-  console.log("Suggested category:", bestMatch.category)
+  // console.log("Suggested category:", bestMatch.category)
 
   return bestMatch.category
 }

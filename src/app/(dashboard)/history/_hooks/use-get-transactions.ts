@@ -16,7 +16,7 @@ export const useGetTransactions = () => {
   return useQuery({
     queryKey: ["transactions", from, to],
     queryFn: async () => {
-      console.log("Fetching transactions with params:", { from, to })
+      // console.log("Fetching transactions with params:", { from, to })
       if (!isMounted) return []
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/history/bulkdata?from=${from}&to=${to}`,
@@ -32,7 +32,7 @@ export const useGetTransactions = () => {
       }
 
       const { transactions } = await response.json()
-      console.log("Fetched transactions count:", transactions.length)
+      // console.log("Fetched transactions count:", transactions.length)
       return transactions
     },
     enabled: isMounted,

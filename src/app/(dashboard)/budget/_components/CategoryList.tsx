@@ -1,22 +1,21 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import Card_Category from "./Card_Category"
 import {
   Bus,
   ChartNoAxesCombined,
   ChefHat,
-  ShieldQuestion,
   Clapperboard,
   Fuel,
   GraduationCap,
   HandCoins,
   Hospital,
   ReceiptText,
+  ShieldQuestion,
   ShoppingCart,
   UtensilsCrossed,
 } from "lucide-react"
-import { CategoryTypes } from "@prisma/client"
+import { useRouter } from "next/navigation"
+import Card_Category from "./Card_Category"
 
 type CategoryListType = {
   categories: {
@@ -26,8 +25,6 @@ type CategoryListType = {
 
 const CategoryList = (props: CategoryListType) => {
   const router = useRouter()
-
-
 
   const categoryItems = [
     {
@@ -99,7 +96,6 @@ const CategoryList = (props: CategoryListType) => {
   }
 
   // console.log(props.categories);
-  
 
   return (
     <section className="ml-6 mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

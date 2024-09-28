@@ -9,13 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
+import { FinancialData_ } from "../page"
 import { ChartBar_1 } from "./charts/ChartBar_1"
 import { ChartBar_3 } from "./charts/ChartBar_3"
 import { ChartBar_4 } from "./charts/ChartBar_4"
-import { FinancialData_ } from "../page"
 
-import { Chart_income_expense_2 } from "./charts/Chart_income_expense_2"
 import { Chart_income_expense_1 } from "./charts/Chart_income_expense_1"
+import { Chart_income_expense_2 } from "./charts/Chart_income_expense_2"
 
 export type Expense = {
   id: string
@@ -49,7 +49,9 @@ export type DropdownChartProps = {
 }
 
 export function Dropdown_chart_1({ data }: DropdownChartProps) {
-  const [selectedChart, setSelectedChart] = React.useState("Monthly Money Meters")
+  const [selectedChart, setSelectedChart] = React.useState(
+    "Monthly Money Meters"
+  )
 
   // 1. monthwise data
   const monthNames: string[] = [
@@ -175,9 +177,9 @@ export function Dropdown_chart_1({ data }: DropdownChartProps) {
   }
 
   return (
-      <div className="w-full max-w-[400px] mx-auto">
-      <div className="flex flex-col sm:flex-row items-center justify-between p-4 space-y-2 sm:space-y-0">
-        <p className="font-semibold text-lg">Transactions</p>
+    <div className="mx-auto w-full max-w-[400px]">
+      <div className="flex flex-col items-center justify-between space-y-2 p-4 sm:flex-row sm:space-y-0">
+        <p className="text-lg font-semibold">Transactions</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="w-full sm:w-auto">

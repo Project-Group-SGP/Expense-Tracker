@@ -1,7 +1,21 @@
 "use client"
+import { Signin } from "@/actions/auth/signin"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
+import { SigninSchema } from "@/lib/index"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, Mail } from "lucide-react"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import * as z from "zod"
+import { Passwordcmp } from "../Passwordcmp"
 import { Button } from "../ui/button"
 import {
   Form,
@@ -12,32 +26,18 @@ import {
   FormMessage,
 } from "../ui/form"
 import { Input } from "../ui/input"
-import { useState, useTransition } from "react"
-import { SigninSchema } from "@/lib/index"
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { Passwordcmp } from "../Passwordcmp"
-import { Loader2, Mail } from "lucide-react"
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
-import { Signin } from "@/actions/auth/signin"
-import { toast } from 'sonner'
 import { CardWrapper } from "./card-wrapper"
 
 export const LoginForm = () => {
   const [showTwoFactor, setShowTwoFactor] = useState<boolean | undefined>()
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false)
   const [isPending, startTransition] = useTransition()
-  const [isDisabled,setDisabled] = useState<boolean>(false);
+  const [isDisabled, setDisabled] = useState<boolean>(false)
   const searchparams = useSearchParams()
   const urlError =
     searchparams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with different provider!"
-      : "";
+      : ""
   const callbackUrl = searchparams.get("callbackUrl")
   // console.log(urlError);
 
@@ -52,29 +52,29 @@ export const LoginForm = () => {
   const onSubmit = (values: z.infer<typeof SigninSchema>) => {
     // const loading = toast.loading("login user...")
     startTransition(() => {
-      setDisabled(true);
-      Signin(values,callbackUrl)
+      setDisabled(true)
+      Signin(values, callbackUrl)
         .then((data) => {
-          if (data?.error!==undefined){
+          if (data?.error !== undefined) {
             toast.error(data.error, {
               closeButton: true,
             })
             console.error(data.error)
           }
-          if(data?.success!==undefined){
+          if (data?.success !== undefined) {
             toast.success(data.success, {
               closeButton: true,
-            });
-            form.reset();
+            })
+            form.reset()
           }
-          if (data?.twoFactor!==undefined) {
+          if (data?.twoFactor !== undefined) {
             setShowTwoFactor(true)
           }
         })
         .catch(() => {
-          toast.error("Something went wrong");
+          toast.error("Something went wrong")
         })
-        setDisabled(false);
+      setDisabled(false)
     })
   }
   return (
@@ -83,7 +83,7 @@ export const LoginForm = () => {
       backButtonLable="Don't have an account?"
       backButtonHref="/auth/signup"
       disabled={isDisabled}
-      setDisabled={setDisabled} 
+      setDisabled={setDisabled}
       showSocial
     >
       <Form {...form}>
@@ -96,20 +96,20 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Two Factor Code</FormLabel>
                   <FormControl>
-                    <div className="flex justify-center items-center text-center">
-                    <InputOTP maxLength={6} disabled={isDisabled} {...field }>
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                      </InputOTPGroup>
-                      <InputOTPSeparator />
-                      <InputOTPGroup>
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
+                    <div className="flex items-center justify-center text-center">
+                      <InputOTP maxLength={6} disabled={isDisabled} {...field}>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <InputOTPSeparator />
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </div>
                   </FormControl>
                   <FormMessage />

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { ExpenseStatus, CategoryTypes, Prisma } from "@prisma/client"
+import { CategoryTypes, ExpenseStatus, Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
 import nodemailer from "nodemailer"
 
