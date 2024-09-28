@@ -101,8 +101,17 @@ const suggestCategory = (description: string): CategoryTypes => {
   for (const category of categories) {
     let matchCount = 0
     for (const keyword of category.keywords) {
-      if (words.includes(keyword.toLowerCase())) {
-        matchCount++
+      // Check for exact matches (including multi-word keywords)
+      if (description.toLowerCase().includes(keyword.toLowerCase())) {
+        matchCount += 2 // Give higher weight to exact matches
+      } else {
+        // Check for individual word matches
+        const keywordWords = keyword.toLowerCase().split(/\s+/)
+        for (const word of keywordWords) {
+          if (words.includes(word)) {
+            matchCount++
+          }
+        }
       }
     }
     if (matchCount > bestMatch.matchCount) {
@@ -122,9 +131,11 @@ export function AddExpense({
   groupMemberName: { userId: string; name: string; avatar: string }[]
   user: string
 }) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(CategoryTypes.Other);
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(
+    CategoryTypes.Other
+  )
 
   // State for members
   const [members, setMembers] = useState<
@@ -172,8 +183,11 @@ export function AddExpense({
     if (watchTitle) {
       const suggested = suggestCategory(watchTitle)
       setSuggestedCategory(suggested)
-       //@ts-ignore
-      if (!form.getValues("category") || form.getValues("category") === CategoryTypes.Other) {
+      //@ts-ignore
+      if (
+        !form.getValues("category") ||
+        form.getValues("category") === CategoryTypes.Other
+      ) {
         //@ts-ignore
         form.setValue("category", suggested, { shouldValidate: true })
       }
@@ -199,7 +213,10 @@ export function AddExpense({
         amount: member.included ? splitAmount : 0,
       }))
     } else if (splitType === "As Amounts") {
-      const totalAssigned = updatedMembers.reduce((sum, member) => sum + (member.included ? member.amount : 0), 0)
+      const totalAssigned = updatedMembers.reduce(
+        (sum, member) => sum + (member.included ? member.amount : 0),
+        0
+      )
       const remaining = totalAmount - totalAssigned
       if (remaining > 0) {
         const splitRemaining = remaining / includedMembers.length
@@ -210,7 +227,8 @@ export function AddExpense({
       }
     }
 
-    const hasChanged = JSON.stringify(members) !== JSON.stringify(updatedMembers)
+    const hasChanged =
+      JSON.stringify(members) !== JSON.stringify(updatedMembers)
     if (hasChanged) {
       setMembers(updatedMembers)
       form.setValue("splitWith", updatedMembers)
@@ -236,10 +254,15 @@ export function AddExpense({
   // Form submission
   const onSubmit = async (data) => {
     const totalAmount = parseFloat(data.amount)
-    const totalSplitAmount = data.splitWith.reduce((sum, member) => sum + (member.included ? member.amount : 0), 0)
+    const totalSplitAmount = data.splitWith.reduce(
+      (sum, member) => sum + (member.included ? member.amount : 0),
+      0
+    )
 
     if (Math.abs(totalSplitAmount - totalAmount) > 0.01) {
-      toast.error("The split amounts do not add up to the total expense amount.")
+      toast.error(
+        "The split amounts do not add up to the total expense amount."
+      )
       return
     }
 
@@ -256,11 +279,11 @@ export function AddExpense({
       amount: member.amount || 0,
     }))
 
-    const splits = splitsall.filter((split) => split.amount !== 0);
+    const splits = splitsall.filter((split) => split.amount !== 0)
 
-    if(splits.length < 2){
-      toast.error("Please select at least two members");
-      return;
+    if (splits.length < 2) {
+      toast.error("Please select at least two members")
+      return
     }
 
     const loading = toast.loading("Adding Expense...")
@@ -284,7 +307,7 @@ export function AddExpense({
           id: loading,
         })
 
-        form.reset();
+        form.reset()
       } else {
         console.error("Failed to Add Expense")
 
@@ -311,7 +334,7 @@ export function AddExpense({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[450px] w-[95vw] max-h-[95vh] overflow-y-auto rounded-lg">
+      <DialogContent className="max-h-[95vh] w-[95vw] overflow-y-auto rounded-lg sm:max-w-[450px]">
         <DialogHeader>
           <DialogTitle className="mb-2 text-center sm:text-left">
             <span className="text-red-500">Add an Expense</span> 😤
@@ -319,7 +342,10 @@ export function AddExpense({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-md">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 rounded-md"
+          >
             {/* Description and Category */}
             <FormField
               control={form.control}
@@ -364,7 +390,8 @@ export function AddExpense({
                                         : "opacity-0"
                                     )}
                                   />
-                                  {categoryEmojis[category.name]} {category.name}
+                                  {categoryEmojis[category.name]}{" "}
+                                  {category.name}
                                   {category.name === suggestedCategory &&
                                     " (Suggested)"}
                                 </DropdownMenuItem>
@@ -523,7 +550,12 @@ export function AddExpense({
                             <Input
                               type="number"
                               value={member.amount}
-                              onChange={(e) => handleAmountChange(member.id, parseFloat(e.target.value) || 0)}
+                              onChange={(e) =>
+                                handleAmountChange(
+                                  member.id,
+                                  parseFloat(e.target.value) || 0
+                                )
+                              }
                               className="w-20"
                               disabled={!member.included}
                             />
@@ -544,14 +576,14 @@ export function AddExpense({
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
-                 className="w-full sm:w-auto rounded-md"
+                className="w-full rounded-md sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 variant="outline"
-               className="w-full sm:w-auto border-red-500 text-red-500 hover:bg-red-600 rounded-md"
+                className="w-full rounded-md border-red-500 text-red-500 hover:bg-red-600 sm:w-auto"
               >
                 Add Expense
               </Button>

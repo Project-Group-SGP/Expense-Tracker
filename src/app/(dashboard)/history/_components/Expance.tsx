@@ -70,8 +70,17 @@ const suggestCategory = (description: string): CategoryTypes => {
   for (const category of categories) {
     let matchCount = 0
     for (const keyword of category.keywords) {
-      if (words.includes(keyword.toLowerCase())) {
-        matchCount++
+      // Check for exact matches (including multi-word keywords)
+      if (description.toLowerCase().includes(keyword.toLowerCase())) {
+        matchCount += 2 // Give higher weight to exact matches
+      } else {
+        // Check for individual word matches
+        const keywordWords = keyword.toLowerCase().split(/\s+/)
+        for (const word of keywordWords) {
+          if (words.includes(word)) {
+            matchCount++
+          }
+        }
       }
     }
     if (matchCount > bestMatch.matchCount) {
@@ -113,15 +122,17 @@ const formSchema = z.object({
 export type ExpenseFormData = z.infer<typeof formSchema>
 
 interface NewExpenseProps {
-  onAdd: (data: ExpenseFormData) => void;
+  onAdd: (data: ExpenseFormData) => void
 }
 
 export function NewExpense() {
-  const [open, setOpen] = useState<boolean>(false);
-  const [isPending, setisPending] = useState<boolean>(false);
-  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(CategoryTypes.Other);
-  
-  const router = useRouter();
+  const [open, setOpen] = useState<boolean>(false)
+  const [isPending, setisPending] = useState<boolean>(false)
+  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(
+    CategoryTypes.Other
+  )
+
+  const router = useRouter()
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -131,56 +142,59 @@ export function NewExpense() {
       transactionDate: new Date(),
     },
   })
-  
-  const onAdd = async(data: ExpenseFormData) => {
-    try{
-      const response = await AddnewExpense(data);
-      if(response === "success"){
+
+  const onAdd = async (data: ExpenseFormData) => {
+    try {
+      const response = await AddnewExpense(data)
+      if (response === "success") {
         toast.success("Expense added successfully", {
           closeButton: true,
           icon: "😤",
           duration: 4500,
-        });
+        })
 
-        setOpen(false);
-        router.refresh();
-        form.reset();
-      }else{
+        setOpen(false)
+        router.refresh()
+        form.reset()
+      } else {
         throw new Error("Expense not added")
       }
-    }catch(error){
-      console.error("Error adding expense:", error);
-      toast.error("Failed to add expense");
+    } catch (error) {
+      console.error("Error adding expense:", error)
+      toast.error("Failed to add expense")
     }
   }
-  
-  const handleSubmit = async(data: ExpenseFormData) => {
-    setisPending(true);
-    await onAdd(data);
-    setisPending(false);
+
+  const handleSubmit = async (data: ExpenseFormData) => {
+    setisPending(true)
+    await onAdd(data)
+    setisPending(false)
   }
 
   // Watch for description input changes to suggest categories
-  const description = form.watch("description");
+  const description = form.watch("description")
 
   useEffect(() => {
     if (description) {
-      const suggested = suggestCategory(description);
-      setSuggestedCategory(suggested);
-      if (!form.getValues("category") || form.getValues("category") === "Other") {
-        form.setValue("category", suggested, { shouldValidate: true });
+      const suggested = suggestCategory(description)
+      setSuggestedCategory(suggested)
+      if (
+        !form.getValues("category") ||
+        form.getValues("category") === "Other"
+      ) {
+        form.setValue("category", suggested, { shouldValidate: true })
       }
     } else {
-      setSuggestedCategory(CategoryTypes.Other);
-      form.setValue("category", CategoryTypes.Other, { shouldValidate: true });
+      setSuggestedCategory(CategoryTypes.Other)
+      form.setValue("category", CategoryTypes.Other, { shouldValidate: true })
     }
-  }, [description, form]);
+  }, [description, form])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-full sm:w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-[150px]"
           variant="outline"
           onClick={() => setOpen(true)}
         >
@@ -191,12 +205,16 @@ export function NewExpense() {
       <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
-            Create a new <span className="text-red-500">expense</span> transaction
+            Create a new <span className="text-red-500">expense</span>{" "}
+            transaction
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="mt-4 space-y-4"
+          >
             <FormField
               control={form.control}
               name="description"
@@ -242,7 +260,8 @@ export function NewExpense() {
                           variant="outline"
                           className="w-full justify-between"
                         >
-                          {categoryEmojis[field.value]} {field.value || "Select a category"}
+                          {categoryEmojis[field.value]}{" "}
+                          {field.value || "Select a category"}
                           <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -260,7 +279,7 @@ export function NewExpense() {
                                     : "opacity-0"
                                 }`}
                               />
-                              {categoryEmojis[category]}  {category}
+                              {categoryEmojis[category]} {category}
                               {category === suggestedCategory && " (Suggested)"}
                             </DropdownMenuItem>
                           ))}
@@ -272,7 +291,7 @@ export function NewExpense() {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="transactionDate"

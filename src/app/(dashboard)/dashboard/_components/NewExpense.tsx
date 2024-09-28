@@ -84,8 +84,17 @@ const suggestCategory = (description: string): CategoryTypes => {
   for (const category of categories) {
     let matchCount = 0
     for (const keyword of category.keywords) {
-      if (words.includes(keyword.toLowerCase())) {
-        matchCount++
+      // Check for exact matches (including multi-word keywords)
+      if (description.toLowerCase().includes(keyword.toLowerCase())) {
+        matchCount += 2 // Give higher weight to exact matches
+      } else {
+        // Check for individual word matches
+        const keywordWords = keyword.toLowerCase().split(/\s+/)
+        for (const word of keywordWords) {
+          if (words.includes(word)) {
+            matchCount++
+          }
+        }
       }
     }
     if (matchCount > bestMatch.matchCount) {
@@ -231,7 +240,8 @@ export function NewExpense() {
                           variant="outline"
                           className="w-full justify-between"
                         >
-                           {categoryEmojis[field.value]} {field.value ||
+                          {categoryEmojis[field.value]}{" "}
+                          {field.value ||
                             suggestedCategory ||
                             "Select a category"}
                           <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
