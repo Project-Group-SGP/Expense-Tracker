@@ -470,7 +470,7 @@ export const categories: { name: CategoryTypes; keywords: string[] }[] = [
   { 
     name: "Other", 
     keywords: [
-      "miscellaneous", "general", "various", "uncategorized", "misc", "random"
+      "miscellaneous", "general", "various", "uncategorized", "misc", "random","unknown",
     ] 
   },
   {
