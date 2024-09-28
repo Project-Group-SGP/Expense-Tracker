@@ -151,16 +151,11 @@ export function AddExpense({
     if (watchTitle) {
       const suggested = suggestCategory(watchTitle)
       setSuggestedCategory(suggested)
-      if (
-        !form.getValues("category") ||
-        //@ts-ignore
-        form.getValues("category") === CategoryTypes.Other
-      ) {
-        //@ts-ignore
-        form.setValue("category", suggested, { shouldValidate: true })
-      }
-    } else {
+
+      // Always update the form value with the new suggestion
       //@ts-ignore
+      form.setValue("category", suggested, { shouldValidate: true })
+    } else {
       setSuggestedCategory(CategoryTypes.Other)
       //@ts-ignore
       form.setValue("category", CategoryTypes.Other, { shouldValidate: true })

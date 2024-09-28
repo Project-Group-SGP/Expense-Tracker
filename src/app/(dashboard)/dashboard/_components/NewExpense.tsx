@@ -97,12 +97,9 @@ export function NewExpense() {
     if (description) {
       const suggested = suggestCategory(description)
       setSuggestedCategory(suggested)
-      if (
-        !form.getValues("category") ||
-        form.getValues("category") === "Other"
-      ) {
-        form.setValue("category", suggested, { shouldValidate: true })
-      }
+
+      // Always update the form value with the new suggestion
+      form.setValue("category", suggested, { shouldValidate: true })
     } else {
       setSuggestedCategory("Other")
       form.setValue("category", "Other", { shouldValidate: true })
