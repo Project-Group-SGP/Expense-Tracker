@@ -33,29 +33,22 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Check, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddGroupExpense } from "../group"
 import { useRouter } from "next/navigation"
-
-// Enum for Category Types
-enum CategoryTypes {
-  Other = "Other",
-  Bills = "Bills",
-  Food = "Food",
-  Entertainment = "Entertainment",
-  Transportation = "Transportation",
-  EMI = "EMI",
-  Healthcare = "Healthcare",
-  Education = "Education",
-  Investment = "Investment",
-  Shopping = "Shopping",
-  Fuel = "Fuel",
-  Groceries = "Groceries",
-}
+import { categories } from "@/lib/categoryKeywords"
+import { CategoryTypes } from "@prisma/client"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Mapping categories to emojis
 const categoryEmojis = {
@@ -97,24 +90,27 @@ const formSchema = z.object({
   category: z.nativeEnum(CategoryTypes),
 })
 
-// category selector
-const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
-  return (
-    <Select value={selectedCategory} onValueChange={onCategoryChange}>
-      <SelectTrigger className="w-[70px]">
-        <SelectValue>
-          {categoryEmojis[selectedCategory] || "Select a category"}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent className="h-60">
-        {Object.values(CategoryTypes).map((category) => (
-          <SelectItem key={category} value={category}>
-            {categoryEmojis[category]} {category}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
+// Function to suggest category
+const suggestCategory = (description: string): CategoryTypes => {
+  const words = description.toLowerCase().split(/\s+/)
+  let bestMatch: { category: CategoryTypes; matchCount: number } = {
+    category: CategoryTypes.Other,
+    matchCount: 0,
+  }
+
+  for (const category of categories) {
+    let matchCount = 0
+    for (const keyword of category.keywords) {
+      if (words.includes(keyword.toLowerCase())) {
+        matchCount++
+      }
+    }
+    if (matchCount > bestMatch.matchCount) {
+      bestMatch = { category: category.name, matchCount }
+    }
+  }
+
+  return bestMatch.category
 }
 
 export function AddExpense({
@@ -128,6 +124,7 @@ export function AddExpense({
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(CategoryTypes.Other);
 
   // State for members
   const [members, setMembers] = useState<
@@ -169,6 +166,24 @@ export function AddExpense({
 
   const watchAmount = form.watch("amount")
   const watchSplitType = form.watch("splitType")
+  const watchTitle = form.watch("title")
+
+  useEffect(() => {
+    if (watchTitle) {
+      const suggested = suggestCategory(watchTitle)
+      setSuggestedCategory(suggested)
+       //@ts-ignore
+      if (!form.getValues("category") || form.getValues("category") === CategoryTypes.Other) {
+        //@ts-ignore
+        form.setValue("category", suggested, { shouldValidate: true })
+      }
+    } else {
+      //@ts-ignore
+      setSuggestedCategory(CategoryTypes.Other)
+      //@ts-ignore
+      form.setValue("category", CategoryTypes.Other, { shouldValidate: true })
+    }
+  }, [watchTitle, form])
 
   useEffect(() => {
     const totalAmount = parseFloat(watchAmount) || 0
@@ -241,7 +256,7 @@ export function AddExpense({
       amount: member.amount || 0,
     }))
 
-    const splits = splitsall.filter((split) => split.amount!==0);
+    const splits = splitsall.filter((split) => split.amount !== 0);
 
     if(splits.length < 2){
       toast.error("Please select at least two members");
@@ -311,7 +326,7 @@ export function AddExpense({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Description</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <FormControl>
                       <Input
@@ -324,12 +339,39 @@ export function AddExpense({
                       name="category"
                       control={form.control}
                       render={({ field }) => (
-                        <CategorySelector
-                          selectedCategory={form.watch("category")}
-                          onCategoryChange={(value) =>
-                            form.setValue("category", value)
-                          }
-                        />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between sm:w-[120px]"
+                            >
+                              {categoryEmojis[field.value]}
+                              <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-[200px]">
+                            <ScrollArea className="h-[300px]">
+                              {categories.map((category) => (
+                                <DropdownMenuItem
+                                  key={category.name}
+                                  onSelect={() => field.onChange(category.name)}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      category.name === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {categoryEmojis[category.name]} {category.name}
+                                  {category.name === suggestedCategory &&
+                                    " (Suggested)"}
+                                </DropdownMenuItem>
+                              ))}
+                            </ScrollArea>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
                     />
                   </div>
@@ -343,7 +385,7 @@ export function AddExpense({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Amount</FormLabel>
+                  <FormLabel>Amount</FormLabel>
                   <div className="flex">
                     <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">
                       ₹
