@@ -186,6 +186,7 @@ export function AddExpense({
       //@ts-ignore
       if (
         !form.getValues("category") ||
+        //@ts-ignore
         form.getValues("category") === CategoryTypes.Other
       ) {
         //@ts-ignore
