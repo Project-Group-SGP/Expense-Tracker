@@ -80,8 +80,10 @@ interface ExpenseSplit {
   amount: number
   status: 'settled up' | 'gets back' | 'owes',
   amountColor:string,
+  detailedBalance: DetailedBalance[]
 }
 
+// In GroupMember.tsx
 interface  GroupID{
   group:{
     id: string;
@@ -103,6 +105,23 @@ interface  GroupID{
   groupMembers:GroupMemberDetails[],
   usersYouNeedToPay:UserToPay[],  
   user:string,
+}
+
+interface DetailedBalance {
+  userId: string
+  name: string
+  amount: string
+  status: 'gets back' | 'owes'
+}
+
+interface GroupMemberBalance {
+  userId: string
+  name: string
+  status: 'settled up' | 'gets back' | 'owes'
+  amount: number // Keep amount as number
+  amountColor: string
+  avatar: string
+  detailedBalance: DetailedBalance[]
 }
 
 export const GroupID = ({group,leave,transactionData,balance,name,groupMembers,usersYouNeedToPay,user}:GroupID) => {

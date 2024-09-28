@@ -596,6 +596,14 @@ export interface GetBalance {
   amount: number
   status: "settled up" | "gets back" | "owes"
   amountColor: string
+  detailedBalance: DetailedBalance[]
+}
+
+interface DetailedBalance {
+  userId: string
+  name: string
+  amount: string
+  status: 'gets back' | 'owes'
 }
 
 export async function getAllData(

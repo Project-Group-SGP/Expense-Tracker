@@ -64,7 +64,7 @@ export interface GetBalance {
   userId: string
   name: string
   status: 'settled up' | 'gets back' | 'owes'
-  amount: string
+  amount: number
   amountColor: string
   avatar: string
   detailedBalance: DetailedBalance[]
