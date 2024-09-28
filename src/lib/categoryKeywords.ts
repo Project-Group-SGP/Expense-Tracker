@@ -468,23 +468,29 @@ export const categories: { name: CategoryTypes; keywords: string[] }[] = [
 
 // Function to suggest category
 export const suggestCategory = (description: string): CategoryTypes => {
-  const words = description.toLowerCase().split(/\s+/)
-  let bestMatch: { category: CategoryTypes; matchCount: number } = {
+  const lowerDescription = description.toLowerCase()
+  let bestMatch: { category: CategoryTypes; score: number } = {
     category: CategoryTypes.Other,
-    matchCount: 0,
+    score: 0,
   }
 
   for (const category of categories) {
-    let matchCount = 0
+    let categoryScore = 0
     for (const keyword of category.keywords) {
-      if (words.includes(keyword.toLowerCase())) {
-        matchCount++
+      const keywordLower = keyword.toLowerCase()
+      if (lowerDescription.includes(keywordLower)) {
+        // Calculate score based on keyword length
+        const keywordScore = keywordLower.length ** 2 // Square the length to give more weight to longer matches
+        categoryScore += keywordScore
       }
     }
-    if (matchCount > bestMatch.matchCount) {
-      bestMatch = { category: category.name, matchCount }
+
+    if (categoryScore > bestMatch.score) {
+      bestMatch = { category: category.name, score: categoryScore }
     }
   }
+
+  console.log("Suggested category:", bestMatch.category)
 
   return bestMatch.category
 }
