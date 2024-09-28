@@ -107,7 +107,7 @@ export function NewExpense() {
       setSuggestedCategory("Other")
       form.setValue("category", "Other", { shouldValidate: true })
     }
-  }, [description, form, suggestedCategory])
+  }, [description, form])
 
   const handleSubmit = async (data: ExpenseFormData) => {
     console.log("Submitting data:", data)
