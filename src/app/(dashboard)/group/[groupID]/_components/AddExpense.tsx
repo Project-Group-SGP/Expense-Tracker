@@ -332,7 +332,7 @@ export function AddExpense({
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-full justify-between sm:w-[120px]"
+                              className="w-full justify-between sm:w-[80px]"
                             >
                               {categoryEmojis[field.value]}
                               <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -435,7 +435,7 @@ export function AddExpense({
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal sm:w-[180px]",
+                              "w-full pl-3 text-left font-normal sm:w-[200px]",
                               !field.value && "text-muted-foreground"
                             )}
                           >
