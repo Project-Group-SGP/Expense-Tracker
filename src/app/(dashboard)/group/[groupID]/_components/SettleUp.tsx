@@ -26,13 +26,13 @@ import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 import React, { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { settleUp } from "../group"
 import { UserAvatar } from "./UserAvatar"
-import { useRouter } from "next/navigation"
 
 interface GroupMember {
   userId: string
@@ -64,8 +64,8 @@ interface EnhancedUserToPay {
   memberName: string
   memberId: string
   // expenses: Expense[]
-  amountToPay:number
-  groupexpanceid: string 
+  amountToPay: number
+  groupexpanceid: string
 }
 
 interface SettleUpProps {
@@ -85,7 +85,7 @@ export const UserSelectionModal: React.FC<{
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-lg max-w-[425px]">
+      <DialogContent className="max-w-[425px] rounded-lg">
         <DialogHeader>
           <DialogTitle>Select Member</DialogTitle>
         </DialogHeader>
@@ -129,10 +129,12 @@ const ExpenseCard = ({ expense, selectedExpenses, onExpenseChange }) => {
   }
 
   return (
-    <div className="flex cursor-pointer  items-center justify-between rounded-lg border p-2 sm:p-4 shadow-sm transition-shadow hover:shadow-md min-h-[9vh]">
+    <div className="flex min-h-[9vh] cursor-pointer items-center justify-between rounded-lg border p-2 shadow-sm transition-shadow hover:shadow-md sm:p-4">
       <div className="flex-grow pr-2">
-        <p className="font-semibold text-sm sm:text-base truncate">{expense.description}</p>
-        <p className="text-xs sm:text-sm text-gray-600">
+        <p className="truncate text-sm font-semibold sm:text-base">
+          {expense.description}
+        </p>
+        <p className="text-xs text-gray-600 sm:text-sm">
           Amount to Pay: ₹{expense.amountToPay.toFixed(2)}
         </p>
       </div>
@@ -163,8 +165,11 @@ export function SettleUp({
   const [selectingFor, setSelectingFor] = useState<
     "fromUser" | "toUser" | null
   >(null)
-  const router = useRouter();
-  const safeUsersYouNeedToPay = useMemo(() => usersYouNeedToPay || [], [usersYouNeedToPay]);
+  const router = useRouter()
+  const safeUsersYouNeedToPay = useMemo(
+    () => usersYouNeedToPay || [],
+    [usersYouNeedToPay]
+  )
 
   const availableRecipients = useMemo(
     () =>
@@ -234,7 +239,7 @@ export function SettleUp({
       .map((user) => ({
         expenseid: user.id,
         amount: user.amountToPay,
-        groupexpenceid:user.groupexpanceid,
+        groupexpenceid: user.groupexpanceid,
       }))
 
     // console.log(expenseDetails)
@@ -252,14 +257,14 @@ export function SettleUp({
         transactionDate: transactionDate,
       })
 
-      toast.dismiss(loadingToast);
+      toast.dismiss(loadingToast)
 
       toast.success("Successfully settled up!", {
         closeButton: true,
         icon: "🤝",
         duration: 4500,
       })
- 
+
       // router.refresh();
       form.reset()
     } catch (error) {
@@ -276,7 +281,7 @@ export function SettleUp({
     }
   }
 
-  const toUser = form.watch("toUser");
+  const toUser = form.watch("toUser")
 
   const selectedUserExpenses = useMemo(() => {
     const selectedUser = safeUsersYouNeedToPay.filter(
@@ -286,17 +291,16 @@ export function SettleUp({
     return selectedUser ? selectedUser : []
   }, [safeUsersYouNeedToPay, toUser])
 
-
   const totalAmount = useMemo(() => {
     return selectedUserExpenses
       .filter((expense) => form.watch("selectedExpenses").includes(expense.id))
-      .reduce((sum, expense) => sum + expense.amountToPay, 0);
-  }, [selectedUserExpenses,form.watch("selectedExpenses")])
+      .reduce((sum, expense) => sum + expense.amountToPay, 0)
+  }, [selectedUserExpenses, form.watch("selectedExpenses")])
 
   if (safeUsersYouNeedToPay.length === 0) {
     return (
       <Button
-        className="w-full sm:w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
+        className="w-full border-green-500 text-green-500 hover:bg-green-700 hover:text-white sm:w-[150px]"
         variant="outline"
         disabled
       >
@@ -307,171 +311,173 @@ export function SettleUp({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-    <DialogTrigger asChild>
-      <Button
-        className="w-full rounded-lg sm:w-[150px] border-green-500 text-green-500 hover:bg-green-700 hover:text-white"
-        variant="outline"
-        onClick={() => setOpen(true)}
-      >
-        Settle up 🤝
-      </Button>
-    </DialogTrigger>
-    <DialogContent className="max-h-[90vh] rounded-lg w-[95vw] sm:max-w-[425px] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle className="text-center sm:text-left">
-          <span className="text-green-500">Settle up</span> 🤝
-        </DialogTitle>
-      </DialogHeader>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-4"
+      <DialogTrigger asChild>
+        <Button
+          className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-700 hover:text-white sm:w-[150px]"
+          variant="outline"
+          onClick={() => setOpen(true)}
         >
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <UserAvatar
-              user={
-                groupMemberName.find((u) => u.userId === user) ||
-                groupMemberName[0]
-              }
-              size={85}
-            />
-            <div className="text-2xl transform rotate-90 sm:rotate-0">→</div>
+          Settle up 🤝
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[90vh] w-[95vw] overflow-y-auto rounded-lg sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center sm:text-left">
+            <span className="text-green-500">Settle up</span> 🤝
+          </DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+              <UserAvatar
+                user={
+                  groupMemberName.find((u) => u.userId === user) ||
+                  groupMemberName[0]
+                }
+                size={85}
+              />
+              <div className="rotate-90 transform text-2xl sm:rotate-0">→</div>
+              <FormField
+                control={form.control}
+                name="toUser"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-24 w-24 rounded-full border-none p-0"
+                        onClick={() => {
+                          setSelectingFor("toUser")
+                          setUserSelectionOpen(true)
+                        }}
+                      >
+                        <UserAvatar
+                          user={
+                            groupMemberName.find(
+                              (u) => u.userId === field.value
+                            ) || { userId: "", name: "Select", avatar: "" }
+                          }
+                          size={85}
+                        />
+                      </Button>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="text-center">
+              <span className="text-green-500">
+                {groupMemberName.find((u) => u.userId === user)?.name}
+              </span>{" "}
+              paid{" "}
+              <span className="text-blue-500">
+                {groupMemberName.find((u) => u.userId === form.watch("toUser"))
+                  ?.name || "Select recipient"}
+              </span>
+            </div>
             <FormField
               control={form.control}
-              name="toUser"
-              render={({ field }) => (
+              name="selectedExpenses"
+              render={() => (
                 <FormItem>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-24 w-24  rounded-full border-none p-0"
-                      onClick={() => {
-                        setSelectingFor("toUser")
-                        setUserSelectionOpen(true)
-                      }}
-                    >
-                      <UserAvatar
-                        user={
-                          groupMemberName.find(
-                            (u) => u.userId === field.value
-                          ) || { userId: "", name: "Select", avatar: "" }
-                        }
-                        size={85}
+                  <div className="mb-4">
+                    <FormLabel className="text-base">
+                      Select expenses to settle:
+                    </FormLabel>
+                  </div>
+                  <div
+                    className={`grid grid-cols-1 content-start gap-4 ${selectedUserExpenses.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"} overflow-y-auto`}
+                  >
+                    {selectedUserExpenses.map((expense) => (
+                      <ExpenseCard
+                        key={expense.memberId + expense.amountToPay}
+                        expense={expense}
+                        selectedExpenses={form.watch("selectedExpenses")}
+                        onExpenseChange={form.setValue}
                       />
-                    </Button>
-                  </FormControl>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-          <div className="text-center">
-            <span className="text-green-500">
-              {groupMemberName.find((u) => u.userId === user)?.name}
-            </span>{" "}
-            paid{" "}
-            <span className="text-blue-500">
-              {groupMemberName.find((u) => u.userId === form.watch("toUser"))
-                ?.name || "Select recipient"}
-            </span>
-          </div>
-          <FormField
-            control={form.control}
-            name="selectedExpenses"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel className="text-base">
-                    Select expenses to settle:
-                  </FormLabel>
-                </div>
-                <div className={`grid grid-cols-1 gap-4 content-start ${selectedUserExpenses.length < 3 ? '' : 'max-h-[30vh] sm:max-h-[40vh]'} overflow-y-auto`}>
-                  {selectedUserExpenses.map((expense) => (
-                    <ExpenseCard
-                      key={expense.memberId + expense.amountToPay}
-                      expense={expense}
-                      selectedExpenses={form.watch("selectedExpenses")}
-                      onExpenseChange={form.setValue}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="transactionDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Transaction Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value
-                          ? format(field.value, "PPP")
-                          : "Pick a date"}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-2">
-            <div className="text-lg font-semibold text-center sm:text-left w-full sm:w-auto">
-              Total: ₹{totalAmount.toFixed(2)} 
+            <FormField
+              control={form.control}
+              name="transactionDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Transaction Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? format(field.value, "PPP")
+                            : "Pick a date"}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
+              <div className="w-full text-center text-lg font-semibold sm:w-auto sm:text-left">
+                Total: ₹{totalAmount.toFixed(2)}
+              </div>
+              <div className="flex w-full flex-col justify-center space-y-2 sm:w-auto sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  className="w-full rounded-lg sm:w-auto"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-600 sm:w-auto"
+                >
+                  Settle up
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row justify-center sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                className="w-full rounded-lg sm:w-auto"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="outline"
-                className="w-full rounded-lg sm:w-auto border-green-500 text-green-500 hover:bg-green-600"
-              >
-                Settle up
-              </Button>
-            </div>
-          </div>
-        </form>
-      </Form>
-    </DialogContent>
-    
-    <UserSelectionModal
-      isOpen={userSelectionOpen}
-      onClose={() => setUserSelectionOpen(false)}
-      onSelect={handleUserSelect}
-      availableUsers={availableRecipients}
-    />
-  </Dialog>
+          </form>
+        </Form>
+      </DialogContent>
+
+      <UserSelectionModal
+        isOpen={userSelectionOpen}
+        onClose={() => setUserSelectionOpen(false)}
+        onSelect={handleUserSelect}
+        availableUsers={availableRecipients}
+      />
+    </Dialog>
   )
 }
 export default SettleUp

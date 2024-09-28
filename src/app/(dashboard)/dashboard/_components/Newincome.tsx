@@ -34,7 +34,6 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { AddnewIncome } from "../actions"
-import { log } from "node:console"
 
 const defaultCategories = [
   "EMI",
@@ -72,7 +71,7 @@ export function Newincome() {
   })
 
   const [open, setOpen] = useState(false)
-  const [isPending, setisPending] = useState<boolean>(false);
+  const [isPending, setisPending] = useState<boolean>(false)
   // handle submit
   const handleSubmit1 = async (data: IncomeFormData) => {
     try {
@@ -86,24 +85,23 @@ export function Newincome() {
         })
 
         setOpen(false)
-     
+
         form.reset()
       } else {
         throw new Error("Income not added")
       }
     } catch (error) {
       // console.error("Error adding income:", error)
-      console.log(error);
+      // console.log(error);
       toast.error("Failed to add income")
     }
   }
 
-  const handleSubmit = async(data: IncomeFormData) => {
-    setisPending(true);
-    await handleSubmit1(data);
-    setisPending(false);
+  const handleSubmit = async (data: IncomeFormData) => {
+    setisPending(true)
+    await handleSubmit1(data)
+    setisPending(false)
   }
-
 
   const [categories, setCategories] = useState(defaultCategories)
   // const [newCategory, setNewCategory] = useState("")
@@ -136,7 +134,7 @@ export function Newincome() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-                console.log("Form validation errors:", errors)
+                // console.log("Form validation errors:", errors)
               })}
               className="mt-4 space-y-4"
             >
@@ -255,8 +253,13 @@ export function Newincome() {
               />
 
               <DialogFooter className="mt-6 sm:mt-8">
-                <Button type="submit" variant='outline' className="w-full sm:w-auto border-green-500 text-green-500 hover:bg-green-700" disabled={isPending}>
-                {isPending ? "Adding..." : "Add new income"}
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full border-green-500 text-green-500 hover:bg-green-700 sm:w-auto"
+                  disabled={isPending}
+                >
+                  {isPending ? "Adding..." : "Add new income"}
                 </Button>
               </DialogFooter>
             </form>

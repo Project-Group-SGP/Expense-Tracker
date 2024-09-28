@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { format } from "date-fns"
 import { CalendarIcon, Check, ChevronDown } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -18,6 +18,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Form,
   FormControl,
@@ -33,17 +39,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
-import { cn } from "@/lib/utils"
-import { AddnewExpense } from "../actions"
-import { CategoryTypes } from "@prisma/client"
 import { categories, suggestCategory } from "@/lib/categoryKeywords"
+import { cn } from "@/lib/utils"
+import { CategoryTypes } from "@prisma/client"
+import { AddnewExpense } from "../actions"
 
 // form validation schema
 const formSchema = z.object({
@@ -107,7 +107,7 @@ export function NewExpense() {
   }, [description, form])
 
   const handleSubmit = async (data: ExpenseFormData) => {
-    console.log("Submitting data:", data)
+    // console.log("Submitting data:", data)
     setIsPending(true)
     try {
       const result = await AddnewExpense(data)

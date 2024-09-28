@@ -54,7 +54,7 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
 
   const router = useRouter()
 
-  console.log("Current budget:", props.currentBudget)
+  // console.log("Current budget:", props.currentBudget)
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(formSchema),
@@ -132,8 +132,8 @@ export function SetCategory_Budget(props: SetCategory_BudgetProps) {
       // Assuming you have a way to get the category (you might need to pass it in or get it from props)
       const category = toCategoryType(props.category)
 
-      console.log("category : " + category)
-      console.log("budget : " + budget)
+      // console.log("category : " + category)
+      // console.log("budget : " + budget)
 
       // Update the category budget
       const result = await SetCategoryBudgetDb(category, budget)

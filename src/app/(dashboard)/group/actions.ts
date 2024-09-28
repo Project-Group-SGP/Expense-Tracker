@@ -1,7 +1,6 @@
 "use server"
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { revalidatePath } from "next/cache"
 import webpush from "web-push"
 
 interface AddGroupData {

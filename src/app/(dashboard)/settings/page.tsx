@@ -1,14 +1,11 @@
 "use client"
 
-import { useCurrentUserClient } from "@/hooks/use-current-user"
-import React, { Suspense, useCallback, useEffect, useMemo } from "react"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { settings } from "@/actions/auth/settings"
-import { useState, useTransition } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SettingsSchema } from "@/lib/index"
+import MaxWidthWrapper from "@/components/MaxWidthWrapper"
+import { ModeToggle } from "@/components/ModeToggle"
+import { Passwordcmp } from "@/components/Passwordcmp"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -19,28 +16,30 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { z } from "zod"
-import { useSession } from "next-auth/react"
 import { Switch } from "@/components/ui/switch"
-import zxcvbn from "zxcvbn"
-import { Passwordcmp } from "@/components/Passwordcmp"
-import { ModeToggle } from "@/components/ModeToggle"
-import { toast } from "sonner"
-import MaxWidthWrapper from "@/components/MaxWidthWrapper"
-import {
-  IconUser,
-  IconMail,
-  IconLock,
-  IconShieldLock,
-  IconPalette,
-  IconBell,
-} from "@tabler/icons-react"
+import { useCurrentUserClient } from "@/hooks/use-current-user"
+import { SettingsSchema } from "@/lib/index"
 import {
   getCurrentPushSubscription,
   registerPushNotifications,
   unregisterPushNotification,
 } from "@/notifications/pushService"
-import { BellOff, BellRing, Loader2 } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+  IconBell,
+  IconLock,
+  IconMail,
+  IconPalette,
+  IconShieldLock,
+  IconUser,
+} from "@tabler/icons-react"
+import { Loader2 } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
+import zxcvbn from "zxcvbn"
 
 const SettingsPage = () => {
   // ... (keep the existing state and hooks)
@@ -57,7 +56,7 @@ const SettingsPage = () => {
   const [onoff, setonoff] = useState<boolean>(false)
 
   const Password_testResult = useMemo(() => zxcvbn(password), [password])
-  console.log(Password_testResult)
+  // console.log(Password_testResult)
   const password_score = useMemo(
     () => (Password_testResult.score * 100) / 4,
     [Password_testResult.score]
@@ -138,7 +137,7 @@ const SettingsPage = () => {
       newPassword: password,
       isTwoFactorEnable: onoff,
     }
-    console.log("values:", newvalues)
+    // console.log("values:", newvalues)
     const toastid: any = toast.loading("Evaluating Updates...")
     startTransition(() => {
       settings(newvalues)

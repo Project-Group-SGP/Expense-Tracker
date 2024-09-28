@@ -1,14 +1,14 @@
-import nodemailer from "nodemailer";
+import nodemailer from "nodemailer"
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
+  const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -44,19 +44,19 @@ export async function sendVerificationEmail(email: string, token: string) {
     </div>
 </body>
 </html>`,
-  };
+  }
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  });
+  })
 }
 
 // RESET PASSWORD EMAIL
-export const sendPasswordResetEmail = async(email:string,token:string) => {
-  const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`;
+export const sendPasswordResetEmail = async (email: string, token: string) => {
+  const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -64,7 +64,7 @@ export const sendPasswordResetEmail = async(email:string,token:string) => {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -100,32 +100,30 @@ export const sendPasswordResetEmail = async(email:string,token:string) => {
     </div>
 </body>
 </html>`,
-  };
-
+  }
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  });
+  })
 }
 
-export const sendTwoFactorTokenEmail = async(email:string,token:string) => {
-
+export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
     },
-  });
+  })
 
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject:"Your SpendWise Two-Factor Authentication Code",
-    html:`<!DOCTYPE html>
+    subject: "Your SpendWise Two-Factor Authentication Code",
+    html: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,13 +150,13 @@ export const sendTwoFactorTokenEmail = async(email:string,token:string) => {
         </div>
     </div>
 </body>
-</html>`
-  };
+</html>`,
+  }
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  });
+  })
 }

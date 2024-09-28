@@ -1,15 +1,9 @@
 "use server"
-import React, { cache } from "react"
-import PageTitle from "./_components/PageTitle"
-import { columns } from "./columns"
-import { DataTable } from "./data-table"
-import DatePicker from "./_components/DatePicker"
-import { Newincome } from "./_components/Income"
-import { NewExpense } from "./_components/Expance"
-import { headers } from "next/headers"
 import { currentUserServer } from "@/lib/auth"
 import { format, parseISO } from "date-fns"
-import { redirect } from 'next/navigation';
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import { cache } from "react"
 import HistoryPage from "./_components/History_page"
 
 const getTransactionData = cache(
@@ -28,17 +22,16 @@ const getTransactionData = cache(
       if (!res.ok) throw new Error("Failed to fetch all transaction data")
 
       const { transactions } = await res.json()
-      console.log("Fetched transactions count:", transactions.length)
+      // console.log("Fetched transactions count:", transactions.length)
       return transactions
     } catch (error) {
-      console.error("Error fetching transaction data:", error)
+      // console.error("Error fetching transaction data:", error)
       return []
     }
   }
 )
 
-
-const Page = async({
+const Page = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string }
@@ -68,13 +61,12 @@ const Page = async({
 
   return (
     <>
-        <HistoryPage Data={Data} />
+      <HistoryPage Data={Data} />
     </>
   )
 }
 
-export default Page;
-
+export default Page
 
 // "use client"
 // import React from "react"

@@ -136,7 +136,6 @@
 //   }
 // };
 
-
 // async function getGroupTransactionData(groupID: string, cookie: string): Promise<FormattedExpenseData[]> {
 //   try {
 //     const res = await fetch(
@@ -211,7 +210,7 @@
 //     amount: findcurrentuser?.amount ?? 0,
 //     userId: findcurrentuser?.userId ?? "",
 //     groupId: params.groupID
-//   }  
+//   }
 
 //   return (
 //       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -259,11 +258,15 @@
 // page.tsx (Server Component)
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { redirect } from "next/navigation"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 
 import GroupClientComponent from "./_components/GroupClientComponet"
-import { fetchGroupBalances, getAllData, getGroupTransactionData } from "./group"
+import {
+  fetchGroupBalances,
+  getAllData,
+  getGroupTransactionData,
+} from "./group"
 
 export default async function GroupPage({
   params,
