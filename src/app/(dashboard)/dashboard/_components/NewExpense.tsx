@@ -60,13 +60,25 @@ const formSchema = z.object({
 export type ExpenseFormData = z.infer<typeof formSchema>
 
 const suggestCategory = (description: string): CategoryTypes => {
-  const lowerDesc = description.toLowerCase()
+  const words = description.toLowerCase().split(/\s+/)
+  let bestMatch: { category: CategoryTypes; matchCount: number } = {
+    category: CategoryTypes.Other,
+    matchCount: 0,
+  }
+
   for (const category of categories) {
-    if (category.keywords.some((keyword) => lowerDesc.includes(keyword))) {
-      return category.name
+    let matchCount = 0
+    for (const keyword of category.keywords) {
+      if (words.includes(keyword.toLowerCase())) {
+        matchCount++
+      }
+    }
+    if (matchCount > bestMatch.matchCount) {
+      bestMatch = { category: category.name, matchCount }
     }
   }
-  return CategoryTypes.Other
+
+  return bestMatch.category
 }
 
 export function NewExpense() {
