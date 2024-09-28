@@ -59,6 +59,21 @@ const formSchema = z.object({
 
 export type ExpenseFormData = z.infer<typeof formSchema>
 
+const categoryEmojis = {
+  [CategoryTypes.Other]: "🔖",
+  [CategoryTypes.Bills]: "🧾",
+  [CategoryTypes.Food]: "🍽️",
+  [CategoryTypes.Entertainment]: "🎮",
+  [CategoryTypes.Transportation]: "🚗",
+  [CategoryTypes.EMI]: "💳",
+  [CategoryTypes.Healthcare]: "🏥",
+  [CategoryTypes.Education]: "🎓",
+  [CategoryTypes.Investment]: "💼",
+  [CategoryTypes.Shopping]: "🛒",
+  [CategoryTypes.Fuel]: "⛽",
+  [CategoryTypes.Groceries]: "🛍️",
+}
+
 const suggestCategory = (description: string): CategoryTypes => {
   const words = description.toLowerCase().split(/\s+/)
   let bestMatch: { category: CategoryTypes; matchCount: number } = {
@@ -216,7 +231,7 @@ export function NewExpense() {
                           variant="outline"
                           className="w-full justify-between"
                         >
-                          {field.value ||
+                           {categoryEmojis[field.value]} {field.value ||
                             suggestedCategory ||
                             "Select a category"}
                           <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -240,7 +255,7 @@ export function NewExpense() {
                                     : "opacity-0"
                                 )}
                               />
-                              {category.name}
+                              {categoryEmojis[category.name]} {category.name}
                               {category.name === suggestedCategory &&
                                 " (Suggested)"}
                             </DropdownMenuItem>

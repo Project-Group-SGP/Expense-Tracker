@@ -1,4 +1,5 @@
 "use client"
+
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -35,12 +36,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { CalendarIcon, Check, ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddnewExpense } from "../action"
 import { useRouter } from "next/navigation"
+import { categories } from "@/lib/categoryKeywords"
 
 // Categories should align with CategoryTypes enum
 const defaultCategories = [
@@ -57,6 +59,43 @@ const defaultCategories = [
   "Fuel",
   "Groceries",
 ]
+
+const suggestCategory = (description: string): CategoryTypes => {
+  const words = description.toLowerCase().split(/\s+/)
+  let bestMatch: { category: CategoryTypes; matchCount: number } = {
+    category: CategoryTypes.Other,
+    matchCount: 0,
+  }
+
+  for (const category of categories) {
+    let matchCount = 0
+    for (const keyword of category.keywords) {
+      if (words.includes(keyword.toLowerCase())) {
+        matchCount++
+      }
+    }
+    if (matchCount > bestMatch.matchCount) {
+      bestMatch = { category: category.name, matchCount }
+    }
+  }
+
+  return bestMatch.category
+}
+
+const categoryEmojis = {
+  [CategoryTypes.Other]: "🔖",
+  [CategoryTypes.Bills]: "🧾",
+  [CategoryTypes.Food]: "🍽️",
+  [CategoryTypes.Entertainment]: "🎮",
+  [CategoryTypes.Transportation]: "🚗",
+  [CategoryTypes.EMI]: "💳",
+  [CategoryTypes.Healthcare]: "🏥",
+  [CategoryTypes.Education]: "🎓",
+  [CategoryTypes.Investment]: "💼",
+  [CategoryTypes.Shopping]: "🛒",
+  [CategoryTypes.Fuel]: "⛽",
+  [CategoryTypes.Groceries]: "🛍️",
+}
 
 const CategoryTypesSchema = z.nativeEnum(CategoryTypes)
 
@@ -80,6 +119,7 @@ interface NewExpenseProps {
 export function NewExpense() {
   const [open, setOpen] = useState<boolean>(false);
   const [isPending, setisPending] = useState<boolean>(false);
+  const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(CategoryTypes.Other);
   
   const router = useRouter();
 
@@ -94,8 +134,8 @@ export function NewExpense() {
   
   const onAdd = async(data: ExpenseFormData) => {
     try{
-      const responce = await AddnewExpense(data);
-      if(responce==="success"){
+      const response = await AddnewExpense(data);
+      if(response === "success"){
         toast.success("Expense added successfully", {
           closeButton: true,
           icon: "😤",
@@ -106,18 +146,35 @@ export function NewExpense() {
         router.refresh();
         form.reset();
       }else{
-        throw new Error("Income not added")
+        throw new Error("Expense not added")
       }
     }catch(error){
       console.error("Error adding expense:", error);
       toast.error("Failed to add expense");
     }
   }
+  
   const handleSubmit = async(data: ExpenseFormData) => {
     setisPending(true);
     await onAdd(data);
     setisPending(false);
   }
+
+  // Watch for description input changes to suggest categories
+  const description = form.watch("description");
+
+  useEffect(() => {
+    if (description) {
+      const suggested = suggestCategory(description);
+      setSuggestedCategory(suggested);
+      if (!form.getValues("category") || form.getValues("category") === "Other") {
+        form.setValue("category", suggested, { shouldValidate: true });
+      }
+    } else {
+      setSuggestedCategory(CategoryTypes.Other);
+      form.setValue("category", CategoryTypes.Other, { shouldValidate: true });
+    }
+  }, [description, form]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -185,7 +242,7 @@ export function NewExpense() {
                           variant="outline"
                           className="w-full justify-between"
                         >
-                          {field.value || "Select a category"}
+                          {categoryEmojis[field.value]} {field.value || "Select a category"}
                           <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -203,7 +260,8 @@ export function NewExpense() {
                                     : "opacity-0"
                                 }`}
                               />
-                              {category}
+                              {categoryEmojis[category]}  {category}
+                              {category === suggestedCategory && " (Suggested)"}
                             </DropdownMenuItem>
                           ))}
                         </ScrollArea>
@@ -240,14 +298,11 @@ export function NewExpense() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent align="start" className="w-auto p-0">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
                         initialFocus
                       />
                     </PopoverContent>
@@ -256,9 +311,15 @@ export function NewExpense() {
                 </FormItem>
               )}
             />
-            <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" variant='outline' className="w-full sm:w-auto border-red-500 text-red-500 hover:bg-red-700" disabled={isPending}>
-                {isPending ? "Adding..." : "Add New Expense"}
+
+            <DialogFooter>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-auto"
+                disabled={isPending}
+              >
+                {isPending ? "Creating expense..." : "Add expense"}
               </Button>
             </DialogFooter>
           </form>
