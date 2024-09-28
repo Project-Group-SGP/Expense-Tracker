@@ -40,7 +40,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 import { AddGroupExpense } from "../group"
 import { useRouter } from "next/navigation"
-import { categories } from "@/lib/categoryKeywords"
+import { categories, suggestCategory } from "@/lib/categoryKeywords"
 import { CategoryTypes } from "@prisma/client"
 import {
   DropdownMenu,
@@ -89,38 +89,6 @@ const formSchema = z.object({
     .min(1, "At least one person must be selected to split with"),
   category: z.nativeEnum(CategoryTypes),
 })
-
-// Function to suggest category
-const suggestCategory = (description: string): CategoryTypes => {
-  const words = description.toLowerCase().split(/\s+/)
-  let bestMatch: { category: CategoryTypes; matchCount: number } = {
-    category: CategoryTypes.Other,
-    matchCount: 0,
-  }
-
-  for (const category of categories) {
-    let matchCount = 0
-    for (const keyword of category.keywords) {
-      // Check for exact matches (including multi-word keywords)
-      if (description.toLowerCase().includes(keyword.toLowerCase())) {
-        matchCount += 2 // Give higher weight to exact matches
-      } else {
-        // Check for individual word matches
-        const keywordWords = keyword.toLowerCase().split(/\s+/)
-        for (const word of keywordWords) {
-          if (words.includes(word)) {
-            matchCount++
-          }
-        }
-      }
-    }
-    if (matchCount > bestMatch.matchCount) {
-      bestMatch = { category: category.name, matchCount }
-    }
-  }
-
-  return bestMatch.category
-}
 
 export function AddExpense({
   params,
@@ -183,7 +151,6 @@ export function AddExpense({
     if (watchTitle) {
       const suggested = suggestCategory(watchTitle)
       setSuggestedCategory(suggested)
-      //@ts-ignore
       if (
         !form.getValues("category") ||
         //@ts-ignore

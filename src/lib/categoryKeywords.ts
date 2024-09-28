@@ -465,3 +465,26 @@ export const categories: { name: CategoryTypes; keywords: string[] }[] = [
     ],
   },
 ]
+
+// Function to suggest category
+export const suggestCategory = (description: string): CategoryTypes => {
+  const words = description.toLowerCase().split(/\s+/)
+  let bestMatch: { category: CategoryTypes; matchCount: number } = {
+    category: CategoryTypes.Other,
+    matchCount: 0,
+  }
+
+  for (const category of categories) {
+    let matchCount = 0
+    for (const keyword of category.keywords) {
+      if (words.includes(keyword.toLowerCase())) {
+        matchCount++
+      }
+    }
+    if (matchCount > bestMatch.matchCount) {
+      bestMatch = { category: category.name, matchCount }
+    }
+  }
+
+  return bestMatch.category
+}

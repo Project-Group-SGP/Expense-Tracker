@@ -31,18 +31,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { suggestCategory } from "@/lib/categoryKeywords"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { CalendarIcon, Check, ChevronDown } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 import { AddnewExpense } from "../action"
-import { useRouter } from "next/navigation"
-import { categories } from "@/lib/categoryKeywords"
 
 // Categories should align with CategoryTypes enum
 const defaultCategories = [
@@ -59,37 +59,6 @@ const defaultCategories = [
   "Fuel",
   "Groceries",
 ]
-
-const suggestCategory = (description: string): CategoryTypes => {
-  const words = description.toLowerCase().split(/\s+/)
-  let bestMatch: { category: CategoryTypes; matchCount: number } = {
-    category: CategoryTypes.Other,
-    matchCount: 0,
-  }
-
-  for (const category of categories) {
-    let matchCount = 0
-    for (const keyword of category.keywords) {
-      // Check for exact matches (including multi-word keywords)
-      if (description.toLowerCase().includes(keyword.toLowerCase())) {
-        matchCount += 2 // Give higher weight to exact matches
-      } else {
-        // Check for individual word matches
-        const keywordWords = keyword.toLowerCase().split(/\s+/)
-        for (const word of keywordWords) {
-          if (words.includes(word)) {
-            matchCount++
-          }
-        }
-      }
-    }
-    if (matchCount > bestMatch.matchCount) {
-      bestMatch = { category: category.name, matchCount }
-    }
-  }
-
-  return bestMatch.category
-}
 
 const categoryEmojis = {
   [CategoryTypes.Other]: "🔖",
