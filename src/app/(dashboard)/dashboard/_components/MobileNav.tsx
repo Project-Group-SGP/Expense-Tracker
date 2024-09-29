@@ -89,7 +89,7 @@ const navLinks = [
   { href: "/history", label: "History", icon: FiClock },
   { href: "/budget", label: "Budget", icon: PiggyBank },
   { href: "/group", label: "Group", icon: FiUsers },
-  { href: "/settings", label: "Settings", icon: FiSettings },
+  // { href: "/settings", label: "Settings", icon: FiSettings },
 ]
 
 export default function MobileNav() {
