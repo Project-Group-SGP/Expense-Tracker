@@ -90,7 +90,7 @@ export const categories: { name: CategoryTypes; keywords: string[] }[] = [
     keywords: [
       "shopping", "shop", "clothes", "apparel", "dress", "electronics", "gadget", "mobile", "laptop", "computer", "phone", 
       "fashion", "flipkart", "myntra", "ajio", "zara", "pantaloons", "mall", "boutique", "supermarket", "big bazaar", 
-      "dmart", "amazon", "shein", "snapdeal", "meesho", "decathlon", "ikea", "furniture", "sofa", "curtain", "blanket", 
+      "amazon", "shein", "snapdeal", "meesho", "decathlon", "ikea", "furniture", "sofa", "curtain", "blanket", 
       "accessories", "reliance digital", "croma", "vijay sales", "tanishq", "kalyan", "tbz", "lifestyle", "westside", 
       "fabindia", "bandhani", "patola", "chaniya choli", "zudio", "jewellery", "makeup", "beauty", "shirt", "tshirt", 
       "jeans", "kurti", "saree", "watch", "necklace", "jewellery", "ring", "earring", "bracelet", "iphone"
@@ -111,7 +111,8 @@ export const categories: { name: CategoryTypes; keywords: string[] }[] = [
       "dmart", "bazaar", "madhur", "cooking", "masala", "atta", "flour", "dal", "dairy", "chocolates", "bakery", "biscuit", 
       "sweets", "namkeen", "spices", "fmcg", "bisleri", "amul", "nestle", "fortune", "maggi", "ghee", "paneer", "khari", 
       "butter", "curd", "yogurt", "sugar", "salt", "rice", "wheat", "toor dal", "bajra", "jowar", "groceries", "beverage", 
-      "daily essentials"
+      "daily essentials", "kirana", "dry fruit", "pulse", "bread", "haldar", "hing", "mirchi", "marchi", "powder", "paneer",
+      "big basket", "bigbasket", "blinkit", "pulses", "lot", "pickle"
     ]
   }
 ];
