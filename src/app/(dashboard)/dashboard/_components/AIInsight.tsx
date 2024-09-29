@@ -207,7 +207,7 @@ export default function AIInsight() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[80%]`}
+                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[85%]`}
                 >
                   <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
                     {message.role === "user" ? (
@@ -227,11 +227,11 @@ export default function AIInsight() {
                     )}
                   </Avatar>
                   <div
-                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"} overflow-x-auto`}
                   >
                     {message.role === "assistant" ? (
                       <ReactMarkdown
-                        className="prose dark:prose-invert max-w-none text-sm sm:text-base"
+                        className="prose max-w-none text-sm dark:prose-invert sm:text-base"
                         // //@ts-ignore
                         // components={renderers}
                         remarkPlugins={[remarkGfm]}
