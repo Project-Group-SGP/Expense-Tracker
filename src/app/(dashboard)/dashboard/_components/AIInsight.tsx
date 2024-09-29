@@ -54,7 +54,13 @@ interface Message {
 export default function AIInsight() {
   const [fromMonth, setFromMonth] = useState<Month | "">("")
   const [toMonth, setToMonth] = useState<Month | "">("")
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content:
+        "Hello, I am your **AI-powered financial advisor**. Please select a time period to generate financial insights?",
+    },
+  ])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
