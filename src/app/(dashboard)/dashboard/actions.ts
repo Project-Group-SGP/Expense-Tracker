@@ -267,7 +267,6 @@ export async function generateFinancialAdvice(
 
     const prompt = `
     As a financial advisor, analyze the following detailed financial data, including budget information, and provide a comprehensive summary and actionable advice:
-
     ${JSON.stringify(financialSummary, null, 2)}
 
     Please provide:
@@ -295,7 +294,7 @@ export async function generateFinancialAdvice(
     - Also dont use tables instead do something else
     - give answer in rupees not in dollars
     - Don't tell user to use any other apps tell them to user our website
-    - Utilize Markdown elements like headers (# ## ###), bullet points, numbered lists, and **bold** or *italic* text for emphasis
+    - Utilize Markdown elements like headers, bullet points, numbered lists, and **bold** or *italic* text for emphasis
     Remember, the goal is to provide clear, actionable financial advice while keeping the tone upbeat and engaging!
     Note: I am using React-Markdown + Remark-gfm for displaying the text so generate response accordingly
     `
