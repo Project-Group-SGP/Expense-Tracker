@@ -77,19 +77,22 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { usePathname } from 'next/navigation'
+import { usePathname } from "next/navigation"
 import { IoClose } from "react-icons/io5"
 import { CiMenuFries } from "react-icons/ci"
 import { motion, AnimatePresence } from "framer-motion"
 import { FiHome, FiClock, FiUsers, FiSettings } from "react-icons/fi"
+import { TbReportAnalytics } from "react-icons/tb"
+
 import { PiggyBank } from "lucide-react"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: FiHome },
   { href: "/history", label: "History", icon: FiClock },
   { href: "/budget", label: "Budget", icon: PiggyBank },
+  { href: "/report", label: "Report", icon: TbReportAnalytics },
   { href: "/group", label: "Group", icon: FiUsers },
-  // { href: "/settings", label: "Settings", icon: FiSettings },
+  { href: "/settings", label: "Settings", icon: FiSettings },
 ]
 
 export default function MobileNav() {
@@ -102,7 +105,7 @@ export default function MobileNav() {
   return (
     <>
       <CiMenuFries
-        className="cursor-pointer text-2xl md:hidden hover:text-primary"
+        className="cursor-pointer text-2xl hover:text-primary md:hidden"
         onClick={toggleMenu}
         aria-label="Toggle mobile menu"
       />
@@ -139,10 +142,7 @@ export default function MobileNav() {
                     onHoverEnd={() => setHoveredItem(null)}
                   >
                     <Link
-                      className={`flex items-center gap-2 relative transition-all duration-300 hover:text-primary
-                        ${hoveredItem && hoveredItem !== href ? 'opacity-30' : ''}
-                        ${pathname === href ? 'text-primary' : ''}
-                      `}
+                      className={`relative flex items-center gap-2 transition-all duration-300 hover:text-primary ${hoveredItem && hoveredItem !== href ? "opacity-30" : ""} ${pathname === href ? "text-primary" : ""} `}
                       href={href}
                       onClick={toggleMenu}
                     >
@@ -150,10 +150,8 @@ export default function MobileNav() {
                       <span className="border-b-2 border-transparent">
                         {label}
                       </span>
-                      <span 
-                        className={`absolute -bottom-1 left-0 w-full h-0.5 bg-primary transform transition-transform duration-300 origin-left
-                          ${pathname === href ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}
-                        `}
+                      <span
+                        className={`absolute -bottom-1 left-0 h-0.5 w-full origin-left transform bg-primary transition-transform duration-300 ${pathname === href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"} `}
                       ></span>
                     </Link>
                   </motion.div>
