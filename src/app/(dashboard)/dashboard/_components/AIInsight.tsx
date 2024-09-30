@@ -193,7 +193,7 @@ export default function AIInsight() {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw] md:w-[80vw] lg:w-[80vw] xl:w-[80vw]">
+      <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw]">
         <DialogHeader className="p-4 sm:p-6">
           <DialogTitle className="text-lg sm:text-xl md:text-2xl">
             Financial AI Insight
