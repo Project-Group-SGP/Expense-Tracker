@@ -118,13 +118,6 @@ export default function AIInsight() {
     }
   }
 
-  // // Custom renderer for paragraphs
-  // const renderers = {
-  //   p: ({ children }: { children: React.ReactNode }) => (
-  //     <p className="mb-4">{children}</p>
-  //   ),
-  // }
-
   return (
     <Dialog>
       <TooltipProvider>
@@ -226,14 +219,13 @@ export default function AIInsight() {
                       </>
                     )}
                   </Avatar>
+
                   <div
                     className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"} overflow-x-auto`}
                   >
                     {message.role === "assistant" ? (
                       <ReactMarkdown
-                        className="prose max-w-none text-sm dark:prose-invert sm:text-base"
-                        // //@ts-ignore
-                        // components={renderers}
+                        className="prose max-w-none overflow-x-auto text-sm dark:prose-invert sm:text-base"
                         remarkPlugins={[remarkGfm]}
                       >
                         {message.content}
