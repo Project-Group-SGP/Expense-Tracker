@@ -155,7 +155,7 @@ export default function Navbar() {
           <Link
             href="/dashboard"
             className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
+          > 
             <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />
             <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
               spend<span className="text-primary">wise</span>

@@ -211,6 +211,7 @@ export default function AIInsight() {
                 >
                   <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
                     {message.role === "user" ? (
+                      //@ts-ignore
                       <>
                         <AvatarImage src={user?.image || ""} alt="User" />
                         <AvatarFallback>
