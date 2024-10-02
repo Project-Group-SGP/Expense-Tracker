@@ -20,7 +20,7 @@ import ReactMarkdown from "react-markdown"
 import { generateFinancialAdvice } from "../actions"
 import { readStreamableValue } from "ai/rsc"
 import { Month } from "../actions"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCurrentUserClient } from "@/hooks/use-current-user"
 import {
@@ -240,6 +240,7 @@ export default function AIInsight() {
             ))}
             <div ref={messagesEndRef} />
           </div>
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
         <div className="border-t p-4 sm:p-6">
           {!open && (
