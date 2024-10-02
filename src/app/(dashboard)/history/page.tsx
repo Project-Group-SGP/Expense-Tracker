@@ -59,11 +59,7 @@ const Page = async ({
 
   const [Data] = await Promise.all([getTransactionData(cookie, from, to)])
 
-  return (
-    <>
-      <HistoryPage Data={Data} />
-    </>
-  )
+  return <HistoryPage Data={Data} />
 }
 
 export default Page

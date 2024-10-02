@@ -61,9 +61,7 @@ export const columns: ColumnDef<ResponceType>[] = [
           <span className="hidden sm:block">
             {format(date, "dd MMMM, yyyy")}
           </span>
-          <span className="sm:hidden block">  
-            {format(date, "dd/MM/yyyy")}
-          </span>
+          <span className="block sm:hidden">{format(date, "dd/MM/yyyy")}</span>
         </div>
       )
     },
@@ -117,6 +115,7 @@ export const columns: ColumnDef<ResponceType>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
+      //@ts-ignore
       if (row.original.description === null) return <></>
 
       return (
