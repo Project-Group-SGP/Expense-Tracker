@@ -162,42 +162,85 @@ export function AddExpense({
     }
   }, [watchTitle, form])
 
+  // useEffect(() => {
+  //   const totalAmount = parseFloat(watchAmount) || 0
+  //   const splitType = watchSplitType
+
+  //   const includedMembers = members.filter((m) => m.included)
+  //   let updatedMembers = [...members]
+
+  //   if (splitType === "Equally") {
+  //     const splitAmount = totalAmount / includedMembers.length || 0
+  //     updatedMembers = updatedMembers.map((member) => ({
+  //       ...member,
+  //       amount: member.included ? splitAmount : 0,
+  //     }))
+  //   } else if (splitType === "As Amounts") {
+  //     const totalAssigned = updatedMembers.reduce(
+  //       (sum, member) => sum + (member.included ? member.amount : 0),
+  //       0
+  //     )
+  //     const remaining = totalAmount - totalAssigned
+  //     if (remaining > 0) {
+  //       const splitRemaining = remaining / includedMembers.length
+  //       updatedMembers = updatedMembers.map((member) => ({
+  //         ...member,
+  //         amount: member.included ? member.amount + splitRemaining : 0,
+  //       }))
+  //     }
+  //   }
+
+  //   const hasChanged =
+  //     JSON.stringify(members) !== JSON.stringify(updatedMembers)
+  //   if (hasChanged) {
+  //     setMembers(updatedMembers)
+  //     form.setValue("splitWith", updatedMembers)
+  //   }
+  // }, [watchAmount, watchSplitType, members, form])
+
   useEffect(() => {
-    const totalAmount = parseFloat(watchAmount) || 0
-    const splitType = watchSplitType
-
-    const includedMembers = members.filter((m) => m.included)
-    let updatedMembers = [...members]
-
+    const totalAmount = parseFloat(watchAmount) || 0;
+    const splitType = watchSplitType;
+  
+    const includedMembers = members.filter((m) => m.included);
+    let updatedMembers = [...members];
+  
     if (splitType === "Equally") {
-      const splitAmount = totalAmount / includedMembers.length || 0
+      const splitAmount = totalAmount / includedMembers.length || 0;
       updatedMembers = updatedMembers.map((member) => ({
         ...member,
         amount: member.included ? splitAmount : 0,
-      }))
+      }));
     } else if (splitType === "As Amounts") {
       const totalAssigned = updatedMembers.reduce(
         (sum, member) => sum + (member.included ? member.amount : 0),
         0
-      )
-      const remaining = totalAmount - totalAssigned
-      if (remaining > 0) {
-        const splitRemaining = remaining / includedMembers.length
+      );
+  
+      if (totalAssigned > totalAmount) {
+        // Handle case where assigned amounts exceed total
+        toast.error("Assigned amounts exceed the total expense.");
+      } else if (totalAssigned < totalAmount) {
+        // Handle remaining amount by distributing equally among included members
+        const remaining = totalAmount - totalAssigned;
+        const splitRemaining = remaining / includedMembers.length;
+  
         updatedMembers = updatedMembers.map((member) => ({
           ...member,
           amount: member.included ? member.amount + splitRemaining : 0,
-        }))
+        }));
       }
     }
-
+  
     const hasChanged =
-      JSON.stringify(members) !== JSON.stringify(updatedMembers)
+      JSON.stringify(members) !== JSON.stringify(updatedMembers);
+  
     if (hasChanged) {
-      setMembers(updatedMembers)
-      form.setValue("splitWith", updatedMembers)
+      setMembers(updatedMembers);
+      form.setValue("splitWith", updatedMembers);
     }
-  }, [watchAmount, watchSplitType, members, form])
-
+  }, [watchAmount, watchSplitType, members, form]);
+  
   const handleMemberToggle = (id: string, included: boolean) => {
     const updatedMembers = members.map((m) =>
       m.id === id ? { ...m, included, amount: included ? m.amount : 0 } : m
@@ -206,29 +249,39 @@ export function AddExpense({
     form.setValue("splitWith", updatedMembers)
   }
 
+  // const handleAmountChange = (id: string, amount: number) => {
+  //   const updatedMembers = members.map((m) =>
+  //     m.id === id ? { ...m, amount } : m
+  //   )
+  //   setMembers(updatedMembers)
+  //   form.setValue("splitWith", updatedMembers)
+  // }
   const handleAmountChange = (id: string, amount: number) => {
     const updatedMembers = members.map((m) =>
       m.id === id ? { ...m, amount } : m
-    )
-    setMembers(updatedMembers)
-    form.setValue("splitWith", updatedMembers)
-  }
+    );
+    setMembers(updatedMembers);
+    
+    // Update form value immediately to ensure synchronization
+    form.setValue("splitWith", updatedMembers, { shouldValidate: true });
+  };
+  
 
   // Form submission
   const onSubmit = async (data) => {
-    const totalAmount = parseFloat(data.amount)
+    const totalAmount = parseFloat(data.amount);
     const totalSplitAmount = data.splitWith.reduce(
       (sum, member) => sum + (member.included ? member.amount : 0),
       0
-    )
-
+    );
+  
+    // Validate the total split amounts against the total expense amount
     if (Math.abs(totalSplitAmount - totalAmount) > 0.01) {
       toast.error(
         "The split amounts do not add up to the total expense amount."
-      )
-      return
+      );
+      return;
     }
-
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
 
