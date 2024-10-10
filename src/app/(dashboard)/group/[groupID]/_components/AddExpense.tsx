@@ -512,7 +512,7 @@ export function AddExpense({
                           {watchSplitType === "As Amounts" ? (
                             <Input
                               type="number"
-                              value={member.amount}
+                              value={Math.round(member.amount * 100) / 100}
                               onChange={(e) =>
                                 handleAmountChange(
                                   member.id,
