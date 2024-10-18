@@ -1,8 +1,9 @@
 import MaxWidthWrapper from "@/components/MaxWidthWrapper"
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
-import { ArrowRight, BarChart2, Check, Coins } from "lucide-react"
+import { ArrowRight, BarChart2, Check, Coins, Tags, Users, Wand } from "lucide-react"
 import Image from "next/image"
+
 const features = [
   {
     icon: Check,
@@ -22,7 +23,26 @@ const features = [
     description:
       "Easily log and categorize your daily expenses, ensuring you stay on top of your spending habits.",
   },
-]
+  {
+    icon: Users,
+    title: "Group Expenses",
+    description:
+      "Create groups to organize shared expenses, split costs, and settle up easily with friends and family.",
+  },
+  {
+    icon: Tags,
+    title: "Categorization",
+    description:
+      "Our smart system automatically categorizes your expenses based on the description, saving you time and effort.",
+  },
+  {
+    icon: Wand,
+    title: "Monthly Summary",
+    description:
+      "Get a comprehensive summary of your expenses for the selected month, helping you track spending and manage your budget effectively.",
+  }
+];
+
 
 const testimonials = [
   {
@@ -55,12 +75,12 @@ const faqs = [
   {
     question: "What is Spendwise?",
     answer:
-      "Spendwise is a free personal finance app designed to track expenses and manage budgets effectively.",
+      "Spendwise is a free personal finance app designed to track expenses, manage budgets effectively, and handle group expenses.",
   },
   {
     question: "How do I get started?",
     answer:
-      "Sign up, start entering expenses manually or import transactions from your bank statement, and set your budget goals.",
+      "Sign up, start entering expenses manually or import transactions from your bank statement, set your budget goals, and invite friends to split expenses if needed.",
   },
   {
     question: "Is my data safe?",
@@ -74,7 +94,7 @@ const faqs = [
   },
 ]
 
-export default async function Home() {
+export default function Home() {
   return (
     <>
       <Navbar />
@@ -124,8 +144,8 @@ export default async function Home() {
           <div className="mt-7 grid grid-cols-1 gap-12 px-3 md:px-0 lg:grid-cols-3 lg:px-0">
             {features.map((feature, index) => (
               <div
-                key={"features" + index}
-                className="rounded-lg p-8 shadow-lg transition-transform hover:scale-105 dark:bg-gray-800"
+                key={`features${index}`}
+                className="rounded-lg p-5 shadow-lg transition-transform hover:scale-105 dark:bg-gray-800"
               >
                 <div className="mb-4 flex items-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
@@ -143,6 +163,7 @@ export default async function Home() {
           </div>
         </section>
       </MaxWidthWrapper>
+
       <MaxWidthWrapper className="mt-24">
         <section>
           <h2 className="text-center text-4xl font-extrabold text-gray-900 dark:text-white">
@@ -151,7 +172,7 @@ export default async function Home() {
           <div className="mt-12 grid grid-cols-1 gap-8 px-3 md:grid-cols-2 md:px-0 lg:grid-cols-3 lg:px-0">
             {testimonials.map((testimonial, index) => (
               <div
-                key={"testimonials" + index}
+                key={`testimonials${index}`}
                 className="rounded-lg p-6 shadow-md dark:bg-gray-800"
               >
                 <p className="mb-4 text-lg italic text-gray-700 dark:text-gray-300">
@@ -185,7 +206,7 @@ export default async function Home() {
             </h2>
             <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
               Discover financial freedom with Spendwise – empowering users to
-              master their finances.
+              master their finances and manage group expenses effortlessly.
             </p>
             <div className="mt-8 flex justify-center">
               <Link
@@ -211,7 +232,7 @@ export default async function Home() {
           <div className="mt-12 grid grid-cols-1 gap-8 pb-8 md:grid-cols-2">
             {faqs.map((faq, index) => (
               <div
-                key={"faqs" + index}
+                key={`faqs${index}`}
                 className="rounded-lg border p-6 dark:border-gray-700"
               >
                 <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
