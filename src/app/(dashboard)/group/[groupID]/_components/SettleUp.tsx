@@ -102,7 +102,7 @@ export const UserSelectionModal: React.FC<{
                   variant="outline"
                   className="flex h-full items-center justify-start space-x-2 p-2"
                   onClick={(e) => {
-                    e.stopPropagation() // Prevent event from bubbling up
+                    e.stopPropagation()
                     onSelect(user)
                     onClose()
                   }}
@@ -321,7 +321,12 @@ export function SettleUp({
           Settle up 🤝
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] w-[95vw] overflow-y-auto rounded-lg sm:max-w-[425px]">
+      <DialogContent
+        className="max-h-[90vh] w-[95vw] overflow-y-auto rounded-lg sm:max-w-[425px]"
+        onInteractOutside={(e) => {
+          e.preventDefault()
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             <span className="text-green-500">Settle up</span> 🤝
