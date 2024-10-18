@@ -4,6 +4,7 @@ import "./globals.css"
 import { Providers } from "@/components/Providers/Providers"
 import { Toaster } from "@/components/ui/sonner"
 import Script from "next/script"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -77,6 +78,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster richColors />
+          <GoogleAnalytics gaId="G-D5HK4RNZKV" />
         </Providers>
       </body>
       <Script type="application/ld+json" id="schema">
