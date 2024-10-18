@@ -182,7 +182,7 @@ export default function Home() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={`testimonials${index}`}
-                className="rounded-lg p-6 shadow-md dark:bg-gray-800"
+                className="rounded-lg p-6 shadow-md transition-transform hover:scale-105 dark:bg-gray-800"
               >
                 <p className="mb-4 text-lg italic text-gray-700 dark:text-gray-300">
                   {testimonial.quote.map((part, i) =>
