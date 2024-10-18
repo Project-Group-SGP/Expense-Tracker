@@ -133,6 +133,7 @@ export default function LeaveButton({
   const alertContent = getAlertContent()
 
   return (
+    //@ts-ignore
     <>
       <TooltipProvider>
         <Tooltip>

@@ -2,119 +2,91 @@ import { CategoryTypes } from "@prisma/client"
 
 //prettier-ignore
 export const categories: { name: CategoryTypes; keywords: string[] }[] = [
-  { 
-    name: "Other", 
+  {
+    name: "Other",
+    //prettier-ignore
     keywords: [
-      "miscellaneous", "general", "various", "uncategorized", "misc", "random","unknown",
-    ] 
+      "general", "misc", "miscellaneous","other", "random", "uncategorized", "unknown", "various"
+    ],
   },
   {
     name: "Bills",
+    //prettier-ignore
     keywords: [
-      "bill", "bills", "utility", "utilities", "electricity", "water", "gas", "bsnl", "jio", "airtel", "recharge", 
-      "subscription", "subscriptions", "maintenance", "internet", "prepaid", "postpaid", "telecom", "tax", "taxes", 
-      "tv", "power", "torrent", "pgvcl", "ugvcl", "mgvcl", "dgvcl", "vera", "gst", "vodafone idea", "vi", "dish tv", 
-      "tata sky", "d2h", "lpg", "cylinder", "electric", "telephone", "landline", "heating", "billing"
-    ]
+      "airtel", "bill", "billing", "bills", "bsnl", "cylinder", "d2h", "dgvcl", "dish tv", "electric", "electricity", "gas", "gst", "heating", "internet", "jio", "landline", "lpg", "maintenance", "mgvcl", "pgvcl", "postpaid", "power", "prepaid", "recharge", "subscription", "subscriptions", "tata sky", "tax", "taxes", "telecom", "telephone", "torrent", "tv", "ugvcl", "utilities", "utility", "vera", "vi", "vodafone idea", "water"
+    ],
   },
   {
     name: "Food",
+    //prettier-ignore
     keywords: [
-      "food", "restaurant", "meal", "dinner", "lunch", "breakfast", "zomato", "swiggy", "cafe", "dhaba", "manchurian", 
-      "kfc", "pizza", "burger", "pasta", "ice cream", "coffee", "tea", "samosa", "momo", "biryani", "dosa", "dhosa", 
-      "snack", "chips", "chocolate", "fries", "snacks", "salad", "fast food", "delivery", "sushi", "curry", "jalebi", 
-      "sandwich", "dessert", "noodles", "sweets", "biscuit", "rice", "gathiya", "khaman", "khamman", "locho", "punjabi", 
-      "chinese", "subway", "bhajiya", "vada", "idli", "thali", "dabeli", "vadapav", "pani puri", "sev", "fafda", "dhokla", 
-      "undhiyu", "khandvi", "dal dhokli", "farsan", "thepla", "rotli", "chai", "lassi", "buttermilk", "chaas", "pav bhaji", 
-      "gujarati", "kathiyawadi", "surti", "buffet", "snack bar", "takeout", "catering", "street food", "bakery", "dessert"
-    ]
+      "bakery", "bhajiya", "biryani", "biscuit", "breakfast", "buffet", "burger", "buttermilk", "cafe", "catering", "chaas", "chai", "chinese", "chips", "chocolate", "coffee", "curry", "dabeli", "dal dhokli", "delivery", "dessert", "dessert", "dhaba", "dhokla", "dhosa", "dinner", "dosa", "fafda", "farsan", "fast food", "food", "fries", "gathiya", "gujarati", "ice cream", "idli", "jalebi", "kathiyawadi", "kfc", "khaman", "khamman", "khandvi", "lassi", "locho", "lunch", "manchurian", "meal", "momo", "noodles", "pani puri", "pasta", "pav bhaji", "pizza", "punjabi", "restaurant", "rice", "rotli", "salad", "samosa", "sandwich", "sev", "snack", "snack bar", "snacks", "street food", "subway", "surti", "sushi", "sweets", "swiggy", "takeout", "tea", "thali", "thepla", "undhiyu", "vada", "vadapav", "zomato"
+    ],
   },
   {
     name: "Entertainment",
+    //prettier-ignore
     keywords: [
-      "movie", "movies", "concert", "game", "parties", "party", "theatre", "theater", "show", "pvr", "inox", "netflix", 
-      "prime", "hotstar", "picture", "music", "radio", "cinema", "esport", "zee5", "sony", "premiere", "ramzat", "club", 
-      "park", "dj", "imax", "garba", "dandiya", "navratri", "kite festival", "uttarayan", "amusement park", "water park", 
-      "museum", "multiplex", "bookmyshow", "jio cinema", "voot", "alt balaji", "mxplayer", "games", "arcade", "festivals", 
-      "streaming", "gaming", "live show", "performance", "circus"
-    ]
+      "alt balaji", "amusement park", "arcade", "bookmyshow", "cinema", "circus", "club", "concert", "dandiya", "dj", "esport", "festivals", "game", "games", "gaming", "garba", "hotstar", "imax", "inox", "jio cinema", "kite festival", "live show", "movie", "movies", "multiplex", "museum", "music", "mxplayer", "navratri", "netflix", "park", "parties", "party", "performance", "picture", "premiere", "prime", "pvr", "radio", "ramzat", "show", "sony", "streaming", "theater", "theatre", "uttarayan", "voot", "water park", "zee5"
+    ],
   },
   {
     name: "Transportation",
+    //prettier-ignore
     keywords: [
-      "bus", "train", "taxi", "uber", "ola", "fare", "auto", "metro", "rickshaw", "cab", "flight", "aeroplane", "ferry", 
-      "cruise", "toll", "fastag", "brts", "amts", "gsrtc", "rapido", "jugnoo", "irctc", "makemytrip", "goibibo", "redbus", 
-      "zoomcar", "revv", "yulu", "vogo", "parking", "rental", "journey", "bike", "scooter", "shuttle", "travel", "trip"
-    ]
+      "aeroplane", "amts", "auto", "bike", "brts", "bus", "cab", "cruise", "fare", "fastag", "ferry", "flight", "goibibo", "gsrtc", "irctc", "journey", "jugnoo", "makemytrip", "metro", "ola", "parking", "rapido", "redbus", "rental", "revv", "rickshaw", "scooter", "shuttle", "taxi", "toll", "train", "travel", "trip", "uber", "vogo", "yulu", "zoomcar"
+    ],
   },
   {
     name: "EMI",
+    //prettier-ignore
     keywords: [
-      "emi", "loan", "installment", "payment", "bajaj", "hdfc", "sbi", "kotak", "icici", "axis", "paytm", "debt", 
-      "interest", "bank", "card", "lender", "borrow", "idbi", "rbi", "mortgage", "credit card", "overdraft", "gpay", 
-      "phonepe", "bhim", "credit", "finance", "installments", "equated monthly installment", "deferred payment", 
-      "monthly payment", "interest payment"
-    ]
+      "axis", "bajaj", "bank", "bhim", "borrow", "card", "credit", "credit card", "debt", "deferred payment", "emi", "equated monthly installment", "finance", "gpay", "hdfc", "icici", "idbi", "installment", "installments", "interest", "interest payment", "kotak", "lender", "loan", "monthly payment", "mortgage", "overdraft", "payment", "paytm", "phonepe", "rbi", "sbi"
+    ],
   },
   {
     name: "Healthcare",
+    //prettier-ignore
     keywords: [
-      "doctor", "hospital", "medicine", "pharmacy", "health", "apollo", "fortis", "operation", "clinic", "dentist", 
-      "eye", "dava", "laboratory", "insurance", "therapy", "vaccine", "prescription", "checkup", "consultation", "icu", 
-      "surgery", "xray", "scan", "mri", "healthcare", "treatment", "civil", "sterling", "zydus", "shalby", "cims", 
-      "ayurveda", "homeopathy", "yoga", "physiotherapy", "optician", "pathology", "blood", "aarogyasetu", "wellness", 
-      "sanjeevani", "medical", "health insurance", "medication", "nurse", "emergency", "ambulance", "care"
-    ]
+      "aarogyasetu", "ambulance", "apollo", "ayurveda", "blood", "care", "checkup", "cims", "civil", "clinic", "consultation", "dava", "dentist", "doctor", "emergency", "eye", "fortis", "health", "health insurance", "healthcare", "homeopathy", "hospital", "icu", "insurance", "laboratory", "medical", "medication", "medicine", "mri", "nurse", "operation", "optician", "pathology", "pharmacy", "physiotherapy", "prescription", "sanjeevani", "scan", "shalby", "sterling", "surgery", "therapy", "treatment", "vaccine", "wellness", "xray", "yoga", "zydus"
+    ],
   },
   {
     name: "Education",
+    //prettier-ignore
     keywords: [
-      "school", "college", "course", "book", "tuition", "study", "tution", "unacademy", "academy", "udemy", "learn", 
-      "coursera", "university", "exam", "degree", "diploma", "class", "training", "certification", "textbook", "chopda", 
-      "library", "iim", "nit", "iit", "iiit", "gtu", "nirma", "pdpu", "charusat", "coaching", "byju", "vedantu", "toppr", 
-      "nptel", "swayam", "upsc", "gpsc", "ielts", "toefl", "gre", "gmat", "learning", "schooling", "syllabus", "education fee", 
-      "tuition fee", "study materials", "curriculum", "scholarship","fees"
-    ]
+      "academy", "book", "byju", "certification", "charusat", "chopda", "class", "coaching", "college", "course", "coursera", "curriculum", "degree", "diploma", "education fee", "exam", "fees", "gmat", "gpsc", "gre", "gtu", "ielts", "iiit", "iim", "iit", "learn", "learning", "library", "nirma", "nit", "nptel", "pdpu", "scholarship", "school", "schooling", "study", "study materials", "swayam", "syllabus", "textbook", "toefl", "toppr", "training", "tuition", "tuition fee", "tution", "udemy", "unacademy", "university", "upsc", "vedantu"
+    ],
   },
   {
     name: "Investment",
+    //prettier-ignore
     keywords: [
-      "invest", "stock", "bond", "mutual fund", "crypto", "sip", "lic", "nsc", "ppf", "ipo", "zerodha", "upstox", "groww", 
-      "angel", "motilal oswal", "icici direct", "nse", "bse", "sensex", "nifty", "demat", "trading", "dividend", "gold", 
-      "silver", "etf", "elss", "nps", "fixed deposit", "fd", "recurring deposit", "rd", "stocks", "real estate", "portfolio", 
-      "investment fund", "assets", "futures", "commodities", "hedge", "shares"
-    ]
+      "angel", "assets", "bond", "bse", "commodities", "crypto", "demat", "dividend", "elss", "etf", "fd", "fixed deposit", "futures", "gold", "groww", "hedge", "icici direct", "invest", "investment fund", "ipo", "lic", "motilal oswal", "mutual fund", "nifty", "nps", "nsc", "nse", "portfolio", "ppf", "rd", "real estate", "recurring deposit", "sensex", "shares", "silver", "sip", "stock", "stocks", "trading", "upstox", "zerodha"
+    ],
   },
   {
     name: "Shopping",
+    //prettier-ignore
     keywords: [
-      "shopping", "shop", "clothes", "apparel", "dress", "electronics", "gadget", "mobile", "laptop", "computer", "phone", 
-      "fashion", "flipkart", "myntra", "ajio", "zara", "pantaloons", "mall", "boutique", "supermarket", "big bazaar", 
-      "dmart", "amazon", "shein", "snapdeal", "meesho", "decathlon", "ikea", "furniture", "sofa", "curtain", "blanket", 
-      "accessories", "reliance digital", "croma", "vijay sales", "tanishq", "kalyan", "tbz", "lifestyle", "westside", 
-      "fabindia", "bandhani", "patola", "chaniya choli", "zudio", "jewellery", "makeup", "beauty", "shirt", "tshirt", 
-      "jeans", "kurti", "saree", "watch", "necklace", "jewellery", "ring", "earring", "bracelet", "iphone"
-    ]
+      "accessories", "ajio", "amazon", "apparel", "bandhani", "beauty", "big bazaar", "blanket", "boutique", "bracelet", "chaniya choli", "clothes", "computer", "croma", "curtain", "decathlon", "dress", "earring", "electronics", "fabindia", "fashion", "flipkart", "furniture", "gadget", "ikea", "iphone", "jeans", "jewellery", "jewellery", "kalyan", "kurti", "laptop", "lifestyle", "makeup", "mall", "meesho", "mobile", "myntra", "necklace", "pantaloons", "patola", "phone", "reliance digital", "ring", "saree", "shein", "shirt", "shop", "shopping", "snapdeal", "sofa", "supermarket", "tanishq", "tbz", "tshirt", "vijay sales", "watch", "westside", "zara", "zudio"
+    ],
   },
   {
     name: "Fuel",
+    //prettier-ignore
     keywords: [
-      "gas", "petrol", "diesel", "fuel", "cng", "indian oil", "hp", "petroleum", "fill", "station", "gulf", "bhavnagar gas", 
-      "gujarat gas", "reliance petrol", "adani gas", "lpg", "oil", "fuel station", "gasoline", "car fuel", "motor oil", "charging",
-      "ev", "charge"
-    ]
+      "adani gas", "bhavnagar gas", "car fuel", "charge", "charging", "cng", "diesel", "ev", "fill", "fuel", "fuel station", "gas", "gasoline", "gujarat gas", "gulf", "hp", "indian oil", "lpg", "motor oil", "oil", "petrol", "petroleum", "reliance petrol", "station"
+    ],
   },
   {
     name: "Groceries",
+    //prettier-ignore
     keywords: [
-      "grocery", "food", "vegetable", "fruit", "milk", "egg", "ration", "bazar", "store", "supermarket", "safal", "reliance", 
-      "dmart", "bazaar", "madhur", "cooking", "masala", "atta", "flour", "dal", "dairy", "chocolates", "bakery", "biscuit", 
-      "sweets", "namkeen", "spices", "fmcg", "bisleri", "amul", "nestle", "fortune", "maggi", "ghee", "paneer", "khari", 
-      "butter", "curd", "yogurt", "sugar", "salt", "rice", "wheat", "toor dal", "bajra", "jowar", "groceries", "beverage", 
-      "daily essentials"
-    ]
-  }
-];
+      "amul", "atta", "bajra", "bakery", "bazaar", "bazar", "beverage", "big basket", "bigbasket", "biscuit", "bisleri", "blinkit", "bread", "butter", "chocolates", "cooking", "curd", "daily essentials", "dairy", "dal", "dmart", "dry fruit", "egg", "flour", "fmcg", "food", "fortune", "fruit", "ghee", "groceries", "grocery", "haldar", "hing", "jowar", "khari", "kirana", "lot", "madhur", "maggi", "marchi", "masala", "milk", "mirchi", "namkeen", "nestle", "paneer", "paneer", "pickle", "powder", "pulse", "pulses", "ration", "reliance", "rice", "safal", "salt", "spices", "store", "sugar", "supermarket", "sweets", "toor dal", "vegetable", "wheat", "yogurt"
+    ],
+  },
+]
 
 // Function to suggest category
 export const suggestCategory = (description: string): CategoryTypes => {

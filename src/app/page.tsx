@@ -96,6 +96,7 @@ const faqs = [
 
 export default function Home() {
   return (
+    //@ts-ignore
     <>
       <Navbar />
       <MaxWidthWrapper>
@@ -108,6 +109,7 @@ export default function Home() {
               <p className="mt-6 text-lg text-gray-600 dark:text-gray-300 sm:text-xl">
                 Track your spending, unleash your saving!
                 <br className="hidden sm:inline" />
+                <span className="sm:hidden"> </span>
                 Transform expenses into financial freedom!
               </p>
               <div className="mt-4 text-base text-gray-700 dark:text-gray-400 sm:text-lg">

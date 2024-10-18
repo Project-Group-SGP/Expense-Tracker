@@ -20,7 +20,7 @@ import ReactMarkdown from "react-markdown"
 import { generateFinancialAdvice } from "../actions"
 import { readStreamableValue } from "ai/rsc"
 import { Month } from "../actions"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCurrentUserClient } from "@/hooks/use-current-user"
 import {
@@ -54,7 +54,13 @@ interface Message {
 export default function AIInsight() {
   const [fromMonth, setFromMonth] = useState<Month | "">("")
   const [toMonth, setToMonth] = useState<Month | "">("")
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content:
+        "Hello, I am your **AI-powered financial advisor**. Please select a time period to generate financial insights?",
+    },
+  ])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -111,13 +117,6 @@ export default function AIInsight() {
       }
     }
   }
-
-  // // Custom renderer for paragraphs
-  // const renderers = {
-  //   p: ({ children }: { children: React.ReactNode }) => (
-  //     <p className="mb-4">{children}</p>
-  //   ),
-  // }
 
   return (
     <Dialog>
@@ -187,7 +186,7 @@ export default function AIInsight() {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw] md:w-[80vw] lg:w-[80vw] xl:w-[80vw]">
+      <DialogContent className="flex h-[90vh] max-h-[90vh] w-[95vw] flex-col gap-0 bg-background p-0 text-foreground sm:h-[80vh] sm:max-h-[80vh] sm:w-[90vw]">
         <DialogHeader className="p-4 sm:p-6">
           <DialogTitle className="text-lg sm:text-xl md:text-2xl">
             Financial AI Insight
@@ -201,10 +200,11 @@ export default function AIInsight() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[80%]`}
+                  className={`flex max-w-[90%] items-start gap-2 ${message.role === "user" ? "flex-row-reverse" : ""} sm:max-w-[85%]`}
                 >
                   <Avatar className="mt-1 h-8 w-8 sm:h-10 sm:w-10">
                     {message.role === "user" ? (
+                      //@ts-ignore
                       <>
                         <AvatarImage src={user?.image || ""} alt="User" />
                         <AvatarFallback>
@@ -220,14 +220,13 @@ export default function AIInsight() {
                       </>
                     )}
                   </Avatar>
+
                   <div
-                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                    className={`rounded-lg p-2 sm:p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"} overflow-x-auto`}
                   >
                     {message.role === "assistant" ? (
                       <ReactMarkdown
-                        className="prose dark:prose-invert max-w-none text-sm sm:text-base"
-                        // //@ts-ignore
-                        // components={renderers}
+                        className="prose max-w-none overflow-x-auto text-sm dark:prose-invert sm:text-base"
                         remarkPlugins={[remarkGfm]}
                       >
                         {message.content}
@@ -241,6 +240,7 @@ export default function AIInsight() {
             ))}
             <div ref={messagesEndRef} />
           </div>
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
         <div className="border-t p-4 sm:p-6">
           {!open && (

@@ -170,6 +170,7 @@ export default function Page() {
   }
 
   return (
+    //@ts-ignore
     <>
       <AddPdfModal
         isOpen={isOpen}
