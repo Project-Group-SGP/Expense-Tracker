@@ -5,6 +5,8 @@ import { Providers } from "@/components/Providers/Providers"
 import { Toaster } from "@/components/ui/sonner"
 import Script from "next/script"
 import { GoogleAnalytics } from "@next/third-parties/google"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" })
 
@@ -79,6 +81,8 @@ export default function RootLayout({
           {children}
           <Toaster richColors />
           <GoogleAnalytics gaId="G-D5HK4RNZKV" />
+          <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
       <Script type="application/ld+json" id="schema">
