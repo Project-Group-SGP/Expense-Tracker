@@ -101,7 +101,8 @@ export const UserSelectionModal: React.FC<{
                   key={user.userId}
                   variant="outline"
                   className="flex h-full items-center justify-start space-x-2 p-2"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation() // Prevent event from bubbling up
                     onSelect(user)
                     onClose()
                   }}
