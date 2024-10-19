@@ -1,4 +1,4 @@
-// // Version - 1 
+// // Version - 1
 
 // // import React from 'react'
 // // interface DetailedBalance {
@@ -26,7 +26,7 @@
 // //   )
 // // }
 
-// // Version - 2 
+// // Version - 2
 
 // // import React from 'react'
 // // import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -76,7 +76,7 @@
 // //           {detailedBalance.map((balance) => (
 // //             <div key={balance.userId} className="flex items-center justify-between text-sm">
 // //               <span className="font-medium truncate mr-2">{balance.name}</span>
-// //               <span 
+// //               <span
 // //                 className={`flex items-center font-semibold ${
 // //                   balance.status === 'gets back' ? 'text-green-400' : 'text-red-400'
 // //                 }`}
@@ -133,18 +133,18 @@
 //         <div className="flex-1">
 //           <h3 className="text-lg font-semibold">{user.name}</h3>
 //           <p className={`text-sm ${
-//             user.status === 'gets back' 
-//               ? 'text-green-600 dark:text-green-400' 
-//               : user.status === 'owes' 
-//                 ? 'text-red-600 dark:text-red-400' 
+//             user.status === 'gets back'
+//               ? 'text-green-600 dark:text-green-400'
+//               : user.status === 'owes'
+//                 ? 'text-red-600 dark:text-red-400'
 //                 : 'text-muted-foreground'
 //           }`}>
 //             {user.status}
 //           </p>
 //         </div>
 //         <div className={`text-2xl font-bold ${
-//           totalAmount >= 0 
-//             ? 'text-green-600 dark:text-green-400' 
+//           totalAmount >= 0
+//             ? 'text-green-600 dark:text-green-400'
 //             : 'text-red-600 dark:text-red-400'
 //         }`}>
 //           ₹{Math.abs(totalAmount).toFixed(2)}
@@ -160,10 +160,10 @@
 //                 <UserAvatar user={{ userId: balance.userId, name: balance.name, avatar: balance.avatar }} size={32} />
 //                 <span className="font-medium truncate">{balance.name}</span>
 //               </div>
-//               <span 
+//               <span
 //                 className={`flex items-center font-semibold ${
-//                   balance.status === 'gets back' 
-//                     ? 'text-green-600 dark:text-green-400' 
+//                   balance.status === 'gets back'
+//                     ? 'text-green-600 dark:text-green-400'
 //                     : 'text-red-600 dark:text-red-400'
 //                 }`}
 //               >
@@ -182,7 +182,7 @@
 //   )
 // }
 
-import React from 'react'
+import React from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { UserAvatar } from "./UserAvatar"
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
@@ -193,7 +193,7 @@ interface DetailedBalance {
   userId: string
   name: string
   amount: string
-  status: 'gets back' | 'owes'
+  status: "gets back" | "owes"
   avatar: string
 }
 
@@ -201,65 +201,93 @@ interface DetailedBalanceTooltipProps {
   detailedBalance: DetailedBalance[]
   user: {
     name: string
-    status: 'settled up' | 'gets back' | 'owes'
+    status: "settled up" | "gets back" | "owes"
     amount: number
     userId: string
     avatar: string
   }
 }
 
-export const DetailedBalanceTooltip: React.FC<DetailedBalanceTooltipProps> = ({ detailedBalance, user }) => {
+export const DetailedBalanceTooltip: React.FC<DetailedBalanceTooltipProps> = ({
+  detailedBalance,
+  user,
+}) => {
   const totalAmount = detailedBalance.reduce((sum, balance) => {
     const amount = parseFloat(balance.amount)
-    return balance.status === 'gets back' ? sum + amount : sum - amount
+    return balance.status === "gets back" ? sum + amount : sum - amount
   }, 0)
 
   return (
-    <Card className="absolute z-10 w-full max-w-[90vw] sm:max-w-[400px] bg-background text-foreground border-border top-full left-0 mt-2 shadow-lg">
-      <CardHeader className="p-3 sm:p-4 pb-2 flex flex-row items-center space-x-2 sm:space-x-4">
-        <UserAvatar user={{ userId: user.userId, name: user.name, avatar: user.avatar }} size={36} />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base sm:text-lg font-semibold truncate">{user.name}</h3>
-          <p className={`text-xs sm:text-sm truncate ${
-            user.status === 'gets back' 
-              ? 'text-green-600 dark:text-green-400' 
-              : user.status === 'owes' 
-                ? 'text-red-600 dark:text-red-400' 
-                : 'text-muted-foreground'
-          }`}>
-            {user.status}
+    <Card className="absolute left-0 top-full z-10 mt-2 w-full max-w-[90vw] border-border bg-background text-foreground shadow-lg sm:max-w-[400px]">
+      <CardHeader className="flex flex-row items-center space-x-2 p-3 pb-2 sm:space-x-4 sm:p-4">
+        <UserAvatar
+          user={{ userId: user.userId, name: user.name, avatar: user.avatar }}
+          size={36}
+        />
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-base font-semibold sm:text-lg">
+            {user.name}
+          </h3>
+          <p
+            className={`truncate text-xs sm:text-sm ${
+              user.status === "gets back"
+                ? "text-green-600 dark:text-green-400"
+                : user.status === "owes"
+                  ? "text-red-600 dark:text-red-400"
+                  : "text-muted-foreground"
+            }`}
+          >
+            {user.status === "settled up"
+              ? "All settled"
+              : user.status === "gets back"
+                ? "Recieves"
+                : "Has to pay"}
           </p>
         </div>
-        <div className={`text-lg sm:text-2xl font-bold ${
-          totalAmount >= 0 
-            ? 'text-green-600 dark:text-green-400' 
-            : 'text-red-600 dark:text-red-400'
-        }`}>
+        <div
+          className={`text-lg font-bold sm:text-2xl ${
+            totalAmount >= 0
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
+          }`}
+        >
           ₹{Math.abs(totalAmount).toFixed(2)}
         </div>
       </CardHeader>
       <Separator className="bg-border" />
-      <CardContent className="p-3 sm:p-4 pt-2">
-        <h4 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Detailed Balance</h4>
+      <CardContent className="p-3 pt-2 sm:p-4">
+        <h4 className="mb-2 text-xs font-medium text-muted-foreground sm:text-sm">
+          Detailed Balance
+        </h4>
         <ScrollArea>
-          <div className="space-y-2 sm:space-y-3 pr-4">
+          <div className="space-y-2 pr-4 sm:space-y-3">
             {detailedBalance.map((balance) => (
-              <div key={balance.userId} className="flex items-center justify-between text-xs sm:text-sm">
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <UserAvatar user={{ userId: balance.userId, name: balance.name, avatar: balance.avatar }} size={24} />
-                  <span className="font-medium truncate">{balance.name}</span>
+              <div
+                key={balance.userId}
+                className="flex items-center justify-between text-xs sm:text-sm"
+              >
+                <div className="flex min-w-0 flex-1 items-center space-x-2">
+                  <UserAvatar
+                    user={{
+                      userId: balance.userId,
+                      name: balance.name,
+                      avatar: balance.avatar,
+                    }}
+                    size={24}
+                  />
+                  <span className="truncate font-medium">{balance.name}</span>
                 </div>
-                <span 
-                  className={`flex items-center font-semibold whitespace-nowrap ${
-                    balance.status === 'gets back' 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-red-600 dark:text-red-400'
+                <span
+                  className={`flex items-center whitespace-nowrap font-semibold ${
+                    balance.status === "gets back"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
                   }`}
                 >
-                  {balance.status === 'gets back' ? (
-                    <ArrowUpIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  {balance.status === "gets back" ? (
+                    <ArrowUpIcon className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                   ) : (
-                    <ArrowDownIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    <ArrowDownIcon className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                   )}
                   ₹{balance.amount}
                 </span>
