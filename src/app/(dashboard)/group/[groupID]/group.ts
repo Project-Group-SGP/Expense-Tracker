@@ -603,7 +603,7 @@ interface DetailedBalance {
   userId: string
   name: string
   amount: string
-  status: 'gets back' | 'owes'
+  status: "gets back" | "owes"
 }
 
 export async function getAllData(

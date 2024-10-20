@@ -29,6 +29,7 @@ export const metadata: Metadata = {
     "finance management",
     "personal finance",
     "spending analysis",
+    "spendwise",
   ],
   authors: [{ name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani" }],
   creator: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     url: process.env.BASE_URL,
     title: "Spendwise - Expense Tracker",
     description:
-      "Easily log and categorize your expenses, set budgets, and track your spending habits.",
+      "Easily log and categorize your expenses, set budgets, and track your spending habits with spendwise.",
     siteName: "Spendwise - Expense Tracker",
     images: [
       {
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Spendwise - Expense Tracker",
     description:
-      "Easily log and categorize your expenses, set budgets, and track your spending habits.",
+      "Easily log and categorize your expenses, set budgets, and track your spending habits with spendwise.",
     images: ["/og_image.png"],
   },
   category: "Finance",
