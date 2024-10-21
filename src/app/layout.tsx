@@ -20,7 +20,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Spendwise - Expense Tracker",
   description:
-    "Spendwise: Your go-to expense tracker for smart financial management. Easily log expenses, set budgets, and analyze your spending habits for better financial control.",
+    "Spendwise helps you effortlessly log and categorize expenses, set personalized budgets, and track spending habits for improved financial health.",
   manifest: "/manifest.json",
   referrer: "origin-when-cross-origin",
   keywords: [
