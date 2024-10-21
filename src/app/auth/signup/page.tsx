@@ -4,7 +4,7 @@ import React from "react"
 const Home = () => {
   return (
     <>
-      <h1 className="hidden">track with spendwise </h1>
+      <h1 className="hidden">Spendwise - Register</h1>
       <RegisterForm />
     </>
   )
