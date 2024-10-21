@@ -20,26 +20,29 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Spendwise - Expense Tracker",
   description:
-    "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
+    "Spendwise: Your go-to expense tracker for smart financial management. Easily log expenses, set budgets, and analyze your spending habits for better financial control.",
   manifest: "/manifest.json",
   referrer: "origin-when-cross-origin",
   keywords: [
+    "Spendwise",
     "expense tracker",
     "budget planner",
     "finance management",
     "personal finance",
     "spending analysis",
-    "spendwise",
+    "money management app",
   ],
-  authors: [{ name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani" }],
-  creator: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
+  authors: [
+    { name: "Spendwise Team: Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani" },
+  ],
+  creator: "Spendwise Team",
   openGraph: {
     type: "website",
     url: process.env.BASE_URL,
     title: "Spendwise - Expense Tracker",
     description:
-      "Easily log and categorize your expenses, set budgets, and track your spending habits with spendwise.",
-    siteName: "Spendwise - Expense Tracker",
+      "Spendwise helps you effortlessly log and categorize expenses, set personalized budgets, and track spending habits for improved financial health.",
+    siteName: "Spendwise",
     images: [
       {
         url: "/og_image.png",
@@ -53,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Spendwise - Expense Tracker",
     description:
-      "Easily log and categorize your expenses, set budgets, and track your spending habits with spendwise.",
+      "Take control of your finances with Spendwise. Log expenses, set budgets, and analyze spending patterns effortlessly.",
     images: ["/og_image.png"],
   },
   category: "Finance",
@@ -83,6 +86,7 @@ export default function RootLayout({
           href="https://trackwithspendwise.vercel.app/favicon.ico"
           type="image/x-icon"
         />
+        <link rel="canonical" href={process.env.BASE_URL} />
       </head>
       <body className={poppins.className}>
         <Providers>
@@ -97,18 +101,41 @@ export default function RootLayout({
         {JSON.stringify({
           "@context": "http://schema.org",
           "@type": "WebSite",
-          name: "Spendwise - Expense Tracker",
+          name: "Spendwise",
           url: process.env.BASE_URL,
           description:
-            "Track your expenses with simplicity and effectiveness. Spendwise helps you log expenses, set budgets, and analyze your spending habits.",
+            "Spendwise is your smart expense tracker for effortless financial management. Log expenses, set budgets, and analyze spending habits to take control of your finances.",
+          applicationCategory: "FinanceApplication",
           creator: {
-            "@type": "Person",
-            name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
+            "@type": "Organization",
+            name: "Spendwise Team",
+            member: [
+              {
+                "@type": "Person",
+                name: "Ayush Kalathiya",
+              },
+              {
+                "@type": "Person",
+                name: "Dhruv Kotadiya",
+              },
+              {
+                "@type": "Person",
+                name: "Sarthak Mayani",
+              },
+            ],
           },
           publisher: {
             "@type": "Person",
             name: "Ayush Kalathiya, Dhruv Kotadiya, Sarthak Mayani",
           },
+          featureList: [
+            "Expense tracking",
+            "Budget planning",
+            "Spending analysis",
+            "Financial insights",
+            "Personalized expenses",
+            "Group expenses",
+          ],
         })}
       </Script>
     </html>
