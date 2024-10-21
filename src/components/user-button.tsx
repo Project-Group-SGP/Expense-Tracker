@@ -48,20 +48,21 @@ export const UserButton = () => {
           {/* Settings icon */}
           Settings
         </DropdownMenuItem>
+        {/* <form action={logout}> */}
         <DropdownMenuItem
           className={`"bg-white text-gray-900" flex items-center dark:text-white dark:hover:bg-zinc-800`}
+          onClick={() => logout()}
         >
-          <form action={logout}>
-            <button className="cursor-pointer">
-              <div className="flex w-full">
-                <ExitIcon
-                  className={`mr-2 h-4 w-4 text-gray-900 dark:text-white`}
-                />
-                <p>Logout</p>
-              </div>
-            </button>
-          </form>
+          <button className="cursor-pointer">
+            <div className="flex w-full">
+              <ExitIcon
+                className={`mr-2 h-4 w-4 text-gray-900 dark:text-white`}
+              />
+              <p>Logout</p>
+            </div>
+          </button>
         </DropdownMenuItem>
+        {/* </form> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )
