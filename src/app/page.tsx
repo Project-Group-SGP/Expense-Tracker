@@ -143,7 +143,7 @@ const developers: Developer[] = [
     name: "Dhruv Kotadiya",
     role: "Full Stack Developer",
     bio: "Specializes in database management with strong front-end and backend knowledge. Skilled in Next.js, PostgreSQL, and Node.js.",
-    email: "john.smith@example.com",
+    email: "dhruvkotadiya0235@gmail.com",
     linkedin: "https://www.linkedin.com/in/dhruv-kotadiya-86b2212ba",
     twitter: "https://x.com/DhruvKotad72384",
     github: "https://github.com/DhruvK007",
