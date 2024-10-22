@@ -6,11 +6,27 @@ import {
   BarChart2,
   Check,
   Coins,
+  Github,
+  Linkedin,
+  Mail,
   Tags,
+  Twitter,
+  User,
   Users,
   Zap,
 } from "lucide-react"
 import Image from "next/image"
+import { TwitterLogoIcon } from "@radix-ui/react-icons"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import { Button } from "@/components/ui/button"
 
 const features = [
   {
@@ -101,14 +117,57 @@ const faqs = [
   },
 ]
 
+interface Developer {
+  name: string
+  role: string
+  bio: string
+  email: string
+  linkedin: string
+  twitter: string
+  github: string
+  avatar: string
+}
+
+const developers: Developer[] = [
+  {
+    name: "Ayush Kalathiya",
+    role: "Full Stack Developer",
+    bio: "Expert in crafting user interfaces with solid backend skills. Proficient in Next.js, PostgreSQL, and Node.js.",
+    email: "ayushkalathiya50@gmail.com",
+    linkedin: "https://www.linkedin.com/in/ayush-kalathiya-750497254",
+    twitter: "https://x.com/AyushKalathiya9",
+    github: "https://github.com/Ayushkalathiya",
+    avatar: "/placeholder.svg?height=200&width=200",
+  },
+  {
+    name: "Dhruv Kotadiya",
+    role: "Full Stack Developer",
+    bio: "Specializes in database management with strong front-end and backend knowledge. Skilled in Next.js, PostgreSQL, and Node.js.",
+    email: "john.smith@example.com",
+    linkedin: "https://www.linkedin.com/in/dhruv-kotadiya-86b2212ba",
+    twitter: "https://x.com/DhruvKotad72384",
+    github: "https://github.com/DhruvK007",
+    avatar: "/placeholder.svg?height=200&width=200",
+  },
+  {
+    name: "Sarthak Mayani",
+    role: "Full Stack Developer",
+    bio: "Versatile developer comfortable with both frontend and backend technologies. Always eager to learn new things.",
+    email: "mayanisarthak@gmail.com",
+    linkedin: "https://www.linkedin.com/in/sarthak-mayani-5250b1286",
+    twitter: "https://x.com/SarthakMayani",
+    github: "https://github.com/MACOOF",
+    avatar: "/placeholder.svg?height=200&width=200",
+  },
+]
 export default function Home() {
   return (
     //@ts-ignore
     <>
       <Navbar />
       <MaxWidthWrapper>
-        <section className="px-3 pt-24 sm:pt-28 md:px-0 lg:px-0">
-          <div className="flex flex-col items-center justify-between gap-12 sm:pt-10 md:flex-row">
+        <section className="px-3 pt-10 sm:pt-28 md:px-0 lg:px-0">
+          <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
             <div className="w-full max-w-xl md:max-w-none md:flex-1 md:text-left">
               <h1 className="text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-6xl">
                 Take control of your expenses today.
@@ -126,10 +185,13 @@ export default function Home() {
               </div>
               <Link
                 href="/auth/signup"
-                className="hover:bg-primary-dark mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-colors"
+                className="hover:bg-primary-dark hover:shadow-primary-dark/50 mt-8 inline-flex transform items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-transform hover:scale-105 hover:shadow-lg"
               >
                 Start Your Journey
-                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                <ArrowRight
+                  className="ml-2 h-5 w-5 transform transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
             <div className="hidden w-full max-w-md lg:block">
@@ -220,10 +282,13 @@ export default function Home() {
             <div className="mt-8 flex justify-center">
               <Link
                 href="/auth/signup"
-                className="hover:bg-primary-dark inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-lg font-medium text-white transition-colors"
+                className="hover:bg-primary-dark group inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-lg font-medium text-white transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
-                Get Started for Free
-                <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                <span className="mr-2">Get Started for Free</span>
+                <ArrowRight
+                  className="h-5 w-5 transition-transform duration-300 ease-in-out group-hover:translate-x-1 group-hover:rotate-12"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
             <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
@@ -253,6 +318,124 @@ export default function Home() {
           </div>
         </section>
       </MaxWidthWrapper>
+
+      <section className="w-full bg-gradient-to-b from-background to-secondary/10 py-8 md:py-10 lg:py-12">
+        <div className="container px-4 md:px-6">
+          <h2 className="mb-4 pb-5 text-center text-3xl font-bold dark:text-white">
+            Meet Our Developers
+          </h2>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {developers.map((developer) => (
+              <Card
+                key={developer.name}
+                className="overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-xl dark:bg-gray-800/50"
+              >
+                <CardHeader className="p-6">
+                  <Avatar className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border-4 bg-gray-100 dark:bg-gray-800/80">
+                    <svg
+                      className="h-16 w-16 text-gray-600"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </Avatar>
+                  <CardTitle className="text-center text-xl font-bold dark:text-white">
+                    {developer.name}
+                  </CardTitle>
+                  <CardDescription className="text-center text-sm font-medium text-muted-foreground">
+                    {developer.role}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <p className="mb-4 line-clamp-3 text-sm dark:text-gray-200">
+                    {developer.bio}
+                  </p>
+                  <div className="flex justify-center space-x-3">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      asChild
+                      className="rounded-full hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Link href={`mailto:${developer.email}`}>
+                        <Mail className="h-4 w-4" />
+                        <span className="sr-only">Email {developer.name}</span>
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      asChild
+                      className="rounded-full hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Link
+                        href={developer.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Linkedin className="h-4 w-4" />
+                        <span className="sr-only">
+                          {developer.name}'s LinkedIn
+                        </span>
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      asChild
+                      className="rounded-full hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Link
+                        href={developer.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          shape-rendering="geometricPrecision"
+                          text-rendering="geometricPrecision"
+                          image-rendering="optimizeQuality"
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          viewBox="0 0 512 462.799"
+                          className="h-4 w-4 text-gray-900 hover:text-white dark:text-white hover:dark:text-gray-900"
+                        >
+                          <path
+                            fill="currentColor"
+                            fill-rule="nonzero"
+                            d="M403.229 0h78.506L310.219 196.04 512 462.799H354.002L230.261 301.007 88.669 462.799h-78.56l183.455-209.683L0 0h161.999l111.856 147.88L403.229 0zm-27.556 415.805h43.505L138.363 44.527h-46.68l283.99 371.278z"
+                          />
+                        </svg>
+                        <span className="sr-only">
+                          {developer.name}'s Twitter
+                        </span>
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      asChild
+                      className="rounded-full hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Link
+                        href={developer.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="h-4 w-4" />
+                        <span className="sr-only">
+                          {developer.name}'s GitHub
+                        </span>
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   )
 }

@@ -52,11 +52,14 @@ const Navbar = () => {
               <Button
                 variant="default"
                 className={cn(
-                  "hidden h-9 rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700 dark:bg-primary md:flex lg:flex"
+                  "hidden h-9 transform rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white transition-all hover:scale-105 hover:bg-green-700 hover:shadow-lg hover:shadow-green-500/50 dark:bg-primary md:flex lg:flex"
                 )}
               >
                 Get Started
-                <ArrowRight className="ml-1.5 h-5 w-5" aria-hidden="true" />
+                <ArrowRight
+                  className="ml-1.5 h-5 w-5 transform transition-transform group-hover:translate-x-1 group-hover:scale-110"
+                  aria-hidden="true"
+                />
               </Button>
             </Link>
           </div>
