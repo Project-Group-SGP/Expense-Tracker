@@ -2,7 +2,7 @@ import { ModeToggle } from "@/components/ModeToggle"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import MobileNav from "./MobileNav"
+// import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
@@ -17,7 +17,7 @@ const Navbar = () => {
     <nav className="dark:bg-dark-background/70 dark:border-dark-border fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <MobileNav />
+          {/* <MobileNav /> */}
           <Link
             href="/"
             className="flex items-center space-x-3 rtl:space-x-reverse"

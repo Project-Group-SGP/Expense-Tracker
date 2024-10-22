@@ -5,7 +5,9 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 
 export default function Loading() {
-  const [loadingText, setLoadingText] = useState("Preparing your financial insights")
+  const [loadingText, setLoadingText] = useState(
+    "Preparing your financial insights"
+  )
   const loadingMessages = [
     "Crunching the numbers",
     "Balancing the books",
@@ -21,19 +23,21 @@ export default function Loading() {
     "Master Your Money Flow",
     "Budgeting Made Brilliant",
     "Your Finances, Fully Optimized",
-    "Effortless Tracking, Smarter Spending"
-  ];
-  
+    "Effortless Tracking, Smarter Spending",
+  ]
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setLoadingText(loadingMessages[Math.floor(Math.random() * loadingMessages.length)])
+      setLoadingText(
+        loadingMessages[Math.floor(Math.random() * loadingMessages.length)]
+      )
     }, 2000)
 
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <div className="flex h-screen mt-8 w-screen items-center justify-center bg-gray-100 dark:bg-zinc-950">
+    <div className="mt-8 flex h-screen w-screen items-center justify-center dark:bg-zinc-950">
       <div className="flex flex-col items-center">
         <motion.div
           animate={{
@@ -47,7 +51,13 @@ export default function Loading() {
             repeat: Infinity,
           }}
         >
-          <Image src="/SpendWIse-5.png" width={250} height={250} alt="SpendWise logo" priority />
+          <Image
+            src="/SpendWIse-5.png"
+            width={250}
+            height={250}
+            alt="SpendWise logo"
+            priority
+          />
         </motion.div>
         <motion.p
           className="mt-4 text-5xl font-bold text-gray-800 dark:text-gray-200"
