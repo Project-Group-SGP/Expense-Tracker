@@ -68,7 +68,7 @@ const TwitterIcon = () => (
 
 export default function DeveloperSection() {
   return (
-    <section className="font-poppins w-full bg-gradient-to-b from-background to-secondary/10 py-12">
+    <section className="w-full bg-gradient-to-b from-background to-secondary/10 py-12">
       <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-4xl font-bold dark:text-white">
           Meet Our Developers
@@ -77,7 +77,7 @@ export default function DeveloperSection() {
           {developers.map((developer) => (
             <Card
               key={developer.name}
-              className="transform bg-background/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-zinc-950/80"
+              className="flex h-full transform flex-col bg-background/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-zinc-950/80"
             >
               <CardHeader className="space-y-4">
                 <div className="flex justify-center">
@@ -104,8 +104,8 @@ export default function DeveloperSection() {
                   </CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <p className="h-20 text-center text-sm text-muted-foreground">
+              <CardContent className="flex flex-1 flex-col justify-between space-y-6">
+                <p className="text-center text-sm text-muted-foreground">
                   {developer.bio}
                 </p>
                 <div className="flex justify-center gap-4">
