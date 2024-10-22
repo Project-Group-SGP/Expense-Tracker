@@ -68,7 +68,7 @@ const TwitterIcon = () => (
 
 export default function DeveloperSection() {
   return (
-    <section className="w-full bg-gradient-to-b from-background to-secondary/10 py-12">
+    <section className="font-poppins w-full bg-gradient-to-b from-background to-secondary/10 py-12">
       <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-4xl font-bold dark:text-white">
           Meet Our Developers
