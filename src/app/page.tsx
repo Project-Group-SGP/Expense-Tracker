@@ -109,7 +109,7 @@ export default function Home() {
     <>
       <Navbar />
       <MaxWidthWrapper>
-        <section className="px-3 pt-10 sm:pt-28 md:px-0 lg:px-0">
+        <section className="px-3 pt-28  md:px-0 lg:px-0">
           <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
             <div className="w-full max-w-xl md:max-w-none md:flex-1 md:text-left">
               <h1 className="text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-6xl">
