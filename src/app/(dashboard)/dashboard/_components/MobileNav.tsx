@@ -10,6 +10,8 @@ import { FiHome, FiClock, FiUsers, FiSettings } from "react-icons/fi"
 import { TbReportAnalytics } from "react-icons/tb"
 
 import { PiggyBank } from "lucide-react"
+import { useSidebar } from "@/components/Providers/SidebarProvider"
+import { cn } from "@/lib/utils"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: FiHome },
@@ -21,28 +23,32 @@ const navLinks = [
 ]
 
 export default function MobileNav() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isSidebarOpen, toggleSidebar } = useSidebar()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const pathname = usePathname()
 
-  const toggleMenu = () => setIsOpen(!isOpen)
+  // const toggleMenu = () => setIsOpen(!isOpen)
 
   return (
-    <>
+    <div
+      className={cn({
+        "blur-none": isSidebarOpen,
+      })}
+    >
       <CiMenuFries
         className="cursor-pointer text-2xl hover:text-primary md:hidden"
-        onClick={toggleMenu}
+        onClick={toggleSidebar}
         aria-label="Toggle mobile menu"
       />
 
       <AnimatePresence>
-        {isOpen && (
+        {isSidebarOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed left-0 top-0 z-50 h-full w-screen backdrop-blur-sm lg:hidden"
+            className="fixed left-0 top-0 z-50 h-full w-screen backdrop-blur-sm md:hidden"
           >
             <motion.section
               initial={{ x: "-100%" }}
@@ -52,7 +58,7 @@ export default function MobileNav() {
               className="absolute left-0 top-0 h-screen w-56 flex-col gap-8 bg-white p-8 shadow-lg dark:bg-black"
             >
               <IoClose
-                onClick={toggleMenu}
+                onClick={toggleSidebar}
                 className="mb-8 cursor-pointer text-3xl hover:text-red-600"
                 aria-label="Close mobile menu"
               />
@@ -69,7 +75,7 @@ export default function MobileNav() {
                     <Link
                       className={`relative flex items-center gap-2 transition-all duration-300 hover:text-primary ${hoveredItem && hoveredItem !== href ? "opacity-30" : ""} ${pathname === href ? "text-primary" : ""} `}
                       href={href}
-                      onClick={toggleMenu}
+                      onClick={toggleSidebar}
                     >
                       <Icon className="text-xl" />
                       <span className="border-b-2 border-transparent">
@@ -86,6 +92,6 @@ export default function MobileNav() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   )
 }

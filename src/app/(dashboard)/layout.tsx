@@ -1,5 +1,6 @@
 import RegisterServiceWorker from "@/components/RegisterServiceWorker"
 import Navbar from "./dashboard/_components/Navbar"
+import { SidebarProvider } from "@/components/Providers/SidebarProvider"
 
 export default function RootLayout({
   children,
@@ -7,10 +8,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <Navbar />
+    <SidebarProvider navbar={<Navbar />}>
       {children}
       <RegisterServiceWorker />
-    </>
+    </SidebarProvider>
   )
 }
