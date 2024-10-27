@@ -28,17 +28,17 @@ export function SidebarProvider({
 
   return (
     <SidebarContext.Provider value={{ isSidebarOpen, toggleSidebar }}>
-      <div className="flex min-h-screen flex-col">
+      {/* <div className="flex min-h-screen flex-col"> */}
         {navbar}
-        <div className="flex flex-1">
+        {/* <div className="f"> */}
           {sidebar}
           <main
-            className={`flex-1 ${isSidebarOpen ? "blur-sm md:blur-none" : ""}`}
+            className={`${isSidebarOpen ? "blur-sm md:blur-none" : ""}`}
           >
             {children}
           </main>
-        </div>
-      </div>
+        {/* </div> */}
+      {/* </div> */}
     </SidebarContext.Provider>
   )
 }
