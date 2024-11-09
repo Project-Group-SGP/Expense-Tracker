@@ -38,25 +38,40 @@ type UserExpense = {
 }
 
 export async function GET(request: NextRequest) {
+  console.log("[Cron] Starting expense reminder job:", new Date().toISOString())
   const authHeader = request.headers.get("authorization")
   console.log("authHeader", authHeader)
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.error("[Cron] Unauthorized attempt to run expense reminder")
     return new Response("Unauthorized", {
       status: 401,
     })
   }
 
   try {
-    const expenses = await fetchExpenses()
+    const startTime = Date.now()
+    const [expenses,deletedTokens] = await Promise.all([fetchExpenses(),db.tokens.deleteMany({
+      where: {
+        expires: {
+          lte: new Date(),
+        }
+      }
+    })])
+
+    console.log(`[Cron] Found ${expenses.length} expenses to process`)
+    console.log(`[Cron] Cleaned up ${deletedTokens.count} expired tokens`)
+
     const userExpenses = organizeExpenses(expenses)
     await sendReminderEmails(userExpenses)
 
+    const duration = Date.now() - startTime
+    console.log(`[Cron] Job completed successfully in ${duration}ms`)
     return Response.json({
       success: true,
       message: "Reminder emails sent successfully",
     })
   } catch (error) {
-    console.error("Error in expense reminder process:", error)
+    console.error("[Cron] Job failed:", error)
     return Response.json(
       { success: false, error: "Internal server error" },
       { status: 500 }
