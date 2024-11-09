@@ -39,8 +39,6 @@ export const {
 
         if (!existingUser) return token
 
-        const existingAccount = await getAccountByUserId(existingUser.id)
-
         token.isOAuth = !existingUser.password
 
         token.name = existingUser.name
