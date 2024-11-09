@@ -77,58 +77,32 @@ export const {
     },
     // Action to take when user sign in / login
     async signIn({ user, account }) {
-      // // Allow OAuth without email verification
-      // if (account?.provider !== 'credentials' && !user.id) {
-      //   return true;
-      // }
+      
+      if (account?.provider === "google") {
+        try {
+          const existingUser = await db.user.findUnique({
+            // @ts-ignore
+            where: { email: user?.email },
+          });
 
-      // // For OAuth sign-in with existing email
-      // For OAuth sign-in with existing email
-      // if (account?.provider !== 'credentials' && user.email) {
-      //   const existingUser = await db.user.findUnique({
-      //     where: { email: user.email },
-      //   });
-
-      //   // If user exists, link the new OAuth account
-      //   if (existingUser) {
-      //     await db.account.create({
-      //       data: {
-      //         userId: existingUser.id,
-      //         type: account.type,
-      //         provider: account.provider,
-      //         providerAccountId: account.providerAccountId,
-      //         access_token: account.access_token,
-      //         token_type: account.token_type,
-      //         scope: account.scope,
-      //       },
-      //     });
-      //     return true;
-      //   }
-      // }// For OAuth sign-in with existing email
-      // if (account?.provider !== 'credentials' && user.email) {
-      //   const existingUser = await db.user.findUnique({
-      //     where: { email: user.email },
-      //   });
-
-      //   // If user exists, link the new OAuth account
-      //   if (existingUser) {
-      //     await db.account.create({
-      //       data: {
-      //         userId: existingUser.id,
-      //         type: account?.type as string,
-      //         provider: account?.provider  as string,
-      //         providerAccountId: account?.providerAccountId  as string,
-      //         access_token: account?.access_token,
-      //         token_type: account?.token_type,
-      //         scope: account?.scope,
-      //       },
-      //     });
-      //     return true;
-      //   }
-      // }
-
-      // console.log("\n\nprovider :\n\n",account?.provider);
-      if (account?.provider != "credentials") return true
+          if (existingUser) {
+            // If the user exists but email is not verified, update the emailVerified field
+            if (!existingUser.emailVerified) {
+              await db.user.update({
+                where: { id: existingUser.id },
+                data: { emailVerified: new Date() },
+              });
+            }
+            return true;
+          } else {
+            // If it's a new user, emailVerified will be set automatically by the adapter
+            return true;
+          }
+        } catch (error) {
+          console.error("Error in Google sign in:", error);
+          return false;
+        }
+      }
 
       try {
         const existingUser = await getUserById(user.id || "")
