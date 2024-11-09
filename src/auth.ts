@@ -41,7 +41,7 @@ export const {
 
         const existingAccount = await getAccountByUserId(existingUser.id)
 
-        token.isOAuth = !!existingAccount
+        token.isOAuth = !existingUser.password
 
         token.name = existingUser.name
         token.email = existingUser.email
@@ -49,6 +49,7 @@ export const {
         if(existingUser.emailVerified !== null)
           token.joininDate = existingUser.emailVerified.toISOString().split("T")[0];
 
+        console.log("JWT callback token", token)
         return token
       } catch (error) {
         console.error("Error in jwt callback:", error)
