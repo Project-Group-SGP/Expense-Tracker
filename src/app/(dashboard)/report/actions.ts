@@ -12,6 +12,7 @@ import nodemailer from "nodemailer"
 import { CategoryTypes, Prisma } from "@prisma/client"
 import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
+import { PDFDocument } from "pdf-lib";
 
 Chart.register(...registerables, ChartDataLabels)
 
@@ -106,8 +107,121 @@ async function sendReportEmail(
     to: email,
     subject: "Your SpendWise Expense Report",
     html: `
-      <h1>Your SpendWise Expense Report</h1>
-      <p>Please find your requested expense report attached.</p>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your SpendWise Expense Report</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+          body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            background-color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #4CAF50;
+          }
+          .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+          }
+          .logo {
+            max-width: 100px;
+            height: auto;
+          }
+          .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin: auto 0;
+          }
+          .content {
+            padding: 30px;
+            background-color: #ffffff;
+          }
+          h1 {
+            color: #2E7D32;
+            margin-top: 0;
+            font-size: 24px;
+            text-align: center;
+          }
+          .warning {
+            background-color: #FFF3E0;
+            border: 1px solid #FFB74D;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+          .warning-icon {
+            font-size: 24px;
+          }
+          .warning-text {
+            color: #E65100;
+            margin: 0;
+          }
+          .divider {
+            height: 1px;
+            background-color: #eaeaea;
+            margin: 20px 0;
+          }
+          .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eaeaea;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo-container">
+              <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" class="logo">
+              <span class="logo-text">SpendWise</span>
+            </div>
+          </div>
+          <div class="content">
+            <h1>Your SpendWise Expense Report</h1>
+            <p>Hello,${name},</p>
+            <p>Thank you for using SpendWise to track your expenses. Your requested expense report is now ready and attached to this email.</p>
+            <p>We encourage you to review the attached report for a detailed breakdown of your financial activity during this period.</p>
+            <div class="warning">
+              <span class="warning-icon" role="img" aria-label="Warning">⚠️</span>
+              <p class="warning-text">This report contains sensitive financial information. Please do not share this report with anyone else.</p>
+            </div>
+            <div class="divider"></div>
+            <p style="font-size: 14px; color: #666;">If you have any questions about this report or need help understanding your expenses, please don't hesitate to contact our support team.</p>
+          </div>
+          <div class="footer">
+            <p>Need help? Contact us at etracker690@gmail.com</p>
+            <p>&copy; 2023 SpendWise. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
     `,
     attachments: [
       {
@@ -115,7 +229,7 @@ async function sendReportEmail(
         content: reportBuffer,
       },
     ],
-  }
+  };
 
   await transporter.sendMail(mailOptions)
 }
