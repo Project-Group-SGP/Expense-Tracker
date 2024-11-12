@@ -1,68 +1,100 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { logout } from "@/actions/auth/logout"
+import { useCurrentUserClient } from "@/hooks/use-current-user"
 import { AvatarFallback } from "@radix-ui/react-avatar"
+import { LogOut, Monitor, Moon, Settings, Sun } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { FaUser } from "react-icons/fa"
 import { Avatar, AvatarImage } from "./ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
-import { FaUser, FaCog } from "react-icons/fa"
-import { ExitIcon } from "@radix-ui/react-icons"
-import { useCurrentUserClient } from "@/hooks/use-current-user"
 import { useTheme } from "next-themes"
-import { logout } from "@/actions/auth/logout"
+import { Button } from "./ui/button"
+import { cn } from "@/lib/utils"
+
+const themeOptions = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+]
 
 export const UserButton = () => {
   const user = useCurrentUserClient()
   const router = useRouter()
-  const handleSettingsClick = () => {
-    router.push("/settings")
-  }
+  const { theme, setTheme } = useTheme()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border-none focus:outline-none">
-        <Avatar
-          className={`h-10 w-10 border-none bg-white focus:outline-none dark:bg-black`}
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="group relative h-10 w-10 rounded-full p-0 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-primary"
+          aria-label="Open user menu"
         >
-          <AvatarImage src={user?.image || ""} className="object-cover" />
-          <AvatarFallback
-            className={`flex h-full w-full items-center justify-center bg-green-600 text-white`}
-          >
-            <FaUser className="text-white" />
-          </AvatarFallback>
-        </Avatar>
+          <Avatar className="h-10 w-10 border-2 border-transparent bg-background transition-all duration-200 group-hover:border-primary/20 group-hover:shadow-md dark:bg-black">
+            <AvatarImage src={user?.image || ""} className="object-cover" />
+            <AvatarFallback className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground">
+              <FaUser className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-40 border-none focus:outline-none"
-        align="end"
-      >
+      <DropdownMenuContent className="w-48" align="end" sideOffset={5}>
+        <DropdownMenuLabel className="px-2 pt-2">
+          <div className="flex flex-col gap-1">
+            <p className="truncate text-sm font-medium">{user?.name}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user?.email}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="md:hidden" />
+        <div className="p-1 md:hidden">
+          <div className="flex items-center gap-1 rounded-lg bg-accent/50 p-1">
+            {themeOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <Button
+                  key={option.value}
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-7 flex-1 px-2 transition-all duration-200 hover:text-primary",
+                    theme === option.value &&
+                      "bg-background text-primary shadow-sm"
+                  )}
+                  onClick={() => setTheme(option.value)}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="sr-only">{option.label}</span>
+                </Button>
+              )
+            })}
+          </div>
+        </div>
+
+        <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={handleSettingsClick}
-          className={`flex cursor-pointer items-center dark:text-white dark:hover:bg-zinc-800`}
+          onClick={() => router.push("/settings")}
+          className="cursor-pointer gap-2 p-2 transition-colors duration-200 hover:text-primary focus:text-primary"
         >
-          <FaCog className={`mr-2 h-4 w-4 text-gray-900 dark:text-white`} />{" "}
-          {/* Settings icon */}
+          <Settings className="h-4 w-4" />
           Settings
         </DropdownMenuItem>
-        {/* <form action={logout}> */}
         <DropdownMenuItem
-          className={`"bg-white text-gray-900" flex items-center dark:text-white dark:hover:bg-zinc-800`}
           onClick={() => logout()}
+          className="cursor-pointer gap-2 p-2 text-destructive transition-colors duration-200 hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive"
         >
-          <button className="cursor-pointer">
-            <div className="flex w-full">
-              <ExitIcon
-                className={`mr-2 h-4 w-4 text-gray-900 dark:text-white`}
-              />
-              <p>Logout</p>
-            </div>
-          </button>
+          <LogOut className="h-4 w-4" />
+          Logout
         </DropdownMenuItem>
-        {/* </form> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )
