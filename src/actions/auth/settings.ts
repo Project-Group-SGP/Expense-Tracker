@@ -23,7 +23,7 @@ async function sendVerificationEmail(email: string, token: string) {
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: "Email Verification For SPEND WISE",
+    subject: "Email Verification For Spendwise",
     html: `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,83 +31,121 @@ async function sendVerificationEmail(email: string, token: string) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Your SpendWise Account</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f4f4f4;
+            background-color: #f0f0f0;
             margin: 0;
             padding: 0;
         }
         .container {
             max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
+            margin: 20px auto;
             background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         .logo {
-            text-align: center;
-            margin-bottom: 20px;
+            max-width: 100px;
+            height: auto;
+        }
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin: auto 0;
         }
         .content {
-            background-color: #f9f9f9;
             padding: 30px;
-            border-radius: 5px;
+            background-color: #ffffff;
         }
-        h2 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.5;
+        h1 {
+            color: #2E7D32;
+            margin-top: 0;
+            font-size: 24px;
             text-align: center;
         }
-        .button {
+        .btn {
             display: inline-block;
-            padding: 12px 24px;
-            background-color: #4CAF50;
+            padding: 12px 32px;
+            background-color: #2E7D32;
             color: white;
-            font-size: 16px;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            border-radius: 25px;
+            font-weight: bold;
             text-align: center;
-        }
-        .button:hover {
-            background-color: #45a049;
+            margin: 20px 0;
         }
         .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
             text-align: center;
-            font-size: 12px;
-            color: #777;
-            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eaeaea;
         }
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            .content {
-                padding: 20px;
-            }
+        .divider {
+            height: 1px;
+            background-color: #eaeaea;
+            margin: 20px 0;
+        }
+        .link {
+            color: #2E7D32;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .security-notice {
+            background-color: #F1F8E9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #33691E;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" class="logo">
+                <span class="logo-text">Spendwise</span>
+            </div>
         </div>
         <div class="content">
-            <h2>Verify Your Email Address</h2>
-            <p>Welcome to SpendWise! To get started, please verify your email address by clicking the button below:</p>
+            <h1>Verify Your Email Address</h1>
+            <p>Hello,</p>
+            <p>Welcome to Spendwise! We're excited to have you on board. To get started, please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
-                <a href="${VerificationLink}" class="button">Verify Email</a>
+                <a href="${VerificationLink}" class="btn" style="color: white;">Verify Email</a>
             </p>
-            <p>If you didn't create an account with SpendWise, please ignore this email.</p>
+            <div class="security-notice">
+                🔒 This link will expire in 24 hours for your security.
+            </div>
+            <div class="divider"></div>
+            <p style="font-size: 14px;">If you're having trouble with the button, copy and paste this link into your browser:</p>
+            <p class="link">${VerificationLink}</p>
+            <p style="font-size: 14px; color: #666;">If you didn't create an account with Spendwise, please ignore this email or contact our support team.</p>
+        </div>
+        <div class="footer">
+            <p>Need help? Contact us at etracker690@gmail.com</p>
+            <p>&copy; 2023 Spendwise. All rights reserved.</p>
         </div>
     </div>
 </body>
