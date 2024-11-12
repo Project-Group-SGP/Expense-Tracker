@@ -180,86 +180,123 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: "Your SpendWise Two-Factor Authentication Code",
+    subject: "Your Spendwise Two-Factor Authentication Code",
     html: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your SpendWise Two-Factor Authentication Code</title>
+    <title>Your Spendwise Two-Factor Authentication Code</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #f4f4f4;
+            background-color: #f0f0f0;
             margin: 0;
             padding: 0;
         }
         .container {
             max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
+            margin: 20px auto;
             background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         .logo {
-            text-align: center;
-            margin-bottom: 20px;
+            max-width: 100px;
+            height: auto;
+        }
+        .logo-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin: auto 0;
         }
         .content {
-            background-color: #f9f9f9;
             padding: 30px;
-            border-radius: 5px;
+            background-color: #ffffff;
         }
-        h2 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.5;
+        h1 {
+            color: #2E7D32;
+            margin-top: 0;
+            font-size: 24px;
             text-align: center;
         }
         .code {
-            font-size: 28px;
+            font-size: 36px;
             font-weight: bold;
-            color: #4CAF50;
+            color: #2E7D32;
             letter-spacing: 5px;
             text-align: center;
             margin: 20px 0;
+            padding: 15px;
+            background-color: #F1F8E9;
+            border-radius: 4px;
         }
         .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
             text-align: center;
-            font-size: 12px;
-            color: #777;
-            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eaeaea;
+        }
+        .security-notice {
+            background-color: #FFF3E0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #E65100;
         }
         @media (max-width: 600px) {
             .container {
-                padding: 15px;
+                margin: 10px;
             }
-            .content {
-                padding: 20px;
+            .code {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img src="${process.env.BASE_URL}/SpendWIse-5.png" alt="SpendWise Logo" width="150">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" class="logo">
+                <span class="logo-text">Spendwise</span>
+            </div>
         </div>
         <div class="content">
-            <h2>Your Two-Factor Authentication Code</h2>
-            <p>To complete your login to SpendWise, please use the following code:</p>
+            <h1>Your Two-Factor Authentication Code</h1>
+            <p>Hello,</p>
+            <p>To complete your login to Spendwise, please use the following code:</p>
             <p class="code" id="authCode">${token}</p>
-            <p>
-                Please copy the code above manually.
-            </p>
-            <p>This code will expire in 10 minutes. If you didn't attempt to log in, please contact our support team immediately.</p>
+            <p>Please enter this code on the login page to verify your identity and access your account.</p>
+            <div class="security-notice">
+                ⏱️ This code will expire in 10 minutes for your security.
+            </div>
+            <p>If you didn't attempt to log in to Spendwise, please contact our support team immediately at etracker690@gmail.com.</p>
+        </div>
+        <div class="footer">
+            <p>Need help? Contact us at etracker690@gmail.com</p>
+            <p>&copy; 2023 Spendwise. All rights reserved.</p>
         </div>
     </div>
 </body>
