@@ -18,7 +18,6 @@ type SidebarProviderProps = {
 export function SidebarProvider({
   children,
   navbar,
-  sidebar,
 }: SidebarProviderProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -30,8 +29,6 @@ export function SidebarProvider({
     <SidebarContext.Provider value={{ isSidebarOpen, toggleSidebar }}>
       {/* <div className="flex min-h-screen flex-col"> */}
         {navbar}
-        {/* <div className="f"> */}
-          {sidebar}
           <main
             className={`${isSidebarOpen ? "blur-sm md:blur-none" : ""}`}
           >
