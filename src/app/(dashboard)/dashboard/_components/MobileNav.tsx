@@ -59,7 +59,6 @@ export default function Component() {
   const user = useCurrentUserClient()
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const router = useRouter()
 
   const handleLogout = async () => {
     await logout()
@@ -144,7 +143,7 @@ export default function Component() {
                     onClick={toggleSidebar}
                     className={cn(
                       "flex items-center gap-4 rounded-lg px-3 py-2 text-base font-medium transition-all duration-300",
-                      pathname === href
+                      pathname.startsWith(href)
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-accent hover:text-foreground"
                     )}

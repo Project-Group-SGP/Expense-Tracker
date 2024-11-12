@@ -24,7 +24,7 @@ export const {
           data: { emailVerified: new Date() },
         })
       } catch (error) {
-        console.error("Error in linkAccount event:", error);
+        console.error("Error in linkAccount event:", error)
       }
     },
   },
@@ -44,10 +44,12 @@ export const {
         token.name = existingUser.name
         token.email = existingUser.email
         token.isTwoFactorEnable = existingUser.isTwoFactorEnable
-        if(existingUser.emailVerified !== null)
-          token.joininDate = existingUser.emailVerified.toISOString().split("T")[0];
+        if (existingUser.emailVerified !== null)
+          token.joininDate = existingUser.emailVerified
+            .toISOString()
+            .split("T")[0]
 
-        console.log("JWT callback token", token)
+        // console.log("JWT callback token", token)
         return token
       } catch (error) {
         console.error("Error in jwt callback:", error)
@@ -61,28 +63,27 @@ export const {
       }
 
       if (session.user) {
-        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean;
+        session.user.isTwoFactorEnable = token.isTwoFactorEnable as boolean
 
-        session.user.name = token.name as string;
+        session.user.name = token.name as string
 
-        session.user.email = token.email as string;
+        session.user.email = token.email as string
 
-        session.user.isOAuth = token.isOAuth as boolean;
-        if(token.joininDate)
-          session.user.joininDate = token.joininDate as string;
+        session.user.isOAuth = token.isOAuth as boolean
+        if (token.joininDate)
+          session.user.joininDate = token.joininDate as string
       }
 
       return session
     },
     // Action to take when user sign in / login
     async signIn({ user, account }) {
-      
       if (account?.provider === "google") {
         try {
           const existingUser = await db.user.findUnique({
             // @ts-ignore
             where: { email: user?.email },
-          });
+          })
 
           if (existingUser) {
             // If the user exists but email is not verified, update the emailVerified field
@@ -90,16 +91,16 @@ export const {
               await db.user.update({
                 where: { id: existingUser.id },
                 data: { emailVerified: new Date() },
-              });
+              })
             }
-            return true;
+            return true
           } else {
             // If it's a new user, emailVerified will be set automatically by the adapter
-            return true;
+            return true
           }
         } catch (error) {
-          console.error("Error in Google sign in:", error);
-          return false;
+          console.error("Error in Google sign in:", error)
+          return false
         }
       }
 
@@ -114,7 +115,7 @@ export const {
           const twoFactorConfirmation = await getTwoFactorConformationByUserId(
             existingUser.id
           )
-          console.log("n\n\n\n TFA: ", twoFactorConfirmation)
+          // console.log("n\n\n\n TFA: ", twoFactorConfirmation)
           if (!twoFactorConfirmation) return false
 
           // Delete two factor confirmation for next sign in
