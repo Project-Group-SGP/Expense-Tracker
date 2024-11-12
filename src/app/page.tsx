@@ -105,15 +105,19 @@ const faqs = [
 
 export default function Home() {
   return (
-    //@ts-ignore
     <>
       <Navbar />
       <MaxWidthWrapper>
         <section className="px-3 pt-24 sm:pt-28 md:px-0 lg:px-0">
           <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
             <div className="w-full max-w-xl md:max-w-none md:flex-1 md:text-left">
-              <h1 className="text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-6xl">
-                Take control of your expenses today.
+              <h1 className="group text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-6xl">
+                Take control of your{" "}
+                <span className="relative inline-block transition-transform duration-300 ease-in-out group-hover:translate-y-[-2px]">
+                  expenses
+                  <span className="absolute bottom-0 left-0 h-1 w-0 bg-primary transition-all duration-300 ease-in-out group-hover:w-full"></span>
+                </span>{" "}
+                today.
               </h1>
               <p className="mt-6 text-lg text-gray-600 dark:text-gray-300 sm:text-xl">
                 Track your spending, unleash your saving!
@@ -128,23 +132,25 @@ export default function Home() {
               </div>
               <Link
                 href="/auth/signup"
-                className="hover:bg-primary-dark hover:shadow-primary-dark/50 mt-8 inline-flex transform items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-transform hover:scale-105 hover:shadow-lg"
+                className="group mt-8 inline-flex transform items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-medium text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-primary/30"
               >
                 Start Your Journey
                 <ArrowRight
-                  className="ml-2 h-5 w-5 transform transition-transform group-hover:translate-x-1"
+                  className="ml-2 h-5 w-5 transform transition-all duration-300 ease-in-out"
                   aria-hidden="true"
                 />
               </Link>
             </div>
             <div className="hidden w-full max-w-md lg:block">
-              <Image
-                src="/main_page.png"
-                width={900}
-                height={900}
-                alt="Financial management illustration"
-                priority
-              />
+              <div className="transform transition-transform duration-300 ease-in-out hover:scale-105">
+                <Image
+                  src="/main_page.png"
+                  width={900}
+                  height={900}
+                  alt="Financial management illustration"
+                  priority
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -155,14 +161,14 @@ export default function Home() {
           <h2 className="text-center text-4xl font-extrabold text-gray-900 dark:text-white">
             Why Spendwise?
           </h2>
-          <div className="mt-7 grid grid-cols-1 gap-12 px-3 md:px-0 lg:grid-cols-3 lg:px-0">
+          <div className="mt-7 grid grid-cols-1 gap-12 px-3 md:grid-cols-2 md:px-0 lg:grid-cols-3 lg:px-0">
             {features.map((feature, index) => (
               <div
                 key={`features${index}`}
-                className="rounded-lg p-5 shadow-lg transition-transform hover:scale-105 dark:bg-gray-800"
+                className="rounded-lg p-5 shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl dark:bg-gray-800"
               >
                 <div className="mb-4 flex items-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white transition-transform duration-300 ease-in-out hover:scale-110">
                     <feature.icon className="h-6 w-6" />
                   </div>
                   <h3 className="ml-4 text-2xl font-bold text-gray-900 dark:text-white">
@@ -187,14 +193,14 @@ export default function Home() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={`testimonials${index}`}
-                className="rounded-lg p-6 shadow-md transition-transform hover:scale-105 dark:bg-gray-800"
+                className="rounded-lg p-6 shadow-md transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg dark:bg-gray-800"
               >
                 <p className="mb-4 text-lg italic text-gray-700 dark:text-gray-300">
                   {testimonial.quote.map((part, i) =>
                     i % 2 === 1 ? (
                       <span
                         key={i}
-                        className="dark:text-primary-light font-semibold text-primary"
+                        className="dark:text-primary-light hover:text-primary-dark font-semibold text-primary transition-colors duration-300 ease-in-out"
                       >
                         {part}
                       </span>
@@ -229,7 +235,7 @@ export default function Home() {
               >
                 <span className="mr-2">Get Started for Free</span>
                 <ArrowRight
-                  className="h-5 w-5 transition-transform duration-300 ease-in-out group-hover:translate-x-1 group-hover:rotate-12"
+                  className="h-5 w-5 transition-transform duration-300 ease-in-out"
                   aria-hidden="true"
                 />
               </Link>
@@ -250,9 +256,9 @@ export default function Home() {
             {faqs.map((faq, index) => (
               <div
                 key={`faqs${index}`}
-                className="rounded-lg border p-6 dark:border-gray-700"
+                className="rounded-lg border p-6 transition-all duration-300 ease-in-out hover:shadow-md dark:border-gray-700"
               >
-                <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900 transition-colors duration-300 ease-in-out hover:text-primary dark:text-white">
                   {faq.question}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">{faq.answer}</p>
