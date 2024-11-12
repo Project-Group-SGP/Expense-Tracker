@@ -120,7 +120,7 @@ async function sendVerificationEmail(email: string, token: string,name:string) {
         }
     </style>
 </head>
-<body>
+<body style="font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 40px 20px;">
     <div class="container">
         <div class="header">
             <div class="logo-container">
@@ -130,7 +130,7 @@ async function sendVerificationEmail(email: string, token: string,name:string) {
         </div>
         <div class="content">
             <h1>Verify Your Email Address</h1>
-            <p>Hello,${name}</p>
+            <p>Hello,</p>
             <p>Welcome to Spendwise! We're excited to have you on board. To get started, please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
                 <a href="${VerificationLink}" class="btn" style="color: white;">Verify Email</a>
@@ -149,7 +149,8 @@ async function sendVerificationEmail(email: string, token: string,name:string) {
         </div>
     </div>
 </body>
-</html>`,
+</html>
+`,
   }
 
   try {
