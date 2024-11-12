@@ -12,7 +12,7 @@ import { getTwoFactorConformationByUserId } from "@/data/two-factor-conformation
 import { AuthError } from "next-auth"
 import nodemailer from "nodemailer"
 
-async function sendVerificationEmail(email: string, token: string) {
+async function sendVerificationEmail(email: string, token: string,name: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`;
   // console.log("Varification Link",VerificationLink);
   const transporter = nodemailer.createTransport({
@@ -133,7 +133,7 @@ async function sendVerificationEmail(email: string, token: string) {
         </div>
         <div class="content">
             <h1>Verify Your Email Address</h1>
-            <p>Hello,</p>
+            <p>Hello,${name}</p>
             <p>Welcome to Spendwise! We're excited to have you on board. To get started, please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
                 <a href="${VerificationLink}" class="btn" style="color: white;">Verify Email</a>
@@ -166,7 +166,7 @@ async function sendVerificationEmail(email: string, token: string) {
   }
 }
 
-const sendTwoFactorTokenEmail = async (email: string, token: string) => {
+const sendTwoFactorTokenEmail = async (email: string, token: string,name:string) => {
 
   console.log(`Attempting to send 2FA email to: ${email} , token:${token}`);
   const transporter = nodemailer.createTransport({
@@ -285,7 +285,7 @@ const sendTwoFactorTokenEmail = async (email: string, token: string) => {
         </div>
         <div class="content">
             <h1>Your Two-Factor Authentication Code</h1>
-            <p>Hello,</p>
+            <p>Hello,${name}</p>
             <p>To complete your login to Spendwise, please use the following code:</p>
             <p class="code" id="authCode">${token}</p>
             <p>Please enter this code on the login page to verify your identity and access your account.</p>
@@ -337,7 +337,7 @@ export const Signin = async (
     )
 
     try{
-      await sendVerificationEmail(verificationToken.email, verificationToken.token)
+      await sendVerificationEmail(verificationToken.email, verificationToken.token,existingUser.name);
     }catch(error){
       console.error('Test email failed:', error);
     }
@@ -385,7 +385,7 @@ export const Signin = async (
 
 
       try {
-        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token)
+        await sendTwoFactorTokenEmail(twoFactorToken.email,twoFactorToken.token,existingUser.name);
         console.log('Test email sent successfully');
       } catch (error) {
         console.error('Test email failed:', error);

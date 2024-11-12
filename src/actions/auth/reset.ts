@@ -5,7 +5,7 @@ import { ResetSchema } from "@/lib/index"
 import nodemailer from "nodemailer"
 import { z } from "zod"
 
-const sendPasswordResetEmail = async(email: string, token: string) => {
+const sendPasswordResetEmail = async(email: string, token: string,name:string) => {
   const resetLink = `${process.env.BASE_URL}/auth/new-password?token=${token}`
 
   const transporter = nodemailer.createTransport({
@@ -125,7 +125,7 @@ const sendPasswordResetEmail = async(email: string, token: string) => {
         </div>
         <div class="content">
             <h1>Reset Your Password</h1>
-            <p>Hello,</p>
+            <p>Hello,${name}</p>
             <p>We received a request to reset your SpendWise password. Don't worry, we've got you covered!</p>
             <p style="text-align: center;">
                 <a href="${resetLink}" class="btn" style="color: white;">Reset My Password</a>
@@ -175,7 +175,7 @@ export const Resetpass = async ({ email }: z.infer<typeof ResetSchema>) => {
     validatedFields.data.email
   )
   try{
-    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token);
+    await sendPasswordResetEmail(passwordResettoken.email, passwordResettoken.token,existinguser.name);
   }catch(error){
     console.error("Error while sending resetpass mail",error);
   }
