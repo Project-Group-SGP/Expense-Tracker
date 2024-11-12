@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 // import MobileNav from "./MobileNav"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const navLinks = [
   // { href: "/", label: "Home" },
@@ -22,7 +23,14 @@ const Navbar = () => {
             href="/"
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
-            <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />
+            <Image
+              src="/SpendWIse-5.png"
+              width={36}
+              height={36}
+              alt="SpendWise Logo"
+              fetchPriority="high"
+              priority
+            />
             <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
               spend<span className="text-primary">wise</span>
             </span>

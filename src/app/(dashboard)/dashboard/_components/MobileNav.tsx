@@ -37,6 +37,7 @@ import { TbReportAnalytics } from "react-icons/tb"
 import { PiggyBank } from "lucide-react"
 import { CiMenuFries } from "react-icons/ci"
 import { FaUser } from "react-icons/fa"
+import Image from "next/image"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: FiHome },
@@ -119,10 +120,14 @@ export default function Component() {
 
               {/* Header */}
               <div className="flex items-center space-x-4 border-b p-6">
-                <img
-                  src={`${process.env.NEXT_PUBLIC_BASE_URL}/SpendWIse-5.png`}
+                <Image
+                  src={`/SpendWIse-5.png`}
                   alt="SpendWise Logo"
-                  className="h-10 w-10 flex-shrink-0"
+                  className="flex-shrink-0"
+                  height={40}
+                  width={40}
+                  fetchPriority="high"
+                  priority
                 />
                 <span className="truncate text-2xl font-bold tracking-tight">
                   <span className="text-foreground">spend</span>

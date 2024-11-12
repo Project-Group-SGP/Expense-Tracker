@@ -59,9 +59,7 @@
 // }
 // export default Navbar
 
-
 // Version-2
-
 
 // "use client"
 // import { useState } from 'react'
@@ -129,12 +127,13 @@
 // Version-3
 
 "use client"
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { ModeToggle } from "@/components/ModeToggle"
 import Link from "next/link"
 import MobileNav from "./MobileNav"
 import { UserButton } from "@/components/user-button"
+import Image from "next/image"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -148,15 +147,22 @@ export default function Navbar() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl dark:border-dark-border dark:bg-dark-background/70">
+    <nav className="dark:border-dark-border dark:bg-dark-background/70 fixed start-0 top-0 z-20 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <MobileNav />
           <Link
             href="/dashboard"
             className="flex items-center space-x-3 rtl:space-x-reverse"
-          > 
-            <img src="/SpendWIse-5.png" className="h-9" alt="SpendWise Logo" />
+          >
+            <Image
+              src="/SpendWIse-5.png"
+              width={36}
+              height={36}
+              alt="SpendWise Logo"
+              fetchPriority="high"
+              priority
+            />
             <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
               spend<span className="text-primary">wise</span>
             </span>
@@ -171,18 +177,13 @@ export default function Navbar() {
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
-              className={`relative transition-all duration-300 hover:text-primary 
-                ${isHovering ? 'opacity-30 hover:opacity-100' : ''}
-                ${pathname === href ? 'text-primary' : ''}
-              `}
+              className={`relative transition-all duration-300 hover:text-primary ${isHovering ? "opacity-30 hover:opacity-100" : ""} ${pathname === href ? "text-primary" : ""} `}
               href={href}
               onMouseEnter={() => setIsHovering(true)}
             >
               {label}
-              <span 
-                className={`absolute -bottom-1 left-0 w-full h-0.5 bg-primary transform transition-transform duration-300 origin-left
-                  ${pathname === href ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}
-                `}
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 w-full origin-left transform bg-primary transition-transform duration-300 ${pathname === href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"} `}
               ></span>
             </Link>
           ))}
