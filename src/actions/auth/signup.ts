@@ -8,7 +8,7 @@ import { generateVerificationToken } from "@/lib/tokens"
 import nodemailer from "nodemailer"
 
 
-async function sendVerificationEmail(email: string, token: string) {
+async function sendVerificationEmail(email: string, token: string, name: string) {
   const VerificationLink = `${process.env.BASE_URL}/auth/new-verification?token=${token}`
   console.log("Varification Link",VerificationLink);
   const transporter = nodemailer.createTransport({
@@ -129,7 +129,7 @@ async function sendVerificationEmail(email: string, token: string) {
         </div>
         <div class="content">
             <h1>Verify Your Email Address</h1>
-            <p>Hello,</p>
+            <p>Hello,${name}</p>
             <p>Welcome to Spendwise! We're excited to have you on board. To get started, please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
                 <a href="${VerificationLink}" class="btn" style="color: white;">Verify Email</a>
@@ -189,7 +189,8 @@ export const Register = async (values: z.infer<typeof RegisterSchema>) => {
   const verificationToken = await generateVerificationToken(email)
 
   try{
-    await sendVerificationEmail(verificationToken.email, verificationToken.token)
+  if (existinguser) return { error: "User already exist!", success: "" }
+  await sendVerificationEmail(verificationToken.email, verificationToken.token,name);
   }catch(error){
     console.error("Error while sending Verification Mail:",error);
   }
