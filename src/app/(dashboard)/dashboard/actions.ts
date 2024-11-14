@@ -266,11 +266,12 @@ export async function generateFinancialAdvice(
     })
 
     const prompt = `
+    Keep the answer short and concise.
     As a financial advisor, analyze the following detailed financial data, including budget information, and provide a comprehensive summary and actionable advice:
     ${JSON.stringify(financialSummary, null, 2)}
 
     Please provide:
-    1. A brief summary of the user's overall financial situation for the entire period
+    1. A concise summary of the user's overall financial situation for the entire period
     2. Month-by-month analysis of income and expenses trends 
     3. Insights on spending patterns across different categories, comparing actual expenses to budgeted amounts
     4. Identification of categories where the user is consistently over or under budget
@@ -291,11 +292,9 @@ export async function generateFinancialAdvice(
     - Make the financial advice feel personal and actionable, as if you're having a one-on-one conversation with the user
     - Use encouraging language to motivate the user and make them feel positive about taking control of their finances
     - Make the response short and concise
-    - Ensure there is spacing between in the response to make it easier to read
     - Also use tables if required and don't mention any currency symbol in it
     - give answer in rupees not in dollars
     - Don't tell user to use any other apps tell them to user our website
-    - Utilize Markdown elements like headers, bullet points, numbered lists, and **bold** or *italic* text for emphasis
     Remember, the goal is to provide clear, actionable financial advice while keeping the tone upbeat and engaging!
     Note: I am using React-Markdown + Remark-gfm for displaying the text so generate response accordingly
     `
