@@ -118,7 +118,7 @@ export default function Component() {
               </motion.div>
 
               {/* Header */}
-              <div className="flex items-center space-x-4 border-b p-6">
+              <div className="flex items-center space-x-2 border-b p-6">
                 <Image
                   src={`/SpendWIse-5.png`}
                   alt="SpendWise Logo"

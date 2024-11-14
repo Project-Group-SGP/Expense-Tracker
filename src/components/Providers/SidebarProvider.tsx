@@ -12,13 +12,9 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 type SidebarProviderProps = {
   children: React.ReactNode
   navbar: React.ReactNode
-  sidebar?: React.ReactNode
 }
 
-export function SidebarProvider({
-  children,
-  navbar,
-}: SidebarProviderProps) {
+export function SidebarProvider({ children, navbar }: SidebarProviderProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const toggleSidebar = () => {
@@ -27,15 +23,12 @@ export function SidebarProvider({
 
   return (
     <SidebarContext.Provider value={{ isSidebarOpen, toggleSidebar }}>
-      {/* <div className="flex min-h-screen flex-col"> */}
-        {navbar}
-          <main
-            className={`${isSidebarOpen ? "blur-sm md:blur-none" : ""}`}
-          >
-            {children}
-          </main>
-        {/* </div> */}
-      {/* </div> */}
+      {navbar}
+      <main
+        className={`${isSidebarOpen ? "pointer-events-none select-none blur-sm md:pointer-events-auto md:select-auto md:blur-none" : ""}`}
+      >
+        {children}
+      </main>
     </SidebarContext.Provider>
   )
 }
