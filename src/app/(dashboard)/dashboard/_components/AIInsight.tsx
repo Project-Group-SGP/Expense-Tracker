@@ -228,6 +228,116 @@ export default function AIInsight() {
                       <ReactMarkdown
                         className="prose max-w-none overflow-x-auto text-sm dark:prose-invert sm:text-base"
                         remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({ node, ...props }) => (
+                            <h1
+                              {...props}
+                              className="mb-4 border-b-2 border-green-500 pb-2 text-2xl font-bold text-green-600 dark:border-green-700 dark:text-green-400"
+                            />
+                          ),
+                          h2: ({ node, ...props }) => (
+                            <h2
+                              {...props}
+                              className="mb-3 mt-5 border-l-4 border-green-500 pl-2 text-xl font-semibold text-green-600 dark:border-green-700 dark:text-green-400"
+                            />
+                          ),
+                          h3: ({ node, ...props }) => (
+                            <h3
+                              {...props}
+                              className="mb-2 text-lg font-semibold text-green-600 dark:text-green-400"
+                            />
+                          ),
+
+                          p: ({ node, ...props }) => (
+                            <p
+                              {...props}
+                              className="mb-4 leading-relaxed text-gray-800 dark:text-gray-200"
+                            />
+                          ),
+                          ul: ({ node, ...props }) => (
+                            <ul
+                              {...props}
+                              className="mb-4 list-disc pl-5 [&>li]:mb-2"
+                            />
+                          ),
+                          ol: ({ node, ...props }) => (
+                            <ol
+                              {...props}
+                              className="mb-4 list-decimal pl-5 [&>li]:mb-2"
+                            />
+                          ),
+                          li: ({ node, ...props }) => (
+                            <li
+                              {...props}
+                              className="text-gray-800 dark:text-gray-200"
+                            />
+                          ),
+                          strong: ({ node, ...props }) => (
+                            <strong
+                              {...props}
+                              className="font-semibold text-gray-900 dark:text-gray-100"
+                            />
+                          ),
+                          em: ({ node, ...props }) => (
+                            <em
+                              {...props}
+                              className="font-semibold italic text-green-600 dark:text-green-400"
+                            />
+                          ),
+                          blockquote: ({ node, ...props }) => (
+                            <blockquote
+                              {...props}
+                              className="border-l-4 border-green-500 pl-4 italic text-gray-600 dark:border-green-700 dark:text-gray-400"
+                            />
+                          ),
+                          code: ({ node, ...props }) => (
+                            <code
+                              {...props}
+                              className="block overflow-x-auto rounded-lg bg-gray-100 p-3 font-mono text-sm text-green-600 dark:bg-gray-800 dark:text-green-400"
+                            />
+                          ),
+                          table: ({ node, ...props }) => (
+                            <div className="overflow-x-auto">
+                              <table
+                                {...props}
+                                className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+                              />
+                            </div>
+                          ),
+                          thead: ({ node, ...props }) => (
+                            <thead
+                              {...props}
+                              className="bg-gray-50 dark:bg-gray-800"
+                            />
+                          ),
+                          tbody: ({ node, ...props }) => (
+                            <tbody
+                              {...props}
+                              className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
+                            />
+                          ),
+                          tr: ({ node, ...props }) => (
+                            <tr
+                              {...props}
+                              className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                            />
+                          ),
+                          th: ({ node, ...props }) => (
+                            <th
+                              {...props}
+                              className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            />
+                          ),
+                          td: ({ node, ...props }) => (
+                            <td
+                              {...props}
+                              className="whitespace-nowrap px-4 py-2 text-sm text-gray-900 dark:text-gray-100"
+                            />
+                          ),
+                          div: ({ node, ...props }) => (
+                            <div {...props} className="my-0" />
+                          ),
+                        }}
                       >
                         {message.content}
                       </ReactMarkdown>
