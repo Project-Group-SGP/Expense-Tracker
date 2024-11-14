@@ -256,7 +256,7 @@ export function Newincome() {
                 <Button
                   type="submit"
                   variant="outline"
-                  className="w-full border-green-500 text-green-500 hover:bg-green-700 sm:w-auto"
+                  className="w-full border-green-500 text-green-500 hover:bg-green-700 hover:text-white sm:w-auto"
                   disabled={isPending}
                 >
                   {isPending ? "Adding..." : "Add new income"}
