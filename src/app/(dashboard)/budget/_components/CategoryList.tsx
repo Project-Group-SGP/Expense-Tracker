@@ -1,21 +1,10 @@
 "use client"
 
-import {
-  Bus,
-  ChartNoAxesCombined,
-  ChefHat,
-  Clapperboard,
-  Fuel,
-  GraduationCap,
-  HandCoins,
-  Hospital,
-  ReceiptText,
-  ShieldQuestion,
-  ShoppingCart,
-  UtensilsCrossed,
-} from "lucide-react"
+import { Bus, BarChartIcon as ChartNoAxesCombined, ChefHat, Clapperboard, Fuel, GraduationCap, HandCoins, Hospital, ReceiptText, ShieldQuestion, ShoppingCart, UtensilsCrossed } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import Card_Category from "./Card_Category"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from 'lucide-react'
 
 type CategoryListType = {
   categories: {
@@ -91,27 +80,44 @@ const CategoryList = (props: CategoryListType) => {
     },
   ]
 
-  const handleCategoryClick = (path) => {
+  const handleCategoryClick = (path: string) => {
     router.push(path)
   }
 
-  // console.log(props.categories);
+  const filteredCategories = categoryItems.filter(
+    (category) => props.categories[category.title] !== 0
+  )
+
+  const allCategoriesZero = filteredCategories.length === 0
 
   return (
-    <section className="ml-6 mt-4 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {categoryItems.map((category) => (
-        <div
-          key={category.title}
-          onClick={() => handleCategoryClick(category.path)}
-        >
-          <Card_Category
-            title={category.title}
-            amount={props.categories[category.title] || 0}
-            color={category.color}
-            icon={category.icon}
-          />
+    <section className="ml-6 mt-4 w-full">
+      {allCategoriesZero ? (
+        <Alert variant="default" className="max-w-md mx-auto">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Categories</AlertTitle>
+          <AlertDescription>
+            There are no categories with non-zero amounts. Start adding expenses to see categories here!
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredCategories.map((category) => (
+            <div
+              key={category.title}
+              onClick={() => handleCategoryClick(category.path)}
+              className="cursor-pointer transition-transform hover:scale-105"
+            >
+              <Card_Category
+                title={category.title}
+                amount={props.categories[category.title] || 0}
+                color={category.color}
+                icon={category.icon}
+              />
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </section>
   )
 }
