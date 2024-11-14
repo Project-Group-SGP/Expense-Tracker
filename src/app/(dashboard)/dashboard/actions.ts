@@ -301,19 +301,25 @@ export async function generateFinancialAdvice(
     `
 
     const stream = createStreamableValue("")
+    try {
+      ;(async () => {
+        const { textStream } = await streamText({
+          model: model,
+          prompt: prompt,
+        })
 
-    ;(async () => {
-      const { textStream } = await streamText({
-        model: model,
-        prompt: prompt,
-      })
+        for await (const delta of textStream) {
+          stream.update(delta)
+          console.log("Streaming update:", delta)
+        }
 
-      for await (const delta of textStream) {
-        stream.update(delta)
-      }
-
-      stream.done()
-    })()
+        stream.done()
+        console.log("Stream completed successfully")
+      })()
+    } catch (error) {
+      console.error("Error during stream generation:", error)
+      stream.error(error)
+    }
 
     return { output: stream.value }
   } catch (error: any) {
