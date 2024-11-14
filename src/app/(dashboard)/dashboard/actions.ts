@@ -327,5 +327,3 @@ export async function generateFinancialAdvice(
     return { error: "Failed to generate content", details: error.message }
   }
 }
-
-export const maxDuration = 60
