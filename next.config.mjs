@@ -7,6 +7,11 @@ const nextConfig = {
       fullUrl: true,
     },
   },
+  serverRuntimeConfig: {
+    functions: {
+      maxDuration: 60, // Set this to the desired number of seconds
+    },
+  },
 }
 
 const pwaConfig = {
