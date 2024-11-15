@@ -256,12 +256,14 @@ export default function Home() {
             {faqs.map((faq, index) => (
               <div
                 key={`faqs${index}`}
-                className="rounded-lg border p-6 transition-all duration-300 ease-in-out hover:shadow-md dark:border-gray-700"
+                className="group rounded-lg border p-6 transition-all duration-300 ease-in-out hover:shadow-md dark:border-gray-700"
               >
-                <h3 className="mb-2 text-xl font-semibold text-gray-900 transition-colors duration-300 ease-in-out hover:text-primary dark:text-white">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900 transition-colors duration-300 ease-in-out hover:text-primary group-hover:text-primary dark:text-white">
                   {faq.question}
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300">{faq.answer}</p>
+                <p className="pointer-events-none text-gray-700 dark:text-gray-300">
+                  {faq.answer}
+                </p>
               </div>
             ))}
           </div>
