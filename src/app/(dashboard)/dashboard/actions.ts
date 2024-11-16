@@ -256,7 +256,7 @@ export async function generateFinancialAdvice(
       apiKey: process.env.GEMINI_MAIL_API_KEY,
     })
 
-    const model = google("gemini-1.5-flash", {
+    const model = google("gemini-1.5-flash-002", {
       safetySettings: [
         {
           category: "HARM_CATEGORY_DANGEROUS_CONTENT",
