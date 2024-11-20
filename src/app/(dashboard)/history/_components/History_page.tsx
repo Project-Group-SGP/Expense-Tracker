@@ -1,3 +1,76 @@
+'use client'
+
+import { columns } from "../columns"
+import { DataTable } from "../data-table"
+import { Showoptions } from "./showoptions"
+
+interface HistoryPageProps {
+  Data: any[]
+}
+
+export default function HistoryPage({ Data }: HistoryPageProps) {
+  return (
+    <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+      <div className="mt-20 space-y-6">
+        <Showoptions />
+      </div>
+      
+      <div className="mt-8">
+        <DataTable 
+          columns={columns} 
+          data={Data} 
+          filterKey="description" 
+          disabled={false}
+        />
+      </div>
+    </div>
+  )
+}
+
+// 'use client'
+// import { useState } from "react"
+// import { columns } from "../columns"
+// import { DataTable } from "../data-table"
+// import DatePicker from "./DatePicker"
+// import { NewExpense } from "./Expance"
+// import { Newincome } from "./Income"
+// import { Showoptions } from "./showoptions"
+
+// interface HistoryPageProps {
+//   Data: any[]
+// }
+
+// export default function HistoryPage({ Data }: HistoryPageProps) {
+
+//   return (
+//     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+//       <div className="mt-20 space-y-6">
+//         <Showoptions/>
+
+//         {/* Tablet/Desktop view */}
+//         <div className="hidden sm:flex w-full flex-col md:flex-row items-start md:items-center justify-between gap-4">
+//           <div className="w-full md:w-auto">
+//             <DatePicker />
+//           </div>
+//           <div className="flex flex-wrap items-center gap-2">
+//             <Newincome />
+//             <NewExpense />
+//           </div>
+//         </div>
+//       </div>
+      
+//       <div className="mt-8">
+//         <DataTable 
+//           columns={columns} 
+//           data={Data} 
+//           filterKey="description" 
+//           disabled={false}
+//         />
+//       </div>
+//     </div>
+//   )
+// }
+
 // 'use client'
 
 // import React, { useState } from "react"
@@ -131,50 +204,3 @@
 //   )
 // }
 // export default HistoryPage
-
-
-'use client'
-import { useState } from "react"
-import { columns } from "../columns"
-import { DataTable } from "../data-table"
-import DatePicker from "./DatePicker"
-import { NewExpense } from "./Expance"
-import { Newincome } from "./Income"
-import { Showoptions } from "./showoptions"
-
-interface HistoryPageProps {
-  Data: any[]
-}
-
-Showoptions
-export default function HistoryPage({ Data }: HistoryPageProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  return (
-    <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-      <div className="mt-20 space-y-6">
-        <Showoptions/>
-
-        {/* Tablet/Desktop view */}
-        <div className="hidden sm:flex w-full flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="w-full md:w-auto">
-            <DatePicker />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Newincome />
-            <NewExpense />
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-8">
-        <DataTable 
-          columns={columns} 
-          data={Data} 
-          filterKey="description" 
-          disabled={false}
-        />
-      </div>
-    </div>
-  )
-}

@@ -14,6 +14,7 @@ import * as XLSX from "xlsx"
 import { logo } from "@/lib/logo"
 import { PDFDocument } from "pdf-lib";
 
+
 Chart.register(...registerables, ChartDataLabels)
 
 interface ChartData {
