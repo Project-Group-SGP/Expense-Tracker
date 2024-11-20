@@ -2,13 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, Info } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CategoryTypes } from "@prisma/client"
 import { format } from "date-fns"
 import { formatCurrency } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { EditTransaction } from "./_components/EditTransactions"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 export type ResponceType = {
   category: CategoryTypes | "Income"
   id: string
@@ -119,11 +125,23 @@ export const columns: ColumnDef<ResponceType>[] = [
       if (row.original.description === null) return <></>
 
       return (
-        <span>
-          {row.original.description.length > 20
-            ? row.original.description?.slice(0, 19) + "..."
-            : row.original.description}
-        </span>
+        <TooltipProvider>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <div className="flex cursor-pointer items-center space-x-1">
+                <span className="max-w-[60px] sm:max-w-[150px] truncate">
+                  {row.original.description}
+                </span>
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs p-2 bg-white text-black z-10 dark:bg-gray-950 dark:text-white">
+                <p className="text-sm">
+                  {row.original.description}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
       )
     },
   },
