@@ -162,20 +162,6 @@ export function NewExpense() {
           >
             <FormField
               control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
@@ -187,6 +173,20 @@ export function NewExpense() {
                       step="0.01"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

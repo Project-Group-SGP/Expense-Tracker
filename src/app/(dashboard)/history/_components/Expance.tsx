@@ -181,19 +181,7 @@ export function NewExpense() {
             onSubmit={form.handleSubmit(handleSubmit)}
             className="mt-4 space-y-4"
           >
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
             <FormField
               control={form.control}
               name="amount"
@@ -207,6 +195,20 @@ export function NewExpense() {
                       step="0.01"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
