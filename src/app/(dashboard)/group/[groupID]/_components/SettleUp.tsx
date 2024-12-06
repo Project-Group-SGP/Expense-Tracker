@@ -457,19 +457,19 @@ export function SettleUp({
               </div>
               <div className="flex w-full flex-col justify-center space-y-2 sm:w-auto sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
                 <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-600 sm:w-auto"
+                >
+                  Settle up
+                </Button>
+                <Button
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
                   className="w-full rounded-lg sm:w-auto"
                 >
                   Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="outline"
-                  className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-600 sm:w-auto"
-                >
-                  Settle up
                 </Button>
               </div>
             </div>

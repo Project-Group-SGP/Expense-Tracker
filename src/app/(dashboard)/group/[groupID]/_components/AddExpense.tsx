@@ -590,19 +590,19 @@ export function AddExpense({
             {/* Buttons */}
             <div className="flex flex-col justify-end space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
               <Button
+                type="submit"
+                variant="outline"
+                className="w-full rounded-md border-red-500 text-red-500 hover:bg-red-600 sm:w-auto"
+              >
+                Add Expense
+              </Button>
+              <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
                 className="w-full rounded-md sm:w-auto"
               >
                 Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="outline"
-                className="w-full rounded-md border-red-500 text-red-500 hover:bg-red-600 sm:w-auto"
-              >
-                Add Expense
               </Button>
             </div>
           </form>
