@@ -361,7 +361,35 @@ export function AddExpense({
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 rounded-md"
-          >
+          >    {/* Amount */}
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount</FormLabel>
+                <div className="flex">
+                  <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">
+                    ₹
+                  </div>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      {...field}
+                      className="ml-2 flex-grow"
+                      onChange={(e) => {
+                        field.onChange(e)
+                      }}
+                    />
+                  </FormControl>
+                </div>
+              </FormItem>
+            )}
+          />
+            
+            
+            
             {/* Description and Category */}
             <FormField
               control={form.control}
@@ -417,33 +445,6 @@ export function AddExpense({
                         </DropdownMenu>
                       )}
                     />
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            {/* Amount */}
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <div className="flex">
-                    <div className="rounded border pl-[10px] pr-[10px] pt-[5px]">
-                      ₹
-                    </div>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        {...field}
-                        className="ml-2 flex-grow"
-                        onChange={(e) => {
-                          field.onChange(e)
-                        }}
-                      />
-                    </FormControl>
                   </div>
                 </FormItem>
               )}
@@ -589,19 +590,19 @@ export function AddExpense({
             {/* Buttons */}
             <div className="flex flex-col justify-end space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
               <Button
+                type="submit"
+                variant="outline"
+                className="w-full rounded-md border-red-500 text-red-500 hover:bg-red-600 sm:w-auto"
+              >
+                Add Expense
+              </Button>
+              <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
                 className="w-full rounded-md sm:w-auto"
               >
                 Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="outline"
-                className="w-full rounded-md border-red-500 text-red-500 hover:bg-red-600 sm:w-auto"
-              >
-                Add Expense
               </Button>
             </div>
           </form>

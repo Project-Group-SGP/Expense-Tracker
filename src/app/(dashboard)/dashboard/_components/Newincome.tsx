@@ -138,21 +138,6 @@ export function Newincome() {
               })}
               className="mt-4 space-y-4"
             >
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               {/* Amount */}
               <FormField
                 control={form.control}
@@ -167,6 +152,21 @@ export function Newincome() {
                         step="0.01"
                         {...field}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter description" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
