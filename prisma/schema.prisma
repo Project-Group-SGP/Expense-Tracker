@@ -27,6 +27,8 @@ model User {
   joinRequests          JoinRequest[]
   paidExpenses         GroupExpense[] @relation("PaidExpenses")
   expenseSplits        ExpenseSplit[] @relation("ExpenseSplits")
+  recurringTransactions RecurringTransaction[]
+  reminders            Reminder[]
 
   @@index([email])
   @@map("users")
@@ -193,12 +195,50 @@ model Payment {
   @@index([expenseSplitId])
 }
 
+model Reminder {
+  id            String           @id @default(cuid())
+  userId        String
+  amount        Decimal
+  description   String
+  dueDate       DateTime
+  type          TransactionType
+  category      CategoryTypes?  
+  status        ReminderStatus  @default(PENDING)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dueDate])
+  @@index([userId, status])
+  @@map("reminders")
+}
+
+model RecurringTransaction {
+  id            String             @id @default(cuid())
+  userId        String
+  type          TransactionType
+  amount        Decimal
+  description   String?
+  category      CategoryTypes?     
+  startDate     DateTime
+  endDate       DateTime?          
+  frequency     RecurringFrequency
+  customInterval Int? 
+  reminderEnabled Boolean
+  isActive      Boolean            @default(true)
+  lastProcessed DateTime?          // To track when the last transaction was created
+  nextOccurrence DateTime          // Next date when transaction should occur
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, type])
+  @@index([userId, isActive])
+  @@index([nextOccurrence])
+  @@map("recurring_transactions")
+}
+
 enum SplitStatus {
   UNPAID
   PARTIALLY_PAID
   PAID
 }
-
 
 enum ExpenseStatus {
   UNSETTLED
@@ -233,3 +273,23 @@ enum TokenTypes {
   PasswordReset
   TwoFactor
 }
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum RecurringFrequency {
+  DAILY
+  CUSTOM
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum ReminderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
