@@ -39,7 +39,7 @@ export default function RecurringTransactionsAndReminders() {
       setIsDialogOpen(false)
       toast({
         title: "Item added",
-        description: `Successfully added ${newItem.description}`,
+        description: `Successfully added ${newItem.title}`,
       })
     } catch (error) {
       toast({
@@ -52,10 +52,6 @@ export default function RecurringTransactionsAndReminders() {
 
   const handleEditItem = async (updatedItem: RecurringTransaction | Reminder) => {
     try {
-      console.log("Updated Item");
-      
-      // console.log(updatedItem.id);
-      
       await editItem(updatedItem)
       await fetchData()
       setIsDialogOpen(false)
@@ -64,7 +60,6 @@ export default function RecurringTransactionsAndReminders() {
         title: "Item updated",
         description: `Successfully updated ${updatedItem.title}`,
       })
-      console.log("Item Updated Successfully");
     } catch (error) {
       toast({
         title: "Error",
@@ -92,19 +87,19 @@ export default function RecurringTransactionsAndReminders() {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto mt-8">
+    <Card className="w-full max-w-4xl mx-auto mt-4 sm:mt-8">
       <CardHeader>
-        <CardTitle>Recurring Transactions and Reminders</CardTitle>
-        <CardDescription>Manage your recurring transactions and payment reminders</CardDescription>
+        <CardTitle className="text-xl sm:text-2xl">Recurring Transactions and Reminders</CardTitle>
+        <CardDescription className="text-sm sm:text-base">Manage your recurring transactions and payment reminders</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'transactions' | 'reminders')}>
-          <div className="flex justify-between items-center mb-4">
-            <TabsList>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="reminders">Reminders</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'transactions' | 'reminders')} className="w-full">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="transactions" className="flex-1 sm:flex-none">Transactions</TabsTrigger>
+              <TabsTrigger value="reminders" className="flex-1 sm:flex-none">Reminders</TabsTrigger>
             </TabsList>
-            <Button onClick={() => setIsDialogOpen(true)}>
+            <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" />
               Add {activeTab === 'transactions' ? 'Transaction' : 'Reminder'}
             </Button>
@@ -133,7 +128,7 @@ export default function RecurringTransactionsAndReminders() {
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-h-[95vh] w-[105vw] overflow-y-auto rounded-lg sm:max-w-[450px]">
+        <DialogContent className="max-h-[95vh] w-[95vw] overflow-y-auto rounded-lg sm:max-w-[450px]">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Edit' : 'Add'} {activeTab === 'transactions' ? 'Transaction' : 'Reminder'}</DialogTitle>
             <DialogDescription>
@@ -150,4 +145,3 @@ export default function RecurringTransactionsAndReminders() {
     </Card>
   )
 }
-
