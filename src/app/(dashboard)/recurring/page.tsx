@@ -21,7 +21,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { ItemForm } from "./_components/ItemForm"
-import { useToast } from "@/hooks/use-toast"
 import {
   getRecurringTransactions,
   getReminders,
@@ -30,6 +29,7 @@ import {
   deleteItem,
 } from "./action"
 import { RecurringTransaction, Reminder } from "./_components/types"
+import { toast } from "sonner"
 
 export default function RecurringTransactionsAndReminders() {
   const [transactions, setTransactions] = useState<RecurringTransaction[]>([])
@@ -41,7 +41,6 @@ export default function RecurringTransactionsAndReminders() {
   const [activeTab, setActiveTab] = useState<"transactions" | "reminders">(
     "transactions"
   )
-  const { toast } = useToast()
 
   useEffect(() => {
     fetchData()
@@ -55,19 +54,30 @@ export default function RecurringTransactionsAndReminders() {
   }
 
   const handleAddItem = async (newItem: RecurringTransaction | Reminder) => {
+    
     try {
-      await addItem(newItem)
-      await fetchData()
+      const loading = toast.loading("Adding Recurring transactions...")
       setIsDialogOpen(false)
-      toast({
-        title: "Item added",
-        description: `Successfully added ${newItem.description}`,
-      })
+      const response = await addItem(newItem)
+      // console.log(response);
+      
+      await fetchData()
+      
+      if(response){
+        toast.success("Recurring transactions added successfully", {
+          closeButton: true,
+          icon: "♻️",
+          duration: 4500,
+          id: loading,
+        })
+      }
+
+      
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add item",
-        variant: "destructive",
+      toast.error("Error Adding Recurring transactions", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
@@ -76,42 +86,48 @@ export default function RecurringTransactionsAndReminders() {
     updatedItem: RecurringTransaction | Reminder
   ) => {
     try {
+      const loading = toast.loading("Updating Recurring transactions...")
+      setIsDialogOpen(false)
       await editItem(updatedItem)
       await fetchData()
-      setIsDialogOpen(false)
       setEditingItem(null)
-      toast({
-        title: "Item updated",
-        description: `Successfully updated ${updatedItem.description}`,
+      toast.success("Recurring transactions updated successfully", {
+        closeButton: true,
+        icon: "♻️",
+        duration: 4500,
+        id: loading,
       })
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update item",
-        variant: "destructive",
+     toast.error("Error Updating Recurring transactions", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
 
   const handleDeleteItem = async (id: string) => {
     try {
+      const loading = toast.loading("Deleting Recurring transactions...")
       await deleteItem(id)
       await fetchData()
-      toast({
-        title: "Item deleted",
-        description: "Successfully deleted the item",
+      toast.success("Recurring transactions deleted successfully", {
+        closeButton: true,
+        icon: "♻️",
+        duration: 4500,
+        id: loading,
       })
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete item",
-        variant: "destructive",
+      toast.error("Error Deleting Recurring transactions", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
 
   return (
-    <div className="m-2">
+    <div className="m">
       <Card className="mx-auto mt-20 w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-xl sm:text-2xl">

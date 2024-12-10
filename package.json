@@ -75,7 +75,7 @@
     "remark-gfm": "^4.0.0",
     "shadcn-ui": "^0.8.0",
     "sharp": "^0.33.4",
-    "sonner": "^1.5.0",
+    "sonner": "^1.7.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",

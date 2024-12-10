@@ -42,7 +42,7 @@ export async function getReminders(): Promise<Reminder[]> {
   }
 }
 
-export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">) {
+export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">): Promise<boolean> {
   try {
     
     const user = await currentUserServer()
@@ -52,7 +52,7 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
     }
 
     if ('frequency' in item) {
-      console.log("Try to Adding reccurrent");
+      console.log( "User : " + user.id + "Try to Adding reccurrent");
       
       const recurringTransaction = await db.recurringTransaction.create({
         data: {
@@ -72,12 +72,14 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
           // isActive: 'isActive' in item ? item.isActive as boolean : false,
         },
       });
-      console.log(recurringTransaction);
+      // console.log(recurringTransaction);
       
-      console.log("Reccurrent Added Successfully");
+      console.log( "User : " + user.id + "Reccurrent Added Successfully");
       
+      return true;
+
     } else {
-      console.log("Try to Adding reminder");
+      console.log( "User : " + user.id + "Try to Adding reminder");
       
       const reminder = await db.reminder.create({
         data: {
@@ -91,26 +93,31 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
           status: 'status' in item ? item.status as ReminderStatus : "PENDING",
         },
       });
-      console.log(reminder);
-
-      console.log("Reminder Added Successfully");
+      // console.log(reminder);
+      console.log( "User : " + user.id + "Reminder Added Successfully");
+      return true;
       
     }
   } catch (error) {
     console.error("Error adding item:", error)
+    return false;
     throw new Error("Failed to add item")
   }
   
 }
 
-export async function editItem(item: RecurringTransaction | Reminder) {
+export async function editItem(item: RecurringTransaction | Reminder): Promise<boolean> {
   try {
-    console.log("Editing Item");
+    const user = await currentUserServer()
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+    console.log( "User : " + user.id + "Editing Item");
     
     // console.log(item);
     
     if ('frequency' in item) {
-      return await db.recurringTransaction.update({
+      await db.recurringTransaction.update({
         where: { id: item.id },
         data: {
           description: item.description ?? '',
@@ -127,8 +134,9 @@ export async function editItem(item: RecurringTransaction | Reminder) {
           reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
         },
       })
+      return true;
     } else {
-      return await db.reminder.update({
+      await db.reminder.update({
         where: { id: item.id },
         data: {
           title: 'title' in item ? item.title as string : '',
@@ -140,11 +148,13 @@ export async function editItem(item: RecurringTransaction | Reminder) {
           category: item.category as CategoryTypes | null,
         },
       })
-      // console.log("Item Edited Successfully");
+      console.log( "User : " + user.id + "Item Edited Successfully");
+      return true;
     }
     
   } catch (error) {
     console.error("Error updating item:", error)
+    return false;
     throw new Error("Failed to update item")
   }
 }

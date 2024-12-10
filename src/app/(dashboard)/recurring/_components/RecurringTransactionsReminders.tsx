@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { ItemForm } from './ItemForm'
-import { useToast } from "@/hooks/use-toast"
 import { getRecurringTransactions, getReminders, addItem, editItem, deleteItem } from '../action'
 import { RecurringTransaction, Reminder } from './types'
+import { toast } from 'sonner'
 
 export default function RecurringTransactionsAndReminders() {
   const [transactions, setTransactions] = useState<RecurringTransaction[]>([])
@@ -19,7 +19,7 @@ export default function RecurringTransactionsAndReminders() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<RecurringTransaction | Reminder | null>(null)
   const [activeTab, setActiveTab] = useState<'transactions' | 'reminders'>('transactions')
-  const { toast } = useToast()
+
 
   useEffect(() => {
     fetchData()
@@ -34,54 +34,69 @@ export default function RecurringTransactionsAndReminders() {
 
   const handleAddItem = async (newItem: RecurringTransaction | Reminder) => {
     try {
-      await addItem(newItem)
-      await fetchData()
       setIsDialogOpen(false)
-      toast({
-        title: "Item added",
-        description: `Successfully added ${newItem.title}`,
-      })
+      
+      const loading = toast.loading("Adding Reminder...")
+      
+      const response = await addItem(newItem)
+      await fetchData()
+      if(response){
+        toast.success("Reminder added successfully", {
+          closeButton: true,
+          icon: "🔔",
+          duration: 4500,
+          id: loading,
+        })
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add item",
-        variant: "destructive",
+      toast.error("Error Adding Reminder", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
 
   const handleEditItem = async (updatedItem: RecurringTransaction | Reminder) => {
     try {
+      
+      const loading = toast.loading("Updating Reminder...")
+
+      setIsDialogOpen(false)
       await editItem(updatedItem)
       await fetchData()
-      setIsDialogOpen(false)
       setEditingItem(null)
-      toast({
-        title: "Item updated",
-        description: `Successfully updated ${updatedItem.title}`,
+      toast.success("Reminder updated successfully", {
+        closeButton: true,
+        icon: "🔔",
+        duration: 4500,
+        id: loading,
       })
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update item",
-        variant: "destructive",
+      toast.error("Error Updating Reminder", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
 
   const handleDeleteItem = async (id: string) => {
     try {
+      const loading = toast.loading("Deleting Reminder...")
       await deleteItem(id)
       await fetchData()
-      toast({
-        title: "Item deleted",
-        description: "Successfully deleted the item",
+      toast.success("Reminder deleted successfully", {
+        closeButton: true,
+        icon: "🔔",
+        duration: 4500,
+        id: loading,
       })
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete item",
-        variant: "destructive",
+      toast.error("Error Deleting Reminder", {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
       })
     }
   }
