@@ -1,4 +1,5 @@
-/**
+
+"/recurring"/**
  *  An Array of routes that are accessible to public
  * These routes do not require aythentication
  * @type{string[]}
@@ -79,4 +80,5 @@ export const privateRoutes = [
   "/budget/fuel",
   "/budget/emi",
   "/group",
+  "/recurring"
 ]
