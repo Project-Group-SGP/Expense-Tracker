@@ -64,8 +64,8 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
           type: item.type,
           frequency:item.frequency as RecurringFrequency,
           customInterval: 'customInterval' in item ? Number(item.customInterval) ?? null : null,
-          startDate: 'startDate' in item ? new Date(item.startDate as string | number) : new Date(),
-          endDate: 'endDate' in item ? new Date(item.endDate as string | number) : null,
+          startDate: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
+          endDate: 'endDate' in item ? new Date(item.endDate as unknown as string | number) : null,
           lastProcessed: 'lastProcessed' in item ? new Date(item.lastProcessed as string | number | Date) : null,
           nextOccurrence: 'nextOccurrence' in item ? new Date(item.nextOccurrence as string | number | Date) : new Date(),
           reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
@@ -105,23 +105,44 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
 
 export async function editItem(item: RecurringTransaction | Reminder) {
   try {
+    console.log("Editing Item");
+    
+    // console.log(item);
+    
     if ('frequency' in item) {
       return await db.recurringTransaction.update({
         where: { id: item.id },
         data: {
-          ...item,
+          description: item.description ?? '',
+          title: 'title' in item ? item.title as string : '',
+          amount: item.amount,
           category: item.category as CategoryTypes | null,
+          type: item.type,
+          frequency: item.frequency as RecurringFrequency,
+          customInterval: 'customInterval' in item ? Number(item.customInterval) ?? null : null,
+          startDate: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
+          endDate: 'endDate' in item ? new Date(item.endDate as unknown as string | number) : null,
+          lastProcessed: 'lastProcessed' in item ? new Date(item.lastProcessed as string | number | Date) : null,
+          nextOccurrence: 'nextOccurrence' in item ? new Date(item.nextOccurrence as string | number | Date) : new Date(),
+          reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
         },
       })
     } else {
       return await db.reminder.update({
         where: { id: item.id },
         data: {
-          ...item,
+          title: 'title' in item ? item.title as string : '',
+          description: item.description ?? '',
+          amount: item.amount,
+          type: item.type,
+          dueDate: 'dueDate' in item ? new Date(item.dueDate as string | number | Date) : new Date(),
+          status: 'status' in item ? item.status as ReminderStatus : "PENDING",
           category: item.category as CategoryTypes | null,
         },
       })
+      // console.log("Item Edited Successfully");
     }
+    
   } catch (error) {
     console.error("Error updating item:", error)
     throw new Error("Failed to update item")

@@ -52,14 +52,19 @@ export default function RecurringTransactionsAndReminders() {
 
   const handleEditItem = async (updatedItem: RecurringTransaction | Reminder) => {
     try {
+      console.log("Updated Item");
+      
+      // console.log(updatedItem.id);
+      
       await editItem(updatedItem)
       await fetchData()
       setIsDialogOpen(false)
       setEditingItem(null)
       toast({
         title: "Item updated",
-        description: `Successfully updated ${updatedItem.description}`,
+        description: `Successfully updated ${updatedItem.title}`,
       })
+      console.log("Item Updated Successfully");
     } catch (error) {
       toast({
         title: "Error",

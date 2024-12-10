@@ -18,6 +18,7 @@ import {
   deleteItem 
 } from "./action"
 import { RecurringTransaction, Reminder } from "./_components/types"
+import { log } from "console"
 
 export default function RecurringTransactionsAndReminders() {
   const [transactions, setTransactions] = useState<RecurringTransaction[]>([])
@@ -58,6 +59,9 @@ export default function RecurringTransactionsAndReminders() {
 
   const handleEditItem = async (updatedItem: RecurringTransaction | Reminder) => {
     try {
+      console.log("Updating Item");
+      // console.log(updatedItem.id);
+      
       await editItem(updatedItem)
       await fetchData()
       setIsDialogOpen(false)
@@ -66,6 +70,7 @@ export default function RecurringTransactionsAndReminders() {
         title: "Item updated",
         description: `Successfully updated ${updatedItem.description}`,
       })
+      console.log("Item Updated Successfully");
     } catch (error) {
       toast({
         title: "Error",
