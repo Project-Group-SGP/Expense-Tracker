@@ -19,7 +19,7 @@ export const Reminders: React.FC<RemindersProps> = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Description</TableHead>
+          <TableHead>Title</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Due Date</TableHead>
@@ -30,7 +30,7 @@ export const Reminders: React.FC<RemindersProps> = ({
       <TableBody>
         {reminders.map((reminder) => (
           <TableRow key={reminder.id}>
-            <TableCell>{reminder.description}</TableCell>
+            <TableCell>{reminder.title}</TableCell>
             <TableCell>₹{reminder.amount.toFixed(2)}</TableCell>
             <TableCell>{reminder.category}</TableCell>
             <TableCell>{new Date(reminder.dueDate).toLocaleDateString()}</TableCell>

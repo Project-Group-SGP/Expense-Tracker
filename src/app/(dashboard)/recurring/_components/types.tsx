@@ -1,6 +1,7 @@
 export interface RecurringTransaction {
   id: string
   userId: string
+  title: string
   type: 'INCOME' | 'EXPENSE'
   amount: number
   description: string
@@ -19,6 +20,7 @@ export interface Reminder {
   id: string
   userId: string
   amount: number
+  title: string
   description: string
   dueDate: Date
   type: 'INCOME' | 'EXPENSE'

@@ -19,7 +19,7 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Description</TableHead>
+          <TableHead>Title</TableHead>
           <TableHead>Amount</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Frequency</TableHead>
@@ -30,7 +30,7 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
       <TableBody>
         {transactions.map((transaction) => (
           <TableRow key={transaction.id}>
-            <TableCell>{transaction.description}</TableCell>
+            <TableCell>{transaction.title}</TableCell>
             <TableCell>₹{transaction.amount.toFixed(2)}</TableCell>
             <TableCell>{transaction.category}</TableCell>
             <TableCell>{transaction.frequency}</TableCell>

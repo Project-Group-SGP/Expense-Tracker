@@ -58,6 +58,7 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
         data: {
           userId: user.id,
           description: item.description ?? '',
+          title: 'title' in item ? item.title as string : '',
           amount: item.amount,
           category: item.category as CategoryTypes | null,
           type: item.type,
@@ -81,6 +82,7 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
       const reminder = await db.reminder.create({
         data: {
           userId: user.id,
+          title: 'title' in item ? item.title as string : '',
           description: item.description ?? '',
           amount: item.amount,
           category: item.category as CategoryTypes | null,
