@@ -50,7 +50,7 @@ const formSchema = z.object({
   amount: z.number().positive({ message: "Amount must be positive" }),
   category: z.nativeEnum(CategoryTypes),
   description: z.string().optional(),
-  frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]).optional(),
+  frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY", "CUSTOM"]).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   dueDate: z.string().optional(),
@@ -67,9 +67,9 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onSubmit, isTransactio
       category: (item?.category as CategoryTypes) || CategoryTypes.Other,
       description: item?.description || "",
       frequency: (item as RecurringTransaction)?.frequency,
-      startDate: (item as RecurringTransaction)?.startDate?.toISOString().split("T")[0] || "",
-      endDate: (item as RecurringTransaction)?.endDate?.toISOString().split("T")[0] || "",
-      dueDate: (item as Reminder)?.dueDate?.toISOString().split("T")[0] || "",
+      startDate: (item as RecurringTransaction)?.startDate?.toISOString().split("T")[0] || undefined,
+      endDate: (item as RecurringTransaction)?.endDate?.toISOString().split("T")[0] || undefined,
+      dueDate: (item as Reminder)?.dueDate ? new Date((item as Reminder).dueDate).toISOString().split("T")[0] : undefined,
       isActive: (item as RecurringTransaction)?.isActive ?? true,
       status: (item as Reminder)?.status || "PENDING",
     },
@@ -85,6 +85,8 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onSubmit, isTransactio
           userId: (item as RecurringTransaction)?.userId || "",
           type: (item as RecurringTransaction)?.type || "EXPENSE",
           customInterval: (item as RecurringTransaction)?.customInterval,
+          startDate: data.startDate ? new Date(data.startDate) : undefined,
+          endDate: data.endDate ? new Date(data.endDate) : undefined,
           reminderEnabled: (item as RecurringTransaction)?.reminderEnabled || false,
           lastProcessed: (item as RecurringTransaction)?.lastProcessed,
           nextOccurrence: (item as RecurringTransaction)?.nextOccurrence || new Date(),
@@ -94,6 +96,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ item, onSubmit, isTransactio
           id: (item as Reminder)?.id || "",
           userId: (item as Reminder)?.userId || "",
           type: (item as Reminder)?.type || "EXPENSE",
+          dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         } as Reminder
 
     onSubmit(submittedItem)

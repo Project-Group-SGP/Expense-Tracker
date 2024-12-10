@@ -198,6 +198,7 @@ model Payment {
 model Reminder {
   id            String           @id @default(cuid())
   userId        String
+  title         String
   amount        Decimal
   description   String
   dueDate       DateTime
@@ -216,6 +217,7 @@ model RecurringTransaction {
   userId        String
   type          TransactionType
   amount        Decimal
+  title         String
   description   String?
   category      CategoryTypes?     
   startDate     DateTime

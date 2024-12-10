@@ -1,8 +1,14 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { RecurringTransaction, Reminder } from "./_components/types"
-import { CategoryTypes } from "@prisma/client"
+import { RecurringTransaction, Reminder 
+
+} from "./_components/types"
+import { CategoryTypes, ReminderStatus } from "@prisma/client"
+import { number } from "zod"
+import { RecurringFrequency } from "@prisma/client"
+import { log } from "util"
+import { currentUserServer } from "@/lib/auth"
 
 export async function getRecurringTransactions(): Promise<RecurringTransaction[]> {
   try {
@@ -38,25 +44,61 @@ export async function getReminders(): Promise<Reminder[]> {
 
 export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">) {
   try {
+    
+    const user = await currentUserServer()
+
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
     if ('frequency' in item) {
-      return await db.recurringTransaction.create({
+      console.log("Try to Adding reccurrent");
+      
+      const recurringTransaction = await db.recurringTransaction.create({
         data: {
-          ...item,
+          userId: user.id,
+          description: item.description ?? '',
+          amount: item.amount,
           category: item.category as CategoryTypes | null,
+          type: item.type,
+          frequency:item.frequency as RecurringFrequency,
+          customInterval: 'customInterval' in item ? Number(item.customInterval) ?? null : null,
+          startDate: 'startDate' in item ? new Date(item.startDate as string | number) : new Date(),
+          endDate: 'endDate' in item ? new Date(item.endDate as string | number) : null,
+          lastProcessed: 'lastProcessed' in item ? new Date(item.lastProcessed as string | number | Date) : null,
+          nextOccurrence: 'nextOccurrence' in item ? new Date(item.nextOccurrence as string | number | Date) : new Date(),
+          reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
+          // isActive: 'isActive' in item ? item.isActive as boolean : false,
         },
-      })
+      });
+      console.log(recurringTransaction);
+      
+      console.log("Reccurrent Added Successfully");
+      
     } else {
-      return await db.reminder.create({
+      console.log("Try to Adding reminder");
+      
+      const reminder = await db.reminder.create({
         data: {
-          ...item,
+          userId: user.id,
+          description: item.description ?? '',
+          amount: item.amount,
           category: item.category as CategoryTypes | null,
+          type: item.type,
+          dueDate: 'dueDate' in item ? new Date(item.dueDate as string | number | Date) : new Date(),
+          status: 'status' in item ? item.status as ReminderStatus : "PENDING",
         },
-      })
+      });
+      console.log(reminder);
+
+      console.log("Reminder Added Successfully");
+      
     }
   } catch (error) {
     console.error("Error adding item:", error)
     throw new Error("Failed to add item")
   }
+  
 }
 
 export async function editItem(item: RecurringTransaction | Reminder) {
