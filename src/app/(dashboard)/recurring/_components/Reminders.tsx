@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, Trash2, ChevronDown } from 'lucide-react'
+import { Edit, Trash2, ChevronDown, Info } from 'lucide-react'
 import { Reminder } from './types'
 import { 
   DropdownMenu, 
@@ -11,6 +11,12 @@ import {
   DropdownMenuContent, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface RemindersProps {
   reminders: Reminder[]
@@ -23,6 +29,7 @@ type ColumnVisibility = {
   category: boolean
   dueDate: boolean
   status: boolean
+  description: boolean
 }
 
 export const Reminders: React.FC<RemindersProps> = ({
@@ -33,12 +40,18 @@ export const Reminders: React.FC<RemindersProps> = ({
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     amount: true,
     category: false,
-    dueDate: false,
-    status: false
+    dueDate: true,
+    status: true,
+    description: true
   })
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({ ...prev, [column]: !prev[column] }))
+  }
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
   }
 
   return (
@@ -75,6 +88,12 @@ export const Reminders: React.FC<RemindersProps> = ({
             >
               Status
             </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={columnVisibility.description}
+              onCheckedChange={() => toggleColumn('description')}
+            >
+              Description
+            </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -87,9 +106,7 @@ export const Reminders: React.FC<RemindersProps> = ({
               {columnVisibility.category && <TableHead className="sm:table-cell">Category</TableHead>}
               {columnVisibility.dueDate && <TableHead className="sm:table-cell">Due Date</TableHead>}
               {columnVisibility.status && <TableHead className="sm:table-cell">Status</TableHead>}
-              <TableHead className="hidden sm:table-cell">Category</TableHead>
-              <TableHead className="hidden md:table-cell">Due Date</TableHead>
-              <TableHead className="hidden lg:table-cell">Status</TableHead>
+              {columnVisibility.description && <TableHead className="hidden md:table-cell">Description</TableHead>}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -98,21 +115,36 @@ export const Reminders: React.FC<RemindersProps> = ({
               <TableRow key={reminder.id}>
                 <TableCell className="font-medium">{reminder.title}</TableCell>
                 {columnVisibility.amount && (
-                  <TableCell className="sm:hidden">₹{reminder.amount.toFixed(2)}</TableCell>
+                  <TableCell>₹{reminder.amount.toFixed(2)}</TableCell>
                 )}
                 {columnVisibility.category && (
-                  <TableCell className="sm:hidden">{reminder.category}</TableCell>
+                  <TableCell>{reminder.category}</TableCell>
                 )}
                 {columnVisibility.dueDate && (
-                  <TableCell className="sm:hidden">{new Date(reminder.dueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(reminder.dueDate).toLocaleDateString()}</TableCell>
                 )}
                 {columnVisibility.status && (
-                  <TableCell className="sm:hidden">{reminder.status}</TableCell>
+                  <TableCell>{reminder.status}</TableCell>
                 )}
-                <TableCell className="hidden sm:table-cell">₹{reminder.amount.toFixed(2)}</TableCell>
-                <TableCell className="hidden sm:table-cell">{reminder.category}</TableCell>
-                <TableCell className="hidden md:table-cell">{new Date(reminder.dueDate).toLocaleDateString()}</TableCell>
-                <TableCell className="hidden lg:table-cell">{reminder.status}</TableCell>
+                {columnVisibility.description && (
+                  <TableCell className="hidden md:table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex items-center">
+                            <span className="mr-1">{truncateText(reminder.description || '', 20)}</span>
+                            {reminder.description && reminder.description.length > 20 && (
+                              <Info className="h-4 w-4" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{reminder.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                )}
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" size="icon" onClick={() => onEdit(reminder)}>

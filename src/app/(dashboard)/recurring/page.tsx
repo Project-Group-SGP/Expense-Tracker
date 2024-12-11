@@ -56,23 +56,39 @@ export default function RecurringTransactionsAndReminders() {
   const handleAddItem = async (newItem: RecurringTransaction | Reminder) => {
     
     try {
-      const loading = toast.loading("Adding Recurring transactions...")
+      let isFrequency = 'frequency' in newItem && newItem.frequency !== undefined;
+      let loading: any;
+      if (isFrequency) {
+        loading = toast.loading("Adding Recurring transactions...")
+      }else{
+        loading = toast.loading("Adding Reminder...")
+      }
+
       setIsDialogOpen(false)
       const response = await addItem(newItem)
       // console.log(response);
       
       await fetchData()
-      
+    
       if(response){
-        toast.success("Recurring transactions added successfully", {
-          closeButton: true,
-          icon: "♻️",
-          duration: 4500,
-          id: loading,
-        })
+        if(isFrequency){
+
+          toast.success("Recurring transactions added successfully", {
+            closeButton: true,
+            icon: "♻️",
+            duration: 4500,
+            id: loading,
+          })
+        }else{
+          toast.success("Reminder added successfully", {
+            closeButton: true,
+            icon: "🔔",
+            duration: 4500,
+            id: loading,
+          })
+        }
       }
 
-      
     } catch (error) {
       toast.error("Error Adding Recurring transactions", {
         closeButton: true,
@@ -86,19 +102,39 @@ export default function RecurringTransactionsAndReminders() {
     updatedItem: RecurringTransaction | Reminder
   ) => {
     try {
-      const loading = toast.loading("Updating Recurring transactions...")
+      let isFrequency = 'frequency' in updatedItem && updatedItem.frequency !== undefined;
+      // console.log(updatedItem);
+      
+      // console.log(isFrequency);
+      
+      let loading: any;
+      if (isFrequency) {
+        loading = toast.loading("Updating Recurring transactions...")
+      }else{
+        loading = toast.loading("Updating Reminder ...")
+      }
       setIsDialogOpen(false)
       await editItem(updatedItem)
       await fetchData()
       setEditingItem(null)
-      toast.success("Recurring transactions updated successfully", {
-        closeButton: true,
-        icon: "♻️",
-        duration: 4500,
-        id: loading,
-      })
+
+      if (isFrequency) {
+        toast.success("Recurring transactions updated successfully", {
+          closeButton: true,
+          icon: "♻️",
+          duration: 4500,
+          id: loading,
+        })
+      }else{
+        toast.success("Reminder updated successfully", {
+          closeButton: true,
+          icon: "🔔",
+          duration: 4500,
+          id: loading,
+        })
+      }
     } catch (error) {
-     toast.error("Error Updating Recurring transactions", {
+     toast.error("Error while Updating....", {
         closeButton: true,
         icon: "❌",
         duration: 4500,
@@ -108,15 +144,30 @@ export default function RecurringTransactionsAndReminders() {
 
   const handleDeleteItem = async (id: string) => {
     try {
-      const loading = toast.loading("Deleting Recurring transactions...")
+
+      let loading: any 
+      if(activeTab === "reminders"){
+        loading = toast.loading("Deleting Reminder...")
+      }else{
+        loading = toast.loading("Deleting Recurring transactions...")
+      }
       await deleteItem(id)
       await fetchData()
-      toast.success("Recurring transactions deleted successfully", {
-        closeButton: true,
-        icon: "♻️",
-        duration: 4500,
-        id: loading,
-      })
+      if(activeTab === "reminders"){
+        toast.success("Reminder deleted successfully", {
+          closeButton: true,
+          icon: "🔔",
+          duration: 4500,
+          id: loading,
+        })
+      }else{
+       toast.success("Recurring transactions deleted successfully", {
+          closeButton: true,
+          icon: "♻️",
+          duration: 4500,
+          id: loading,
+        })
+      }
     } catch (error) {
       toast.error("Error Deleting Recurring transactions", {
         closeButton: true,
@@ -127,7 +178,7 @@ export default function RecurringTransactionsAndReminders() {
   }
 
   return (
-    <div className="m">
+    <div className="m-2">
       <Card className="mx-auto mt-20 w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-xl sm:text-2xl">

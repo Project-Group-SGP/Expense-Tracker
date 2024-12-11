@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Check } from "lucide-react"
+import { Check } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 interface ItemFormProps {
@@ -56,18 +56,26 @@ const categoryEmojis = {
   [CategoryTypes.Groceries]: "🛍️",
 }
 
-const formSchema = z.object({
+const baseSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().optional(),
   amount: z.number().positive({ message: "Amount must be positive" }),
   category: z.nativeEnum(CategoryTypes),
-  description: z.string().optional(),
-  frequency: z
-    .enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY", "CUSTOM"])
-    .optional(),
+  isActive: z.boolean().optional(),
+})
+
+const transactionSchema = baseSchema.extend({
+  frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY", "CUSTOM"]),
+  customInterval: z.number().positive({ message: "Custom interval must be positive" }).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+}).refine(
+  (data) => data.frequency !== "CUSTOM" || data.customInterval,
+  { message: "Custom interval is required for custom frequency", path: ["customInterval"] }
+)
+
+const reminderSchema = baseSchema.extend({
   dueDate: z.string().optional(),
-  isActive: z.boolean(),
   status: z.enum(["PENDING", "COMPLETED", "CANCELLED"]).optional(),
 })
 
@@ -76,30 +84,31 @@ export const ItemForm: React.FC<ItemFormProps> = ({
   onSubmit,
   isTransaction,
 }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const formSchema = isTransaction ? transactionSchema : reminderSchema
+
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: item?.description || "",
+      title: item?.title || "",
+      description: item?.description || "",
       amount: item?.amount || 0,
       category: (item?.category as CategoryTypes) || CategoryTypes.Other,
-      description: item?.description || "",
-      frequency: (item as RecurringTransaction)?.frequency,
-      startDate:
-        (item as RecurringTransaction)?.startDate
-          ?.toISOString()
-          .split("T")[0] || undefined,
-      endDate:
-        (item as RecurringTransaction)?.endDate?.toISOString().split("T")[0] ||
-        undefined,
-      dueDate: (item as Reminder)?.dueDate
-        ? new Date((item as Reminder).dueDate).toISOString().split("T")[0]
-        : undefined,
-      isActive: (item as RecurringTransaction)?.isActive ?? true,
-      status: (item as Reminder)?.status || "PENDING",
+      ...(isTransaction ? {
+        frequency: (item as RecurringTransaction)?.frequency,
+        startDate: (item as RecurringTransaction)?.startDate?.toISOString().split("T")[0] || undefined,
+        endDate: (item as RecurringTransaction)?.endDate?.toISOString().split("T")[0] || undefined,
+        isActive: (item as RecurringTransaction)?.isActive ?? true,
+        customInterval: (item as RecurringTransaction)?.customInterval,
+      } : {
+        dueDate: (item as Reminder)?.dueDate 
+          ? new Date((item as Reminder).dueDate).toISOString().split("T")[0] 
+          : undefined,
+        status: (item as Reminder)?.status || "PENDING",
+      }),
     },
   })
 
-  const submitHandler = (data: z.infer<typeof formSchema>) => {
+  const submitHandler = (data: any) => {
     console.log(data)
 
     const submittedItem = isTransaction
@@ -108,14 +117,11 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           id: (item as RecurringTransaction)?.id || "",
           userId: (item as RecurringTransaction)?.userId || "",
           type: (item as RecurringTransaction)?.type || "EXPENSE",
-          customInterval: (item as RecurringTransaction)?.customInterval,
           startDate: data.startDate ? new Date(data.startDate) : undefined,
           endDate: data.endDate ? new Date(data.endDate) : undefined,
-          reminderEnabled:
-            (item as RecurringTransaction)?.reminderEnabled || false,
+          reminderEnabled: (item as RecurringTransaction)?.reminderEnabled || false,
           lastProcessed: (item as RecurringTransaction)?.lastProcessed,
-          nextOccurrence:
-            (item as RecurringTransaction)?.nextOccurrence || new Date(),
+          nextOccurrence: (item as RecurringTransaction)?.nextOccurrence || new Date(),
         } as RecurringTransaction)
       : ({
           ...data,
@@ -219,32 +225,58 @@ export const ItemForm: React.FC<ItemFormProps> = ({
               />
 
               {isTransaction && (
-                <FormField
-                  control={form.control}
-                  name="frequency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Frequency</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select frequency" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="DAILY">Daily</SelectItem>
-                          <SelectItem value="WEEKLY">Weekly</SelectItem>
-                          <SelectItem value="MONTHLY">Monthly</SelectItem>
-                          <SelectItem value="YEARLY">Yearly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                <>
+                  <FormField
+                    control={form.control}
+                    name="frequency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Frequency</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select frequency" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="DAILY">Daily</SelectItem>
+                            <SelectItem value="WEEKLY">Weekly</SelectItem>
+                            <SelectItem value="MONTHLY">Monthly</SelectItem>
+                            <SelectItem value="YEARLY">Yearly</SelectItem>
+                            <SelectItem value="CUSTOM">Custom</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch('frequency') === 'CUSTOM' && (
+                    <FormField
+                      control={form.control}
+                      name="customInterval"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Custom Interval (Days)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Enter custom interval"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
+                </>
               )}
 
               {isTransaction ? (
@@ -317,7 +349,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter description"
@@ -340,3 +372,4 @@ export const ItemForm: React.FC<ItemFormProps> = ({
     </Card>
   )
 }
+

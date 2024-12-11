@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, Trash2, ChevronDown } from 'lucide-react'
+import { Edit, Trash2, ChevronDown, Info } from 'lucide-react'
 import { RecurringTransaction } from './types'
 import { 
   DropdownMenu, 
@@ -11,6 +11,12 @@ import {
   DropdownMenuContent, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface RecurringTransactionsProps {
   transactions: RecurringTransaction[]
@@ -23,6 +29,7 @@ type ColumnVisibility = {
   category: boolean
   frequency: boolean
   nextOccurrence: boolean
+  description: boolean
 }
 
 export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
@@ -33,12 +40,18 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     amount: true,
     category: false,
-    frequency: false,
-    nextOccurrence: false
+    frequency: true,
+    nextOccurrence: true,
+    description: true
   })
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({ ...prev, [column]: !prev[column] }))
+  }
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
   }
 
   return (
@@ -75,6 +88,12 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
             >
               Next Occurrence
             </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={columnVisibility.description}
+              onCheckedChange={() => toggleColumn('description')}
+            >
+              Description
+            </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -83,14 +102,11 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[150px]">Title</TableHead>
-              {columnVisibility.amount && <TableHead className="sm:hidden">Amount</TableHead>}
-              {columnVisibility.category && <TableHead className="sm:hidden">Category</TableHead>}
-              {columnVisibility.frequency && <TableHead className="sm:hidden">Frequency</TableHead>}
-              {columnVisibility.nextOccurrence && <TableHead className="sm:hidden">Next Occurrence</TableHead>}
-              <TableHead className="hidden sm:table-cell">Amount</TableHead>
-              <TableHead className="hidden sm:table-cell">Category</TableHead>
-              <TableHead className="hidden md:table-cell">Frequency</TableHead>
-              <TableHead className="hidden lg:table-cell">Next Occurrence</TableHead>
+              {columnVisibility.amount && <TableHead className="sm:table-cell">Amount</TableHead>}
+              {columnVisibility.category && <TableHead className="sm:table-cell">Category</TableHead>}
+              {columnVisibility.frequency && <TableHead className="sm:table-cell">Frequency</TableHead>}
+              {columnVisibility.nextOccurrence && <TableHead className="sm:table-cell">Next Occurrence</TableHead>}
+              {columnVisibility.description && <TableHead className="hidden md:table-cell">Description</TableHead>}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -99,21 +115,36 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
               <TableRow key={transaction.id}>
                 <TableCell className="font-medium">{transaction.title}</TableCell>
                 {columnVisibility.amount && (
-                  <TableCell className="sm:hidden">₹{transaction.amount.toFixed(2)}</TableCell>
+                  <TableCell>₹{transaction.amount.toFixed(2)}</TableCell>
                 )}
                 {columnVisibility.category && (
-                  <TableCell className="sm:hidden">{transaction.category}</TableCell>
+                  <TableCell>{transaction.category}</TableCell>
                 )}
                 {columnVisibility.frequency && (
-                  <TableCell className="sm:hidden">{transaction.frequency}</TableCell>
+                  <TableCell>{transaction.frequency === "CUSTOM" ? `${transaction.customInterval} days` : transaction.frequency}</TableCell>
                 )}
                 {columnVisibility.nextOccurrence && (
-                  <TableCell className="sm:hidden">{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
                 )}
-                <TableCell className="hidden sm:table-cell">₹{transaction.amount.toFixed(2)}</TableCell>
-                <TableCell className="hidden sm:table-cell">{transaction.category}</TableCell>
-                <TableCell className="hidden md:table-cell">{transaction.frequency}</TableCell>
-                <TableCell className="hidden lg:table-cell">{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
+                {columnVisibility.description && (
+                  <TableCell className="hidden md:table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex items-center">
+                            <span className="mr-1">{truncateText(transaction.description || '', 20)}</span>
+                            {transaction.description && transaction.description.length > 20 && (
+                              <Info className="h-4 w-4" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{transaction.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                )}
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" size="icon" onClick={() => onEdit(transaction)}>
