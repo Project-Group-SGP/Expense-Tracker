@@ -58,6 +58,7 @@ export const apiRoutes = [
   "/api/get-group-transaction",
   "/api/balance",
   "/api/get-suggestion",
+  "/api/recurringTransaction"
 ]
 
 export const privateRoutes = [

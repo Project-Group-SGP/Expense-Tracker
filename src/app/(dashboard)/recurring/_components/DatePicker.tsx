@@ -14,7 +14,7 @@ import {
 
 interface DatePickerProps {
   date?: Date
-  setDate: (date: Date) => void
+  setDate: (date: Date ) => void
 }
 
 export function DatePicker({ date, setDate }: DatePickerProps) {
@@ -28,7 +28,7 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
             !date && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="h-4 w-4" />
           {date ? format(date, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
@@ -36,7 +36,13 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={(newDate) => newDate && setDate(newDate)}
+          onSelect={(newDate) => {
+            if (newDate) {
+              const updatedDate = new Date(newDate);
+              updatedDate.setDate(updatedDate.getDate() + 1);
+              setDate(updatedDate);
+            }
+          }}
           initialFocus
         />
       </PopoverContent>
