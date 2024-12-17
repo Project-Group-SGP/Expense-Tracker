@@ -112,7 +112,6 @@
 //     }
 //   }
 // }
-
 // const fetchGroupBalances = async (groupId: string,cookie: string):Promise<GetBalance[]> => {
 //   try {
 //     const res = await fetch(`${process.env.BASE_URL}/api/balance?groupId=${groupId}`,{

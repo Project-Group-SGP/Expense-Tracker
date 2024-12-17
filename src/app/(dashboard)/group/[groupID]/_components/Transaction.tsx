@@ -20,6 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
+  Trash2,
+  User,
 } from "lucide-react"
 import {
   Popover,
@@ -47,6 +49,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import DeleteGroupTransactionButton from "./delete-group-transaction-button"
 
 interface ExpenseSplit {
   userName: string
@@ -75,15 +78,17 @@ const columns = [
   { id: "paidBy", label: "Paid By", sortable: false },
   { id: "amount", label: "Amount", sortable: true },
   { id: "status", label: "Status", sortable: false },
-  { id: "action", label: "View split", sortable: false },
+  { id: "action", label: "Action", sortable: false },
 ]
 
 export default function Transaction({
   transactionsData,
   loading,
+  userId,
 }: {
   transactionsData: Transaction[]
   loading: boolean
+  userId: string
 }) {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null)
   const [showDetailed, setShowDetailed] = useState(false)
@@ -170,7 +175,6 @@ export default function Transaction({
   if (loading) {
     return <TransactionTableSkeleton />
   }
-
   return (
     <Card className="mx-auto w-full max-w-4xl bg-background">
       <CardHeader>
@@ -332,7 +336,7 @@ export default function Transaction({
                                 <TooltipTrigger asChild>
                                   <div className="flex cursor-pointer items-center space-x-1">
                                     <span className="max-w-[150px] truncate">
-                                      {transaction.description}
+                                      {transaction.description.slice(0,10)}
                                     </span>
                                     <Info className="h-4 w-4 text-muted-foreground" />
                                   </div>
@@ -378,6 +382,8 @@ export default function Transaction({
                       )}
                       {selectedColumns.includes("action") && (
                         <TableCell>
+                          <div className="flex items-center gap-2">
+                          <DeleteGroupTransactionButton groupId={transaction.groupId as string} transactionId={transaction.expenseId as string}  isCreator={transaction.paidById === userId ? true : false } canDelete={transaction.expenseSplits.filter(split => split.isPaid === "PAID").length === 1 ? true : false}/>
                           <Button
                             variant="outline"
                             size="sm"
@@ -402,6 +408,7 @@ export default function Transaction({
                               </>
                             )}
                           </Button>
+                          </div>
                         </TableCell>
                       )}
                     </TableRow>

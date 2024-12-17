@@ -157,7 +157,7 @@ export const GroupID = ({group,leave,transactionData,balance,name,groupMembers,u
           </div>
           <section className="text-bl grid w-full gap-4 transition-all grid-cols-1 lg:grid-cols-3">
             <Cardcontent className="border-none p-0 col-span-1 md:col-span-2 ">
-              <Transaction transactionsData={transactionData} loading={false}/>
+              <Transaction transactionsData={transactionData} loading={false} userId={user}/>
             </Cardcontent>
             <Cardcontent className="border-none p-0 w-full col-span-1 md:col-span-1">
               <GroupMember loading={false} balance={balance} />

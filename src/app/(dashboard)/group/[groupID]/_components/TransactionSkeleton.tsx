@@ -20,7 +20,7 @@ const columns = [
   { id: 'paidBy', label: 'Paid By', sortable: true },
   { id: 'amount', label: 'Amount', sortable: true },
   { id: 'status', label: 'Status', sortable: false },
-  { id: 'action', label: 'View split', sortable: false },
+  { id: 'action', label: 'Action', sortable: false },
 ];
 
 const SkeletonRow = () => (

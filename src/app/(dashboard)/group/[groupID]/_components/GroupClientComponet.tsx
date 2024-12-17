@@ -69,7 +69,7 @@ export default function GroupClientComponent({
         </div>
         <section className="text-bl grid w-full grid-cols-1 gap-4 transition-all lg:grid-cols-3">
           <Cardcontent className="col-span-1 border-none p-0 md:col-span-2">
-            <Transaction transactionsData={transactionData} loading={false} />
+            <Transaction transactionsData={transactionData} loading={false} userId={userId} />
           </Cardcontent>
           <Cardcontent className="col-span-1 w-full border-none p-0 shadow-none md:col-span-1">
             <GroupMember loading={false} balance={balance} />

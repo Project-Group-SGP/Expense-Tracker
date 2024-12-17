@@ -691,3 +691,60 @@ export async function getGroupTransactionData(
     return []
   }
 }
+
+
+export async function deleteGroupTransaction(groupId: string, expenseId: string) {
+  try {
+    // Validate input
+    if (!groupId || !expenseId) {
+      return { 
+        error: 'Invalid group or expense ID',
+        success: false 
+      };
+    }
+
+    // Perform the database operation
+    const expense = await db.groupExpense.findUnique({
+      where: {
+        id: expenseId,
+        groupId: groupId
+      }
+    });
+
+    // Check if expense exists and belongs to the group
+    if (!expense) {
+      return { 
+        error: 'Expense not found or does not belong to the specified group',
+        success: false 
+      };
+    }
+
+    // Delete associated expense splits
+    await db.expenseSplit.deleteMany({
+      where: {
+        expenseId: expenseId
+      }
+    });
+
+    // Delete the group expense
+    await db.groupExpense.delete({
+      where: {
+        id: expenseId
+      }
+    });
+
+    // Return success response
+    return { 
+      success: true,
+      error: null
+    };
+
+  } catch (error) {
+    // Log the error and return an error response
+    console.error('Error deleting group transaction:', error);
+    return { 
+      success: false,
+      error: error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}

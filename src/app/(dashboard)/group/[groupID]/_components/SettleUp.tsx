@@ -296,7 +296,7 @@ export function SettleUp({
     return selectedUserExpenses
       .filter((expense) => form.watch("selectedExpenses").includes(expense.id))
       .reduce((sum, expense) => sum + expense.amountToPay, 0)
-  }, [selectedUserExpenses, form.watch("selectedExpenses")])
+  }, [selectedUserExpenses,form.watch("selectedExpenses")])
 
   if (safeUsersYouNeedToPay.length === 0) {
     return (
@@ -337,7 +337,7 @@ export function SettleUp({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
           >
-            <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex  items-center justify-center flex-row space-x-4 space-y-0">
               <UserAvatar
                 user={
                   groupMemberName.find((u) => u.userId === user) ||
