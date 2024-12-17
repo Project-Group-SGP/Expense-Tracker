@@ -132,7 +132,7 @@ export const columns: ColumnDef<ResponceType>[] = [
                 <span className="max-w-[60px] sm:max-w-[150px] truncate">
                   {row.original.description}
                 </span>
-                <Info className="h-4 w-4 text-muted-foreground" />
+                {row.original.description.length > 20 && <Info className="h-4 w-4 text-muted-foreground" />}
               </div>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs p-2 bg-white text-black z-10 dark:bg-gray-950 dark:text-white">
