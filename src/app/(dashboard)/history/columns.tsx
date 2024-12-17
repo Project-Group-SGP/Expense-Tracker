@@ -121,28 +121,29 @@ export const columns: ColumnDef<ResponceType>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      //@ts-ignore
-      if (row.original.description === null) return <></>
-
+      if (!row.original.description) return <></>;
+  
+      const isTruncated = row.original.description.length > 10;
+  
       return (
         <TooltipProvider>
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
               <div className="flex cursor-pointer items-center space-x-1">
-                <span className="max-w-[60px] sm:max-w-[150px] truncate">
+                <span className={`max-w-[${isTruncated ? "60px" : "none"}] sm:max-w-[150px] truncate`}>
                   {row.original.description}
                 </span>
-                {row.original.description.length > 20 && <Info className="h-4 w-4 text-muted-foreground" />}
+                {isTruncated && <Info className="h-4 w-4 text-muted-foreground" />}
               </div>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs p-2 bg-white text-black z-10 dark:bg-gray-950 dark:text-white">
-                <p className="text-sm">
-                  {row.original.description}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-      )
+              <p className="text-sm">
+                {row.original.description}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
     },
   },
   {

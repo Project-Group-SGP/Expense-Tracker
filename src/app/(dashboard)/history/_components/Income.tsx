@@ -246,14 +246,14 @@ const formSchema = z.object({
 export type IncomeFormData = z.infer<typeof formSchema>
 
 interface NewIncomeProps {
-  onAdd: (data: IncomeFormData) => void;
+  onAdd: (data: IncomeFormData) => void
 }
 
 export function Newincome() {
   const [open, setOpen] = useState(false)
-  const [isPending, setisPending] = useState<boolean>(false);
+  const [isPending, setisPending] = useState<boolean>(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
   const form = useForm<IncomeFormData>({
     resolver: zodResolver(formSchema),
@@ -264,32 +264,32 @@ export function Newincome() {
     },
   })
 
-  const onAdd = async(data: IncomeFormData) => {
-    try{
-      const responce = await AddnewIncome(data);
-      if(responce==="success"){
+  const onAdd = async (data: IncomeFormData) => {
+    try {
+      const responce = await AddnewIncome(data)
+      if (responce === "success") {
         toast.success("Income added successfully", {
           closeButton: true,
           icon: "🤑",
           duration: 4500,
-        });
+        })
 
-        setOpen(false);
-        router.refresh();
-        form.reset();
-      }else{
+        setOpen(false)
+        router.refresh()
+        form.reset()
+      } else {
         throw new Error("Income not added")
       }
-    }catch(error){
-      console.error("Error adding expense:", error);
-      toast.error("Failed to add income");
+    } catch (error) {
+      console.error("Error adding expense:", error)
+      toast.error("Failed to add income")
     }
   }
 
-  const handleSubmit = async(data: IncomeFormData) => {
-    setisPending(true);
-    await onAdd(data);
-    setisPending(false);
+  const handleSubmit = async (data: IncomeFormData) => {
+    setisPending(true)
+    await onAdd(data)
+    setisPending(false)
   }
 
   return (
@@ -302,91 +302,101 @@ export function Newincome() {
           New Income 🤑
         </Button>
       </DialogTrigger>
-    
+
       <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
-            Create a new <span className="text-green-500">income</span> transaction
+            Create a new <span className="text-green-500">income</span>{" "}
+            transaction
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="mt-4 space-y-4"
+          >
             <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter amount"
+                      type="number"
+                      step="0.01"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter amount"
-                        type="number"
-                        step="0.01"
-                        {...field}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="transactionDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Transaction Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal sm:w-[240px]",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="transactionDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Transaction Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal sm:w-[240px]",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter className="mt-6 sm:mt-8">
-              <Button type="submit" variant='outline' className="w-full sm:w-auto border-green-500 text-green-500 hover:bg-green-700" disabled={isPending}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full border-green-500 text-green-500 hover:bg-green-700 sm:w-auto"
+                disabled={isPending}
+              >
                 {isPending ? "Adding..." : "Add new income"}
               </Button>
             </DialogFooter>

@@ -1,6 +1,8 @@
+<a href="https://trackwithspendwise.vercel.app" target="_blank">
 <p align="center">
   <img src="https://i.imgur.com/AOMmh8Z.jpg" width="1000" height="450" />
 </p>
+</a>
 
 <div align="center">
 
