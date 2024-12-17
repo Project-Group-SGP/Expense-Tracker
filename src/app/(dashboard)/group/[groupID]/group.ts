@@ -330,6 +330,161 @@ async function sendSettleUpNotification(
   }
 }
 
+// export async function AddGroupExpense(params: {
+//   groupID: string
+//   paidById: string
+//   title: string
+//   amount: number
+//   date: Date
+//   category: CategoryTypes
+//   splits: { userId: string; amount: number }[]
+// }) {
+//   const result = await db.$transaction(async (prisma) => {
+//     const user = await currentUserServer()
+//     if (!user) {
+//       throw new Error("Login Please")
+//     }
+
+//     const groupMembers = await prisma.groupMember.findMany({
+//       where: {
+//         groupId: params.groupID,
+//       },
+//     })
+
+//     if (!groupMembers.some((member) => member.userId === params.paidById)) {
+//       throw new Error("User is not a member of the group")
+//     }
+
+//     // Create the new expense record
+//     const newExpense = await prisma.groupExpense.create({
+//       data: {
+//         groupId: params.groupID,
+//         paidById: params.paidById,
+//         category: params.category,
+//         amount: params.amount,
+//         description: params.title,
+//         date: params.date,
+//         splits: {
+//           create: params.splits,
+//         },
+//       },
+//       include: {
+//         splits: true
+//       }
+//     })
+
+//     // Mark the split for the person who paid as PAID
+//     await prisma.expenseSplit.update({
+//       where: {
+//         expenseId_userId: {
+//           expenseId: newExpense.id,
+//           userId: params.paidById,
+//         },
+//       },
+//       data: {
+//         isPaid: "PAID",
+//       },
+//     })
+
+//     // Find all unsettled expense splits in the group
+//     const unsettledExpenseSplits = await prisma.expenseSplit.findMany({
+//       where: {
+//         isPaid: {
+//           not: "PAID"
+//         },
+//         expense: {
+//           groupId: params.groupID,
+//         },
+//       },
+//       include: {
+//         expense: true,
+//         user: true
+//       }
+//     })
+
+//     // Create a settlement matrix
+//     const settlementMatrix = new Map<string, number>()
+
+//     // Calculate net balances for each user
+//     for (const split of unsettledExpenseSplits) {
+//       const paidByKey = split.expense.paidById
+//       const owedToKey = split.userId
+//       const amount = Number(split.amount)
+
+//       // Adjust settlement matrix
+//       settlementMatrix.set(paidByKey, (settlementMatrix.get(paidByKey) || 0) + amount)
+//       settlementMatrix.set(owedToKey, (settlementMatrix.get(owedToKey) || 0) - amount)
+//     }
+
+//     // Identify and settle offsetting transactions
+//     const userBalances = Array.from(settlementMatrix.entries())
+//     userBalances.sort((a, b) => b[1] - a[1])
+
+//     while (userBalances.length > 0) {
+//       const [creditor, creditorBalance] = userBalances[0]
+//       const [debtor, debtorBalance] = userBalances[userBalances.length - 1]
+
+//       if (Math.abs(debtorBalance) < 0.01 || Math.abs(creditorBalance) < 0.01) {
+//         break
+//       }
+
+//       const settlementAmount = Math.min(Math.abs(debtorBalance), creditorBalance)
+
+//       // Find matching unsettled splits to update
+//       const matchingSplits = unsettledExpenseSplits.filter(
+//         split => (split.expense.paidById === debtor && split.userId === creditor) ||
+//                  (split.expense.paidById === creditor && split.userId === debtor)
+//       )
+
+//       // Update matching splits
+//       for (const split of matchingSplits) {
+//         const updateAmount = Math.min(settlementAmount, Number(split.amount))
+        
+//         if (updateAmount > 0) {
+//           await prisma.expenseSplit.update({
+//             where: { id: split.id },
+//             data: {
+//               isPaid: updateAmount === Number(split.amount) ? "PAID" : "PARTIALLY_PAID"
+//             }
+//           })
+
+//           // Update corresponding group expense status
+//           await prisma.groupExpense.update({
+//             where: { id: split.expenseId },
+//             data: {
+//               status: updateAmount === Number(split.amount) ? "SETTLED" : "PARTIALLY_SETTLED"
+//             }
+//           })
+//         }
+//       }
+
+//       // Update balances
+//       userBalances[0][1] -= settlementAmount
+//       userBalances[userBalances.length - 1][1] += settlementAmount
+
+//       // Resort and remove zero balance entries
+//       userBalances.sort((a, b) => b[1] - a[1])
+//       while (userBalances.length > 0 && Math.abs(userBalances[userBalances.length - 1][1]) < 0.01) {
+//         userBalances.pop()
+//       }
+//     }
+
+//      // Send notification
+//       sendExpenseNotification(
+//         params.groupID,
+//         newExpense.id,
+//         params.paidById,
+//         params.amount,
+//         params.title
+//       )
+
+//     revalidatePath(`/group/${params.groupID}`)
+//     return { success: true, expenseId: newExpense.id }
+//   })
+
+//   return result;
+// }
+
 export async function AddGroupExpense(params: {
   groupID: string
   paidById: string
@@ -339,7 +494,7 @@ export async function AddGroupExpense(params: {
   category: CategoryTypes
   splits: { userId: string; amount: number }[]
 }) {
-  const user = await currentUserServer()
+  const user = await currentUserServer();
 
   if (!user) {
     throw new Error("Login Please")
@@ -392,9 +547,6 @@ export async function AddGroupExpense(params: {
   )
 
   revalidatePath(`/group/${params.groupID}`)
-  // revalidateTag("getGroupTransactiondata")
-  // revalidateTag("getGroupBalance")
-  // revalidateTag("getGroupdata")
 
   return { success: true }
 }

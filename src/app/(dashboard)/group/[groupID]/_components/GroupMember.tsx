@@ -92,7 +92,7 @@ export const GroupMember = ({ loading, balance }: GroupMemberProps) => {
             avatar={member.avatar}
             userId={member.userId}
             detailedBalance={member.detailedBalance.map((user)=>{ return {...user,avatar:balance.map((bal)=>
-              user.userId===bal.userId? bal.avatar : ""  )[0]}})}
+              user.userId === bal.userId ?bal.avatar : ""  )[0]}})}
           />
         ))}
         {loading && (

@@ -202,8 +202,9 @@ export default function Transaction({
               Show
             </label>
           </div>
+          <div className="hidden sm:block">
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-            <PopoverTrigger asChild>
+          <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className="mt-0 border-primary/20 bg-primary/10 text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/20 hover:text-primary"
@@ -253,12 +254,17 @@ export default function Transaction({
               </div>
             </PopoverContent>
           </Popover>
-          {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
+          </div>
+          <div className="sm:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                      variant="outline"
+                      className="mt-0 w-full border-primary/20 bg-primary/10 px-3 py-2 text-sm text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/20 hover:text-primary sm:w-auto sm:text-base"
+                    >
+                      Simple View
+                </Button>
+            </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {columns
               .map((column) => {
@@ -266,7 +272,7 @@ export default function Transaction({
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
-                    checked={selectedColumns.filter(col=> col.id===column.id)}
+                    checked={selectedColumns.filter(col=> col === column.id).length===1 }
                     onCheckedChange={(value) =>
                       toggleColumn(column.id)
                     }
@@ -276,7 +282,8 @@ export default function Transaction({
                 )
               })}
           </DropdownMenuContent>
-        </DropdownMenu> */}
+        </DropdownMenu>
+        </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -383,7 +390,7 @@ export default function Transaction({
                       {selectedColumns.includes("action") && (
                         <TableCell>
                           <div className="flex items-center gap-2">
-                          <DeleteGroupTransactionButton groupId={transaction.groupId as string} transactionId={transaction.expenseId as string}  isCreator={transaction.paidById === userId ? true : false } canDelete={transaction.expenseSplits.filter(split => split.isPaid === "PAID").length === 1 ? true : false}/>
+                          <DeleteGroupTransactionButton groupId={transaction.groupId as string} transactionId={transaction.expenseId as string}  isCreator={transaction.paidById === userId ? true : false } canDelete={transaction.expenseSplits.filter(split => split.isPaid === "PAID").length === 1}/>
                           <Button
                             variant="outline"
                             size="sm"
