@@ -11,8 +11,16 @@ import { log } from "util"
 import { currentUserServer } from "@/lib/auth"
 
 export async function getRecurringTransactions(): Promise<RecurringTransaction[]> {
+  const user = await currentUserServer();
   try {
-    const result = await db.recurringTransaction.findMany()
+    const result = await db.recurringTransaction.findMany({
+      where: {
+        userId: user?.id,
+      },
+      include: {
+        user: true,
+      },
+    })
     return result.map((transaction) => ({
       ...transaction,
       amount: Number(transaction.amount),
@@ -29,8 +37,19 @@ export async function getRecurringTransactions(): Promise<RecurringTransaction[]
 }
 
 export async function getReminders(): Promise<Reminder[]> {
+   const user = await currentUserServer(); 
   try {
-    const result = await db.reminder.findMany()
+    const result = await db.reminder.findMany(
+      {
+        where: {
+          userId: user?.id,
+          status: "PENDING",
+        },
+        include: {
+          user: true,
+        },
+      }
+    )
     return result.map((reminder) => ({
       ...reminder,
       amount: Number(reminder.amount),
@@ -67,7 +86,7 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
           startDate: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
           endDate: 'endDate' in item ? new Date(item.endDate as unknown as string | number) : null,
           lastProcessed: 'lastProcessed' in item ? new Date(item.lastProcessed as string | number | Date) : null,
-          nextOccurrence: 'nextOccurrence' in item ? new Date(item.nextOccurrence as string | number | Date) : new Date(),
+          nextOccurrence: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
           reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
           // isActive: 'isActive' in item ? item.isActive as boolean : false,
         },

@@ -1,5 +1,4 @@
-
-"/recurring"/**
+/**
  *  An Array of routes that are accessible to public
  * These routes do not require aythentication
  * @type{string[]}
@@ -10,6 +9,7 @@ export const publicRoutes = [
   "/auth/new-verification",
   "/api/sendMonthlyMail",
   "/api/sendRemainder",
+  "/api/recurringTransaction"
 ]
 
 /**
@@ -58,7 +58,6 @@ export const apiRoutes = [
   "/api/get-group-transaction",
   "/api/balance",
   "/api/get-suggestion",
- 
 ]
 
 export const privateRoutes = [
