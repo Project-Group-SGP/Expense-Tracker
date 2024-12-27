@@ -12,7 +12,7 @@ import {
 import { RecurringTransactions } from "./_components/RecurringTransactions"
 import { Reminders } from "./_components/Reminders"
 import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
+import { PlusCircle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,7 @@ import {
 } from "./action"
 import { RecurringTransaction, Reminder } from "./_components/types"
 import { toast } from "sonner"
+import { SkeletonLoader } from "./_components/SkeletonLoader"
 
 export default function RecurringTransactionsAndReminders() {
   const [transactions, setTransactions] = useState<RecurringTransaction[]>([])
@@ -41,16 +42,19 @@ export default function RecurringTransactionsAndReminders() {
   const [activeTab, setActiveTab] = useState<"transactions" | "reminders">(
     "transactions"
   )
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     fetchData()
   }, [])
 
   const fetchData = async () => {
+    setIsLoading(true)
     const fetchedTransactions = await getRecurringTransactions()
     const fetchedReminders = await getReminders()
     setTransactions(fetchedTransactions)
     setReminders(fetchedReminders)
+    setIsLoading(false)
   }
 
   const handleAddItem = async (newItem: RecurringTransaction | Reminder) => {
@@ -217,24 +221,32 @@ export default function RecurringTransactionsAndReminders() {
               </Button>
             </div>
             <TabsContent value="transactions">
-              <RecurringTransactions
-                transactions={transactions}
-                onEdit={(item) => {
-                  setEditingItem(item)
-                  setIsDialogOpen(true)
-                }}
-                onDelete={handleDeleteItem}
-              />
+              {isLoading ? (
+                <SkeletonLoader />
+              ) : (
+                <RecurringTransactions
+                  transaction={transactions}
+                  onEdit={(item) => {
+                    setEditingItem(item)
+                    setIsDialogOpen(true)
+                  }}
+                  onDelete={handleDeleteItem}
+                />
+              )}
             </TabsContent>
             <TabsContent value="reminders">
-              <Reminders
-                reminders={reminders}
-                onEdit={(item) => {
-                  setEditingItem(item)
-                  setIsDialogOpen(true)
-                }}
-                onDelete={handleDeleteItem}
-              />
+              {isLoading ? (
+                <SkeletonLoader />
+              ) : (
+                <Reminders
+                  reminders={reminders}
+                  onEdit={(item) => {
+                    setEditingItem(item)
+                    setIsDialogOpen(true)
+                  }}
+                  onDelete={handleDeleteItem}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -265,3 +277,4 @@ export default function RecurringTransactionsAndReminders() {
     </div>
   )
 }
+

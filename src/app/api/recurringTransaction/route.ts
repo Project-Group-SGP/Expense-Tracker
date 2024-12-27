@@ -3,227 +3,442 @@ import nodemailer from "nodemailer"
 import { db } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
-  //get reminder data
-  const reminderData = await fetchReminderData()
-
-  //get recurring transaction data which have next occurrence after 2 days
-  const recurringTransactionData = await fetchRecurringTransactionData()
-
-  console.log("reminderData")
-  console.log(reminderData)
-
-  console.log("recurringTransactionData")
-  console.log(recurringTransactionData)
-
-  try {
-    // Sending reminder emails
-    await sendEmails(reminderData)
-  } catch (error) {
-    console.error("Failed to send reminder emails:", error)
+  console.log("[Cron] Starting recurring transaction reminder job:", new Date().toISOString())
+  
+  const authHeader = request.headers.get("authorization")
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.error("[Cron] Unauthorized attempt to run transaction reminder")
+    return new Response("Unauthorized", { status: 401 })
   }
 
   try {
-    // Sending recurring transaction emails
-    await sendEmails(recurringTransactionData)
+    const startTime = Date.now()
+    
+    // Fetch required data
+    const [reminderData, recurringTransactionData] = await Promise.all([
+      fetchReminderData(),
+      fetchRecurringTransactionData()
+    ])
+
+    console.log(`[Cron] Processing ${reminderData.length} reminders and ${recurringTransactionData.length} transactions`)
+
+    // Execute operations
+    await Promise.all([
+      sendEmails(reminderData, recurringTransactionData),
+      setNextOccurrence(),
+      setReminderStatus()
+    ])
+
+    const duration = Date.now() - startTime
+    console.log(`[Cron] Job completed successfully in ${duration}ms`)
+    
+    return NextResponse.json({
+      success: true,
+      message: "Reminders processed successfully",
+      stats: {
+        reminders: reminderData.length,
+        transactions: recurringTransactionData.length,
+        duration
+      }
+    })
+
   } catch (error) {
-    console.error("Failed to send recurring transaction emails:", error)
+    console.error("[Cron] Job failed:", error)
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    )
   }
-
-  console.log("Emails sent successfully")
-
-  return NextResponse.json({ message: "Mail sent successfully" })
 }
+
 // get reminder data
 async function fetchReminderData() {
-    const startOfTargetDate = new Date();
-    startOfTargetDate.setDate(startOfTargetDate.getDate() + 2);
-    startOfTargetDate.setHours(0, 0, 0, 0); // Start of the target day
-    const endOfTargetDate = new Date(startOfTargetDate);
-    endOfTargetDate.setHours(23, 59, 59, 999); // End of the target day
-  
-    const reminderData = await db.reminder.findMany({
-      where: {
-        status: "PENDING",
-        dueDate: {
-          gte: startOfTargetDate,
-          lte: endOfTargetDate,
-        },
+  const startOfTargetDate = new Date()
+  startOfTargetDate.setDate(startOfTargetDate.getDate() + 2)
+  startOfTargetDate.setHours(0, 0, 0, 0) // Start of the target day
+  const endOfTargetDate = new Date(startOfTargetDate)
+  endOfTargetDate.setHours(23, 59, 59, 999) // End of the target day
+
+  const reminderData = await db.reminder.findMany({
+    where: {
+      status: "PENDING",
+      dueDate: {
+        gte: startOfTargetDate,
+        lte: endOfTargetDate,
       },
-      include: {
-        user: true,
-      },
-    });
-  
-    return reminderData;
-  }
-  
-  // get recurring transaction data
-  async function fetchRecurringTransactionData() {
-    const startOfTargetDate = new Date();
-    startOfTargetDate.setDate(startOfTargetDate.getDate() + 2);
-    startOfTargetDate.setHours(0, 0, 0, 0); // Start of the target day
-    const endOfTargetDate = new Date(startOfTargetDate);
-    endOfTargetDate.setHours(23, 59, 59, 999); // End of the target day
-  
-    const recurringTransactionData = await db.recurringTransaction.findMany({
-      where: {
-        nextOccurrence: {
-          gte: startOfTargetDate,
-          lte: endOfTargetDate,
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
-  
-    return recurringTransactionData;
-  }
-  
-  // Group reminders and recurring transactions by user
-  function groupByUser(reminders, recurringTransactions) {
-    const groupedData = {};
-  
-    reminders.forEach(reminder => {
-      if (!groupedData[reminder.user.email]) {
-        groupedData[reminder.user.email] = { reminders: [], recurringTransactions: [] };
-      }
-      groupedData[reminder.user.email].reminders.push(reminder);
-    });
-  
-    recurringTransactions.forEach(transaction => {
-      if (!groupedData[transaction.user.email]) {
-        groupedData[transaction.user.email] = { reminders: [], recurringTransactions: [] };
-      }
-      groupedData[transaction.user.email].recurringTransactions.push(transaction);
-    });
-  
-    return groupedData;
-  }
-  
-  // Create a transporter
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD,
     },
-  });
-  
-  // Send email to users
-  async function sendEmails(groupedData) {
-    for (const userEmail in groupedData) {
-      const user = groupedData[userEmail];
-      const emailContent = generateEmailContent(user);
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: userEmail,
-        subject: "SpendWise - Reminder and Recurring Transaction",
-        html: emailContent,
-      };
-  
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email sent to ${userEmail}`);
-      } catch (error) {
-        console.error(`Failed to send email to ${userEmail}:`, error);
+    include: {
+      user: true,
+    },
+  })
+
+  // format reminder data
+  function formatReminders(reminderData) {
+    return reminderData.map((reminder) => ({
+      email: reminder.user.email,
+      name: reminder.user.name,
+      title: reminder.title,
+      amount: `₹${reminder.amount}`,
+      description: reminder.description,
+      dueDate: new Date(reminder.dueDate).toLocaleDateString(),
+    }))
+  }
+
+  return formatReminders(reminderData)
+}
+
+// get recurring transaction data
+async function fetchRecurringTransactionData() {
+  const startOfTargetDate = new Date()
+  startOfTargetDate.setDate(startOfTargetDate.getDate() + 2)
+  startOfTargetDate.setHours(0, 0, 0, 0) // Start of the target day
+  const endOfTargetDate = new Date(startOfTargetDate)
+  endOfTargetDate.setHours(23, 59, 59, 999) // End of the target day
+
+  // get recurring transaction data if it has next occurrence after 2 days
+  // and is active (true)
+  const recurringTransactionData = await db.recurringTransaction.findMany({
+    where: {
+      nextOccurrence: {
+        gte: startOfTargetDate,
+        lte: endOfTargetDate,
+      },
+      isActive: true,
+    },
+    include: {
+      user: true,
+    },
+  })
+
+  // format recurring transaction data
+  function formatRecurringTransactions(recurringTransactionData) {
+    return recurringTransactionData.map((transaction) => ({
+      email: transaction.user.email,
+      name: transaction.user.name,
+      title: transaction.title,
+      amount: `₹${transaction.amount}`,
+      description: transaction.description,
+      category: transaction.category,
+      nextOccurrence: new Date(transaction.nextOccurrence).toLocaleDateString(),
+      frequency:
+        transaction.frequency === "CUSTOM"
+          ? `Every ${transaction.customInterval} days`
+          : transaction.frequency,
+    }))
+  }
+
+  return formatRecurringTransactions(recurringTransactionData)
+}
+
+async function sendEmails(reminderData, recurringTransactionData) {
+  const groupedData = {}
+
+  // Group reminders by email
+  reminderData.forEach((reminder) => {
+    const { email, name, title, amount, description, dueDate } = reminder
+    if (!groupedData[email]) {
+      groupedData[email] = {
+        name,
+        reminders: [],
+        recurringTransactions: [],
       }
     }
+    groupedData[email].reminders.push({
+      title,
+      amount,
+      description,
+      dueDate,
+    })
+  })
+
+  // Group recurring transactions by email
+  recurringTransactionData.forEach((transaction) => {
+    const {
+      email,
+      name,
+      title,
+      amount,
+      description,
+      category,
+      nextOccurrence,
+      frequency,
+    } = transaction
+    if (!groupedData[email]) {
+      groupedData[email] = {
+        name,
+        reminders: [],
+        recurringTransactions: [],
+      }
+    }
+    groupedData[email].recurringTransactions.push({
+      title,
+      amount,
+      description,
+      category,
+      nextOccurrence,
+      frequency,
+    })
+  })
+
+  // Create a transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+})
+  // Send emails
+  for (const email in groupedData) {
+    const user = groupedData[email]
+
+    const emailContent = generateEmailContent(user) // Generate email HTML content
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: `Your Notifications - ${user.name}`,
+      html: emailContent,
+    }
+
+    try {
+      await transporter.sendMail(mailOptions)
+      console.log(`Email sent to ${email}`)
+    } catch (error) {
+      console.error(`Failed to send email to ${email}:`, error)
+    }
   }
-  
-  // Generate email content
-  function generateEmailContent(user) {
-    const remindersContent = user.reminders
-      .map(
-        reminder => `
-          <tr>
-            <td>${reminder.title}</td>
-            <td>₹${reminder.amount}</td>
-            <td>${new Date(reminder.dueDate).toLocaleDateString()}</td>
-            <td>${reminder.description}</td>
-          </tr>
-        `
-      )
-      .join("");
-  
-    const recurringTransactionsContent = user.recurringTransactions
-      .map(
-        transaction => `
-          <tr>
-            <td>${transaction.title}</td>
-            <td>₹${transaction.amount}</td>
-            <td>${new Date(transaction.nextOccurrence).toLocaleDateString()}</td>
-            <td>${transaction.category}</td>
-            <td>${transaction.frequency}</td>
-          </tr>
-        `
-      )
-      .join("");
-  
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; }
-          .container { padding: 20px; max-width: 600px; margin: auto; background-color: #f4f4f4; }
-          .header { font-size: 20px; font-weight: bold; margin-bottom: 20px; }
-          .info { font-size: 16px; margin-bottom: 10px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #ddd; }
-          th { background-color: #f2f2f2; font-weight: bold; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <p class="header">Hello ${user.reminders[0].user.name},</p>
-          <p class="info">You have the following reminders and recurring transactions:</p>
-  
-          <h3>Upcoming Reminders:</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Amount</th>
-                <th>Due Date</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${remindersContent}
-            </tbody>
-          </table>
-  
-          <h3>Upcoming Recurring Transactions:</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Amount</th>
-                <th>Next Occurrence</th>
-                <th>Category</th>
-                <th>Frequency</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${recurringTransactionsContent}
-            </tbody>
-          </table>
-  
-          <p>Please make sure to complete the payments and review your recurring transactions.</p>
+}
+
+// Helper function to generate email content
+function generateEmailContent(user) {
+  // Inline styles for email compatibility
+  const content = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SpendWise Reminder</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #fbfcfc">
+        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px;">
+            <!-- Logo -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" style="width: 120px; height: auto;">
+            </div>
+
+            <!-- Header -->
+            <h1 style="color: #4CAF50; text-align: center; margin-bottom: 30px; font-size: 28px;">Recurring Transaction Reminder</h1>
+            
+            <!-- Greeting -->
+            <p style="font-weight: bold; margin-bottom: 20px; font-size: 18px;">Hi ${user.name},</p>
+            <p>This is a reminder about your upcoming recurring payment:</p>
+
+            <!-- Highlight Box -->
+            <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
+                <p style="margin: 0;">Your next payment is due in <strong>2 days</strong></p>
+            </div>
+
+            ${user.reminders && user.reminders.length > 0 
+              ? `
+                <!-- Reminders Table -->
+                <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">Reminders</h2>
+                <div style="overflow-x: auto; margin: 20px 0;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background-color: #e8f5e9;">
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Title</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Due Date</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Category</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${user.reminders.map(reminder => `
+                                <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 12px 15px;">${reminder.title}</td>
+                                    <td style="padding: 12px 15px;">₹${reminder.amount}</td>
+                                    <td style="padding: 12px 15px;">${reminder.dueDate}</td>
+                                    <td style="padding: 12px 15px;">${reminder.category}</td>
+                                    <td style="padding: 12px 15px;">${reminder.description}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+              `
+              : `
+                <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
+                    <p style="margin: 0;">No reminders at the moment.</p>
+                </div>
+              `
+            }
+
+            ${user.recurringTransactions && user.recurringTransactions.length > 0
+              ? `
+                <!-- Recurring Transactions Table -->
+                <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">Recurring Transactions</h2>
+                <div style="overflow-x: auto; margin: 20px 0;">
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background-color: #e8f5e9;">
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Next Occurrence</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Frequency</th>
+                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${user.recurringTransactions.map(transaction => `
+                                <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
+                                    <td style="padding: 12px 15px;">${transaction.title}</td>
+                                    <td style="padding: 12px 15px;">₹${transaction.amount}</td>
+                                    <td style="padding: 12px 15px;">${transaction.nextOccurrence}</td>
+                                    <td style="padding: 12px 15px;">${transaction.frequency}</td>
+                                    <td style="padding: 12px 15px;">${transaction.category}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+              `
+              : `
+                <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
+                    <p style="margin: 0;">No recurring transactions found.</p>
+                </div>
+              `
+            }
+
+            <!-- Instructions -->
+            <p>This is an automated reminder for your recurring expense. Please ensure to:</p>
+            <ul style="padding-left: 20px;">
+                <li style="margin-bottom: 10px;">Review the payment details</li>
+                <li style="margin-bottom: 10px;">Mark as paid once you've completed the transaction</li>
+                <li style="margin-bottom: 10px;">Update any changes in the recurring schedule if needed</li>
+            </ul>
+
+            <!-- Footer -->
+            <div style="margin-top: 30px; text-align: center; font-size: 14px; color: #666; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                <p style="margin: 5px 0;">SpendWise - Helping you manage your recurring expenses wisely</p>
+                <p style="margin: 5px 0;">You're receiving this because you set up a recurring transaction reminder.</p>
+            </div>
         </div>
-      </body>
-      </html>
-    `;
+    </body>
+    </html>
+  `
+
+  return content
+}
+
+// set next occurrence for recurring transaction according to frequency
+async function setNextOccurrence() {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    const endOfToday = new Date(today);
+    endOfToday.setHours(23, 59, 59, 999); // End of today
+
+    const recurringTransactions = await db.recurringTransaction.findMany({
+      where: {
+        nextOccurrence: {
+          gte: today,
+          lte: endOfToday,
+        },
+      },
+    });
+
+    console.log(`Found ${recurringTransactions.length} recurring transactions for today.`);
+
+    const updates: { id: string; data: { nextOccurrence: Date; lastProcessed : Date } }[] = [];
+
+    for (const transaction of recurringTransactions) {
+      if (!transaction.isActive) {
+        console.log(`Skipping inactive transaction: ${transaction.id}`);
+        continue;
+      }
+
+      const { frequency, customInterval } = transaction;
+      const nextOccurrence = new Date(transaction.nextOccurrence);
+
+      switch (frequency) {
+        case "DAILY":
+          nextOccurrence.setDate(nextOccurrence.getDate() + 1);
+          break;
+        case "WEEKLY":
+          nextOccurrence.setDate(nextOccurrence.getDate() + 7);
+          break;
+        case "MONTHLY":
+          nextOccurrence.setMonth(nextOccurrence.getMonth() + 1);
+          break;
+        case "YEARLY":
+          nextOccurrence.setFullYear(nextOccurrence.getFullYear() + 1);
+          break;
+        case "CUSTOM":
+          if (!customInterval) {
+            console.error(`No custom interval set for transaction: ${transaction.id}`);
+            throw new Error(`Missing custom interval for transaction: ${transaction.id}`);
+          }
+          nextOccurrence.setDate(nextOccurrence.getDate() + customInterval);
+          break;
+        default:
+          console.error(`Unknown frequency: ${frequency} for transaction: ${transaction.id}`);
+          throw new Error(`Unknown frequency: ${frequency}`);
+      }
+
+      updates.push({
+        id: transaction.id,
+        data: {
+          nextOccurrence,
+          lastProcessed : new Date(),
+        },
+      });
+    }
+
+    // Perform updates in a batch
+    for (const update of updates) {
+      await db.recurringTransaction.update({
+        where: { id: update.id },
+        data: update.data,
+      });
+    }
+
+    console.log(`Updated ${updates.length} recurring transactions.`);
+  } catch (error) {
+    console.error("Error in setNextOccurrence:", error);
+    throw error; // Re-throw to allow higher-level error handling if needed
   }
-  
-  // Main function to fetch data and send emails
-  async function main() {
-    const reminders = await fetchReminderData();
-    const recurringTransactions = await fetchRecurringTransactionData();
-    const groupedData = groupByUser(reminders, recurringTransactions);
-    await sendEmails(groupedData);
+}
+
+
+// set Reminder status to COMPLETED
+async function setReminderStatus() {
+  try {
+    const startOfTargetDate = new Date()
+    // startOfTargetDate.setDate(startOfTargetDate.getDate() + 2)
+    startOfTargetDate.setHours(0, 0, 0, 0) // Start of the target day
+    const endOfTargetDate = new Date(startOfTargetDate)
+    endOfTargetDate.setHours(23, 59, 59, 999) // End of the target day
+
+    try {
+      const recurringTransactions = await db.reminder.updateMany({
+          where: { 
+              dueDate: { 
+                  gte: startOfTargetDate, 
+                  lte: endOfTargetDate 
+              } 
+          },
+          data: { status : "COMPLETED" }
+      });
+      console.log(` ${recurringTransactions.count} Reminder updated.`);
+  } catch (error) {
+      console.error("Error updating transactions:", error);
   }
-  
-  main().catch(console.error);
-  
+
+  } catch (error) {
+    console.error("Error in setReminderStatus:", error);
+    throw error; // Re-throw to allow higher-level error handling if needed
+  }  
+}

@@ -12,6 +12,8 @@ import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
 import { generateFinancialAdvice } from "./actions"
 import AIInsight from "./_components/AIInsight"
+import { Button } from "react-day-picker"
+import { RecurringButton } from "./_components/RecurringButton"
 
 type FinancialData = {
   amount: number
@@ -20,15 +22,12 @@ type FinancialData = {
 const getTotalIncome = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(
-        `${process.env.BASE_URL}/api/totalIncome`,
-        {
-          method: "GET",
-          headers: { Cookie: cookie },
-          next: { tags: ["totalIncome"] },
-          cache: "force-cache",
-        }
-      )
+      const res = await fetch(`${process.env.BASE_URL}/api/totalIncome`, {
+        method: "GET",
+        headers: { Cookie: cookie },
+        next: { tags: ["totalIncome"] },
+        cache: "force-cache",
+      })
       if (!res.ok) throw new Error("Failed to fetch total income")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -41,15 +40,12 @@ const getTotalIncome = cache(
 const getTotalExpense = cache(
   async (id: string, cookie: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(
-        `${process.env.BASE_URL}/api/totalExpense`,
-        {
-          method: "GET",
-          headers: { Cookie: cookie },
-          next: { tags: ["totalExpense"] },
-          cache: "force-cache",
-        }
-      )
+      const res = await fetch(`${process.env.BASE_URL}/api/totalExpense`, {
+        method: "GET",
+        headers: { Cookie: cookie },
+        next: { tags: ["totalExpense"] },
+        cache: "force-cache",
+      })
       if (!res.ok) throw new Error("Failed to fetch total expense")
       const data = await res.json()
       return { amount: Number(data) || 0 }
@@ -143,7 +139,7 @@ export default async function Dashboard({
 
   return (
     <Suspense>
-      <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4 relative">
+      <div className="relative mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
           <PageTitle title="Dashboard" />
 
@@ -156,9 +152,10 @@ export default async function Dashboard({
               </span>
               👋
             </p>
-            <div className="ml-auto flex gap-2">
+            <div className="mt-4 flex w-full flex-col items-stretch gap-2 sm:mt-0 sm:w-auto sm:flex-row sm:items-center">
               <Newincome />
               <NewExpense />
+              <RecurringButton />
             </div>
           </div>
 
@@ -191,8 +188,8 @@ export default async function Dashboard({
 
           <DateSelect />
 
-          <section className="w-full space-y-4 md:space-y-0 md:space-x-4 md:flex">
-            <Cardcontent className="w-full md:w-1/2 p-4">
+          <section className="w-full space-y-4 md:flex md:space-x-4 md:space-y-0">
+            <Cardcontent className="w-full p-4 md:w-1/2">
               <Dropdown_chart_1 data={Data} />
             </Cardcontent>
 
@@ -201,7 +198,7 @@ export default async function Dashboard({
             </Cardcontent>
           </section>
         </div>
-        
+
         <AIInsight />
       </div>
     </Suspense>

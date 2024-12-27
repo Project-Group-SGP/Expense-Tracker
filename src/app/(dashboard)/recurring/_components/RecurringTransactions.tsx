@@ -1,9 +1,8 @@
-"use client"
 
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, Trash2, ChevronDown, Info } from 'lucide-react'
+import { Edit, Trash2, ChevronDown, Info, ChevronLeft, ChevronRight, Bell, BellOff } from 'lucide-react'
 import { RecurringTransaction } from './types'
 import { 
   DropdownMenu, 
@@ -17,9 +16,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { setReminderStatus } from '../action'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface RecurringTransactionsProps {
-  transactions: RecurringTransaction[]
+  transaction: RecurringTransaction[]
   onEdit: (transaction: RecurringTransaction) => void
   onDelete: (id: string) => void
 }
@@ -33,17 +38,23 @@ type ColumnVisibility = {
 }
 
 export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
-  transactions,
+  transaction,
   onEdit,
   onDelete
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     amount: true,
-    category: false,
+    category: true,
     frequency: true,
     nextOccurrence: true,
     description: true
   })
+
+  const [transactions , setTransactions] = useState(transaction);
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
+  const route = useRouter();
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({ ...prev, [column]: !prev[column] }))
@@ -54,113 +65,217 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
     return text.slice(0, maxLength) + '...';
   }
 
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = transactions.slice(indexOfFirstItem, indexOfLastItem)
+
+  const totalPages = Math.ceil(transactions.length / itemsPerPage)
+
+  const handleReminderToggle = async (id: string, enabled: boolean) => {
+    console.log(`Reminder for transaction ${id} ${enabled ? 'enabled' : 'disabled'}`);
+
+    try {
+      // Send a request to the server to update the reminder status
+      const response = await setReminderStatus(id, enabled);
+      
+     
+      if(response === true) {
+
+        setTransactions(prevTransactions => 
+          prevTransactions.map(transaction =>
+            transaction.id === id
+              ? { ...transaction, reminderEnabled: enabled }
+              : transaction
+          )
+        );
+
+        toast.success(`Reminder ${enabled ? 'enabled' : 'disabled'} successfully`, {
+          closeButton: true,
+          icon: enabled ? "🔔" : "🔕",
+          duration: 4500,
+        });
+
+        route.push('/recurring');
+      
+      }else{
+        toast.error('Failed to update reminder status', {
+          closeButton: true,
+          icon: "❌",
+          duration: 4500,
+        });
+      }
+      
+
+    } catch (error) {
+      toast.error('Failed to update reminder status', {
+        closeButton: true,
+        icon: "❌",
+        duration: 4500,
+      });
+      console.error('Failed to update reminder status:', error);
+    }
+    
+
+  }
+
+  const getFrequencyColor = (frequency: string) => {
+    switch (frequency.toLowerCase()) {
+      case 'daily':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+      case 'weekly':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+      case 'monthly':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+      case 'yearly':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    }
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end sm:hidden">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={columnVisibility.amount}
-              onCheckedChange={() => toggleColumn('amount')}
-            >
-              Amount
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={columnVisibility.category}
-              onCheckedChange={() => toggleColumn('category')}
-            >
-              Category
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={columnVisibility.frequency}
-              onCheckedChange={() => toggleColumn('frequency')}
-            >
-              Frequency
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={columnVisibility.nextOccurrence}
-              onCheckedChange={() => toggleColumn('nextOccurrence')}
-            >
-              Next Occurrence
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={columnVisibility.description}
-              onCheckedChange={() => toggleColumn('description')}
-            >
-              Description
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[150px]">Title</TableHead>
-              {columnVisibility.amount && <TableHead className="sm:table-cell">Amount</TableHead>}
-              {columnVisibility.category && <TableHead className="sm:table-cell">Category</TableHead>}
-              {columnVisibility.frequency && <TableHead className="sm:table-cell">Frequency</TableHead>}
-              {columnVisibility.nextOccurrence && <TableHead className="sm:table-cell">Next Occurrence</TableHead>}
-              {columnVisibility.description && <TableHead className="hidden md:table-cell">Description</TableHead>}
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell className="font-medium">{transaction.title}</TableCell>
-                {columnVisibility.amount && (
-                  <TableCell>₹{transaction.amount.toFixed(2)}</TableCell>
-                )}
-                {columnVisibility.category && (
-                  <TableCell>{transaction.category}</TableCell>
-                )}
-                {columnVisibility.frequency && (
-                  <TableCell>{transaction.frequency === "CUSTOM" ? `${transaction.customInterval} days` : transaction.frequency}</TableCell>
-                )}
-                {columnVisibility.nextOccurrence && (
-                  <TableCell>{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
-                )}
-                {columnVisibility.description && (
-                  <TableCell className="hidden md:table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center">
-                            <span className="mr-1">{truncateText(transaction.description || '', 20)}</span>
-                            {transaction.description && transaction.description.length > 20 && (
-                              <Info className="h-4 w-4" />
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{transaction.description}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                )}
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="icon" onClick={() => onEdit(transaction)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" onClick={() => onDelete(transaction.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <Card className="w-full shadow-lg">
+      <CardHeader >
+        <CardTitle className="text-2xl font-bold">Recurring Transactions</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="p-4 space-y-4">
+          <div className="flex justify-between items-center">
+            <Badge variant="outline" className="text-sm">
+              Total: {transactions.length}
+            </Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Columns <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {Object.entries(columnVisibility).map(([key, value]) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={value}
+                    onCheckedChange={() => toggleColumn(key as keyof ColumnVisibility)}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-[100px]">Title</TableHead>
+                  {columnVisibility.amount && <TableHead className="text-right">Amount</TableHead>}
+                  {columnVisibility.category && <TableHead>Category</TableHead>}
+                  {columnVisibility.frequency && <TableHead>Frequency</TableHead>}
+                  {columnVisibility.nextOccurrence && <TableHead>Next Occurrence</TableHead>}
+                  {columnVisibility.description && <TableHead className="hidden md:table-cell">Description</TableHead>}
+                  <TableHead className="text-center">Reminder</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentItems.map((transaction) => (
+                  <TableRow key={transaction.id} className="hover:bg-muted/50 transition-colors">
+                    <TableCell className="font-medium">{transaction.title}</TableCell>
+                    {columnVisibility.amount && (
+                      <TableCell className="text-right font-mono">₹{transaction.amount.toFixed(2)}</TableCell>
+                    )}
+                    {columnVisibility.category && (
+                      <TableCell>
+                        <Badge variant="secondary">{transaction.category}</Badge>
+                      </TableCell>
+                    )}
+                    {columnVisibility.frequency && (
+                      <TableCell>
+                        <Badge className={`${getFrequencyColor(transaction.frequency)}`}>
+                          {transaction.frequency === "CUSTOM" ? `${transaction.customInterval} days` : transaction.frequency}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {columnVisibility.nextOccurrence && (
+                      <TableCell>{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
+                    )}
+                    {columnVisibility.description && (
+                      <TableCell className="hidden md:table-cell max-w-[200px]">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger className="cursor-help">
+                              <div className="flex items-center">
+                                <span className="mr-1 truncate">{truncateText(transaction.description || '', 30)}</span>
+                                {transaction.description && transaction.description.length > 30 && (
+                                  <Info className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p className="max-w-xs">{transaction.description}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                    )}
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={transaction.reminderEnabled}
+                        onCheckedChange={(checked) => handleReminderToggle(transaction.id, checked)}
+                        className="data-[state=checked]:bg-green-500"
+                      />
+                      <span className="sr-only">
+                        {transaction.reminderEnabled ? 'Disable reminder' : 'Enable reminder'}
+                      </span>
+                      {transaction.reminderEnabled ? (
+                        <Bell className="h-4 w-4 text-green-500 inline-block ml-2" />
+                      ) : (
+                        <BellOff className="h-4 w-4 text-muted-foreground inline-block ml-2" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-center space-x-2">
+                        <Button variant="outline" size="icon" onClick={() => onEdit(transaction)}>
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={() => onDelete(transaction.id)}>
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex items-center justify-between bg-muted/10 p-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Previous
+        </Button>
+        <span className="text-sm font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+          <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
+      </CardFooter>
+    </Card>
   )
 }
 

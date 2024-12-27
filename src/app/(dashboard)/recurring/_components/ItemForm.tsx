@@ -109,7 +109,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
   })
 
   const submitHandler = (data: any) => {
-    console.log(data)
+    // console.log(data)
 
     const submittedItem = isTransaction
       ? ({

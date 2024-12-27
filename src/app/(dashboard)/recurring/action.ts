@@ -43,7 +43,6 @@ export async function getReminders(): Promise<Reminder[]> {
       {
         where: {
           userId: user?.id,
-          status: "PENDING",
         },
         include: {
           user: true,
@@ -189,3 +188,17 @@ export async function deleteItem(id: string) {
   }
 }
 
+//set Reminder status
+export async function setReminderStatus(id: string, status: boolean): Promise<boolean> {
+  try {
+    await db.recurringTransaction.update({
+      where: { id },
+      data: { reminderEnabled:  status },
+    })
+    
+    return true
+  } catch (error) {
+    console.error("Error setting reminder status:", error)
+    return false
+  }
+}
