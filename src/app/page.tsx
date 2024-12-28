@@ -55,7 +55,7 @@ const features = [
 
 const testimonials = [
   {
-    name: "Dhruv Kotadiya",
+    name: "Yash Kakadiya",
     quote: [
       "Spendwise has ",
       "completely transformed",
@@ -63,7 +63,7 @@ const testimonials = [
     ],
   },
   {
-    name: "Ayush Kalathiya",
+    name: "Meet Gangani",
     quote: [
       "I've never been so aware of my spending habits. ",
       "Highly recommended!",
@@ -71,7 +71,7 @@ const testimonials = [
     ],
   },
   {
-    name: "Sarthak Mayani",
+    name: "Akshay Lakkad",
     quote: [
       "The insights provided by Spendwise are invaluable. It's a ",
       "game-changer!",
