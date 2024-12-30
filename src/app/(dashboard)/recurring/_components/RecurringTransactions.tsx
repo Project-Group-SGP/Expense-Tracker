@@ -1,15 +1,31 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, Trash2, ChevronDown, Info, ChevronLeft, ChevronRight, Bell, BellOff } from 'lucide-react'
-import { RecurringTransaction } from './types'
-import { 
-  DropdownMenu, 
-  DropdownMenuCheckboxItem, 
-  DropdownMenuContent, 
-  DropdownMenuTrigger 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Edit,
+  Trash2,
+  ChevronDown,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+  Bell,
+  BellOff,
+} from "lucide-react"
+import { RecurringTransaction } from "./types"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   Tooltip,
@@ -17,12 +33,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { setReminderStatus } from '../action'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { setReminderStatus } from "../action"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface RecurringTransactionsProps {
   transaction: RecurringTransaction[]
@@ -41,29 +63,29 @@ type ColumnVisibility = {
 export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
   transaction,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     amount: true,
     category: true,
     frequency: true,
     nextOccurrence: true,
-    description: true
+    description: true,
   })
 
-  const [transactions , setTransactions] = useState(transaction);
+  const [transactions, setTransactions] = useState(transaction)
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
-  const route = useRouter();
+  const route = useRouter()
 
   const toggleColumn = (column: keyof ColumnVisibility) => {
-    setColumnVisibility(prev => ({ ...prev, [column]: !prev[column] }))
+    setColumnVisibility((prev) => ({ ...prev, [column]: !prev[column] }))
   }
 
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + '...';
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength) + "..."
   }
 
   const indexOfLastItem = currentPage * itemsPerPage
@@ -73,75 +95,75 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
   const totalPages = Math.ceil(transactions.length / itemsPerPage)
 
   const handleReminderToggle = async (id: string, enabled: boolean) => {
-    console.log(`Reminder for transaction ${id} ${enabled ? 'enabled' : 'disabled'}`);
+    console.log(
+      `Reminder for transaction ${id} ${enabled ? "enabled" : "disabled"}`
+    )
 
     try {
       // Send a request to the server to update the reminder status
-      const response = await setReminderStatus(id, enabled);
-      
-     
-      if(response === true) {
+      const response = await setReminderStatus(id, enabled)
 
-        setTransactions(prevTransactions => 
-          prevTransactions.map(transaction =>
+      if (response === true) {
+        setTransactions((prevTransactions) =>
+          prevTransactions.map((transaction) =>
             transaction.id === id
               ? { ...transaction, reminderEnabled: enabled }
               : transaction
           )
-        );
+        )
 
-        toast.success(`Reminder ${enabled ? 'enabled' : 'disabled'} successfully`, {
-          closeButton: true,
-          icon: enabled ? "🔔" : "🔕",
-          duration: 4500,
-        });
+        toast.success(
+          `Reminder ${enabled ? "enabled" : "disabled"} successfully`,
+          {
+            closeButton: true,
+            icon: enabled ? "🔔" : "🔕",
+            duration: 4500,
+          }
+        )
 
-        route.push('/recurring');
-      
-      }else{
-        toast.error('Failed to update reminder status', {
+        route.push("/recurring")
+      } else {
+        toast.error("Failed to update reminder status", {
           closeButton: true,
           icon: "❌",
           duration: 4500,
-        });
+        })
       }
-      
-
     } catch (error) {
-      toast.error('Failed to update reminder status', {
+      toast.error("Failed to update reminder status", {
         closeButton: true,
         icon: "❌",
         duration: 4500,
-      });
-      console.error('Failed to update reminder status:', error);
+      })
+      console.error("Failed to update reminder status:", error)
     }
-    
-
   }
 
   const getFrequencyColor = (frequency: string) => {
     switch (frequency.toLowerCase()) {
-      case 'daily':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-      case 'weekly':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-      case 'monthly':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
-      case 'yearly':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+      case "daily":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+      case "weekly":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+      case "monthly":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
+      case "yearly":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
     }
   }
 
   return (
     <Card className="w-full shadow-lg">
-      <CardHeader >
-        <CardTitle className="text-2xl font-bold">Recurring Transactions</CardTitle>
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          Recurring Transactions
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="p-4 space-y-4">
-          <div className="flex justify-between items-center">
+        <div className="space-y-4 p-4">
+          <div className="flex items-center justify-between">
             <Badge variant="outline" className="text-sm">
               Total: {transactions.length}
             </Badge>
@@ -156,7 +178,9 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
                   <DropdownMenuCheckboxItem
                     key={key}
                     checked={value}
-                    onCheckedChange={() => toggleColumn(key as keyof ColumnVisibility)}
+                    onCheckedChange={() =>
+                      toggleColumn(key as keyof ColumnVisibility)
+                    }
                   >
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </DropdownMenuCheckboxItem>
@@ -164,31 +188,51 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="rounded-md border overflow-hidden">
+          <div className="overflow-hidden rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead className="w-[100px]">Title</TableHead>
-                  {columnVisibility.amount && <TableHead className="text-right">Amount</TableHead>}
+                  {columnVisibility.amount && (
+                    <TableHead className="text-right">Amount</TableHead>
+                  )}
                   {columnVisibility.category && <TableHead>Category</TableHead>}
-                  {columnVisibility.frequency && <TableHead>Frequency</TableHead>}
-                  {columnVisibility.nextOccurrence && <TableHead>Next Occurrence</TableHead>}
-                  {columnVisibility.description && <TableHead className="hidden md:table-cell">Description</TableHead>}
+                  {columnVisibility.frequency && (
+                    <TableHead>Frequency</TableHead>
+                  )}
+                  {columnVisibility.nextOccurrence && (
+                    <TableHead>Next Occurrence</TableHead>
+                  )}
+                  {columnVisibility.description && (
+                    <TableHead className="hidden md:table-cell">
+                      Description
+                    </TableHead>
+                  )}
                   <TableHead className="text-center">Reminder</TableHead>
                   <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentItems.map((transaction) => (
-                  <TableRow key={transaction.id} className="hover:bg-muted/50 transition-colors">
-                    <TableCell className="font-medium">{transaction.title}</TableCell>
+                  <TableRow
+                    key={transaction.id}
+                    className="transition-colors hover:bg-muted/50"
+                  >
+                    <TableCell className="font-medium">
+                      {transaction.title}
+                    </TableCell>
                     {columnVisibility.amount && (
                       <TableCell className="text-right">
-                        <Badge 
-                          variant={transaction.type === 'INCOME' ? 'primary' : 'destructive'}
+                        <Badge
+                          variant={
+                            transaction.type === "INCOME"
+                              ? "primary"
+                              : "destructive"
+                          }
                           className={`font-mono ${
-                            transaction.type === 'INCOME' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
-                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                            transaction.type === "INCOME"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                           }`}
                         >
                           ₹{transaction.amount.toFixed(2)}
@@ -197,60 +241,94 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
                     )}
                     {columnVisibility.category && (
                       <TableCell>
-                        <Badge variant="secondary">{transaction.category == null ? 'Income' : transaction.category  }</Badge>
+                        <Badge variant="secondary">
+                          {transaction.category == null
+                            ? "Income"
+                            : transaction.category}
+                        </Badge>
                       </TableCell>
                     )}
                     {columnVisibility.frequency && (
                       <TableCell>
-                        <Badge className={`${getFrequencyColor(transaction.frequency)}`}>
-                          {transaction.frequency === "CUSTOM" ? `${transaction.customInterval} days` : transaction.frequency}
+                        <Badge
+                          className={`${getFrequencyColor(transaction.frequency)}`}
+                        >
+                          {transaction.frequency === "CUSTOM"
+                            ? `${transaction.customInterval} days`
+                            : transaction.frequency}
                         </Badge>
                       </TableCell>
                     )}
                     {columnVisibility.nextOccurrence && (
-                      <TableCell>{new Date(transaction.nextOccurrence).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {new Date(
+                          transaction.nextOccurrence
+                        ).toLocaleDateString()}
+                      </TableCell>
                     )}
                     {columnVisibility.description && (
-                      <TableCell className="hidden md:table-cell max-w-[200px]">
+                      <TableCell className="hidden max-w-[200px] md:table-cell">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger className="cursor-help">
                               <div className="flex items-center">
-                                <span className="mr-1 truncate">{truncateText(transaction.description || '', 30)}</span>
-                                {transaction.description && transaction.description.length > 30 && (
-                                  <Info className="h-4 w-4 text-muted-foreground" />
-                                )}
+                                <span className="mr-1 truncate">
+                                  {truncateText(
+                                    transaction.description || "",
+                                    30
+                                  )}
+                                </span>
+                                {transaction.description &&
+                                  transaction.description.length > 30 && (
+                                    <Info className="h-4 w-4 text-muted-foreground" />
+                                  )}
                               </div>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
-                              <p className="max-w-xs">{transaction.description}</p>
+                              <p className="max-w-xs">
+                                {transaction.description}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                       </TableCell>
                     )}
                     <TableCell className="text-center">
-                      <Switch
-                        checked={transaction.reminderEnabled}
-                        onCheckedChange={(checked) => handleReminderToggle(transaction.id, checked)}
-                        className="data-[state=checked]:bg-green-500"
-                      />
-                      <span className="sr-only">
-                        {transaction.reminderEnabled ? 'Disable reminder' : 'Enable reminder'}
-                      </span>
-                      {transaction.reminderEnabled ? (
-                        <Bell className="h-4 w-4 text-green-500 inline-block ml-2" />
-                      ) : (
-                        <BellOff className="h-4 w-4 text-muted-foreground inline-block ml-2" />
-                      )}
+                      <div className="flex items-center justify-center gap-2">
+                        <Switch
+                          checked={transaction.reminderEnabled}
+                          onCheckedChange={(checked) =>
+                            handleReminderToggle(transaction.id, checked)
+                          }
+                          className="data-[state=checked]:bg-green-500"
+                        />
+                        <span className="sr-only">
+                          {transaction.reminderEnabled
+                            ? "Disable reminder"
+                            : "Enable reminder"}
+                        </span>
+                        {transaction.reminderEnabled ? (
+                          <Bell className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <BellOff className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-center space-x-2">
-                        <Button variant="outline" size="icon" onClick={() => onEdit(transaction)}>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => onEdit(transaction)}
+                        >
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
-                        <Button variant="outline" size="icon" onClick={() => onDelete(transaction.id)}>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => onDelete(transaction.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Delete</span>
                         </Button>
@@ -267,10 +345,10 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="mr-2 h-4 w-4" />
           Previous
         </Button>
         <span className="text-sm font-medium">
@@ -279,14 +357,15 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
         >
           Next
-          <ChevronRight className="h-4 w-4 ml-2" />
+          <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>
   )
 }
-

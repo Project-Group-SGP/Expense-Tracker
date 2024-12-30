@@ -79,7 +79,7 @@ export default function RecurringTransactionsAndReminders() {
 
           toast.success("Recurring transactions added successfully", {
             closeButton: true,
-            icon: "♻️",
+            icon: "🔄",
             duration: 4500,
             id: loading,
           })
@@ -125,7 +125,7 @@ export default function RecurringTransactionsAndReminders() {
       if (isFrequency) {
         toast.success("Recurring transactions updated successfully", {
           closeButton: true,
-          icon: "♻️",
+          icon: "🔄",
           duration: 4500,
           id: loading,
         })
@@ -167,7 +167,7 @@ export default function RecurringTransactionsAndReminders() {
       }else{
        toast.success("Recurring transactions deleted successfully", {
           closeButton: true,
-          icon: "♻️",
+          icon: "🔄",
           duration: 4500,
           id: loading,
         })
