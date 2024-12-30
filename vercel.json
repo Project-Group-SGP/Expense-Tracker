@@ -5,8 +5,8 @@
       "schedule": "0 14 * * *"
     },
     {
-      "path": "/api/recurring",
-      "schedule": "0 14 * * *"
-    }
+      "path": "/api/recurringTransaction",
+      "schedule": "30 13 * * *"
+    }    
   ]
 }

@@ -1,3 +1,4 @@
+"use client"
 
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
@@ -182,11 +183,21 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
                   <TableRow key={transaction.id} className="hover:bg-muted/50 transition-colors">
                     <TableCell className="font-medium">{transaction.title}</TableCell>
                     {columnVisibility.amount && (
-                      <TableCell className="text-right font-mono">₹{transaction.amount.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">
+                        <Badge 
+                          variant={transaction.type === 'INCOME' ? 'primary' : 'destructive'}
+                          className={`font-mono ${
+                            transaction.type === 'INCOME' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
+                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                          }`}
+                        >
+                          ₹{transaction.amount.toFixed(2)}
+                        </Badge>
+                      </TableCell>
                     )}
                     {columnVisibility.category && (
                       <TableCell>
-                        <Badge variant="secondary">{transaction.category}</Badge>
+                        <Badge variant="secondary">{transaction.category == null ? 'Income' : transaction.category  }</Badge>
                       </TableCell>
                     )}
                     {columnVisibility.frequency && (

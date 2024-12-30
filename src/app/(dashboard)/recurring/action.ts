@@ -90,7 +90,7 @@ export async function addItem(item: Omit<RecurringTransaction | Reminder, "id">)
           // isActive: 'isActive' in item ? item.isActive as boolean : false,
         },
       });
-      // console.log(recurringTransaction);
+      console.log(recurringTransaction);
       
       console.log( "User : " + user.id + "Reccurrent Added Successfully");
       
@@ -130,7 +130,9 @@ export async function editItem(item: RecurringTransaction | Reminder): Promise<b
     if (!user) {
       throw new Error("User is not authenticated");
     }
-    console.log( "User : " + user.id + "Editing Item");
+    // console.log( "User : " + user.id + "Editing Item");
+    
+    // console.log("Editing item:");
     
     // console.log(item);
     
@@ -148,7 +150,7 @@ export async function editItem(item: RecurringTransaction | Reminder): Promise<b
           startDate: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
           endDate: 'endDate' in item ? new Date(item.endDate as unknown as string | number) : null,
           lastProcessed: 'lastProcessed' in item ? new Date(item.lastProcessed as string | number | Date) : null,
-          nextOccurrence: 'nextOccurrence' in item ? new Date(item.nextOccurrence as string | number | Date) : new Date(),
+          nextOccurrence: 'startDate' in item ? new Date(item.startDate as unknown as string | number) : new Date(),
           reminderEnabled: 'reminderEnabled' in item ? item.reminderEnabled as boolean : false,
         },
       })

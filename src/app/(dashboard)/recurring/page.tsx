@@ -118,7 +118,7 @@ export default function RecurringTransactionsAndReminders() {
         loading = toast.loading("Updating Reminder ...")
       }
       setIsDialogOpen(false)
-      await editItem(updatedItem)
+      await editItem(updatedItem);
       await fetchData()
       setEditingItem(null)
 
