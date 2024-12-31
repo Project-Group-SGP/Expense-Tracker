@@ -1,4 +1,5 @@
 // "use client"
+
 // import React, { useEffect, useMemo, useState } from "react"
 // import { useForm } from "react-hook-form"
 // import { zodResolver } from "@hookform/resolvers/zod"
@@ -83,9 +84,11 @@
 //   fromUser: z.string().min(1, "Please select a valid payer."),
 //   toUser: z.string().min(1, "Please select a valid recipient."),
 //   selectedExpenses: z.array(z.string()),
-//   transactionDate: z.date().refine((date) => date <= new Date(), {
-//     message: "Transaction date cannot be in the future",
-//   }),
+//   // transactionDate: z.date({
+//   //   required_error: "Please select a date",
+//   // }).refine((date) => date <= new Date(), {
+//   //   message: "Transaction date cannot be in the future",
+//   // }),
 //   isNetSettlement: z.boolean().default(false),
 // })
 
@@ -159,26 +162,25 @@
 // }
 
 // const ExpenseCard: React.FC<ExpenseCardProps> = ({ expense, type, selectedExpenses, onExpenseChange, user, disabled }) => {
-//   let isChecked;
-//   if(disabled){
-//     isChecked=false;
-//   }else{
-//     isChecked = selectedExpenses?.includes(expense.id);
-//   }
+//   const isChecked = disabled ? false : selectedExpenses?.includes(expense.id)
 
 //   const handleCheckboxChange = (checked: boolean) => {
+//     if (disabled) return
 //     const updatedExpenses = checked
 //       ? [...selectedExpenses, expense.id]
 //       : selectedExpenses.filter((id) => id !== expense.id)
+    
 //     onExpenseChange(updatedExpenses)
 //   }
 
 //   return (
-//     <div className={`flex min-h-[8vh] items-center justify-between rounded-lg border p-3 shadow-sm transition-all hover:shadow-md sm:p-4 
+//     <div className={`flex min-h-[8vh] items-center justify-between rounded-lg border p-3 shadow-sm transition-all hover:shadow-md sm:p-4 mt-2
 //       ${type === 'payable' 
 //         ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950' 
 //         : 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950' }
-//       ` }>
+//       ` }
+//       role="listitem"
+//     >
 //       <div className="flex items-center flex-grow pr-2">
 //         <UserAvatar user={user} size={48} />
 //         <div className="ml-3">
@@ -189,7 +191,7 @@
 //             ${type === 'payable' 
 //               ? 'text-red-600 dark:text-red-400' 
 //               : 'text-green-600 dark:text-green-400'}`}>
-//             {type === 'payable' ? 'You owe' : 'You are owed'}: ₹{expense.amount}
+//             {type === 'payable' ? 'You owe' : 'You are owed'}: ₹{expense.amount.toLocaleString('en-IN')}
 //           </p>
 //         </div>
 //       </div>
@@ -200,6 +202,7 @@
 //             onCheckedChange={handleCheckboxChange}
 //             disabled={disabled}
 //             className="h-5 w-5 text-red-500 border-red-300 rounded dark:border-red-700 dark:text-red-400"
+//             aria-label={`Select ${expense.expense.description} expense`}
 //           />
 //         </div>
 //       )}
@@ -209,7 +212,7 @@
 
 // const formatAmount = (amount: number | undefined) => {
 //   if (amount === undefined) return 0
-//   return Math.abs(amount)
+//   return Math.abs(amount).toLocaleString('en-IN')
 // }
 
 // export function SettleUp({
@@ -222,12 +225,13 @@
 //   const [showConfirmation, setShowConfirmation] = useState(false)
 //   const [selectedData, setSelectedData] = useState<FormSchema | null>(null)
 //   const [activeTab, setActiveTab] = useState<'pay' | 'receive'>('pay')
+//   const [isSettling, setIsSettling] = useState(false)
 
 //   const form = useForm<FormSchema>({
 //     resolver: zodResolver(formSchema),
 //     defaultValues: {
 //       fromUser: user,
-//       toUser: settleup[0].member.id,
+//       toUser: settleup[0]?.member.id ?? '',
 //       selectedExpenses: [],
 //       // transactionDate: new Date(),
 //       isNetSettlement: false,
@@ -235,14 +239,15 @@
 //   })
 
 //   const handleSubmit = async (data: FormSchema) => {
-//     setSelectedData(data);
-//     setShowConfirmation(true);
+//     setSelectedData(data)
+//     setShowConfirmation(true)
 //   }
 
 //   const confirmAndSettle = async () => {
 //     if (!selectedData) return
-//     setShowConfirmation(false);
-//     const loading = toast.loading("Setteling up...");
+//     setShowConfirmation(false)
+//     setIsSettling(true)
+    
 //     try {
 //       await settleUp({
 //         ...selectedData,
@@ -250,20 +255,20 @@
 //         isNetSettle: selectedData.isNetSettlement,
 //       })
       
-//       // console.log("Result: ",selectedData,"Total: ",totalAmount);
-//         toast.success("Setteled successfully", {
-//           closeButton: true,
-//           icon: "🤝",
-//           duration: 4500,
-//           id: loading,
-//         })
-  
-//         form.reset();
-//         setOpen(false);
+//       toast.success("Successfully settled up!", {
+//         description: `Settlement of ₹${formatAmount(totalAmount)} completed`,
+//         icon: "🤝",
+//         duration: 4500,
+//       })
+      
+//       form.reset()
+//       setOpen(false)
 //     } catch (error) {
 //       toast.error("Failed to settle up", {
 //         description: error instanceof Error ? error.message : "An unknown error occurred",
 //       })
+//     } finally {
+//       setIsSettling(false)
 //     }
 //   }
 
@@ -277,9 +282,7 @@
 //   )
 
 //   const [userSelectionOpen, setUserSelectionOpen] = useState(false)
-//   const [selectingFor, setSelectingFor] = useState<
-//     "fromUser" | "toUser" | null
-//   >(null)
+//   const [selectingFor, setSelectingFor] = useState<"fromUser" | "toUser" | null>(null)
 
 //   const handleUserSelect = (selectedUser: GroupMember) => {
 //     if (selectingFor === "toUser") {
@@ -303,9 +306,8 @@
 //         (t) => t.id === expenseId
 //       )
 //       return sum + (payable ? payable.amount : 0)
-//     },0)
+//     }, 0)
 //   }, [selectedUserTransactions, selectedExpenses, currentUserSummary, isNetSettlement])
-
 
 //   if (settleup.length === 0) {
 //     return (
@@ -317,7 +319,7 @@
 //               variant="outline"
 //               disabled
 //             >
-//               No transactions to settle
+//               Settle up 🤝
 //             </Button>
 //           </TooltipTrigger>
 //           <TooltipContent>
@@ -327,6 +329,10 @@
 //       </TooltipProvider>
 //     )
 //   }
+
+//   const isSettlementDisabled = !toUser || 
+//     (!isNetSettlement && selectedExpenses.length === 0) || 
+//     (isNetSettlement && currentUserSummary?.summary.balanceStatus === "receivable")
 
 //   return (
 //     <>
@@ -366,7 +372,7 @@
 //                   }
 //                   size={85}
 //                 />
-//                 <div className="transform text-2xl rotate-0">→</div>
+//                 <div className="transform text-2xl rotate-0" aria-hidden="true">→</div>
 //                 <FormField
 //                   control={form.control}
 //                   name="toUser"
@@ -381,6 +387,7 @@
 //                             setSelectingFor("toUser")
 //                             setUserSelectionOpen(true)
 //                           }}
+//                           aria-label="Select recipient"
 //                         >
 //                           <UserAvatar
 //                             user={
@@ -397,7 +404,7 @@
 //                   )}
 //                 />
 //               </div>
-//               <div className="text-center">
+//               <div className="text-center" aria-live="polite">
 //                 <span className="text-green-500">
 //                   {groupMemberName.find((u) => u.userId === user)?.name}
 //                 </span>{" "}
@@ -407,6 +414,45 @@
 //                     ?.name || "Select recipient"}
 //                 </span>
 //               </div>
+              
+//               {/* <FormField
+//                 control={form.control}
+//                 name="transactionDate"
+//                 render={({ field }) => (
+//                   <FormItem className="flex flex-col">
+//                     <FormLabel>Transaction Date</FormLabel>
+//                     <Popover>
+//                       <PopoverTrigger asChild>
+//                         <FormControl>
+//                           <Button
+//                             variant={"outline"}
+//                             className={cn(
+//                               "w-full pl-3 text-left font-normal",
+//                               !field.value && "text-muted-foreground"
+//                             )}
+//                           >
+//                             {field.value ? format(field.value, "PPP") : "Pick a date"}
+//                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+//                           </Button>
+//                         </FormControl>
+//                       </PopoverTrigger>
+//                       <PopoverContent className="w-auto p-0" align="start">
+//                         <Calendar
+//                           mode="single"
+//                           selected={field.value}
+//                           onSelect={field.onChange}
+//                           disabled={(date) =>
+//                             date > new Date() || date < new Date("1900-01-01")
+//                           }
+//                           initialFocus
+//                         />
+//                       </PopoverContent>
+//                     </Popover>
+//                     <FormMessage />
+//                   </FormItem>
+//                 )} 
+//               />*/}
+
 //               <FormField
 //                 control={form.control}
 //                 name="isNetSettlement"
@@ -416,16 +462,17 @@
 //                       <Checkbox
 //                         checked={field.value}
 //                         onCheckedChange={field.onChange}
+//                         aria-label="Enable net settlement"
 //                       />
 //                     </FormControl>
-//                     <div className="space-y-1 leading-none flex flex-row ">
-//                       <FormLabel>
-//                         <div className="h-full text-center mt-1">Net Settlement</div> 
+//                     <div className="space-y-1 leading-none flex flex-row items-center">
+//                       <FormLabel className="cursor-pointer">
+//                         Net Settlement
 //                       </FormLabel>
-//                         <TooltipProvider>
+//                       <TooltipProvider>
 //                         <Tooltip>
 //                           <TooltipTrigger asChild>
-//                             <Info className="h-4 w-4 ml-2 align-middle" />
+//                             <Info className="h-4 w-4 ml-2" />
 //                           </TooltipTrigger>
 //                           <TooltipContent>
 //                             <p>Settle the net balance instead of individual expenses</p>
@@ -436,20 +483,30 @@
 //                   </FormItem>
 //                 )}
 //               />
+
 //               <FormField
 //                 control={form.control}
 //                 name="selectedExpenses"
 //                 render={() => (
 //                   <FormItem>
-//                     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'pay' | 'receive')} className="w-full">
+//                     <Tabs 
+//                       value={activeTab} 
+//                       onValueChange={(value) => setActiveTab(value as 'pay' | 'receive')} 
+//                       className="w-full"
+//                     >
 //                       <TabsList className="grid w-full grid-cols-2">
 //                         <TabsTrigger value="pay">Pay</TabsTrigger>
 //                         <TabsTrigger value="receive">Receive</TabsTrigger>
 //                       </TabsList>
 //                       <div>
 //                         {activeTab === 'pay' && (
-//                           <div className={`grid grid-cols-1 content-start gap-4 ${selectedUserTransactions.payable.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"} overflow-y-auto`}>
-//                             <div></div>
+//                           <div 
+//                             className={`grid grid-cols-1 content-start gap-2 ${
+//                               selectedUserTransactions.payable.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"
+//                             } overflow-y-auto`}
+//                             role="list"
+//                             aria-label="Payable expenses"
+//                           >
 //                             {selectedUserTransactions.payable.map((expense) => (
 //                               <ExpenseCard
 //                                 key={expense.id}
@@ -464,8 +521,13 @@
 //                           </div>
 //                         )}
 //                         {activeTab === 'receive' && (
-//                           <div className={`grid grid-cols-1 content-start gap-4 ${selectedUserTransactions.receivable.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"} overflow-y-auto`}>
-//                             <div></div>
+//                           <div 
+//                             className={`grid grid-cols-1 content-start gap-2 ${
+//                               selectedUserTransactions.receivable.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"
+//                             } overflow-y-auto`}
+//                             role="list"
+//                             aria-label="Receivable expenses"
+//                           >
 //                             {selectedUserTransactions.receivable.map((expense) => (
 //                               <ExpenseCard
 //                                 key={expense.id}
@@ -485,16 +547,20 @@
 //                   </FormItem>
 //                 )}
 //               />
+
 //               <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
 //                 {currentUserSummary && (
 //                   <>
-//                     <div className={`w-full text-center text-lg font-semibold sm:w-auto sm:text-left ${
-//                       isNetSettlement
-//                         ? currentUserSummary?.summary.balanceStatus == "receivable" 
-//                           ? 'text-green-500 dark:text-green-400'
-//                           : 'text-red-500 dark:text-red-400'
-//                         : 'text-blue-500 dark:text-blue-400'
-//                     }`}>
+//                     <div 
+//                       className={`w-full text-center text-lg font-semibold sm:w-auto sm:text-left ${
+//                         isNetSettlement
+//                           ? currentUserSummary?.summary.balanceStatus === "receivable"
+//                             ? 'text-green-500 dark:text-green-400'
+//                             : 'text-red-500 dark:text-red-400'
+//                           : 'text-blue-500 dark:text-blue-400'
+//                       }`}
+//                       aria-live="polite"
+//                     >
 //                       Total: ₹{formatAmount(totalAmount)}
 //                     </div>
 //                     <div className="flex w-full flex-col justify-center space-y-2 sm:w-auto sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
@@ -505,9 +571,14 @@
 //                               type="submit"
 //                               variant="outline"
 //                               className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-600 hover:text-white sm:w-auto"
-//                               disabled={!toUser || (!isNetSettlement && selectedExpenses.length === 0)|| (isNetSettlement && (currentUserSummary?.summary.balanceStatus == "receivable" ))}
+//                               disabled={isSettlementDisabled || isSettling}
 //                             >
-//                               {isNetSettlement ? "Net Settle" : "Settle Selected"}
+//                               {isSettling 
+//                                 ? "Settling..." 
+//                                 : isNetSettlement 
+//                                   ? "Net Settle" 
+//                                   : "Settle Selected"
+//                               }
 //                             </Button>
 //                           </TooltipTrigger>
 //                           <TooltipContent>
@@ -521,16 +592,6 @@
 //                       </TooltipProvider>
 //                     </div>
 //                   </>
-//                 )}
-//                 {!currentUserSummary && (
-//                   <Button
-//                     type="submit"
-//                     variant="outline"
-//                     className="w-full rounded-lg border-green-500 text-green-500 hover:bg-green-600 sm:w-auto"
-//                     disabled={!toUser || (!isNetSettlement && selectedExpenses.length === 0)}
-//                   >
-//                     Settle up
-//                   </Button>
 //                 )}
 //               </div>
 //             </form>
@@ -554,14 +615,16 @@
 //             <Button
 //               variant="outline"
 //               onClick={() => setShowConfirmation(false)}
+//               disabled={isSettling}
 //             >
 //               Cancel
 //             </Button>
 //             <Button
 //               onClick={confirmAndSettle}
 //               className="bg-green-500 text-white hover:bg-green-600"
+//               disabled={isSettling}
 //             >
-//               Confirm Settlement
+//               {isSettling ? "Settling..." : "Confirm Settlement"}
 //             </Button>
 //           </div>
 //         </DialogContent>
@@ -576,6 +639,7 @@
 //     </>
 //   )
 // }
+
 // export default SettleUp
 
 "use client"
@@ -781,7 +845,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({ expense, type, selectedExpens
             checked={isChecked}
             onCheckedChange={handleCheckboxChange}
             disabled={disabled}
-            className="h-5 w-5 text-red-500 border-red-300 rounded dark:border-red-700 dark:text-red-400"
+            className="h-5 w-5 text-red-500 border-red-300 rounded dark:border-red-700 dark:text-red-400 data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
             aria-label={`Select ${expense.expense.description} expense`}
           />
         </div>
@@ -791,8 +855,8 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({ expense, type, selectedExpens
 }
 
 const formatAmount = (amount: number | undefined) => {
-  if (amount === undefined) return 0
-  return Math.abs(amount).toLocaleString('en-IN')
+  if (amount === undefined || isNaN(amount)) return 0
+  return Number(Math.abs(amount)).toLocaleString('en-IN')
 }
 
 export function SettleUp({
@@ -885,7 +949,8 @@ export function SettleUp({
       const payable = selectedUserTransactions.payable.find(
         (t) => t.id === expenseId
       )
-      return sum + (payable ? payable.amount : 0)
+      // Ensure numerical addition by converting to number
+      return Number(sum) + Number(payable?.amount || 0)
     }, 0)
   }, [selectedUserTransactions, selectedExpenses, currentUserSummary, isNetSettlement])
 
