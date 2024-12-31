@@ -265,9 +265,11 @@ export default function DeleteGroupTransactionButton({
               )}
               onClick={() => setIsAlertOpen(true)}
             >
-              <Trash2 className="hidden sm:block mr-1 h-4 w-4" />
-              <span className="hidden sm:block">Delete</span>
-              <span className="sm:hidden"><Trash2 className="h-5 w-5" /></span>
+              {/* <Trash2 className="hidden sm:block mr-1 h-4 w-4" />
+              <span className="hidden sm:block">Delete</span> */}
+              {/* <span className="sm:hidden"> */}
+                <Trash2 className="h-5 w-5" />
+                {/* </span> */}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
