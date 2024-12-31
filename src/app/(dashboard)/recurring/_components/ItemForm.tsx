@@ -145,16 +145,10 @@ export const ItemForm: React.FC<ItemFormProps> = ({
 
   return (
     <Card className="mx-auto w-full max-w-2xl overflow-y-auto border-none shadow-none dark:bg-zinc-950">
-      <CardHeader>
-        <CardTitle className="text-xl sm:text-2xl">
-          {item ? "Edit" : "Add"} {isTransaction ? "Transaction" : "Reminder"}
-        </CardTitle>
-      </CardHeader>
       <CardContent className="overflow-y-auto">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(submitHandler)}
-            className="space-y-4 sm:space-y-6"
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
@@ -164,7 +158,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Enter title" {...field} />
+                      <Input type="text" className="cursor-text"  placeholder="Enter title" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
