@@ -1101,7 +1101,7 @@ export function SettleUp({
                         )}
                         {activeTab === 'receive' && (
                           <div 
-                            className={`grid grid-cols-1 content-start gap-4 ${
+                            className={`grid grid-cols-1 content-start gap-2 ${
                               selectedUserTransactions.receivable.length < 3 ? "" : "max-h-[30vh] sm:max-h-[40vh]"
                             } overflow-y-auto`}
                             role="list"
