@@ -845,7 +845,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({ expense, type, selectedExpens
             checked={isChecked}
             onCheckedChange={handleCheckboxChange}
             disabled={disabled}
-            className="h-5 w-5 text-red-500 border-red-300 rounded dark:border-red-700 dark:text-red-400 data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
+            className="h-5 w-5 text-red-500 border-red-300 rounded dark:border-red-700 dark:text-red-400 data-[state=checked]:bg-red-200 data-[state=checked]:dark:bg-red-950"
             aria-label={`Select ${expense.expense.description} expense`}
           />
         </div>
@@ -1111,19 +1111,19 @@ export function SettleUp({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none flex flex-row items-center">
-                      <FormLabel className="cursor-pointer">
+                      <FormLabel className="cursor-pointer flex items-center">
                         Net Settlement
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-2" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Settle the net balance instead of individual expenses</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-4 w-4 ml-2" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Settle the net balance instead of individual expenses</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                     </div>
                   </FormItem>
                 )}
