@@ -5,6 +5,7 @@ import { GroupMember } from "./_components/GroupMember"
 import { SettleUp } from "./_components/SettleUp"
 import AddExpense from "./_components/AddExpense"
 import PageTitle from "./_components/PageTitle"
+import { TransactionSummary } from "./group"
 
 
 interface Group {
@@ -103,7 +104,7 @@ interface  GroupID{
   balance:GetBalance[],
   name:string,
   groupMembers:GroupMemberDetails[],
-  usersYouNeedToPay:UserToPay[],  
+  settleup: TransactionSummary[],
   user:string,
 }
 
@@ -124,7 +125,7 @@ interface GroupMemberBalance {
   detailedBalance: DetailedBalance[]
 }
 
-export const GroupID = ({group,leave,transactionData,balance,name,groupMembers,usersYouNeedToPay,user}:GroupID) => {
+export const GroupID = ({group,leave,transactionData,balance,name,groupMembers,settleup,user}:GroupID) => {
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-center justify-between p-4">
         <div className="mt-20 flex w-full flex-col gap-5 px-4">
@@ -147,10 +148,7 @@ export const GroupID = ({group,leave,transactionData,balance,name,groupMembers,u
               <SettleUp
                 params={{ groupID: group.id ||""}}
                 groupMemberName={groupMembers}
-                usersYouNeedToPay={usersYouNeedToPay.map((user) => ({
-                  ...user,
-                  expenses: [],
-                }))}
+                settleup={settleup}
                 user={user}
               />
             </div>

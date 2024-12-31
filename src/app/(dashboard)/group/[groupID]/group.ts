@@ -551,127 +551,262 @@ export async function AddGroupExpense(params: {
   return { success: true }
 }
 
-interface ExpenseDetails {
-  expenseid: string
-  amount: number
-  groupexpenceid: string
+// interface ExpenseDetails {
+//   expenseid: string
+//   amount: number
+//   groupexpenceid: string
+// }
+
+// export async function settleUp(params: {
+//   groupID: string
+//   payerId: string
+//   recipientId: string
+//   expenseIds: ExpenseDetails[]
+//   transactionDate: Date
+// }) {
+//   const user = await currentUserServer()
+//   if (!user || user.id !== params.payerId) {
+//     throw new Error("Please log in with the correct account.")
+//   }
+
+//   // Fetch group members in a single query
+//   const groupMembers = await db.groupMember.findMany({
+//     where: { groupId: params.groupID },
+//     select: { userId: true },
+//   })
+
+//   const memberIds = new Set(groupMembers.map((member) => member.userId))
+//   if (!memberIds.has(params.payerId) || !memberIds.has(params.recipientId)) {
+//     throw new Error("Both users must be members of the group.")
+//   }
+
+//   // Fetch all relevant group expenses in a single query
+//   const groupExpenses = await db.groupExpense.findMany({
+//     where: {
+//       id: { in: params.expenseIds.map((e) => e.groupexpenceid) },
+//       groupId: params.groupID,
+//       paidById: params.recipientId,
+//       status: { not: "CANCELLED" },
+//     },
+//     include: {
+//       splits: true,
+//     },
+//   })
+
+//   const groupExpensesMap = new Map(groupExpenses.map((ge) => [ge.id, ge]))
+
+//   const updates = params.expenseIds.map(async (expense) => {
+//     const groupExpense = groupExpensesMap.get(expense.groupexpenceid)
+//     if (!groupExpense) {
+//       console.warn(`Invalid group expense for ID: ${expense.groupexpenceid}`)
+//       return null
+//     }
+
+//     const payerSplit = groupExpense.splits.find(
+//       (split) => split.userId === params.payerId
+//     )
+//     if (!payerSplit) {
+//       console.warn(
+//         `No split found for payer in expense: ${expense.groupexpenceid}`
+//       )
+//       return null
+//     }
+
+//     const [payment, updatedSplit] = await Promise.all([
+//       db.payment.create({
+//         data: {
+//           expenseSplitId: expense.expenseid,
+//           amount: new Decimal(expense.amount),
+//           paidAt: params.transactionDate,
+//         },
+//       }),
+//       db.expenseSplit.update({
+//         where: { id: expense.expenseid },
+//         data: { isPaid: "PAID" },
+//       }),
+//     ])
+
+//     // Check the status of all splits for this expense
+//     const allSplitsPaid = groupExpense.splits.every((split) =>
+//       split.id === expense.expenseid ? true : split.isPaid === "PAID"
+//     )
+//     const someSplitsPaid = groupExpense.splits.some(
+//       (split) => split.id === expense.expenseid || split.isPaid === "PAID"
+//     )
+
+//     let newStatus
+//     if (allSplitsPaid) {
+//       newStatus = "SETTLED"
+//     } else if (someSplitsPaid) {
+//       newStatus = "PARTIALLY_SETTLED"
+//     } else {
+//       newStatus = "UNSETTLED"
+//     }
+
+//     await db.groupExpense.update({
+//       where: { id: expense.groupexpenceid },
+//       data: { status: newStatus },
+//     })
+
+//     return groupExpense.id
+//   })
+
+//   await Promise.all(updates)
+
+//   // Calculate total amount settled
+//   const totalAmount = params.expenseIds.reduce(
+//     (sum, expense) => sum + expense.amount,
+//     0
+//   )
+
+//   // Send settle up notification
+//   sendSettleUpNotification(
+//     params.groupID,
+//     params.payerId,
+//     params.recipientId,
+//     totalAmount
+//   )
+
+//   revalidatePath(`/group/${params.groupID}`)
+
+//   return { message: "Payment to group member completed successfully!" }
+// }
+
+
+interface SettleUpData {
+  fromUser: string;
+  toUser: string;
+  selectedExpenses: string[];
+  isNetSettle: boolean;
+  groupID: string;
 }
 
-export async function settleUp(params: {
-  groupID: string
-  payerId: string
-  recipientId: string
-  expenseIds: ExpenseDetails[]
-  transactionDate: Date
-}) {
-  const user = await currentUserServer()
-  if (!user || user.id !== params.payerId) {
-    throw new Error("Please log in with the correct account.")
+export async function settleUp(data: SettleUpData) {
+  try {
+    const user = await currentUserServer();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    if (data.fromUser !== user.id) {
+      throw new Error("You can only settle your own expenses");
+    }
+
+    // Validate group membership
+    const group = await db.group.findFirst({
+      where: {
+        id: data.groupID,
+        members: {
+          some: {
+            userId: user.id
+          }
+        }
+      }
+    });
+
+    if (!group) {
+      throw new Error("Group not found or you're not a member");
+    }
+
+    // Start transaction
+    await db.$transaction(async (tx) => {
+      if (data.isNetSettle) {
+        // Handle net settlement
+        const payableSplits = await tx.expenseSplit.findMany({
+          where: {
+            userId: user.id,
+            expense: {
+              groupId: data.groupID,
+              paidById: data.toUser,
+            },
+            isPaid: "UNPAID",
+          },
+        });
+
+        const receivableSplits = await tx.expenseSplit.findMany({
+          where: {
+            userId: data.toUser,
+            expense: {
+              groupId: data.groupID,
+              paidById: user.id,
+            },
+            isPaid: "UNPAID",
+          },
+        });
+
+        // Update all splits
+        await Promise.all([
+          ...payableSplits.map(split => 
+            tx.expenseSplit.update({
+              where: { id: split.id },
+              data: { isPaid: "PAID" }
+            })
+          ),
+          ...receivableSplits.map(split => 
+            tx.expenseSplit.update({
+              where: { id: split.id },
+              data: { isPaid: "PAID" }
+            })
+          )
+        ]);
+
+        // Update expense statuses
+        const expenseIds = [...new Set([
+          ...payableSplits.map(split => split.expenseId),
+          ...receivableSplits.map(split => split.expenseId)
+        ])];
+
+        await updateExpenseStatuses(tx, expenseIds);
+      } else {
+        // Handle individual expense settlements
+        await Promise.all(
+          data.selectedExpenses.map(async (splitId) => {
+            const split = await tx.expenseSplit.findUnique({
+              where: { id: splitId },
+              include: { expense: true }
+            });
+
+            if (!split) {
+              throw new Error(`Split ${splitId} not found`);
+            }
+
+            await tx.expenseSplit.update({
+              where: { id: splitId },
+              data: { isPaid: "PAID" }
+            });
+
+            await updateExpenseStatuses(tx, [split.expenseId]);
+          })
+        );
+      }
+    });
+    
+    revalidatePath(`/groups/${data.groupID}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error in settleUp:", error);
+    throw error;
   }
+}
 
-  // Fetch group members in a single query
-  const groupMembers = await db.groupMember.findMany({
-    where: { groupId: params.groupID },
-    select: { userId: true },
-  })
+async function updateExpenseStatuses(tx: any, expenseIds: string[]) {
+  await Promise.all(
+    expenseIds.map(async (expenseId) => {
+      const allSplits = await tx.expenseSplit.findMany({
+        where: { expenseId }
+      });
 
-  const memberIds = new Set(groupMembers.map((member) => member.userId))
-  if (!memberIds.has(params.payerId) || !memberIds.has(params.recipientId)) {
-    throw new Error("Both users must be members of the group.")
-  }
+      const unpaidSplits = allSplits.filter(split => split.isPaid === "UNPAID");
 
-  // Fetch all relevant group expenses in a single query
-  const groupExpenses = await db.groupExpense.findMany({
-    where: {
-      id: { in: params.expenseIds.map((e) => e.groupexpenceid) },
-      groupId: params.groupID,
-      paidById: params.recipientId,
-      status: { not: "CANCELLED" },
-    },
-    include: {
-      splits: true,
-    },
-  })
+      const newStatus = unpaidSplits.length === 0 ? "SETTLED" : "UNSETTLED";
 
-  const groupExpensesMap = new Map(groupExpenses.map((ge) => [ge.id, ge]))
-
-  const updates = params.expenseIds.map(async (expense) => {
-    const groupExpense = groupExpensesMap.get(expense.groupexpenceid)
-    if (!groupExpense) {
-      console.warn(`Invalid group expense for ID: ${expense.groupexpenceid}`)
-      return null
-    }
-
-    const payerSplit = groupExpense.splits.find(
-      (split) => split.userId === params.payerId
-    )
-    if (!payerSplit) {
-      console.warn(
-        `No split found for payer in expense: ${expense.groupexpenceid}`
-      )
-      return null
-    }
-
-    const [payment, updatedSplit] = await Promise.all([
-      db.payment.create({
-        data: {
-          expenseSplitId: expense.expenseid,
-          amount: new Decimal(expense.amount),
-          paidAt: params.transactionDate,
-        },
-      }),
-      db.expenseSplit.update({
-        where: { id: expense.expenseid },
-        data: { isPaid: "PAID" },
-      }),
-    ])
-
-    // Check the status of all splits for this expense
-    const allSplitsPaid = groupExpense.splits.every((split) =>
-      split.id === expense.expenseid ? true : split.isPaid === "PAID"
-    )
-    const someSplitsPaid = groupExpense.splits.some(
-      (split) => split.id === expense.expenseid || split.isPaid === "PAID"
-    )
-
-    let newStatus
-    if (allSplitsPaid) {
-      newStatus = "SETTLED"
-    } else if (someSplitsPaid) {
-      newStatus = "PARTIALLY_SETTLED"
-    } else {
-      newStatus = "UNSETTLED"
-    }
-
-    await db.groupExpense.update({
-      where: { id: expense.groupexpenceid },
-      data: { status: newStatus },
+      await tx.groupExpense.update({
+        where: { id: expenseId },
+        data: { status: newStatus }
+      });
     })
-
-    return groupExpense.id
-  })
-
-  await Promise.all(updates)
-
-  // Calculate total amount settled
-  const totalAmount = params.expenseIds.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  )
-
-  // Send settle up notification
-  sendSettleUpNotification(
-    params.groupID,
-    params.payerId,
-    params.recipientId,
-    totalAmount
-  )
-
-  revalidatePath(`/group/${params.groupID}`)
-
-  return { message: "Payment to group member completed successfully!" }
+  );
 }
-
 // _services/groupServices.ts
 
 interface Group {
@@ -758,10 +893,41 @@ interface DetailedBalance {
   status: "gets back" | "owes"
 }
 
+ export interface TransactionSummary {
+  member: {
+    id: string;
+    name: string;
+  };
+  transactions: {
+    payable: {
+      id: string;
+      amount: number;
+      expense: {
+        id: string;
+        description: string;
+      };
+    }[];
+    receivable: {
+      id: string;
+      amount: number;
+      expense: {
+        id: string;
+        description: string;
+      };
+    }[];
+  };
+  summary: {
+    totalPayable: number;
+    totalReceivable: number;
+    netBalance: number;
+    balanceStatus: "receivable" | "payable";
+  };
+}
+
 export async function getAllData(
   groupID: string,
   cookie: string
-): Promise<GetResponse> {
+): Promise<TransactionSummary[]> {
   try {
     const res = await fetch(
       `${process.env.BASE_URL}/api/get-group?groupID=${groupID}`,
@@ -771,23 +937,23 @@ export async function getAllData(
         next: { tags: ["getGroupdata"] },
         cache: "force-cache",
       }
-    )
+    );
 
     if (!res.ok) {
-      throw new Error("Network response was not ok")
+      throw new Error("Network response was not ok");
     }
 
-    const data: GetResponse = await res.json()
-    return data
+    const transactionsSummary: TransactionSummary[] = await res.json();
+
+    return transactionsSummary;
   } catch (error) {
-    console.error("Error fetching data:", error)
-    return {
-      group: null,
-      pendingPayments: [],
-      usersToPay: [],
-    }
+    console.error("Error fetching data:", error);
+
+    // Return an empty array as fallback for the API return type
+    return [];
   }
 }
+
 
 export async function fetchGroupBalances(
   groupId: string,

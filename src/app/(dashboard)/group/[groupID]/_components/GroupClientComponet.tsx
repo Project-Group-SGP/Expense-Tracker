@@ -8,6 +8,7 @@ import SettleUp from "./SettleUp"
 
 import { GroupMember } from "./GroupMember"
 import Transaction from "./Transaction"
+import { TransactionSummary } from "../group"
 
 interface GroupClientProps {
   groupName: string
@@ -21,7 +22,7 @@ interface GroupClientProps {
     groupId: string
   }
   groupMembers: { userId: string; avatar: string; name: string }[]
-  usersYouNeedToPay: any[]
+  settleup: TransactionSummary[]
   transactionData: any[]
   balance: any[]
 }
@@ -33,7 +34,7 @@ export default function GroupClientComponent({
   userId,
   leave,
   groupMembers,
-  usersYouNeedToPay,
+  settleup,
   transactionData,
   balance,
 }: GroupClientProps) {
@@ -59,10 +60,7 @@ export default function GroupClientComponent({
             <SettleUp
               params={{ groupID: leave.groupId }}
               groupMemberName={groupMembers}
-              usersYouNeedToPay={usersYouNeedToPay.map((user) => ({
-                ...user,
-                expenses: [],
-              }))}
+              settleup={settleup}
               user={userId}
             />
           </div>

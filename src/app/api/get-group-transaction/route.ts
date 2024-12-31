@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Group members not found", { status: 404 })
   }
 
-  console.log("GroupID", group.id)
+  // console.log("GroupID", group.id)
 
   // get group transactions
   const groupTransations = await db.groupExpense.findMany({
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
       date: "desc",
     },
   })
-  console.log("groupTransations : ", groupTransations)
+  // console.log("groupTransations : ", groupTransations)
   // console.log("group : ", group);
 
   // format data According to required
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     }),
   }))
 
-  console.log("formattedData: ", JSON.stringify(formattedData, null, 2))
+  // console.log("formattedData: ", JSON.stringify(formattedData, null, 2))
 
   return NextResponse.json(formattedData)
 }

@@ -44,7 +44,6 @@ export default async function GroupPage({
     name: b.name,
   }))
 
-  const usersYouNeedToPay = data.usersToPay
   const findcurrentuser = balance.find((b) => b.userId === user.id) || null
 
   const leave = {
@@ -62,7 +61,7 @@ export default async function GroupPage({
       userId={user.id}
       leave={leave}
       groupMembers={groupMembers}
-      usersYouNeedToPay={usersYouNeedToPay}
+      settleup={data}
       transactionData={transactionData}
       balance={balance}
     />
