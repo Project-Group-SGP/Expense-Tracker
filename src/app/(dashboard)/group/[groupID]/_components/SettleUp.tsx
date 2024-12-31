@@ -664,11 +664,11 @@ const formSchema = z.object({
   fromUser: z.string().min(1, "Please select a valid payer."),
   toUser: z.string().min(1, "Please select a valid recipient."),
   selectedExpenses: z.array(z.string()),
-  transactionDate: z.date({
-    required_error: "Please select a date",
-  }).refine((date) => date <= new Date(), {
-    message: "Transaction date cannot be in the future",
-  }),
+  // transactionDate: z.date({
+  //   required_error: "Please select a date",
+  // }).refine((date) => date <= new Date(), {
+  //   message: "Transaction date cannot be in the future",
+  // }),
   isNetSettlement: z.boolean().default(false),
 })
 
@@ -749,6 +749,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({ expense, type, selectedExpens
     const updatedExpenses = checked
       ? [...selectedExpenses, expense.id]
       : selectedExpenses.filter((id) => id !== expense.id)
+    
     onExpenseChange(updatedExpenses)
   }
 
@@ -812,7 +813,7 @@ export function SettleUp({
       fromUser: user,
       toUser: settleup[0]?.member.id ?? '',
       selectedExpenses: [],
-      transactionDate: new Date(),
+      // transactionDate: new Date(),
       isNetSettlement: false,
     },
   })
@@ -898,7 +899,7 @@ export function SettleUp({
               variant="outline"
               disabled
             >
-              No transactions to settle
+              Settle up 🤝
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -994,7 +995,7 @@ export function SettleUp({
                 </span>
               </div>
               
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="transactionDate"
                 render={({ field }) => (
@@ -1029,8 +1030,8 @@ export function SettleUp({
                     </Popover>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
+                )} 
+              />*/}
 
               <FormField
                 control={form.control}
