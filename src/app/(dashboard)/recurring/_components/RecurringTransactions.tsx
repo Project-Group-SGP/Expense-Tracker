@@ -121,7 +121,7 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
           }
         )
 
-        route.push("/recurring")
+        route.refresh();
       } else {
         toast.error("Failed to update reminder status", {
           closeButton: true,
