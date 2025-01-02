@@ -915,7 +915,7 @@ export function AddExpense({
 
     if (splits.length < 2) {
       toast.error("Please select at least two members")
-      return
+      return;
     }
 
     const loading = toast.loading("Adding Expense...")

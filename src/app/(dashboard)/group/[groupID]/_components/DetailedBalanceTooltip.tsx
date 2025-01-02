@@ -218,7 +218,7 @@ export const DetailedBalanceTooltip: React.FC<DetailedBalanceTooltipProps> = ({
   }, 0)
 
   return (
-    <Card className="absolute left-0 top-full z-10 mt-2 w-full max-w-[90vw] border-border bg-background text-foreground shadow-lg sm:max-w-[400px]">
+    <Card className="absolute left-0 top-full z-10 mt-2 w-full  border-border bg-background text-foreground shadow-lg ">
       <CardHeader className="flex flex-row items-center space-x-2 p-3 pb-2 sm:space-x-4 sm:p-4">
         <UserAvatar
           user={{ userId: user.userId, name: user.name, avatar: user.avatar }}
