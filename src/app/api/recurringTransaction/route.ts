@@ -234,130 +234,141 @@ function generateEmailContent(user, day) {
   // Inline styles for email compatibility
   const content = `
     <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SpendWise Reminder</title>
-    </head>
-    <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #fbfcfc">
-        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px;">
-            <!-- Logo -->
-            <div style="text-align: center; margin-bottom: 30px;">
-                <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" style="width: 120px; height: auto;">
-            </div>
-
-            <!-- Header -->
-            <h1 style="color: #4CAF50; text-align: center; margin-bottom: 30px; font-size: 28px;">Recurring Transaction Reminder</h1>
-            
-            <!-- Greeting -->
-            <p style="font-weight: bold; margin-bottom: 20px; font-size: 18px;">Hi ${user.name},</p>
-            <p>This is a reminder about your upcoming recurring payment:</p>
-
-            <!-- Highlight Box -->
-            <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
-                <p style="margin: 0;">Your next payment is due in <strong>${day} days</strong></p>
-            </div>
-
-            ${
-              user.reminders && user.reminders.length > 0
-                ? `
-                <!-- Reminders Table -->
-                <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">Reminders</h2>
-                <div style="overflow-x: auto; margin: 20px 0;">
-                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
-                        <thead>
-                            <tr style="background-color: #e8f5e9;">
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Title</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Due Date</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Category</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${user.reminders
-                              .map(
-                                (reminder) => `
-                                <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
-                                    <td style="padding: 12px 15px;">${reminder.title}</td>
-                                    <td style="padding: 12px 15px;">${reminder.amount}</td>
-                                    <td style="padding: 12px 15px;">${reminder.dueDate}</td>
-                                    <td style="padding: 12px 15px;">${reminder.category}</td>
-                                    <td style="padding: 12px 15px;">${reminder.description}</td>
-                                </tr>
-                            `
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                </div>
-              `
-                : `
-                <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
-                    <p style="margin: 0;">No reminders at the moment.</p>
-                </div>
-              `
-            }
-
-            ${
-              user.recurringTransactions &&
-              user.recurringTransactions.length > 0
-                ? `
-                <!-- Recurring Transactions Table -->
-                <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">Recurring Transactions</h2>
-                <div style="overflow-x: auto; margin: 20px 0;">
-                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
-                        <thead>
-                            <tr style="background-color: #e8f5e9;">
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Next Occurrence</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Frequency</th>
-                                <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px;">Category</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${user.recurringTransactions
-                              .map(
-                                (transaction) => `
-                                <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
-                                    <td style="padding: 12px 15px;">${transaction.title}</td>
-                                    <td style="padding: 12px 15px;">${transaction.amount}</td>
-                                    <td style="padding: 12px 15px;">${transaction.nextOccurrence}</td>
-                                    <td style="padding: 12px 15px;">${transaction.frequency}</td>
-                                    <td style="padding: 12px 15px;">${transaction.category}</td>
-                                </tr>
-                            `
-                              )
-                              .join("")}
-                        </tbody>
-                    </table>
-                </div>
-              `
-                : `
-                <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ff9800;">
-                    <p style="margin: 0;">No recurring transactions found.</p>
-                </div>
-              `
-            }
-
-            <!-- Instructions -->
-            <p>This is an automated reminder for your recurring expense. Please ensure to:</p>
-            <ul style="padding-left: 20px;">
-                <li style="margin-bottom: 10px;">Review the payment details</li>
-                <li style="margin-bottom: 10px;">Mark as paid once you've completed the transaction</li>
-                <li style="margin-bottom: 10px;">Update any changes in the recurring schedule if needed</li>
-            </ul>
-
-            <!-- Footer -->
-            <div style="margin-top: 30px; text-align: center; font-size: 14px; color: #666; border-top: 1px solid #e0e0e0; padding-top: 20px;">
-                <p style="margin: 5px 0;">SpendWise - Helping you manage your recurring expenses wisely</p>
-                <p style="margin: 5px 0;">You're receiving this because you set up a recurring transaction reminder.</p>
-            </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendWise Reminder</title>
+    <style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .table-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .table-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 10px; background-color: #fbfcfc;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; width: 100%; box-sizing: border-box;">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://trackwithspendwise.vercel.app/SpendWIse-5.png" alt="SpendWise Logo" style="width: 120px; height: auto; max-width: 100%;">
         </div>
-    </body>
-    </html>
+
+        <!-- Header -->
+        <h1 style="color: #4CAF50; text-align: center; margin-bottom: 20px; font-size: clamp(20px, 4vw, 28px);">Recurring Transaction Reminder</h1>
+        
+        <!-- Greeting -->
+        <p style="font-weight: bold; margin-bottom: 15px; font-size: clamp(16px, 3vw, 18px);">Hi ${user.name},</p>
+        <p style="font-size: 16px;">This is a reminder about your upcoming recurring payment:</p>
+
+        <!-- Highlight Box -->
+        <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ff9800;">
+            <p style="margin: 0; font-size: 16px;">Your next payment is due in <strong>${day} days</strong></p>
+        </div>
+
+        ${
+          user.reminders && user.reminders.length > 0
+            ? `
+            <!-- Reminders Table -->
+            <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px; font-size: clamp(18px, 3vw, 22px);">Reminders</h2>
+            <div class="table-container" style="overflow-x: auto; margin: 15px 0; -webkit-overflow-scrolling: touch;">
+                <table style="width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr style="background-color: #e8f5e9;">
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Title</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Amount</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Due Date</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Category</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${user.reminders
+                          .map(
+                            (reminder) => `
+                            <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
+                                <td style="padding: 12px 15px; white-space: nowrap;">${reminder.title}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${reminder.amount}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${reminder.dueDate}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${reminder.category}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${reminder.description}</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            </div>
+          `
+            : `
+            <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ff9800;">
+                <p style="margin: 0; font-size: 16px;">No reminders at the moment.</p>
+            </div>
+          `
+        }
+
+        ${
+          user.recurringTransactions && user.recurringTransactions.length > 0
+            ? `
+            <!-- Recurring Transactions Table -->
+            <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 5px; font-size: clamp(18px, 3vw, 22px);">Recurring Transactions</h2>
+            <div class="table-container" style="overflow-x: auto; margin: 15px 0; -webkit-overflow-scrolling: touch;">
+                <table style="width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr style="background-color: #e8f5e9;">
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Description</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Amount</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Next Occurrence</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Frequency</th>
+                            <th style="padding: 12px 15px; text-align: left; color: #2e7d32; font-weight: bold; text-transform: uppercase; font-size: 14px; white-space: nowrap;">Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${user.recurringTransactions
+                          .map(
+                            (transaction) => `
+                            <tr style="background-color: #ffffff; border-bottom: 1px solid #e0e0e0;">
+                                <td style="padding: 12px 15px; white-space: nowrap;">${transaction.title}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${transaction.amount}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${transaction.nextOccurrence}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${transaction.frequency}</td>
+                                <td style="padding: 12px 15px; white-space: nowrap;">${transaction.category}</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            </div>
+          `
+            : `
+            <div style="background-color: #fff3e0; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ff9800;">
+                <p style="margin: 0; font-size: 16px;">No recurring transactions found.</p>
+            </div>
+          `
+        }
+
+        <!-- Instructions -->
+        <p style="font-size: 16px;">This is an automated reminder for your recurring expense. Please ensure to:</p>
+        <ul style="padding-left: 20px;">
+            <li style="margin-bottom: 10px; font-size: 16px;">Review the payment details</li>
+            <li style="margin-bottom: 10px; font-size: 16px;">Mark as paid once you've completed the transaction</li>
+            <li style="margin-bottom: 10px; font-size: 16px;">Update any changes in the recurring schedule if needed</li>
+        </ul>
+
+        <!-- Footer -->
+        <div style="margin-top: 20px; text-align: center; font-size: 14px; color: #666; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+            <p style="margin: 5px 0;">SpendWise - Helping you manage your recurring expenses wisely</p>
+            <p style="margin: 5px 0;">You're receiving this because you set up a recurring transaction reminder.</p>
+        </div>
+    </div>
+</body>
+</html>
   `
 
   return content
@@ -446,7 +457,7 @@ async function setNextOccurrence() {
           data: {
             userId,
             amount,
-            description : "Income from recurring transaction",
+            description: "Income from recurring transaction",
             date: new Date(), // Current date
           },
         })
@@ -455,7 +466,7 @@ async function setNextOccurrence() {
           data: {
             userId,
             amount,
-            description : "Expense from recurring transaction",
+            description: "Expense from recurring transaction",
             date: new Date(), // Current date
             category: transaction.category as CategoryTypes, // Include category
           },
