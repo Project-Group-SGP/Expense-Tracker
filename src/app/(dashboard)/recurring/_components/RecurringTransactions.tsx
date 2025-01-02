@@ -95,9 +95,9 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
   const totalPages = Math.ceil(transactions.length / itemsPerPage)
 
   const handleReminderToggle = async (id: string, enabled: boolean) => {
-    console.log(
-      `Reminder for transaction ${id} ${enabled ? "enabled" : "disabled"}`
-    )
+    // console.log(
+    //   `Reminder for transaction ${id} ${enabled ? "enabled" : "disabled"}`
+    // )
 
     try {
       // Send a request to the server to update the reminder status

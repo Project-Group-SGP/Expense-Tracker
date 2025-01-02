@@ -29,7 +29,7 @@ const getTotalIncomeExpense = cache(
       })
       if (!res.ok) throw new Error("Failed to fetch total income")
       const data = await res.json()
-      console.log(data);
+      // console.log(data);
       
       return data;
     } catch (error) {
