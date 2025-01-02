@@ -198,9 +198,9 @@ export async function setReminderStatus(id: string, status: boolean): Promise<bo
       data: { reminderEnabled:  status },
     })
     
-    return true
+    return true;
   } catch (error) {
     console.error("Error setting reminder status:", error)
-    return false
+    return false;
   }
 }

@@ -47,9 +47,10 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
 interface RecurringTransactionsProps {
-  transaction: RecurringTransaction[]
+  initialTransactions: RecurringTransaction[]
   onEdit: (transaction: RecurringTransaction) => void
   onDelete: (id: string) => void
+  update_Transactions: (transactions: RecurringTransaction[]) => void
 }
 
 type ColumnVisibility = {
@@ -61,7 +62,8 @@ type ColumnVisibility = {
 }
 
 export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
-  transaction,
+  initialTransactions: transactions,
+  update_Transactions,
   onEdit,
   onDelete,
 }) => {
@@ -72,8 +74,6 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
     nextOccurrence: true,
     description: true,
   })
-
-  const [transactions, setTransactions] = useState(transaction)
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
@@ -102,14 +102,15 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
     try {
       // Send a request to the server to update the reminder status
       const response = await setReminderStatus(id, enabled)
-
+      route.refresh()
       if (response === true) {
-        setTransactions((prevTransactions) =>
-          prevTransactions.map((transaction) =>
-            transaction.id === id
-              ? { ...transaction, reminderEnabled: enabled }
-              : transaction
-          )
+        update_Transactions(
+          transactions.map((transaction) => {
+            if (transaction.id === id) {
+              return { ...transaction, reminderEnabled: enabled }
+            }
+            return transaction
+          })
         )
 
         toast.success(
@@ -120,9 +121,6 @@ export const RecurringTransactions: React.FC<RecurringTransactionsProps> = ({
             duration: 4500,
           }
         )
-
-        route.push("/recurring");
-        route.refresh();
       } else {
         toast.error("Failed to update reminder status", {
           closeButton: true,

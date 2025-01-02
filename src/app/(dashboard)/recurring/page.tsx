@@ -225,7 +225,8 @@ export default function RecurringTransactionsAndReminders() {
                 <SkeletonLoader />
               ) : (
                 <RecurringTransactions
-                  transaction={transactions}
+                initialTransactions={transactions}
+                update_Transactions={setTransactions}
                   onEdit={(item) => {
                     setEditingItem(item)
                     setIsDialogOpen(true)
