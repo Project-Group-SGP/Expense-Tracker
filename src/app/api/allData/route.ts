@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(req: NextRequest) {
   try {
-    const searchParams = req.nextUrl.searchParams
+    const { searchParams } = new URL(req.url)
     // const userId = searchParams.get("userId")
     const startDate = searchParams.get("startDate")
     const endDate = searchParams.get("endDate")

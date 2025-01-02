@@ -63,7 +63,7 @@ export async function GetBudgetDb() {
       throw new Error("Budget not found.")
     }
 
-    console.log("budget", budget.budget)
+    // console.log("budget", budget.budget)
     return budget
   } catch (error) {
     console.error("Error in GetBudget:", error)

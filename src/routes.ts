@@ -46,8 +46,7 @@ export const apiAuthPrefix = "/api/auth"
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard"
 
 export const apiRoutes = [
-  "/api/totalExpense",
-  "/api/totalIncome",
+  "/api/total-income-expense",
   "/api/allData",
   "/api/joinin-date",
   "/api/budget-category",

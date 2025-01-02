@@ -16,41 +16,26 @@ import { Button } from "react-day-picker"
 import { RecurringButton } from "./_components/RecurringButton"
 
 type FinancialData = {
-  amount: number
+  income: number
+  expense: number
 }
 
-const getTotalIncome = cache(
-  async (id: string, cookie: string): Promise<FinancialData> => {
+const getTotalIncomeExpense = cache(
+  async (id: string, cookie: string, startDate: string, endDate: string): Promise<FinancialData> => {
     try {
-      const res = await fetch(`${process.env.BASE_URL}/api/totalIncome`, {
+      const res = await fetch(`${process.env.BASE_URL}/api/total-income-expense?&startDate=${startDate}&endDate=${endDate}`, {
         method: "GET",
         headers: { Cookie: cookie },
-        next: { tags: ["totalIncome"] },
+        next: { tags: ["total-income-expense"] },
         cache: "force-cache",
       })
       if (!res.ok) throw new Error("Failed to fetch total income")
       const data = await res.json()
-      return { amount: Number(data) || 0 }
+      console.log(data);
+      
+      return data;
     } catch (error) {
-      return { amount: 0 }
-    }
-  }
-)
-
-const getTotalExpense = cache(
-  async (id: string, cookie: string): Promise<FinancialData> => {
-    try {
-      const res = await fetch(`${process.env.BASE_URL}/api/totalExpense`, {
-        method: "GET",
-        headers: { Cookie: cookie },
-        next: { tags: ["totalExpense"] },
-        cache: "force-cache",
-      })
-      if (!res.ok) throw new Error("Failed to fetch total expense")
-      const data = await res.json()
-      return { amount: Number(data) || 0 }
-    } catch (error) {
-      return { amount: 0 }
+      return { income: 0, expense: 0}
     }
   }
 )
@@ -90,7 +75,7 @@ const getAllData = cache(
         `${process.env.BASE_URL}/api/allData?&startDate=${startDate}&endDate=${endDate}`,
         {
           method: "GET",
-          headers: { Cookie: cookie },
+          headers: { Cookie: cookie  },
           next: {
             tags: ["getAllData"],
           },
@@ -128,14 +113,13 @@ export default async function Dashboard({
   const endDate =
     searchParams?.endDate || format(new Date(), "yyyy-MM-dd") || ""
 
-  const [totalIncome, totalExpense, Data] = await Promise.all([
-    getTotalIncome(user.id, cookie),
-    getTotalExpense(user.id, cookie),
+  const [ total , Data] = await Promise.all([
+    getTotalIncomeExpense(user.id, cookie, startDate, endDate),
     getAllData(user.id, cookie, startDate, endDate),
   ])
 
-  const incomeAmount = totalIncome?.amount ?? 0
-  const expenseAmount = totalExpense?.amount ?? 0
+  // console.log(total);
+  
 
   return (
     <Suspense>
@@ -158,12 +142,13 @@ export default async function Dashboard({
               <RecurringButton />
             </div>
           </div>
+            <DateSelect />
 
           <section className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card
               label="Remaining"
               icon={PiggyBankIcon}
-              amount={(incomeAmount - expenseAmount).toFixed(2)}
+              amount={(total.income - total.expense).toFixed(2)}
               description="All time"
               iconclassName="text-blue-600"
               descriptionColor="text-blue-400"
@@ -171,7 +156,7 @@ export default async function Dashboard({
             <Card
               label="Income"
               icon={MoveUpIcon}
-              amount={incomeAmount.toFixed(2)}
+              amount={total.income.toFixed(2)}
               description="All time"
               iconclassName="text-green-600"
               descriptionColor="text-green-400"
@@ -179,14 +164,13 @@ export default async function Dashboard({
             <Card
               label="Expenses"
               icon={MoveDownIcon}
-              amount={expenseAmount.toFixed(2)}
+              amount={total.expense.toFixed(2)}
               description="All time"
               iconclassName="text-red-600"
               descriptionColor="text-red-400"
             />
           </section>
 
-          <DateSelect />
 
           <section className="w-full space-y-4 md:flex md:space-x-4 md:space-y-0">
             <Cardcontent className="w-full p-4 md:w-1/2">
