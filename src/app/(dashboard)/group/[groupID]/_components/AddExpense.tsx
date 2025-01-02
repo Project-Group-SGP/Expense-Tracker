@@ -1162,7 +1162,7 @@ export function AddExpense({
                       }}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger className="w-full sm:w-[120px]">
+                      <SelectTrigger className="w-full sm:w-[140px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
