@@ -10,9 +10,7 @@ import { Dropdown_chart_2 } from "./_components/Dropdown_chart_2"
 import { NewExpense } from "./_components/NewExpense"
 import { Newincome } from "./_components/Newincome"
 import PageTitle from "./_components/PageTitle"
-import { generateFinancialAdvice } from "./actions"
 import AIInsight from "./_components/AIInsight"
-import { Button } from "react-day-picker"
 import { RecurringButton } from "./_components/RecurringButton"
 
 type FinancialData = {
