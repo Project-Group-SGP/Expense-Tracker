@@ -6,9 +6,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET(req: NextRequest) {
   try {
     const user = await currentUserServer()
-    const searchParams = req.nextUrl.searchParams
-    const to = searchParams.get("to")
-    const from = searchParams.get("from")
+    
     const userId = user?.id
 
     if (!userId || typeof userId !== "string") {
@@ -19,6 +17,9 @@ export async function GET(req: NextRequest) {
       )
     }
 
+    const { searchParams } = new URL(req.url)
+    const to = searchParams.get("to")
+    const from = searchParams.get("from")
     const defaultTo = new Date()
     const defaultFrom = subDays(defaultTo, 30)
 
