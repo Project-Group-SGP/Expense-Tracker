@@ -880,6 +880,15 @@ export function AddExpense({
       (sum, member) => sum + (member.included ? member.amount : 0),
       0
     );
+
+    data.splitWith.forEach(element => {
+      if(element.amount <0){
+        toast.error(
+          "The split amounts cannot be negative."
+        );
+        return;
+      }
+    });
   
     if (Math.abs(totalSplitAmount - totalAmount) > 0.01) {
       toast.error(
