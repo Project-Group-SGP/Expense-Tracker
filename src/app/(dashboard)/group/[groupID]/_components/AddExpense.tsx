@@ -867,6 +867,7 @@ export function AddExpense({
           member.amount = Number(amountPerMember.toFixed(2));
           remainingAmount -= member.amount;
         }
+        member.amount < 0? member.amount = 0 : member.amount;
       });
     }
 
@@ -882,7 +883,7 @@ export function AddExpense({
     );
 
     data.splitWith.forEach(element => {
-      if(element.amount <0){
+      if(element.amount < 0){
         toast.error(
           "The split amounts cannot be negative."
         );
@@ -896,6 +897,7 @@ export function AddExpense({
       );
       return;
     }
+
     const groupId = params.groupID
     const paidById = members.find((member) => member.name === data.paidBy)?.id
 
