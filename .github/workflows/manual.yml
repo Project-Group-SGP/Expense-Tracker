@@ -1,11 +1,8 @@
 name: Keep API Alive
-
 on:
   schedule:
-    # This will run every 3 hours
-    - cron: '0 */1 * * *'
-  workflow_dispatch:  # This allows manual triggering of the workflow
-
+    - cron: '*/20 * * * *'
+  workflow_dispatch:  
 jobs:
   call-api:
     runs-on: ubuntu-latest
