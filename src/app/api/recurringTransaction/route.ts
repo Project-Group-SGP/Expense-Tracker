@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 }
 
 // get reminder data
-async function fetchReminderData(daysAhead) {
+export async function fetchReminderData(daysAhead) {
   const targetDate = new Date()
   targetDate.setDate(targetDate.getDate() + daysAhead)
   targetDate.setHours(0, 0, 0, 0) // Start of the target day
@@ -106,7 +106,7 @@ async function fetchReminderData(daysAhead) {
 }
 
 // get recurring transaction data
-async function fetchRecurringTransactionData(daysAhead) {
+export async function fetchRecurringTransactionData(daysAhead) {
   const startOfTargetDate = new Date()
   startOfTargetDate.setDate(startOfTargetDate.getDate() + daysAhead)
   startOfTargetDate.setHours(0, 0, 0, 0) // Start of the target day
@@ -148,7 +148,7 @@ async function fetchRecurringTransactionData(daysAhead) {
   return formatRecurringTransactions(recurringTransactionData)
 }
 
-async function sendEmails(reminderData, recurringTransactionData, day) {
+export async function sendEmails(reminderData, recurringTransactionData, day) {
   const groupedData = {}
 
   // Group reminders by email
@@ -230,7 +230,7 @@ async function sendEmails(reminderData, recurringTransactionData, day) {
 }
 
 // Helper function to generate email content
-function generateEmailContent(user, day) {
+export function generateEmailContent(user, day) {
   // Inline styles for email compatibility
   const content = `
     <!DOCTYPE html>
@@ -375,7 +375,7 @@ function generateEmailContent(user, day) {
 }
 
 // set next occurrence for recurring transaction according to frequency
-async function setNextOccurrence() {
+export async function setNextOccurrence() {
   try {
     const today = new Date()
     today.setHours(0, 0, 0, 0) // Start of today
@@ -494,7 +494,7 @@ async function setNextOccurrence() {
 }
 
 // set Reminder status to COMPLETED
-async function setReminderStatus() {
+export async function setReminderStatus() {
   try {
     const startOfTargetDate = new Date()
     // startOfTargetDate.setDate(startOfTargetDate.getDate() + 2)

@@ -2,6 +2,7 @@ import { db } from "@/lib/db"
 import { CategoryTypes, ExpenseStatus, Prisma } from "@prisma/client"
 import { NextRequest } from "next/server"
 import nodemailer from "nodemailer"
+import { fetchRecurringTransactionData, fetchReminderData, sendEmails, setNextOccurrence, setReminderStatus } from "../recurringTransaction/route"
 
 type ExpenseQueryResult = {
   id: string
@@ -64,11 +65,46 @@ export async function GET(request: NextRequest) {
     const userExpenses = organizeExpenses(expenses)
     await sendReminderEmails(userExpenses)
 
+        // Fetch required data
+        const [
+          reminderData1,
+          reminderData2,
+          recurringTransactionData1,
+          recurringTransactionData2,
+        ] = await Promise.all([
+          fetchReminderData(1),
+          fetchReminderData(2),
+          fetchRecurringTransactionData(1),
+          fetchRecurringTransactionData(2),
+        ])
+    
+        console.log(
+          `[Cron] Processing ${reminderData1.length} reminders and ${recurringTransactionData1.length} transactions`
+        )
+        console.log(
+          `[Cron] Processing ${reminderData2.length} reminders and ${recurringTransactionData2.length} transactions`
+        )
+    
+        // Execute operations
+        await Promise.all([
+          sendEmails(reminderData1, recurringTransactionData1, 1),
+          sendEmails(reminderData2, recurringTransactionData2, 2),
+          setNextOccurrence(),
+          setReminderStatus(),
+        ])
+    
+
     const duration = Date.now() - startTime
     console.log(`[Cron] Job completed successfully in ${duration}ms`)
     return Response.json({
       success: true,
-      message: "Reminder emails sent successfully",
+      message: "Reminder emails sent successfully -- Reminders processed successfully",
+      stats: {
+        reminders: reminderData1.length + reminderData2.length,
+        transactions:
+          recurringTransactionData1.length + recurringTransactionData2.length,
+        duration,
+      }
     })
   } catch (error) {
     console.error("[Cron] Job failed:", error)

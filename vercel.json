@@ -3,10 +3,6 @@
     {
       "path": "/api/sendRemainder",
       "schedule": "0 14 * * *"
-    },
-    {
-      "path": "/api/recurringTransaction",
-      "schedule": "0 15 * * *"
-    }    
+    }  
   ]
 }
