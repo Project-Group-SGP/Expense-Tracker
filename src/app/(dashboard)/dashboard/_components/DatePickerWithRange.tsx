@@ -1,5 +1,4 @@
 "use client"
-import * as React from "react"
 import {
   format,
   subMonths,
@@ -17,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useEffect, useState } from "react"
 
 export function DatePickerWithRange({
   className,
@@ -26,13 +26,13 @@ export function DatePickerWithRange({
   onDateRangeChange?: (dateRange: DateRange | undefined) => void
   defaultDateRange?: DateRange
 }) {
-  const [date, setDate] = React.useState<DateRange>({
+  const [date, setDate] = useState<DateRange>({
     from: undefined,
     to: new Date(),
   })
 
   // ṣet start date to joing Date
-  React.useEffect(() => {
+  useEffect(() => {
     // Fetch the join date from the server
     const fetchJoinDate = async () => {
       try {
@@ -42,6 +42,8 @@ export function DatePickerWithRange({
           cache: "force-cache",
         })
         const data = await response.json()
+
+        console.log("Join date:", data)
 
         if (data.joininDate) {
           const joinDate = parseISO(data.joininDate)
@@ -69,7 +71,7 @@ export function DatePickerWithRange({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (onDateRangeChange) {
       onDateRangeChange(date)
     }

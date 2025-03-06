@@ -18,17 +18,17 @@ model User {
   isTwoFactorEnable     Boolean                @default(false)
   accounts              Account[]
   categories            Category[]
-  incomes               Income[]
   expenses              Expense[]
-  twoFactorConfirmation TwoFactorConfirmation?
-  pushSubscriptions     PushSubscription[]
+  expenseSplits         ExpenseSplit[]         @relation("ExpenseSplits")
   createdGroups         Group[]                @relation("GroupCreator")
+  paidExpenses          GroupExpense[]         @relation("PaidExpenses")
   groupMemberships      GroupMember[]
+  incomes               Income[]
   joinRequests          JoinRequest[]
-  paidExpenses         GroupExpense[] @relation("PaidExpenses")
-  expenseSplits        ExpenseSplit[] @relation("ExpenseSplits")
+  pushSubscriptions     PushSubscription[]
+  twoFactorConfirmation TwoFactorConfirmation?
   recurringTransactions RecurringTransaction[]
-  reminders            Reminder[]
+  reminders             Reminder[]
 
   @@index([email])
   @@map("users")
@@ -82,7 +82,7 @@ model Expense {
   date        DateTime
   description String?
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId, category, date])
 }
 
@@ -104,27 +104,27 @@ model TwoFactorConfirmation {
 }
 
 model PushSubscription {
-  id           String   @id @default(cuid())
-  userId       String
-  endpoint     String   @unique
-  auth         String
-  p256dh       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  userId   String
+  endpoint String @unique
+  auth     String
+  p256dh   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Group {
-  id          String        @id @default(cuid())
-  name        String
-  description String?
-  photo       String?
-  code        String        @unique
-  creatorId   String
-  creator     User          @relation("GroupCreator", fields: [creatorId], references: [id])
-  members     GroupMember[]
+  id           String         @id @default(cuid())
+  name         String
+  description  String?
+  photo        String?
+  code         String         @unique
+  creatorId    String
+  creator      User           @relation("GroupCreator", fields: [creatorId], references: [id])
+  expenses     GroupExpense[]
+  members      GroupMember[]
   joinRequests JoinRequest[]
-  expenses    GroupExpense[]
 
   @@index([creatorId])
 }
@@ -133,79 +133,78 @@ model GroupMember {
   id      String @id @default(cuid())
   userId  String
   groupId String
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
 }
 
 model JoinRequest {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   userId    String
   groupId   String
   status    JoinRequestStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+  group     Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
   @@index([groupId, status])
 }
 
 model GroupExpense {
-  id          String        @id @default(cuid())
+  id          String         @id @default(cuid())
   groupId     String
   paidById    String
   category    CategoryTypes?
   amount      Decimal
   description String
   date        DateTime
-  status      ExpenseStatus @default(UNSETTLED)
-
-  createdAt   DateTime      @default(now())
-  group       Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  paidBy      User          @relation("PaidExpenses", fields: [paidById], references: [id], onDelete: Cascade)
+  status      ExpenseStatus  @default(UNSETTLED)
+  createdAt   DateTime       @default(now())
   splits      ExpenseSplit[]
+  group       Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy      User           @relation("PaidExpenses", fields: [paidById], references: [id], onDelete: Cascade)
 
   @@index([groupId, date])
   @@index([paidById])
 }
 
 model ExpenseSplit {
-  id          String       @id @default(cuid())
-  expenseId   String
-  userId      String
-  amount      Decimal     @default(0)
-  isPaid      SplitStatus @default(UNPAID)
-  expense     GroupExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  user        User         @relation("ExpenseSplits", fields: [userId], references: [id], onDelete: Cascade)
-  payments    Payment[]
+  id        String       @id @default(cuid())
+  expenseId String
+  userId    String
+  amount    Decimal      @default(0)
+  isPaid    SplitStatus  @default(UNPAID)
+  expense   GroupExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user      User         @relation("ExpenseSplits", fields: [userId], references: [id], onDelete: Cascade)
+  payments  Payment[]
 
   @@unique([expenseId, userId])
   @@index([userId])
 }
 
 model Payment {
-  id            String       @id @default(cuid())
+  id             String       @id @default(cuid())
   expenseSplitId String
-  amount        Decimal
-  paidAt        DateTime     @default(now())
-  expenseSplit  ExpenseSplit @relation(fields: [expenseSplitId], references: [id], onDelete: Cascade)
-  
+  amount         Decimal
+  paidAt         DateTime     @default(now())
+  expenseSplit   ExpenseSplit @relation(fields: [expenseSplitId], references: [id], onDelete: Cascade)
+
   @@index([expenseSplitId])
 }
 
 model Reminder {
-  id            String           @id @default(cuid())
-  userId        String
-  title         String
-  amount        Decimal
-  description   String
-  dueDate       DateTime
-  type          TransactionType
-  category      CategoryTypes?  
-  status        ReminderStatus  @default(PENDING)
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  userId      String
+  amount      Decimal
+  description String
+  dueDate     DateTime
+  type        TransactionType
+  category    CategoryTypes?
+  status      ReminderStatus  @default(PENDING)
+  title       String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, dueDate])
   @@index([userId, status])
@@ -213,23 +212,23 @@ model Reminder {
 }
 
 model RecurringTransaction {
-  id            String             @id @default(cuid())
-  userId        String
-  type          TransactionType
-  amount        Decimal
-  title         String
-  description   String?
-  category      CategoryTypes?     
-  startDate     DateTime
-  endDate       DateTime?          
-  frequency     RecurringFrequency
-  customInterval Int? 
+  id              String             @id @default(cuid())
+  userId          String
+  type            TransactionType
+  amount          Decimal
+  description     String?
+  category        CategoryTypes?
+  startDate       DateTime
+  endDate         DateTime?
+  frequency       RecurringFrequency
+  customInterval  Int?
   reminderEnabled Boolean
-  isActive      Boolean            @default(true)
-  lastProcessed DateTime?          // To track when the last transaction was created
-  nextOccurrence DateTime          // Next date when transaction should occur
-  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  isActive        Boolean            @default(true)
+  lastProcessed   DateTime?
+  nextOccurrence  DateTime
+  title           String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, type])
   @@index([userId, isActive])
   @@index([nextOccurrence])
@@ -294,4 +293,3 @@ enum ReminderStatus {
   COMPLETED
   CANCELLED
 }
-

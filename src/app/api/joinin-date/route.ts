@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
     }
 
     const joininDate = userData.emailVerified.toISOString().split("T")[0]
-    // console.log(joininDate);
 
     return NextResponse.json({ joininDate })
   } catch (error) {
