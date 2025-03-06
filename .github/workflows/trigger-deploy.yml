@@ -26,6 +26,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.Deployment }}
         run: |
-          git add trigger-file.txt
-          git commit -m "Trigger deploy by adding a space"
+          git add .
+          git commit -m "Deployment Trigger"
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git main
