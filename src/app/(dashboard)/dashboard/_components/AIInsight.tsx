@@ -51,6 +51,7 @@ interface Message {
   content: string
 }
 
+
 export default function AIInsight() {
   const [fromMonth, setFromMonth] = useState<Month | "">("")
   const [toMonth, setToMonth] = useState<Month | "">("")
