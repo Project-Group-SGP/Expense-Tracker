@@ -219,7 +219,7 @@ export function NewExpense() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="h-10 w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:h-10 sm:w-[150px]"
+          className="h-9 w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:h-9 sm:w-[150px]"
           variant="outline"
           onClick={() => setOpen(true)}
         >

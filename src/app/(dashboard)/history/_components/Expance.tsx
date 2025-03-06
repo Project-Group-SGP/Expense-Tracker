@@ -379,11 +379,11 @@ export function NewExpense() {
               disabled={isAnalyzing}
             />
 
-            <DialogFooter className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
+            <DialogFooter className="flex w-full flex-col gap-4 pt-2 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 w-full border border-gray-200 text-sm font-medium hover:bg-gray-50 sm:h-10 sm:flex-1"
+                className="h-10 w-full border border-gray-300 text-sm font-medium hover:bg-gray-700 hover:text-white sm:h-10 sm:flex-1"
                 disabled={isAnalyzing}
                 onClick={triggerFileUpload}
               >
@@ -393,7 +393,7 @@ export function NewExpense() {
               <Button
                 type="submit"
                 variant="outline"
-                className="h-10 w-full border-red-400 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 sm:flex-1"
+                className="h-10 w-full border-red-500 text-sm font-medium text-red-500 hover:bg-red-700 hover:text-white sm:flex-1"
                 disabled={isPending}
               >
                 {isPending ? "Adding..." : "Add new Expense"}
