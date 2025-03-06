@@ -3,7 +3,7 @@ name: Trigger Deploy Commit
 on:
   push:
     branches:
-      - main
+      - main # Change if needed
 
 jobs:
   deploy_trigger:
@@ -12,20 +12,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.DEPLOY_TOKEN }} # Use PAT for write access
 
       - name: Configure Git
         run: |
-          git config --global user.name "Deployment Bot"
+          git config --global user.name "Deploy Bot"
           git config --global user.email "deploy-bot@example.com"
 
-      - name: Modify a file (Add space)
+      - name: Prepend newline to global.d.ts
         run: |
           sed -i '1s/^/\n/' global.d.ts
 
       - name: Commit and Push Changes
         env:
-          GH_TOKEN: ${{ secrets.Deployment }}
+          GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           git add .
-          git commit -m "Deployment Trigger"
-          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git main
+          git commit -m "Trigger deploy by adding a newline"
+          git push origin main
