@@ -5,9 +5,10 @@ import { ExpenseFormData } from "./_components/NewExpense"
 import { IncomeFormData } from "./_components/Newincome"
 import { revalidateTag } from "next/cache"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { streamText } from "ai"
+import { generateText, streamText } from "ai"
 import { createStreamableValue } from "ai/rsc"
 import { CategoryTypes } from "@prisma/client"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
 export type Month =
   | "January"
@@ -324,5 +325,141 @@ export async function generateFinancialAdvice(
   } catch (error: any) {
     console.error("Error generating content:", error)
     return { error: "Failed to generate content", details: error.message }
+  }
+}
+
+export async function AnalayzeBill(imageBase64: string) {
+  try {
+    // Validate input is an image
+    if (!imageBase64 || typeof imageBase64 !== "string") {
+      throw new Error(
+        "Invalid input: Must provide a base64 encoded image string"
+      )
+    }
+
+    // Check if the string is a valid base64 image
+    const isBase64Image = /^data:image\/(jpeg|png|jpg|gif|webp);base64,/.test(
+      imageBase64
+    )
+    if (!isBase64Image) {
+      throw new Error("Invalid input: Must be a base64 encoded image")
+    }
+
+    const user = await currentUserServer()
+    if (!user) {
+      throw new Error("Please log in.")
+    }
+
+    // Initialize the Google Generative AI with your API key
+    const genAI = new GoogleGenerativeAI(
+      process.env.GEMINI_MAIL_API_KEY as string
+    )
+
+    // Get the model
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash-002",
+    })
+
+    const prompt = `
+Analyze this image and determine if it's a bill/receipt or not.
+
+If it IS a bill or receipt:
+1. Extract the total amount
+2. Extract the date of transaction (in YYYY-MM-DD format)
+   - If the date is not visible in the receipt, indicate this with "date_not_found" instead of making up a date
+3. Extract a brief description of what the bill/receipt is for
+4. Determine the expense category from: ${Object.values(CategoryTypes).join(", ")}
+
+If it is NOT a bill or receipt:
+1. Identify what type of image it is (e.g., "landscape photo", "portrait", "screenshot", etc.)
+
+Format your response as a valid JSON object with these exact keys:
+{
+  "isBill": boolean,
+  "type": string, // "bill" or the identified image type if not a bill
+  "data": {
+    // If isBill is true:
+    "totalAmount": number,
+    "date": string, // YYYY-MM-DD or "date_not_found" if not visible
+    "description": string, // Brief description of what the bill is for
+    "category": string // One of the categories listed above
+    
+    // If isBill is false:
+    "description": string // Brief description of what the image contains
+  }
+}
+
+Return ONLY the JSON object, nothing else.
+`
+    // Extract the base64 data without the MIME prefix
+    const base64Data = imageBase64.split(",")[1]
+
+    // Create a content part with the image
+    const imagePart = {
+      inlineData: {
+        data: base64Data,
+        mimeType: imageBase64.match(/data:(.*?);base64/)?.[1] || "image/jpeg",
+      },
+    }
+
+    // Generate content with the image and prompt
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }, imagePart],
+        },
+      ],
+    })
+
+    const response = result.response
+    const text = response.text()
+    console.log("Response text:", text)
+
+    // Parse the response
+    try {
+      const jsonTextMatch = text.match(/(\{[\s\S]*\})/)
+      const cleanedText = jsonTextMatch ? jsonTextMatch[0] : text
+      const result = JSON.parse(cleanedText)
+
+      // If this is a bill and the date was not found, use today's date in Indian format
+      if (result.isBill === true && result.data.date === "date_not_found") {
+        // Create a date object for today in Indian time
+        const options = { timeZone: "Asia/Kolkata" }
+        const today = new Date()
+
+        // Format as YYYY-MM-DD
+        const year = today.toLocaleString("en-US", {
+          year: "numeric",
+          timeZone: "Asia/Kolkata",
+        })
+        // Month is 0-indexed, so add 1 and pad with leading zero if needed
+        const month = String(
+          today.toLocaleString("en-US", {
+            month: "numeric",
+            timeZone: "Asia/Kolkata",
+          })
+        ).padStart(2, "0")
+        const day = String(
+          today.toLocaleString("en-US", {
+            day: "numeric",
+            timeZone: "Asia/Kolkata",
+          })
+        ).padStart(2, "0")
+
+        result.data.date = `${year}-${month}-${day}`
+      }
+
+      return result
+    } catch (error) {
+      console.error("Error parsing AI response:", error)
+      throw new Error("Failed to parse the analysis result")
+    }
+  } catch (error: any) {
+    console.error("Error analyzing bill:", error)
+    return {
+      error: true,
+      message: error.message || "Failed to analyze the image",
+    }
   }
 }

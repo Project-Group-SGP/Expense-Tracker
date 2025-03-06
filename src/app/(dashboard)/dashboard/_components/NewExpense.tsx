@@ -1,9 +1,11 @@
 "use client"
 
+import type React from "react"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import { CalendarIcon, Check, ChevronDown } from "lucide-react"
-import { useEffect, useState } from "react"
+import { CalendarIcon, Check, ChevronDown, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
@@ -43,16 +45,19 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { categories, suggestCategory } from "@/lib/categoryKeywords"
 import { cn } from "@/lib/utils"
 import { CategoryTypes } from "@prisma/client"
-import { AddnewExpense } from "../actions"
+import { AddnewExpense, AnalayzeBill } from "../actions"
 
 // form validation schema
 const formSchema = z.object({
   description: z.string().optional(),
   amount: z
     .string()
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a valid number greater than 0",
-    }),
+    .refine(
+      (val) => !isNaN(Number.parseFloat(val)) && Number.parseFloat(val) > 0,
+      {
+        message: "Amount must be a valid number greater than 0",
+      }
+    ),
   transactionDate: z.date(),
   category: z.nativeEnum(CategoryTypes),
 })
@@ -80,6 +85,81 @@ export function NewExpense() {
   const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(
     CategoryTypes.Other
   )
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleBillUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsAnalyzing(true)
+    try {
+      // Convert the file to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = (error) => reject(error)
+      })
+
+      // Call the analyze bill function
+      const result = await AnalayzeBill(base64)
+
+      if (result.error) {
+        toast.error("Failed to analyze bill")
+        return
+      }
+
+      if (result.isBill) {
+        // Fill the form with the extracted data
+        form.setValue("amount", result.data.totalAmount.toString(), {
+          shouldValidate: true,
+        })
+
+        if (result.data.description) {
+          form.setValue("description", result.data.description, {
+            shouldValidate: true,
+          })
+        }
+
+        if (result.data.date && result.data.date !== "date_not_found") {
+          form.setValue("transactionDate", new Date(result.data.date), {
+            shouldValidate: true,
+          })
+        }
+
+        if (result.data.category) {
+          form.setValue("category", result.data.category as CategoryTypes, {
+            shouldValidate: true,
+          })
+          setSuggestedCategory(result.data.category as CategoryTypes)
+        }
+
+        toast.success("Bill analyzed successfully", {
+          closeButton: true,
+          icon: "📄",
+          duration: 3000,
+        })
+      } else {
+        toast.error("This doesn't appear to be a bill or receipt")
+      }
+    } catch (error) {
+      console.error("Error analyzing bill:", error)
+      toast.error("Failed to analyze bill")
+    } finally {
+      setIsAnalyzing(false)
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -139,7 +219,7 @@ export function NewExpense() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-full  sm:w-[150px] border-red-500 text-red-500 hover:bg-red-700 hover:text-white"
+          className="h-10 w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:h-10 sm:w-[150px]"
           variant="outline"
           onClick={() => setOpen(true)}
         >
@@ -204,7 +284,7 @@ export function NewExpense() {
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between"
+                          className="h-10 w-full justify-between"
                         >
                           {categoryEmojis[field.value]}{" "}
                           {field.value ||
@@ -257,7 +337,7 @@ export function NewExpense() {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal sm:w-[240px]",
+                            "h-10 w-full pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -287,11 +367,32 @@ export function NewExpense() {
               )}
             />
 
-            <DialogFooter className="mt-6 sm:mt-8">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              //Accept images only not svg pr gif only main image formats
+              accept="image/"
+              className="hidden"
+              onChange={handleBillUpload}
+              disabled={isAnalyzing}
+            />
+
+            <DialogFooter className="flex w-full flex-col gap-4 pt-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 w-full border border-gray-300 text-sm font-medium hover:bg-gray-700 hover:text-white sm:h-10 sm:flex-1"
+                disabled={isAnalyzing}
+                onClick={triggerFileUpload}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {isAnalyzing ? "Analyzing..." : "Upload Bill"}
+              </Button>
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-auto"
+                className="h-10 w-full border-red-500 text-sm font-medium text-red-500 hover:bg-red-700 hover:text-white sm:flex-1"
                 disabled={isPending}
               >
                 {isPending ? "Adding..." : "Add new Expense"}
