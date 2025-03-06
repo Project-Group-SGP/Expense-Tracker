@@ -25,6 +25,7 @@ jobs:
           sed -i '1s/^/\n/' global.d.ts
 
       - name: Commit and Push Changes
+        if: github.event.head_commit.message != 'Trigger deploy by adding a newline'
         env:
           GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
