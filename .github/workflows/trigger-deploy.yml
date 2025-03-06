@@ -1,0 +1,31 @@
+name: Trigger Deploy Commit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Deployment Bot"
+          git config --global user.email "deploy-bot@example.com"
+
+      - name: Modify a file (Add space)
+        run: |
+          sed -i '1s/^/\n/' global.d.ts
+
+      - name: Commit and Push Changes
+        env:
+          GH_TOKEN: ${{ secrets.Deployment }}
+        run: |
+          git add trigger-file.txt
+          git commit -m "Trigger deploy by adding a space"
+          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git main
