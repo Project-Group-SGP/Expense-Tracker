@@ -17,8 +17,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name "Deploy Bot"
-          git config --global user.email "deploy-bot@example.com"
+          git config --global user.name "Project-Group-SGP"
+          git config --global user.email "etracker690@gmail.com"
 
       - name: Prepend newline to global.d.ts
         run: |
