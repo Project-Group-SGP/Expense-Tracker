@@ -1,5 +1,15 @@
 "use client"
 
+import type React from "react"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
+import { CalendarIcon, Check, ChevronDown, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
+
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -31,34 +41,29 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { suggestCategory } from "@/lib/categoryKeywords"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CategoryTypes } from "@prisma/client"
-import { format } from "date-fns"
-import { CalendarIcon, Check, ChevronDown } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
-import { AddnewExpense } from "../action"
 
-// Categories should align with CategoryTypes enum
-const defaultCategories = [
-  "Other",
-  "Bills",
-  "Food",
-  "Entertainment",
-  "Transportation",
-  "EMI",
-  "Healthcare",
-  "Education",
-  "Investment",
-  "Shopping",
-  "Fuel",
-  "Groceries",
-]
+import { categories, suggestCategory } from "@/lib/categoryKeywords"
+import { cn } from "@/lib/utils"
+import { CategoryTypes } from "@prisma/client"
+import { AddnewExpense } from "../action"
+import { AnalayzeBill } from "../../dashboard/actions"
+
+// form validation schema
+const formSchema = z.object({
+  description: z.string().optional(),
+  amount: z
+    .string()
+    .refine(
+      (val) => !isNaN(Number.parseFloat(val)) && Number.parseFloat(val) > 0,
+      {
+        message: "Amount must be a valid number greater than 0",
+      }
+    ),
+  transactionDate: z.date(),
+  category: z.nativeEnum(CategoryTypes),
+})
+
+export type ExpenseFormData = z.infer<typeof formSchema>
 
 const categoryEmojis = {
   [CategoryTypes.Other]: "🔖",
@@ -75,33 +80,87 @@ const categoryEmojis = {
   [CategoryTypes.Groceries]: "🛍️",
 }
 
-const CategoryTypesSchema = z.nativeEnum(CategoryTypes)
-
-const formSchema = z.object({
-  description: z.string().optional(),
-  amount: z
-    .string()
-    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-      message: "Amount must be a valid number greater than 0",
-    }),
-  transactionDate: z.date(),
-  category: CategoryTypesSchema,
-})
-
-export type ExpenseFormData = z.infer<typeof formSchema>
-
-interface NewExpenseProps {
-  onAdd: (data: ExpenseFormData) => void
-}
-
 export function NewExpense() {
-  const [open, setOpen] = useState<boolean>(false)
-  const [isPending, setisPending] = useState<boolean>(false)
+  const [open, setOpen] = useState(false)
+  const [isPending, setIsPending] = useState<boolean>(false)
   const [suggestedCategory, setSuggestedCategory] = useState<CategoryTypes>(
     CategoryTypes.Other
   )
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const router = useRouter()
+  const handleBillUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsAnalyzing(true)
+    try {
+      // Convert the file to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = (error) => reject(error)
+      })
+
+      // Call the analyze bill function
+      const result = await AnalayzeBill(base64)
+
+      if (result.error) {
+        toast.error("Failed to analyze bill")
+        return
+      }
+
+      if (result.isBill) {
+        // Fill the form with the extracted data
+        form.setValue("amount", result.data.totalAmount.toString(), {
+          shouldValidate: true,
+        })
+
+        if (result.data.description) {
+          form.setValue("description", result.data.description, {
+            shouldValidate: true,
+          })
+        }
+
+        if (result.data.date && result.data.date !== "date_not_found") {
+          form.setValue("transactionDate", new Date(result.data.date), {
+            shouldValidate: true,
+          })
+        }
+
+        if (result.data.category) {
+          form.setValue("category", result.data.category as CategoryTypes, {
+            shouldValidate: true,
+          })
+          setSuggestedCategory(result.data.category as CategoryTypes)
+        }
+
+        toast.success("Bill analyzed successfully", {
+          closeButton: true,
+          icon: "📄",
+          duration: 3000,
+        })
+      } else {
+        toast.error("This doesn't appear to be a bill or receipt")
+      }
+    } catch (error) {
+      console.error("Error analyzing bill:", error)
+      toast.error("Failed to analyze bill")
+    } finally {
+      setIsAnalyzing(false)
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
 
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(formSchema),
@@ -109,38 +168,10 @@ export function NewExpense() {
       description: "",
       amount: "",
       transactionDate: new Date(),
+      category: CategoryTypes.Other,
     },
   })
 
-  const onAdd = async (data: ExpenseFormData) => {
-    try {
-      const response = await AddnewExpense(data)
-      if (response === "success") {
-        toast.success("Expense added successfully", {
-          closeButton: true,
-          icon: "😤",
-          duration: 4500,
-        })
-
-        setOpen(false)
-        router.refresh()
-        form.reset()
-      } else {
-        throw new Error("Expense not added")
-      }
-    } catch (error) {
-      console.error("Error adding expense:", error)
-      toast.error("Failed to add expense")
-    }
-  }
-
-  const handleSubmit = async (data: ExpenseFormData) => {
-    setisPending(true)
-    await onAdd(data)
-    setisPending(false)
-  }
-
-  // Watch for description input changes to suggest categories
   const description = form.watch("description")
 
   useEffect(() => {
@@ -156,11 +187,40 @@ export function NewExpense() {
     }
   }, [description, form])
 
+  const handleSubmit = async (data: ExpenseFormData) => {
+    // console.log("Submitting data:", data)
+    setIsPending(true)
+    try {
+      const result = await AddnewExpense(data)
+      if (result === "success") {
+        toast.success("Expense added successfully", {
+          closeButton: true,
+          icon: "😤",
+          duration: 4500,
+        })
+        setOpen(false)
+        form.reset({
+          description: "",
+          amount: "",
+          transactionDate: new Date(),
+          category: "Other",
+        })
+        setSuggestedCategory("Other")
+      } else {
+        throw new Error("Expense not added")
+      }
+    } catch (error) {
+      console.error("Error adding Expense:", error)
+      toast.error("Failed to add Expense")
+    }
+    setIsPending(false)
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-[150px]"
+          className="h-10 w-full border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 sm:h-9 sm:w-[150px]"
           variant="outline"
           onClick={() => setOpen(true)}
         >
@@ -168,7 +228,7 @@ export function NewExpense() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="w-[95vw] max-w-[425px] p-4 sm:p-6">
+      <DialogContent className="w-[95vw] max-w-[425px] p-5 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-center sm:text-left">
             Create a new <span className="text-red-500">expense</span>{" "}
@@ -179,9 +239,8 @@ export function NewExpense() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="mt-4 space-y-4"
+            className="mt-4 space-y-6"
           >
-            
             <FormField
               control={form.control}
               name="amount"
@@ -200,7 +259,7 @@ export function NewExpense() {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="description"
@@ -226,29 +285,36 @@ export function NewExpense() {
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between"
+                          className="h-10 w-full justify-between"
                         >
                           {categoryEmojis[field.value]}{" "}
-                          {field.value || "Select a category"}
+                          {field.value ||
+                            suggestedCategory ||
+                            "Select a category"}
                           <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-full">
                         <ScrollArea className="h-52 w-full">
-                          {defaultCategories.map((category) => (
+                          {categories.map((category) => (
                             <DropdownMenuItem
-                              key={category}
-                              onSelect={() => field.onChange(category)}
+                              key={category.name}
+                              onSelect={() => {
+                                field.onChange(category.name)
+                                setSuggestedCategory(category.name)
+                              }}
                             >
                               <Check
-                                className={`mr-2 h-4 w-4 ${
-                                  category === field.value
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  category.name === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
-                                }`}
+                                )}
                               />
-                              {categoryEmojis[category]} {category}
-                              {category === suggestedCategory && " (Suggested)"}
+                              {categoryEmojis[category.name]} {category.name}
+                              {category.name === suggestedCategory &&
+                                " (Suggested)"}
                             </DropdownMenuItem>
                           ))}
                         </ScrollArea>
@@ -272,7 +338,7 @@ export function NewExpense() {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal sm:w-[240px]",
+                            "h-10 w-full pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -285,11 +351,14 @@ export function NewExpense() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent align="start" className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
                         initialFocus
                       />
                     </PopoverContent>
@@ -299,14 +368,35 @@ export function NewExpense() {
               )}
             />
 
-            <DialogFooter>
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              //Accept images only not svg pr gif only main image formats
+              accept="image/jpeg, image/png, image/jpg, image/gif, image/webp"
+              className="hidden"
+              onChange={handleBillUpload}
+              disabled={isAnalyzing}
+            />
+
+            <DialogFooter className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 w-full border border-gray-200 text-sm font-medium hover:bg-gray-50 sm:h-10 sm:flex-1"
+                disabled={isAnalyzing}
+                onClick={triggerFileUpload}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {isAnalyzing ? "Analyzing..." : "Upload Bill"}
+              </Button>
               <Button
                 type="submit"
                 variant="outline"
-                className="w-full border-red-500 text-red-500 hover:bg-red-700 hover:text-white sm:w-auto"
+                className="h-10 w-full border-red-400 text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 sm:flex-1"
                 disabled={isPending}
               >
-                {isPending ? "Creating expense..." : "Add expense"}
+                {isPending ? "Adding..." : "Add new Expense"}
               </Button>
             </DialogFooter>
           </form>
