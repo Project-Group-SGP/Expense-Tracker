@@ -6,7 +6,6 @@ import { useState, useEffect } from "react"
 import { format, parseISO } from "date-fns"
 import { DatePickerWithRange } from "./DatePickerWithRange"
 import { useCurrentUserClient } from "@/hooks/use-current-user"
-import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 const DateSelect = () => {
   const router = useRouter()
