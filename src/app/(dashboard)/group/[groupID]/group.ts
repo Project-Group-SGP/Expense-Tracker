@@ -2,10 +2,19 @@
 
 import { currentUserServer } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { CategoryTypes } from "@prisma/client"
-import { Decimal } from "@prisma/client/runtime/library"
+import { logo } from "@/lib/logo"
+import { CategoryTypes, Prisma } from "@prisma/client"
+import { createCanvas } from "canvas"
+import { Chart, registerables } from "chart.js";
+import { endOfMonth, format, startOfMonth, subMonths } from "date-fns"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 import { revalidatePath } from "next/cache"
 import webpush from "web-push"
+import * as XLSX from "xlsx"
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
+Chart.register(...registerables, ChartDataLabels);
 
 export async function removeUserFromGroup(
   groupId: string,
@@ -1065,4 +1074,845 @@ export async function deleteGroupTransaction(groupId: string, expenseId: string)
       error: error instanceof Error ? error.message : 'An unexpected error occurred'
     };
   }
+}
+
+interface ChartData {
+  labels: string[];
+  values: number[];
+}
+
+export async function generateGroupReport(
+  groupId: string,
+  reportType: string,
+  startDate?: Date,
+  endDate?: Date,
+  reportFormat: string = "pdf",
+  includeCharts: boolean = true,
+  isDetailed: boolean = false,
+  selectedCategories: CategoryTypes[] = [],
+  includeMemberDetails: boolean = false
+): Promise<{
+  buffer: string;
+  mimeType: string;
+  fileExtension: string;
+  name?: string;
+}> {
+  const user = await currentUserServer();
+  if (!user) {
+    throw new Error("Please login");
+  }
+
+  // Verify user is a member of the group
+  const groupMember = await db.groupMember.findFirst({
+    where: {
+      userId: user.id,
+      groupId,
+    },
+    include: {
+      group: true,
+    },
+  });
+
+  if (!groupMember) {
+    throw new Error("You are not a member of this group");
+  }
+
+  let start: Date, end: Date;
+  switch (reportType) {
+    case "last_month":
+      start = startOfMonth(subMonths(new Date(), 1));
+      end = endOfMonth(subMonths(new Date(), 1));
+      break;
+    case "last_3_months":
+      start = startOfMonth(subMonths(new Date(), 3));
+      end = endOfMonth(new Date());
+      break;
+    case "last_6_months":
+      start = startOfMonth(subMonths(new Date(), 6));
+      end = endOfMonth(new Date());
+      break;
+    case "custom":
+      if (!startDate || !endDate) {
+        throw new Error("Custom date range requires start and end dates");
+      }
+      start = startDate;
+      end = endDate;
+      break;
+    default:
+      throw new Error("Invalid report type");
+  }
+
+  // Fetch group expenses
+  const expenseQuery: Prisma.GroupExpenseFindManyArgs = {
+    where: {
+      groupId,
+      date: {
+        gte: start,
+        lte: end,
+      },
+      ...(selectedCategories.length > 0 && {
+        category: { in: selectedCategories },
+      }),
+    },
+    include: {
+      splits: {
+        include: {
+          user: true,
+          payments: true,
+        },
+      },
+      paidBy: true,
+    },
+    orderBy: {
+      date: "asc",
+    },
+  };
+
+  const expensesByCategory = await db.groupExpense.groupBy({
+    by: ["category"],
+    where: {
+      groupId,
+      date: {
+        gte: start,
+        lte: end,
+      },
+      ...(selectedCategories.length > 0 && {
+        category: { in: selectedCategories },
+      }),
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  const groupExpenses = await db.groupExpense.findMany(expenseQuery);
+
+  const pieChartData: ChartData = {
+    labels: Object.values(CategoryTypes).filter(
+      (cat) =>
+        selectedCategories.length === 0 || selectedCategories.includes(cat)
+    ),
+    values: Object.values(CategoryTypes)
+      .filter(
+        (cat) =>
+          selectedCategories.length === 0 || selectedCategories.includes(cat)
+      )
+      .map((cat) =>
+        Number(
+          expensesByCategory.find((exp) => exp.category === cat)?._sum.amount ||
+            0
+        )
+      ),
+  };
+
+  let reportBuffer: Buffer;
+  let mimeType: string;
+  let fileExtension: string;
+
+  if (reportFormat === "pdf") {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Enhanced header with logo function
+    const addHeaderWithLogo = (pageNumber: number) => {
+      const headerHeight = 40;
+      const margin = 10;
+
+      doc
+        .setFillColor(230, 250, 230)
+        .setDrawColor(76, 175, 80)
+        .setLineWidth(1)
+        .rect(0, 0, pageWidth, headerHeight, "FD");
+
+      const logoWidth = 20;
+      const logoHeight = 20;
+      doc.addImage(
+        logo,
+        "PNG",
+        margin,
+        (headerHeight - logoHeight) / 2,
+        logoWidth,
+        logoHeight
+      );
+
+      doc.setFontSize(24);
+      doc.setTextColor(46, 125, 50);
+      doc.setFont("helvetica", "bold");
+      doc.text("spend", margin + 23, headerHeight / 2 + 2);
+      doc.setTextColor(76, 175, 80);
+      doc.text(
+        "Wise",
+        margin + doc.getTextWidth("spend") + 23,
+        headerHeight / 2 + 2
+      );
+
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Group: ${groupMember.group.name}`, pageWidth - margin, 15, {
+        align: "right",
+      });
+      const periodText = `Period: ${format(start, "dd MMM yyyy")} - ${format(
+        end,
+        "dd MMM yyyy"
+      )}`;
+      doc.text(periodText, pageWidth - margin, 25, { align: "right" });
+      doc.setFontSize(8);
+      doc.text(`Page ${pageNumber}`, pageWidth - margin, headerHeight - 5, {
+        align: "right",
+      });
+    };
+
+    addHeaderWithLogo(1);
+
+    doc.setFontSize(20);
+    doc.setTextColor("#2E7D32");
+    doc.setFont("helvetica", "bold");
+    doc.text("Group Expense Report", 14, 55);
+
+    // Add report metadata section
+    doc.setFontSize(10);
+    doc.setTextColor("#555555");
+    doc.setFont("helvetica", "normal");
+    doc.text(`Report Generated: ${new Date().toLocaleString()}`, 14, 65);
+    doc.text(
+      `Report Type: ${reportType.replace(/_/g, " ").toUpperCase()}`,
+      14,
+      72
+    );
+    doc.text(`Generated By: ${user.name}`, 14, 79);
+
+    // Add group summary information
+    const memberCount = await db.groupMember.count({ where: { groupId } });
+    doc.setFontSize(12);
+    doc.setTextColor("#1976D2");
+    doc.setFont("helvetica", "bold");
+    doc.text("Group Summary", 14, 90);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor("#555555");
+
+    if (groupExpenses.length === 0) {
+      doc.setFontSize(14);
+      doc.setTextColor("#F44336");
+      doc.text("No group expenses recorded for the selected period.", 14, 110);
+    } else {
+      const totalExpenses = groupExpenses.reduce(
+        (sum, e) => sum + Number(e.amount),
+        0
+      );
+
+      // Add expense summary metrics
+      const expenseCount = groupExpenses.length;
+      const avgExpense = totalExpenses / expenseCount;
+      const maxExpense = Math.max(
+        ...groupExpenses.map((e) => Number(e.amount))
+      );
+      const minExpense = Math.min(
+        ...groupExpenses.map((e) => Number(e.amount))
+      );
+
+      // Group by month for trend analysis
+      const monthlyExpenses = groupExpenses.reduce((acc, expense) => {
+        const month = format(expense.date, "MMM yyyy");
+        if (!acc[month]) acc[month] = 0;
+        acc[month] += Number(expense.amount);
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Get top spenders
+      const memberExpenses = await db.groupExpense.groupBy({
+        by: ["paidById"],
+        where: {
+          groupId,
+          date: {
+            gte: start,
+            lte: end,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+      });
+
+      const topSpenderIds = memberExpenses
+        //@ts-ignore
+        .sort((a, b) => (b._sum.amount as number) - (a._sum.amount as number))
+        .slice(0, 3)
+        .map((m) => m.paidById);
+
+      const topSpenders = await db.user.findMany({
+        where: {
+          id: {
+            in: topSpenderIds,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      const spenderMap = topSpenders.reduce((acc, user) => {
+        acc[user.id] = user.name;
+        return acc;
+      }, {} as Record<string, string>);
+
+      doc.text(`Total Expenses: ${expenseCount}`, 14, 100);
+      doc.text(`Average Expense: ${avgExpense.toFixed(2)}`, 14, 107);
+      doc.text(`Largest Expense: ${maxExpense.toFixed(2)}`, 14, 114);
+      doc.text(`Smallest Expense: ${minExpense.toFixed(2)}`, 14, 121);
+
+      // Add top spenders section
+      doc.setFontSize(12);
+      doc.setTextColor("#1976D2");
+      doc.setFont("helvetica", "bold");
+      doc.text("Top Contributors", pageWidth / 2 + 10, 90);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor("#555555");
+
+      let yPos = 100;
+      memberExpenses
+        //@ts-ignore
+        .sort((a, b) => (b._sum.amount as number) - (a._sum.amount as number))
+        .slice(0, 3)
+        .forEach((member, idx) => {
+          const name = spenderMap[member.paidById] || "Unknown User";
+          const amount = Number(member._sum.amount).toFixed(2);
+          const percentage = (
+            (Number(member._sum.amount) * 100) /
+            totalExpenses
+          ).toFixed(1);
+          doc.text(
+            `${idx + 1}. ${name}: ${amount} (${percentage}%)`,
+            pageWidth / 2 + 10,
+            yPos
+          );
+          yPos += 7;
+        });
+
+      let chartYPos = 0;
+
+      if (includeCharts) {
+        // Calculate chart position based on previous content
+        chartYPos = Math.max(yPos, 130) + 10;
+
+        // Expense pie chart
+        const pieChartBase64 = await generatePieChart(pieChartData);
+        doc.addImage(
+          `data:image/png;base64,${pieChartBase64}`,
+          "PNG",
+          50,
+          chartYPos,
+          110,
+          100
+        );
+
+        doc.setFontSize(16);
+        doc.setTextColor("#2E7D32");
+        doc.setFont("helvetica", "bold");
+        doc.text("Expense Distribution", 14, chartYPos + 108);
+
+        // Add expense distribution labels
+        let leftCol = 20;
+        let rightCol = pageWidth / 2 + 10;
+        let labelYPos = chartYPos + 118;
+        expensesByCategory.forEach((category, index) => {
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(60, 60, 60);
+          const text = `${category.category || "Uncategorized"}: -${Number(
+            category._sum.amount || 0
+          ).toFixed(2)}`;
+          const rectWidth = 3;
+          const rectHeight = 3;
+          const rectX = index % 2 === 0 ? leftCol - 5 : rightCol - 5;
+          const rectY = labelYPos - 3;
+          const colors: { [key: string]: string } = {
+            Other: "#4CAF50",
+            Bills: "#2196F3",
+            Food: "#FFC107",
+            Entertainment: "#F44336",
+            Transportation: "#9C27B0",
+            EMI: "#00BCD4",
+            Healthcare: "#FF9800",
+            Education: "#795548",
+            Investment: "#607D8B",
+            Shopping: "#E91E63",
+            Fuel: "#9E9E9E",
+            Groceries: "#FF5722",
+          };
+          doc.setFillColor(colors[category.category || "Other"]);
+          doc.rect(rectX, rectY, rectWidth, rectHeight, "F");
+
+          // Add percentage information
+          const percentage =
+            ((category._sum.amount as any) * 100) / totalExpenses;
+          doc.text(
+            `${text} (${percentage.toFixed(2)}%)`,
+            index % 2 === 0 ? leftCol : rightCol,
+            labelYPos
+          );
+
+          if (index % 2 !== 0) labelYPos += 8;
+        });
+
+        // Add monthly trend data if we have multiple months
+        if (Object.keys(monthlyExpenses).length > 1) {
+          // Add a new page for the trend chart if needed
+          if (labelYPos > pageHeight - 100) {
+            doc.addPage();
+            //@ts-ignore
+            addHeaderWithLogo(doc.internal.getNumberOfPages());
+            labelYPos = 70;
+          } else {
+            labelYPos += 30;
+          }
+
+          // Create monthly trend bar chart data
+          const trendChartData = {
+            labels: Object.keys(monthlyExpenses),
+            values: Object.values(monthlyExpenses),
+          };
+
+          // Generate trend chart
+          //@ts-ignore
+          const trendChartBase64 = await generateBarChart(trendChartData);
+          doc.addImage(
+            `data:image/png;base64,${trendChartBase64}`,
+            "PNG",
+            30,
+            labelYPos,
+            150,
+            80
+          );
+
+          doc.setFontSize(16);
+          doc.setTextColor("#2E7D32");
+          doc.setFont("helvetica", "bold");
+          doc.text("Monthly Expense Trend", 14, labelYPos - 10);
+        }
+
+        yPos = Math.max(labelYPos + 90, 250);
+      } else {
+        yPos = Math.max(yPos + 20, 130);
+      }
+
+      // Add settlement summary
+      const settlementSummary = await getSettlementSummary(groupId, start, end);
+
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor("#F44336");
+      doc.text(`Total Group Expenses:`, 14, yPos);
+      doc.text(`-${totalExpenses.toFixed(2)}`, pageWidth - 14, yPos, {
+        align: "right",
+      });
+
+      // Add settlement page if needed
+      if (settlementSummary.length > 0) {
+        doc.addPage();
+        //@ts-ignore
+        addHeaderWithLogo(doc.internal.getNumberOfPages());
+
+        doc.setFontSize(16);
+        doc.setTextColor("#2E7D32");
+        doc.setFont("helvetica", "bold");
+        doc.text("Settlement Summary", 14, 60);
+
+        doc.setFontSize(12);
+        doc.text("Recommended Settlements", 14, 75);
+
+        // Create a settlement table
+        autoTable(doc, {
+          head: [["From", "To", "Amount"]],
+          body: settlementSummary.map((s) => [
+            s.fromUser,
+            s.toUser,
+            s.amount.toFixed(2),
+          ]),
+          startY: 80,
+          margin: { top: 50 },
+          styles: {
+            fontSize: 10,
+            cellPadding: 5,
+            fillColor: [240, 248, 240],
+          },
+          headStyles: {
+            fillColor: [46, 125, 50],
+            textColor: 255,
+            fontStyle: "bold",
+          },
+          alternateRowStyles: {
+            fillColor: [248, 255, 248],
+          },
+        });
+      }
+
+      // Add detailed expenses if requested
+      if (isDetailed) {
+        doc.addPage();
+        //@ts-ignore
+        addHeaderWithLogo(doc.internal.getNumberOfPages());
+        doc.setFontSize(16);
+        doc.setTextColor("#2E7D32");
+        doc.text("Group Expenses", 14, 60);
+
+        autoTable(doc, {
+          head: [
+            ["Date", "Category", "Amount", "Paid By", "Description", "Status"],
+          ],
+          body: groupExpenses.map((e) => [
+            format(e.date, "dd-MM-yyyy"),
+            e.category || "Uncategorized",
+            `-${Number(e.amount).toFixed(2)}`,
+            //@ts-ignore
+            e.paidBy.name,
+            e.description || "",
+            e.status,
+          ]),
+          startY: 70,
+          margin: { top: 50 },
+          styles: {
+            fontSize: 10,
+            cellPadding: 5,
+            fillColor: [240, 248, 240],
+            textColor: [50, 50, 50],
+          },
+          headStyles: {
+            fillColor: [46, 125, 50],
+            textColor: 255,
+            fontStyle: "bold",
+          },
+          alternateRowStyles: {
+            fillColor: [248, 255, 248],
+          },
+          didDrawPage: (data) => {
+            //@ts-ignore
+            addHeaderWithLogo(doc.internal.getNumberOfPages());
+          },
+        });
+
+        if (includeMemberDetails) {
+          doc.addPage();
+          //@ts-ignore
+          addHeaderWithLogo(doc.internal.getNumberOfPages());
+          doc.setFontSize(16);
+          doc.setTextColor("#1976D2");
+          doc.text("Member Split Details", 14, 60);
+
+          const splitData = groupExpenses.flatMap((expense) =>
+            //@ts-ignore
+            expense.splits.map((split) => ({
+              date: format(expense.date, "dd-MM-yyyy"),
+              description: expense.description || "",
+              user: split.user.name,
+              amount: Number(split.amount).toFixed(2),
+              status: split.isPaid,
+              paidAmount: split.payments
+                //@ts-ignore
+                .reduce((sum, p) => sum + Number(p.amount), 0)
+                .toFixed(2),
+            }))
+          );
+
+          autoTable(doc, {
+            head: [
+              [
+                "Date",
+                "Description",
+                "Member",
+                "Owed Amount",
+                "Status",
+                "Paid Amount",
+              ],
+            ],
+            body: splitData.map((s) => [
+              s.date,
+              s.description,
+              s.user,
+              `-${s.amount}`,
+              s.status,
+              s.paidAmount,
+            ]),
+            startY: 70,
+            margin: { top: 50 },
+            styles: {
+              fontSize: 10,
+              cellPadding: 5,
+              fillColor: [240, 248, 255],
+            },
+            headStyles: {
+              fillColor: [25, 118, 210],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+            alternateRowStyles: {
+              fillColor: [248, 255, 248],
+            },
+            didDrawPage: (data) => {
+              //@ts-ignore
+              addHeaderWithLogo(doc.internal.getNumberOfPages());
+            },
+          });
+        }
+      }
+    }
+
+    reportBuffer = Buffer.from(doc.output("arraybuffer"));
+    mimeType = "application/pdf";
+    fileExtension = "pdf";
+  } else if (reportFormat === "csv" || reportFormat === "excel") {
+    const worksheetData = [
+      ["Group Expense Report"],
+      [`Group: ${groupMember.group.name}`],
+      [
+        `Period: ${format(start, "dd MMM yyyy")} - ${format(
+          end,
+          "dd MMM yyyy"
+        )}`,
+      ],
+      [],
+      ["Expenses"],
+      ["Date", "Category", "Amount", "Paid By", "Description", "Status"],
+      ...groupExpenses.map((e) => [
+        format(e.date, "dd-MM-yyyy"),
+        e.category || "Uncategorized",
+        -Number(e.amount),
+        // @ts-ignore
+        e.paidBy.name,
+        e.description || "",
+        e.status,
+      ]),
+      [],
+      [
+        "Total Expenses",
+        "",
+        groupExpenses.reduce((sum, e) => sum + Number(e.amount), 0),
+      ],
+    ];
+
+    if (includeMemberDetails) {
+      worksheetData.push(
+        [],
+        ["Member Splits"],
+        [
+          "Date",
+          "Description",
+          "Member",
+          "Owed Amount",
+          "Status",
+          "Paid Amount",
+        ],
+        ...groupExpenses.flatMap((e) =>
+          // @ts-ignore
+          e.splits.map((s) => [
+            format(e.date, "dd-MM-yyyy"),
+            e.description || "",
+            s.user.name,
+            -Number(s.amount),
+            s.isPaid,
+            // @ts-ignore
+            s.payments.reduce((sum, p) => sum + Number(p.amount), 0),
+          ])
+        )
+      );
+    }
+
+    if (groupExpenses.length === 0) {
+      worksheetData.push([], ["No group expenses for the selected period."]);
+    }
+
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Group Report");
+
+    if (reportFormat === "csv") {
+      reportBuffer = Buffer.from(
+        XLSX.write(workbook, { type: "buffer", bookType: "csv" })
+      );
+      mimeType = "text/csv";
+      fileExtension = "csv";
+    } else {
+      reportBuffer = Buffer.from(
+        XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })
+      );
+      mimeType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      fileExtension = "xlsx";
+    }
+  } else {
+    throw new Error("Invalid report format");
+  }
+
+  return {
+    buffer: reportBuffer.toString("base64"),
+    mimeType,
+    fileExtension,
+    name: groupMember.group.name,
+  };
+}
+
+async function generatePieChart(data: ChartData): Promise<string> {
+  const width = 400;
+  const height = 300;
+
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Failed to get 2D context from canvas");
+  }
+
+  const configuration = {
+    type: "pie",
+    data: {
+      datasets: [
+        {
+          data: data.values,
+          backgroundColor: [
+            "#4CAF50",
+            "#2196F3",
+            "#FFC107",
+            "#F44336",
+            "#9C27B0",
+            "#00BCD4",
+            "#FF9800",
+            "#795548",
+            "#607D8B",
+            "#E91E63",
+            "#9E9E9E",
+            "#FF5722",
+          ],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        datalabels: { display: false },
+      },
+    },
+  };
+
+  //@ts-ignore
+  const chart = new Chart(ctx, configuration);
+  const imageBuffer = canvas.toBuffer("image/png");
+  return imageBuffer.toString("base64");
+}
+
+async function getSettlementSummary(groupId: string, start: Date, end: Date) {
+  // Get all members and their net balances
+  const memberSplits = await db.expenseSplit.findMany({
+    where: {
+      expense: {
+        groupId,
+        date: {
+          gte: start,
+          lte: end,
+        },
+      },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      expense: {
+        select: {
+          paidById: true,
+          amount: true,
+        },
+      },
+      payments: true,
+    },
+  });
+
+  // Calculate net balances for each member
+  const balances: Record<
+    string,
+    { userId: string; name: string; balance: number }
+  > = {};
+
+  memberSplits.forEach((split) => {
+    const userId = split.userId;
+    const userName = split.user.name;
+    const paidById = split.expense.paidById;
+    const totalAmount = Number(split.amount);
+    const paidAmount = split.payments.reduce(
+      (sum, p) => sum + Number(p.amount),
+      0
+    );
+    const owedAmount = totalAmount - paidAmount;
+
+    // Initialize member if not exists
+    if (!balances[userId]) {
+      balances[userId] = { userId, name: userName, balance: 0 };
+    }
+
+    // Add to member's balance (negative means they owe)
+    balances[userId].balance -= owedAmount;
+
+    // Add to payer's balance (positive means they are owed)
+    if (!balances[paidById]) {
+      const payer = memberSplits.find((s) => s.user.id === paidById);
+      balances[paidById] = {
+        userId: paidById,
+        name: payer?.user.name || "Unknown",
+        balance: 0,
+      };
+    }
+    balances[paidById].balance += owedAmount;
+  });
+
+  // Create settlement plan
+  const members = Object.values(balances);
+  const settlements: { fromUser: string; toUser: string; amount: number }[] = [];
+
+  // Debtors (negative balance)
+  const debtors = members
+    .filter((m) => m.balance < 0)
+    .sort((a, b) => a.balance - b.balance);
+
+  // Creditors (positive balance)
+  const creditors = members
+    .filter((m) => m.balance > 0)
+    .sort((a, b) => b.balance - a.balance);
+
+  // Create optimal settlement plan
+  let i = 0,
+    j = 0;
+  while (i < debtors.length && j < creditors.length) {
+    const debtor = debtors[i];
+    const creditor = creditors[j];
+
+    // Calculate transfer amount (minimum of what's owed and what's due)
+    const amount = Math.min(Math.abs(debtor.balance), creditor.balance);
+
+    if (amount > 0.01) {
+      // Only add meaningful transfers
+      settlements.push({
+        fromUser: debtor.name,
+        toUser: creditor.name,
+        amount,
+      });
+    }
+
+    // Update balances
+    debtor.balance += amount;
+    creditor.balance -= amount;
+
+    // Move to next member if balance is (close to) zero
+    if (Math.abs(debtor.balance) < 0.01) i++;
+    if (Math.abs(creditor.balance) < 0.01) j++;
+  }
+
+  return settlements;
 }

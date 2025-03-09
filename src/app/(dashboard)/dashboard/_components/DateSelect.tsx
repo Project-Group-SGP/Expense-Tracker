@@ -5,15 +5,15 @@ import { DateRange } from "react-day-picker"
 import { useState, useEffect } from "react"
 import { format, parseISO } from "date-fns"
 import { DatePickerWithRange } from "./DatePickerWithRange"
-import { currentUserServer } from "@/lib/auth"
+import { useCurrentUserClient } from "@/hooks/use-current-user"
 
 const DateSelect = () => {
   const router = useRouter()
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
+  const user = useCurrentUserClient();
   useEffect(() => {
     const fetchJoininDate = async () => {
       try {
-        const user = await currentUserServer()
         const data = user?.joininDate
 
         if (data) {

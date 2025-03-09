@@ -1,57 +1,42 @@
-import { cn } from '@/lib/utils';
-import  LeaveButton  from './LeaveButton';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
-
-// type Props = {
-//     title : string;
-//     clasName?: string;
-//     leave: {
-//       status: 'settled up' | 'gets back' | 'owes';
-//       amount: number;
-//       userId: string;
-//       groupId: string;
-//     }
-// }
-
-// function PageTitle({title,clasName,leave}: Props) {
-//   return (
-//     <div className='flex justify-between'>
-//       <h1 className={cn("text-2xl font-semibold",clasName)}>
-//           {title}
-//       </h1>
-//       <LeaveButton amount={leave.amount} status={leave.status} userId={leave.userId} groupId={leave.groupId}/>
-//     </div>
-//   )
-// }
-
-// export default PageTitle
+import { cn } from "@/lib/utils"
+import { useParams } from "next/navigation"
+import LeaveButton from "./LeaveButton"
+import { GroupReportDialog } from "./ReportDialog"
 
 interface PageTitleProps {
   title: string
   className?: string
   leave: {
-    status: 'settled up' | 'gets back' | 'owes'
+    status: "settled up" | "gets back" | "owes"
     amount: number
     userId: string
     groupId: string
   }
-  createrId:string
+  createrId: string
 }
 
-export default function PageTitle({ title, className, leave, createrId }: PageTitleProps) {
+export default function PageTitle({
+  title,
+  className,
+  leave,
+  createrId,
+}: PageTitleProps) {
+  const params = useParams()
+  const groupID = params.groupID as string
+
   return (
-    
-<div className="flex justify-between space-y-4 flex-row items-center">
-      <h1 className={cn("text-3xl font-bold", className)}>
-        {title}
-      </h1>
-      <LeaveButton
-        status={leave.status}
-        amount={leave.amount}
-        userId={leave.userId}
-        groupId={leave.groupId}
-        createrId={createrId}
-      />
+    <div className="flex flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
+      <h1 className={cn("text-3xl font-bold", className)}>{title}</h1>
+      <div className="mt-4 flex gap-2 sm:mt-0">
+        <GroupReportDialog groupId={groupID} />
+        <LeaveButton
+          status={leave.status}
+          amount={leave.amount}
+          userId={leave.userId}
+          createrId={createrId}
+          groupId={leave.groupId}
+        />
+      </div>
     </div>
   )
 }
