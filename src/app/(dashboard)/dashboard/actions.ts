@@ -463,3 +463,81 @@ Return ONLY the JSON object, nothing else.
     }
   }
 }
+
+export async function processPrompt(prompt: string) {
+  const user = await currentUserServer()
+  if (!user || !user.id) {
+    throw new Error("User not authenticated")
+  }
+  try {
+    if (!prompt || typeof prompt !== "string") {
+      throw new Error(
+        "Invalid request: prompt is required and must be a string"
+      )
+    }
+
+    // Initialize the Google Generative AI model
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GEMINI_MAIL_API_KEY as string,
+    })
+
+    const model = google("gemini-1.5-flash-002", {
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_LOW_AND_ABOVE",
+        },
+      ],
+    })
+
+    // Create a streamable value to return to the client
+    const stream = createStreamableValue()
+
+    // Use a system prompt that instructs the AI to determine if the query is financial
+    const systemPrompt = `
+      You are a specialized financial advisor assistant. 
+      
+      First, determine if the user's query is related to finance, money, budgeting, investing, 
+      or other financial topics.
+      
+      If the query IS financial in nature:
+      - Provide helpful, accurate, and concise financial advice
+      - Be informative and educational
+      
+      If the query is NOT financial in nature:
+      - Politely explain that you're specialized in financial topics
+      - Suggest that they rephrase their question to be finance-related
+      - Do not answer non-financial questions
+      
+      Always maintain a professional and helpful tone.
+    `
+
+    ;(async () => {
+      try {
+        const { textStream } = await streamText({
+          model: model,
+          system: systemPrompt,
+          prompt: prompt,
+        })
+
+        for await (const text of textStream) {
+          stream.update(text)
+        }
+
+        stream.done()
+      } catch (error) {
+        console.error("Error generating response:", error)
+        stream.error(
+          error instanceof Error
+            ? error
+            : new Error("Failed to generate response")
+        )
+      }
+    })()
+
+    return stream.value
+  } catch (error) {
+    console.error("Error processing prompt:", error)
+    throw error
+  }
+}
