@@ -257,7 +257,7 @@ export async function generateFinancialAdvice(
       apiKey: process.env.GEMINI_MAIL_API_KEY,
     })
 
-    const model = google("gemini-1.5-flash-002", {
+    const model = google("gemini-2.5-flash", {
       safetySettings: [
         {
           category: "HARM_CATEGORY_DANGEROUS_CONTENT",
@@ -357,7 +357,7 @@ export async function AnalayzeBill(imageBase64: string) {
 
     // Get the model
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-002",
+      model: "gemini-2.5-flash",
     })
 
     const prompt = `
@@ -481,7 +481,7 @@ export async function processPrompt(prompt: string) {
       apiKey: process.env.GEMINI_MAIL_API_KEY as string,
     })
 
-    const model = google("gemini-1.5-flash-002", {
+    const model = google("gemini-2.5-flash", {
       safetySettings: [
         {
           category: "HARM_CATEGORY_DANGEROUS_CONTENT",
